@@ -312,19 +312,6 @@ if (BUILD_APPLICATIONS)
   install( TARGETS ${TARGET_NAME} DESTINATION ${EXECUTABLE_INSTALL_DIR} )             # Installing the exectuable
 endif()
 
-# if (BUILD_APPLICATIONS)
-#   set( APPLICATION_NAME ${LIBRARY_NAME}-regressiontesting.x )                         # Set the name of the application (ie the executable) to be build
-#   set( TARGET_NAME ${APPLICATION_NAME} )                                              # Set the name of the target to be build
-#   LogMessage( "Building the ${APPLICATION_NAME} code" )                               # Write log message
-#   add_subdirectory( app/RegressionTesting )                                           # Adding the directory containing the source files
-#   get_sources( SRCS )                                                                 # Get the list of source files and reseting the global variable
-#   add_executable( ${TARGET_NAME} ${SRCS} )                                            # Create a application code from the list of source files
-#   set_target_properties( ${TARGET_NAME} PROPERTIES OUTPUT_NAME ${APPLICATION_NAME} )  # Change the name of the executable from 'spark-driver' to 'spark'
-#   target_link_libraries( ${TARGET_NAME} PUBLIC ${STATIC_LIBRARY} )                    # Linking the 'spark' executable to the 'spark-cfd' library, which will also link to the 'spark' and 'spark-ode' libraries due to the PUBLIC dependency
-#   target_link_libraries( ${TARGET_NAME} PUBLIC ${GSL_LIBRARIES} )                     # Linking the 'spark' executable to the 'spark-cfd' library, which will also link to the 'spark' and
-#   target_include_directories( ${TARGET_NAME} PUBLIC ${GSL_INCLUDE_DIR} )
-#   install( TARGETS ${TARGET_NAME} DESTINATION ${EXECUTABLE_INSTALL_DIR} )             # Installing the exectuable
-# endif()
 
 ##############################################################
 # Installing the Fortran module files and the database files #

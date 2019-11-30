@@ -87,14 +87,6 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   allocate( This%Name, source = adjustl(trim( Input%Molecules_Name(iMol) )) )  
   if (i_Debug_Loc) call Logger%Write( "This%Name = ", This%Name) 
 
-  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/' // trim(adjustl(Input%System)) // '/' // This%Name // '/' )) )
-  allocate( This%PathToMolFldr,    source = adjustl(trim( trim(adjustl(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // This%Name // '/' )) )
-  if (i_Debug_Loc) call Logger%Write( "Path to Folder for Original      Molecule, This%PathToMolDtbFldr = ", This%PathToMolDtbFldr )
-  if (i_Debug_Loc) call Logger%Write( "Path to Folder for Pre-Processed Molecule, This%PathToMolFldr    = ", This%PathToMolFldr    )
-
-  call system('mkdir -p ' // This%PathToMolFldr )
-  if (i_Debug_Loc) call Logger%Write( "Created Folder for Pre-Processed Molecule through system mkdir" )
-
 
   ! ==============================================================================================================
   !   7.1. MAPPING MOLECULES TO PAIRS AND VICEVERSA 
@@ -195,7 +187,25 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   ! ==============================================================================================================
 
 
+  ! ==============================================================================================================
+  !   7.4. CREATING LOCAL FOLDER FOR THE MOLECULE
+  ! ==============================================================================================================
+  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/Molecules/' // This%Name // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
+  allocate( This%PathToMolFldr,    source = adjustl(trim( trim(adjustl(Input%OutputDir)) // '/Molecules/' // This%Name // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
+  if (i_Debug_Loc) call Logger%Write( "Path to Folder for Original      Molecule, This%PathToMolDtbFldr = ", This%PathToMolDtbFldr )
+  if (i_Debug_Loc) call Logger%Write( "Path to Folder for Pre-Processed Molecule, This%PathToMolFldr    = ", This%PathToMolFldr    )
+
+  call system('mkdir -p ' // This%PathToMolFldr )
+  if (i_Debug_Loc) call Logger%Write( "Created Folder for Pre-Processed Molecule through system mkdir" )
+  ! ==============================================================================================================
+
+
   if (Input%TaskType > 2) then
+    
+    
+    ! ==============================================================================================================
+    !   7.4. CONSTRUCTING THE LEVEL CONTAINER
+    ! ==============================================================================================================
     if (Input%TaskType == 3) then
       call system('scp ' // This%PathToMolDtbFldr // '/' // adjustl(trim( Input%LevelsFileName(iMol) )) // ' ' // This%PathToMolFldr )
       if (i_Debug_Loc) call Logger%Write( "Levels List copied to: ", This%PathToMolFldr )
@@ -213,10 +223,6 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
     end if
     FileName  = This%PathToMolFldr // '/levels_cut.inp'
 
-
-    ! ==============================================================================================================
-    !   7.4. CONSTRUCTING THE LEVEL CONTAINER
-    ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Calling This%Levels_Container%InitializeLevelsContainer" )
     allocate(This%LevelsContainer); call This%LevelsContainer%Initialize( Input, iMol, FileName=FileName, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "-> This%Levels_Container%InitializeLevelsContainer" )

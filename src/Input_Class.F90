@@ -2702,9 +2702,9 @@ Subroutine ReadAtomMass(This, iAtom, i_Debug)
   !   --------------------------------------------------------------------------------------------------------------
   !   --------------------------------------------------------------------------------------------------------------
   if ( adjustl(trim(This%FileForAtomMass(iAtom))) == 'NONE') then
-    FileName = adjustl(trim(This%DtbPath)) // '/Mass/' // adjustl(trim(This%AtomsName(iAtom))) // '.dat'
+    FileName = adjustl(trim(This%DtbPath)) // '/Masses/' // adjustl(trim(This%AtomsName(iAtom))) // '.dat'
   elseif ( adjustl(trim(This%FileForAtomMass(iAtom))) == 'Local') then
-    FileName = trim(adjustl(This%OutputDir)) // '/' // trim(adjustl(This%System)) // '/Mass/' // adjustl(trim(This%AtomsName(iAtom))) // '.dat'
+    FileName = trim(adjustl(This%OutputDir)) // '/' // trim(adjustl(This%System)) // '/Masses/' // adjustl(trim(This%AtomsName(iAtom))) // '.dat'
   else
     FileName = adjustl(trim(This%FileForAtomMass(iAtom))) // '/' // adjustl(trim(This%AtomsName(iAtom))) // '.dat'
   end if
