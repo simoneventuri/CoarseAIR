@@ -718,6 +718,124 @@ End Subroutine
 
 
 ! !---------------------------------------------------------------------------------------------------! !
+!!!                           Creating a Mask for Statistic Results                                   !!!
+! !---------------------------------------------------------------------------------------------------! !
+Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, vqnFin, jqnFin, ArrFin, Problematic, i_Debug )
+
+  use Collision_Class             ,only: Collision_Type
+
+  Type(Collision_Type)                              ,intent(in)     :: Collision
+  integer     ,dimension(2)                         ,intent(in)     :: BinOI
+  integer     ,dimension(2)                         ,intent(inout)  :: vqnIn
+  integer     ,dimension(2)                         ,intent(inout)  :: jqnIn
+  integer                                           ,intent(inout)  :: ArrIn
+  integer     ,dimension(2)                         ,intent(inout)  :: vqnFin
+  integer     ,dimension(2)                         ,intent(inout)  :: jqnFin
+  integer                                           ,intent(inout)  :: ArrFin
+  integer                                           ,intent(out)    :: Problematic
+  logical                                 ,optional ,intent(in)     :: i_Debug
+  
+  integer                                                           :: Temp
+  integer                                                           :: iPIn, iPFin, jPIn, jPFin
+  integer                                                           :: iTypeIn, iTypeFin, jTypeIn, jTypeFin
+  integer                                                           :: iMolIn, iMolFin, jMolIn, jMolFin
+  integer                                                           :: iBinIn, iBinFin, iBinTemp, jBinIn, jBinFin, jBinTemp
+  logical                                                           :: i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "Mask4StatisticsReading_Nb4Atoms" )
+  !i_Debug_Loc   =     Logger%On() 
+
+  Problematic = -1
+
+  iPIn     = int(ArrIn / 16.0_rkp)
+  jPIn     = Collision%Pairs(iPIn)%Opposite
+  Temp     = mod(ArrIn, 16)
+  iTypeIn  = mod(Temp, 4)
+  jTypeIn  = int(Temp, 4)
+  iMolIn   = Collision%Pairs(iPIn)%To_Molecule
+  jMolIn   = Collision%Pairs(jPIn)%To_Molecule
+  
+  iBinIn   = BinOI(iMolIn)
+  jBinIn   = BinOI(jMolIn)
+  iBinTemp = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%qns_to_Bin(vqnIn(1),jqnIn(1))
+  jBinTemp = Collision%MoleculesContainer(jMolIn)%Molecule%BinsContainer%qns_to_Bin(vqnIn(2),jqnIn(2))
+
+
+  if ( ( iTypeIn > 1 ) .or. ( jTypeIn > 1 ) ) then
+    Problematic = 1 ! Current Trajectory Starts from Dissociation
+  elseif ( ( Collision%Pairs(iPIn)%To_Molecule /= iMolIn ) .or. ( Collision%Pairs(jPIn)%To_Molecule /= jMolIn ) ) then
+    Problematic = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
+  elseif ( ( iBinTemp == -1 ) .or. ( jBinTemp == -1 ) ) then
+    Problematic = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
+  elseif ( ( iBinTemp /= iBinIn ) .or. ( jBinTemp /= jBinIn ) ) then
+    Problematic = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
+  else
+    ! Current Trajectory has an Initial Condition that is accettable!
+    vqnIn(1) = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(iBinIn)%vqnFirst
+    jqnIn(1) = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(iBinIn)%jqnFirst
+    vqnIn(2) = Collision%MoleculesContainer(jMolIn)%Molecule%BinsContainer%Bin(jBinIn)%vqnFirst
+    jqnIn(2) = Collision%MoleculesContainer(jMolIn)%Molecule%BinsContainer%Bin(jBinIn)%jqnFirst
+  end if
+
+
+  iPFin    = int(ArrFin / 16)
+  jPFin    = Collision%Pairs(iPFin)%Opposite
+  Temp     = mod(ArrFin , 16)
+  iTypeFin = mod(Temp, 4)
+  jTypeFin = int(Temp, 4)
+  iMolIn   = Collision%Pairs(iPFin)%To_Molecule
+  jMolIn   = Collision%Pairs(jPFin)%To_Molecule
+
+  iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
+  jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
+
+  if (iTypeFin < 2) then
+    if ( iBinTemp .eq. -1 ) then
+      if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
+        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+        vqnFin(1) = 0
+        jqnFin(1) = 0
+        iTypeFin  = 2
+      else
+        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
+      endif
+    else
+      ! Current Trajectory has a Final Condition that is accettable!
+      iBinFin   = iBinTemp
+      vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%vqnFirst
+      jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%jqnFirst
+    end if
+  end if
+
+  if (jTypeFin < 2) then
+    if ( jBinTemp .eq. -1 ) then
+      if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
+        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+        vqnFin(2) = 0
+        jqnFin(2) = 0
+        jTypeFin  = 2
+      else
+        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
+      endif
+    else
+      ! Current Trajectory has a Final Condition that is accettable!
+      jBinFin   = jBinTemp
+      vqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%vqnFirst
+      jqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%jqnFirst
+    end if
+  end if
+
+  ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
+
+  
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+! !===================================================================================================! !
+
+
+! !---------------------------------------------------------------------------------------------------! !
 !!!                                                                                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
 Pure Subroutine CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelChar, jLevelChar, Name )

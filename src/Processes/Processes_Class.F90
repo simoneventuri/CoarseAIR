@@ -65,6 +65,7 @@ Module Processes_Class
 
     integer                                                 ::    NProc_Cleaned     = 0   ! 
 
+    integer                                                 ::    Status            = -1
     character(:)                              ,allocatable  ::    OutputDir
     integer                                                 ::    NTraj
     character(17)                                           ::    System

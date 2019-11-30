@@ -311,6 +311,7 @@ Subroutine FindingFinalLevel_Nb3Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   if (i_Debug_Loc) call Logger%Exiting
   
 End Subroutine
+! !---------------------------------------------------------------------------------------------------! !
 
 
 ! !---------------------------------------------------------------------------------------------------! !
@@ -576,6 +577,87 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
+
+
+! !---------------------------------------------------------------------------------------------------! !
+!!!                           Creating a Mask for Statistic Results                                   !!!
+! !---------------------------------------------------------------------------------------------------! !
+Subroutine Mask4StatisticsReading_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, vqnFin, jqnFin, ArrFin, Problematic, i_Debug )
+
+  use Collision_Class             ,only: Collision_Type
+
+  Type(Collision_Type)                              ,intent(in)     :: Collision
+  integer     ,dimension(1)                         ,intent(in)     :: BinOI
+  integer     ,dimension(1)                         ,intent(inout)  :: vqnIn
+  integer     ,dimension(1)                         ,intent(inout)  :: jqnIn
+  integer                                           ,intent(inout)  :: ArrIn
+  integer     ,dimension(1)                         ,intent(inout)  :: vqnFin
+  integer     ,dimension(1)                         ,intent(inout)  :: jqnFin
+  integer                                           ,intent(inout)  :: ArrFin
+  integer                                           ,intent(out)    :: Problematic
+  logical                                 ,optional ,intent(in)     :: i_Debug
+  
+  integer                                                           :: iPIn, iPFin
+  integer                                                           :: iTypeIn, iTypeFin
+  integer                                                           :: iMolIn, iMolFin
+  integer                                                           :: BinIn, BinFin, BinTemp
+  logical                                                           :: i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "Mask4StatisticsReading_Nb3Atoms" )
+  !i_Debug_Loc   =     Logger%On() 
+
+  Problematic = -1
+
+  iPIn    = int(ArrIn / 16)
+  iTypeIn = mod(ArrIn , 16)
+  iMolIn  = Collision%Pairs(iPIn)%To_Molecule
+  BinIn   = BinOI(iMolIn)
+  BinTemp = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%qns_to_Bin(vqnIn(1),jqnIn(1))
+
+  if ( iTypeIn > 1 ) then
+    Problematic = 1 ! Current Trajectory Starts from Dissociation
+  elseif ( Collision%Pairs(iPIn)%To_Molecule /= iMolIn ) then
+    Problematic = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
+  elseif ( BinTemp == -1 ) then
+    Problematic = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
+  elseif ( BinTemp /= BinIn ) then
+    Problematic = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
+  else
+    ! Current Trajectory has an Initial Condition that is accettable!
+    vqnIn(1) = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(BinIn)%vqnFirst
+    jqnIn(1) = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(BinIn)%jqnFirst
+  end if
+
+
+  iPFin    = int(ArrFin / 16)
+  iTypeFin = mod(ArrFin , 16)
+  iMolFin  = Collision%Pairs(iPFin)%To_Molecule
+  BinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
+
+  if (iTypeFin < 2) then
+    if ( BinTemp .eq. -1 ) then
+      if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
+        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+        vqnFin(1) = 0
+        jqnFin(1) = 0
+        ArrFin    = int( iPFin * 16) + 2
+      else
+        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
+      endif
+    else
+      ! Current Trajectory has a Final Condition that is accettable!
+      BinFin    = BinTemp
+      vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%vqnFirst
+      jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%jqnFirst
+    end if
+  end if
+
+  
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+! !===================================================================================================! !
 
 
 ! !---------------------------------------------------------------------------------------------------! !
