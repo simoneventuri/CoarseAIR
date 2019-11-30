@@ -1,0 +1,26 @@
+! TODO:
+! * Add the optional input argument to be defined the default format for all variables.
+! * Add the optional 'Underline' argument. This sould write an underlined string to the log file as in:
+!   call Logger%Write( "Example", Underline=.True. )
+! --------------------------------------------------------
+!
+!     [ProcName]: Example
+!     [ProcName]: =======
+!
+! --------------------------------------------------------
+! In addition, the character used to underline could be specified using 'Logger%Write( "Example", Underline=.True., UnderlineChar="*" )
+! --------------------------------------------------------
+!
+!     [ProcName]: Example
+!     [ProcName]: *******
+!
+! --------------------------------------------------------
+! In a similar way, the 'Frame' option could be added.
+!   call Logger%Write( "Example", Frame=.True. )
+! --------------------------------------------------------
+!
+!     [ProcName]: ***********
+!     [ProcName]: * Example *
+!     [ProcName]: ***********
+!
+! --------------------------------------------------------

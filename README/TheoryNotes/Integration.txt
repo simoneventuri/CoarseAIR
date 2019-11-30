@@ -1,0 +1,17 @@
+
+do while (iter<itermax) & (no traj converged yet)
+
+
+  ODE%Integrate( Traj )   
+  
+  
+  Collision%Hamiltonian( Traj )
+  
+  
+  Traj%AssessConvergence()
+  
+  
+end do
+
+
+Integrator%AnalysisTrajPoints( iTraj, Collision, Traj ) for the converged traj

@@ -1,0 +1,183 @@
+###########################################################################################
+######                                                                               ######
+######                         Input File for QCT Code                               ######
+######                                                                               ######
+###########################################################################################
+
+   System = N3
+   
+   Nb of Species = 2
+     Species 1 = N2
+     Species 2 = N
+   
+   Nb of Molecules = 1
+     Molecule 1 = N2
+   
+   Nb of Atoms = 3
+     Atom 1 = N
+       Mass [a.u.] of Atom 1  = 25526.04289d0
+     Atom 2 = N
+       Mass [a.u.] of Atom 2  = 25526.04289d0
+     Atom 3 = N
+       Mass [a.u.] of Atom 3  = 25526.04289d0
+  
+   Database Path = FromEnvVariable
+   
+   
+   Nb of Translational Temperatures = 3
+     Translational Temperature 1 = 7000.d0
+     Translational Temperature 2 = 30000.d0
+     Translational Temperature 3 = 70000.d0
+   Nb of Internal Temperatures = 1
+   # Internal Temperature 1 = 10000.d0
+   
+   
+   Generating Energy Levels? = no
+   Preprocessing Energy Levels List? = yes
+   Running Trajectories? = yes
+   Postprocessing Trajectories? = yes
+   Generating Derivated Quantities? = no
+
+
+###########################################################################################
+#  CUTTING LEVELS for each of the Molecules   
+###########################################################################################
+
+   #Levels File Name, Molecule 1 = N2_levels_venturi.dat
+   #Levels File Name, Molecule 1 = n2.myleroy
+   Levels File Name, Molecule 1 = n2.leroy.Robyn
+   
+   Min Energy for Cutting Levels, Molecule 1 = -10000.d0
+   Min Time   for Cutting Levels, Molecule 1 = -10000.d0
+   
+   Nb of Atoms, Molecule 1 = 2
+
+
+###########################################################################################
+#  SORTING LEVELS
+###########################################################################################
+
+   # Sorting Method ( State-Specific / Vib-Specific / RoVib-CG )
+   Sorting Method, Molecule 1 = State-Specific
+     Starting Level, Molecule 1 = 9000
+     Final    Level, Molecule 1 = 9000
+   #Sorting Method, Molecule 1 = Vib-Specific
+   #  Starting vqn, Molecule 1 = 10
+   #  Final    vqn, Molecule 1 = 11
+   #Sorting Method, Molecule 1 = RoVib-CG
+   #  File with Bins Energy Minima, Molecule 1 = E_low.dat
+   #  Nb of Bins, Molecule 1 = 60
+
+
+###########################################################################################
+#  RUNNING TRAJECTORIES and ANALYZING TRAJECTORIES
+###########################################################################################
+
+   # Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
+   Using Proportional Allocation? = no
+   #Nb of Total Trajectories = 100
+   Nb of Trajectories per Level / Bin = 100
+   
+   Generate a CPU-Clock Dependent Seed? = no
+   Initial Random Nb Seed = 3
+
+   Initial Distance between Target and Projectile = 23.d0
+   
+   PES Model = NASA
+   Diatomic Potential Model = LeRoy
+   
+   # Relative Translational Model ( Uniform / Boltzmann / FixedTotEn )
+   #   Normal          ->   Relative Translational Energy [Eh] = 
+   #   Boltzmann       ->   Initial Translational Temperature [K]  = 
+   #   FixedTotEn      ->   Fixed Total Energy [Eh] = 
+   Relative Translational Energy Model = Boltzmann
+#     Initial Translational Temperature = see run-bqct.sh file
+
+   # Initial Impact Parameter Model ( Normal / Random / Stratified / FixedAngMom )
+   #   Normal or Random   ->   Initial Impact Parameter = 
+   #   Stratified         ->   Nb of Stratified Sampling Ranges = , Nb of Trajectorie in Range = , Impact Parameter for Range =
+   #   FixedAngMom        ->   Total Angular Momentum = 
+   Initial Impact Parameter Model = Stratified
+     Nb of Stratified Sampling Ranges = 7
+       Nb of Trajectories in Range 1 = 1
+       Impact Parameter for Range 1 = -0.25d0
+       Nb of Trajectories in Range 2 = 1
+       Impact Parameter for Range 2 = -0.5d0
+       Nb of Trajectories in Range 3 = 1
+       Impact Parameter for Range 3 = -1.d0
+       Nb of Trajectories in Range 4 = 1
+       Impact Parameter for Range 4 = -3.d0
+       Nb of Trajectories in Range 5 = 1
+       Impact Parameter for Range 5 = -5.d0
+       Nb of Trajectories in Range 6 = 1
+       Impact Parameter for Range 6 = -8.d0
+       Nb of Trajectories in Range 7 = 1
+       Impact Parameter for Range 7 = -14.d0
+       
+   # Method for Initial Vibrational Quantum Nb (Fixed / Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
+   #   Fixed                    ->   Initial Vibrational Quantum Nb = 
+   #   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
+   Method for Initial Vibrational Quantum Nb = Boltzmann
+   # Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)   
+   #   Fixed                    ->   Initial Rotational Quantum Nb = 
+   All / Only Even / Only Odd values for Rotational Quantum Nb = All
+   
+   Nb of Quadrature Pts for Action Integral = 50
+   Lower Bound for Position of Centrifugal Barrier Max = 1.0d0
+   Upper Bound for Position of Centrifugal Barrier Max = 30.d0
+   Factor for q.b. Levels = 0
+   Time threshold for q.b. Levels [Eh] = 100.d0
+   
+
+   ###########################################################################################
+   #  Write Control Flags (yes/no), CPU time limit and Restart Indicator (yes/no)
+   ###########################################################################################
+  
+   Write the Initial Parameters File?             = yes
+   Write the Progress File?                       = no
+   Write the PaQ Solution File?                   = no
+   Write the PaQ Evolution File?                  = no
+   Write the Spatial Coordinates Evolution File?  = no
+   Write the PES Evolution File?                  = no
+   Write the Energy Evolution File?               = no
+  
+   # If TimeMax is 0, there is no limit.
+   # If TimeMax is gt 0 and the calculation requires more than TimeMax cpu seconds, restart information will be saved on unit 9.
+   #   Then, the calculation can be restarted through "Restart? = yes"
+   CPU Time Limit = 0.d0
+   Restart? = no
+  
+  
+   ###########################################################################################
+   #  ODE Parameters
+   ###########################################################################################
+  
+   Initial time step = 5.00d0
+   Error control parameter = 0.0000000100d0                             
+   Stepsize increase damping factor = 0.5d0
+   Nb of extrapolation steps = 3  
+   Nb of integration between end checking = 10   
+   Max distance between atom pair [bohr] = 30.d0
+   Max trajectory time [a.u.] = 300000.d0
+
+
+###########################################################################################
+#   COMPUTING STATISTICS
+###########################################################################################
+
+   Distinguish Exchanges? = no
+
+   # Nb of Trajectory Conditions = 3  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 1 Molecule)
+   Nb of Final Conditions on the Trajectories = 3
+     Iskip for Condition 1 = 1
+     Preserving Even / Oddness of Condition 1 = yes
+     Iskip for Condition 2 = 1
+     Preserving Even / Oddness of Condition 2 = no
+     Iskip for Condition 3 = 1
+     Preserving Even / Oddness of Condition 3 = no
+   
+   Identical Diatoms? = no
+   
+   # Final States Assigment Mthd = Histogram / QSS
+   Final States Assigment Mthd = Histogram
+   

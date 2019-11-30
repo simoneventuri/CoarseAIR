@@ -1,0 +1,47 @@
+###########################################################################################
+######                                                                               ######
+######                 Input File for Generating Energy Levels                       ######
+######                                                                               ######
+###########################################################################################
+    
+    ### The Parameter Ranges Suggested are Reported as (Extremely Coarse / Extremely Accurate)
+
+    Compute Levels, Molecule 1 = yes
+      New Levels File Name, Molecule 1 = N2_Temp.inp
+    Compute Levels, Molecule 2 = no
+    Compute Levels, Molecule 3 = no
+    
+    ##  Min Value for Energy in the Energy Level Search = E [Eh] from the Diat Pot Depth for Starting Sarching for Levels
+    Min Value for Energy in the Energy Level Search = 0.0d0
+
+    ##  Delta Energy for the Energy Level Search = 1.d-6 / 5.d-8
+    Delta Energy for the Energy Level Search = 1.d-7
+
+    ##  Energy Tolerance for Bisection = 1.d-12 / 5.d-14
+    Energy Tolerance for the Energy Level Search = 1.d-13
+    
+    ##  Interval of Rotation Q.N.s to Look for
+    Min Rotational Quantum Nb = 0
+    Max Rotational Quantum Nb = 400
+
+    ##  Maximum Vibrational Q.N. to Look for
+    Max Vibrational Quantum Nb = 200
+    
+    ##  Print Levels at Screen
+    Print Levels = yes
+    
+    ## Spatial Delta in the Integration Grid (1.d-4 / 1.d-3)
+    Spatial Delta in the Integration Grid = 5.d-3 
+    #Nb of Points in the Integration Grid = 500
+
+    ####  The Following Parameters Should not be Changed
+
+    Left Extreme in the Integration Grid = 0.d0
+    Right Extreme in the Integration Grid = 100.d0
+
+    Location of Boundary Condition, Point Nb 1 = 1.d0
+    Value of Boundary Condition, Point Nb 1 = 0.d0
+    Location of Boundary Condition, Point Nb 2 = 2.d0
+    Value of Boundary Condition, Point Nb 2 = 1.d-100
+    Location of Boundary Condition, Point Nb 3 = -1.d0
+    Value of Boundary Condition, Point Nb 3 = 1.d-20

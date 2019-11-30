@@ -1,0 +1,6 @@
+# LEPS Parameters (re, De1, De3, Alpha, Beta, S)
+
+# Computing Diatomic Component? = yes / no
+Computing Diatomic Component? = yes
+
+S = -0.023d0

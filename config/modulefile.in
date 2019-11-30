@@ -1,0 +1,77 @@
+#%Module1.0###################################################################
+#
+# This modulefile setups the environment for the ${PROJECT_NAME} code.
+#
+##############################################################################
+
+# Variables independent from the build options
+set ${LIBRARY_NAME}_name                       ${PROJECT_NAME}
+set ${LIBRARY_NAME}_library_name               ${LIBRARY_NAME}
+set ${LIBRARY_NAME}_version                    ${PROJECT_VERSION}
+set ${LIBRARY_NAME}_source_dir                 ${PROJECT_SOURCE_DIR}
+
+# Variables dependent on the build options
+set ${LIBRARY_NAME}_build_config               ${PROJECT_BUILD_CONFIGURATION}
+set ${LIBRARY_NAME}_fortran_compiler           ${CMAKE_Fortran_COMPILER_ID}
+set ${LIBRARY_NAME}_fortran_compiler_version   ${CMAKE_Fortran_COMPILER_VERSION}
+set ${LIBRARY_NAME}_build_type                 ${CMAKE_BUILD_TYPE}
+set ${LIBRARY_NAME}_build_dir                  ${CMAKE_BINARY_DIR}
+set ${LIBRARY_NAME}_install_dir                ${PROJECT_INSTALL_DIR}
+set ${LIBRARY_NAME}_library_dir                ${LIBRARY_INSTALL_DIR}
+set ${LIBRARY_NAME}_modules_dir                ${MODULES_INSTALL_DIR}
+set ${LIBRARY_NAME}_cmake_dir                  ${CMAKE_INSTALL_DIR}
+set ${LIBRARY_NAME}_executabales_dir           ${EXECUTABLE_INSTALL_DIR}
+set ${LIBRARY_NAME}_database_dir               ${DATABASE_INSTALL_DIR}
+
+if {[file isdirectory "$${PROJECT_NAME_LC}_install_dir"]} {} else {
+    puts stderr "[module-info name] reports $${PROJECT_NAME_LC}_install_dir is not a directory"
+}
+
+conflict ${LIBRARY_NAME}
+
+proc ModulesHelp { } {
+  puts stderr ""
+  puts stderr "This module loads the ${PROJECT_NAME} code version ${PROJECT_VERSION} with ${CMAKE_BUILD_TYPE} build"
+  puts stderr "using the ${CMAKE_Fortran_COMPILER_ID} Fortran compiler version ${CMAKE_Fortran_COMPILER_VERSION}."
+  puts stderr ""
+  puts stderr "The following environment variables are defined:"
+  puts stderr "\t* Name of the library:           ${PROJECT_NAME_UC}_LIBRARY_NAME   = ${LIBRARY_NAME}"
+  puts stderr "\t* Version of the library:        ${PROJECT_NAME_UC}_VERSION        = ${PROJECT_VERSION}"
+  puts stderr "\t* Build configuration:           ${PROJECT_NAME_UC}_BUILD_CONFIG   = ${PROJECT_BUILD_CONFIGURATION}"
+  puts stderr "\t* Source directory:              ${PROJECT_NAME_UC}_SOURCE_DIR     = ${PROJECT_SOURCE_DIR}"
+  puts stderr "\t* Build directory:               ${PROJECT_NAME_UC}_BUILD_DIR      = ${CMAKE_BINARY_DIR}"
+  puts stderr "\t* Installation directory:        ${PROJECT_NAME_UC}_INSTALL_DIR    = ${PROJECT_INSTALL_DIR}"
+  puts stderr "\t* Libraries directory:           ${PROJECT_NAME_UC}_LIBRARY_DIR    = ${LIBRARY_INSTALL_DIR}"
+  puts stderr "\t* Fortran module file directory: ${PROJECT_NAME_UC}_MODULES_DIR    = ${MODULES_INSTALL_DIR}"
+  puts stderr "\t* Cmake configuration directory: ${PROJECT_NAME_UC}_CMAKE_DIR      = ${CMAKE_INSTALL_DIR}"
+  puts stderr "\t* Executable directory:          ${PROJECT_NAME_UC}_EXECUTABLE_DIR = ${EXECUTABLE_INSTALL_DIR}"
+  puts stderr "\t* Database directory:            ${PROJECT_NAME_UC}_DATABASE_DIR   = ${DATABASE_INSTALL_DIR}"
+  puts stderr ""
+  puts stderr "To use the ${PROJECT_NAME} library with Makefile, use the following options:"
+  puts stderr "\t* to the compilation step: \t  -I\$${PROJECT_NAME_UC}_MODULES_DIR"
+  puts stderr "\t* to the link step:        \t  -L\$${PROJECT_NAME_UC}_LIBRARY_DIR -l\$${PROJECT_NAME_UC}_LIBRARY_NAME"
+  puts stderr ""
+  puts stderr "The ${PROJECT_NAME} library can also be used with projects build with cmake."
+}
+
+module-whatis "Name:        ${PROJECT_NAME}"
+module-whatis "Version:     $${LIBRARY_NAME}_version"
+module-whatis "Build type:  $${LIBRARY_NAME}_build_type"
+module-whatis "Category:    Application/Library"
+module-whatis "Description: ${PROJECT_ACRONYM_DEFINITION}"
+
+# Environment variables
+setenv ${PROJECT_NAME_UC}_LIBRARY_NAME    $${LIBRARY_NAME}_library_name
+setenv ${PROJECT_NAME_UC}_VERSION         $${LIBRARY_NAME}_version
+setenv ${PROJECT_NAME_UC}_BUILD_CONFIG    $${LIBRARY_NAME}_build_config
+setenv ${PROJECT_NAME_UC}_SOURCE_DIR      $${LIBRARY_NAME}_source_dir
+setenv ${PROJECT_NAME_UC}_BUILD_DIR       $${LIBRARY_NAME}_build_dir
+setenv ${PROJECT_NAME_UC}_INSTALL_DIR     $${LIBRARY_NAME}_install_dir
+setenv ${PROJECT_NAME_UC}_LIBRARY_DIR     $${LIBRARY_NAME}_library_dir
+setenv ${PROJECT_NAME_UC}_MODULES_DIR     $${LIBRARY_NAME}_modules_dir
+setenv ${PROJECT_NAME_UC}_CMAKE_DIR       $${LIBRARY_NAME}_cmake_dir
+setenv ${PROJECT_NAME_UC}_EXECUTABLE_DIR  $${LIBRARY_NAME}_executabales_dir
+setenv ${PROJECT_NAME_UC}_DATABASE_DIR    $${LIBRARY_NAME}_database_dir
+
+prepend-path    PATH              $${LIBRARY_NAME}_executabales_dir
+prepend-path    LD_LIBRARY_PATH   $${LIBRARY_NAME}_library_dir

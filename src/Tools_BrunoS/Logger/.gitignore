@@ -1,0 +1,37 @@
+###############################
+# Unwanted files from sources #
+###############################
+*.o
+*.a
+*~
+*.mod
+*.out
+*.x
+bin/*
+mod/
+build*
+Build*
+lib/
+*_genmod.f90
+gmon.out
+
+# vim swap files
+.*.swp
+.swp
+.swo
+.swn
+
+#####################################
+# Unwanted files from documentation #
+#####################################
+*.dvi
+*.ps
+*.aux
+*.tex.backup
+
+############################
+# Unwanted files from Kate #
+############################
+*.kate-swp
+*.kateproject
+*.kateproject.d/

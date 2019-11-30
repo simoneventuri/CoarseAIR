@@ -1,0 +1,33 @@
+# LEPS Parameters (re, De1, De3, Alpha, Beta, S)
+
+# Model = LEPS / LEPS-MOD
+Model = LEPS
+
+# Computing Diatomic Component? = yes / no
+Computing Diatomic Component? = no
+
+Atom(1) = N
+Atom(2) = N
+Atom(3) = N
+
+re(1) = 1.0977d0
+re(2) = 1.0977d0
+re(3) = 1.0977d0
+
+DeB(1) = 228.4d0
+DeB(2) = 228.4d0
+DeB(3) = 228.4d0
+
+DeA(1) = 114.2d0
+DeA(2) = 114.2d0
+DeA(3) = 114.2d0
+
+Alpha(1) = 2.689d0
+Alpha(2) = 2.689d0
+Alpha(3) = 2.689d0
+
+Beta(1) = 2.689d0
+Beta(2) = 2.689d0
+Beta(3) = 2.689d0
+
+S = -0.023d0

@@ -1,0 +1,31 @@
+###########################################################################################
+######                                                                               ######
+######                     Input File for Forward Propagation                        ######
+######                                                                               ######
+###########################################################################################
+
+   Nb of Iterations for Forward Progation = 10000
+
+   Seed for Forward Progation = 3
+
+   Konig Input File = input
+
+   Time Min = 1.d-14
+   Time Max = 3.d-01
+   Nb of Time Nodes = 200
+   Time Scale = log
+
+   Forward Propagating Mole Fractions? = yes
+   Mole Fractions Min = 0.d0
+   Mole Fractions Max = 1.d0
+   Nb of Mole Fractions Bins = 300
+
+   Forward Propagating Temperatures? = no
+   Temperatures Min = 0.d0
+   Temperatures Max = 2.5d4
+   Nb of Temperatures Bins = 300
+
+   Forward Propagating Bins Populations? = yes
+   Bins Populations Min = 1.d10
+   Bins Populations Max = 1.d22
+   Nb of Bins Populations Bins = 300

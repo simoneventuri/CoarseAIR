@@ -1,0 +1,65 @@
+###########################################################################################
+######                                                                               ######
+######                     Input File for Deriving Quantities                        ######
+######                                                                               ######
+###########################################################################################
+
+
+###########################################################################################
+#   MERGING PESs
+###########################################################################################
+
+   Nb of PESs to Merge = 1
+
+   # Results File Path, PES 1 = /Users/sventuri/WORKSPACE/QCT/RESULTS/CO2/CO2_13A1_60Bins_60Bins
+   # Weight, PES 1 = 1
+   # Results File Path, PES 2 = /Users/sventuri/WORKSPACE/QCT/RESULTS/CO2/CO2_13A2_60Bins_60Bins
+   # Weight, PES 2 = 1
+   # Results File Path, PES 3 = /Users/sventuri/WORKSPACE/QCT/RESULTS/CO2/CO2_23A2_60Bins_60Bins
+   # Weight, PES 3 = 1
+
+
+###########################################################################################
+#   RUNNING KONIG
+###########################################################################################
+
+   Reading Formatted Rates? = yes
+   Reading Unformatted Rates? = no
+   #  Path to Rates Folder = ''
+   Reading Unique Rate-File for Multiple Temperatures? = no
+   
+   Writing Formatted Merged Rates? = no
+   Writing Unformatted Merged Rates? = no
+   Writing Unique Rate-File for Multiple Temperatures? = no
+   
+   Computing Dissociation Thermal Rates? = no
+   
+   Writing Arrhenius Coefficients? = no
+   Writing Arrhenius for KONIG? = yes
+   #  Merge Internal Exchanges in Arrhenius Rates? = yes
+   
+   Running KONIG? = yes
+     Nb of Processors for KONIG = 8
+   
+   Binning the StS Rates? = no
+     Nb of Bins for Binning StS, Molecule 1 = 20
+     # Nb of Bins for Binning StS, Molecule 2 = 50
+     Path to the Folder of the Coarse-Grained System = /Users/sventuri/WORKSPACE/QCT/run_N3_CG/Test/
+
+  # Min Value for Bin Rate Coefficient = 1.d-17
+
+   Nb of Chemical Components = 2
+     Comp 1  Name = N
+     Comp 1  Initial Mole Fraction = 0.05d0
+     Comp 2  Name = N2
+     Comp 2  Initial Mole Fraction = 0.95d0
+
+   KONIG Inital Temperature [K] = 300.d0
+
+   Writing Exothermic Processes? = yes
+   Writing Endothermic Processes? = no
+   
+   Writing Inelastic Processes? = yes
+   Writing Dissociation Processes? = no
+   #   Dissociation Rates Correction Factor = 1.0
+   Writing Exchange Processes? = no

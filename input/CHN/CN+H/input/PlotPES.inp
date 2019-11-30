@@ -1,0 +1,92 @@
+###########################################################################################
+######                                                                               ######
+######                        Input File for Plotting PES                            ######
+######                                                                               ######
+###########################################################################################
+
+  Reading Grid Points? = no
+
+  Computing Grid Points? = yes
+  
+  Computing Double-Grid Points? = no
+  
+  Computing Triple-Grid Points? = no
+  
+  Computing Points for Scatter Comparison? = no
+  
+  Computing Stochastic PES Statistics? = no
+
+  Writing Sampled Parameters of Stochastic PES? = no
+
+  Plotting Cuts with Varga et al.'s style? = no
+
+  Computing Rotating 3rd Atom? = no
+  
+  
+  ### Potential / Force
+  Potential or Force = Potential
+  
+  ### PES / Diatomic
+  PES or Diatomic = PES
+
+  ### Distance / Angle
+  Y Axis Variable = Distance  
+
+  ### KcalMolAngstrom / HartreeBohr
+  Unit of measure for Force = HartreeBohr
+
+  ### Bohr / Angstrom
+  Unit of measure for Distance = Bohr
+  
+  ### Hartree / KcalMol / ElectronVolt
+  Unit of measure for Potential = ElectronVolt
+  
+  Nb of Grid Points, Axis 1 = 200
+  Nb of Grid Points, Axis 2 = 200
+ 
+  Grid Min, Axis 1 = 1.5d0
+  Grid Min, Axis 2 = 1.5d0
+ 
+  Grid Max, Axis 1 = 8.0d0
+  Grid Max, Axis 2 = 8.0d0
+  
+  Nb of Angles = 32
+     Angle 1 = 35.d0
+     Angle 2 = 40.d0
+     Angle 3 = 45.d0
+     Angle 4 = 50.d0
+     Angle 5 = 55.d0
+     Angle 6 = 60.d0
+     Angle 7 = 65.d0
+     Angle 8 = 70.d0
+     Angle 9 = 75.d0
+     Angle 10 = 80.d0
+     Angle 11 = 85.d0
+     Angle 12 = 90.d0
+     Angle 13 = 95.d0
+     Angle 14 = 100.d0
+     Angle 15 = 105.d0
+     Angle 16 = 110.d0
+     Angle 17 = 115.d0
+     Angle 18 = 120.d0
+     Angle 19 = 125.d0
+     Angle 20 = 130.d0
+     Angle 21 = 135.d0
+     Angle 22 = 140.d0
+     Angle 23 = 145.d0
+     Angle 24 = 150.d0
+     Angle 25 = 155.d0
+     Angle 26 = 160.d0
+     Angle 27 = 165.d0
+     Angle 28 = 170.d0
+     Angle 29 = 175.d0
+     Angle 30 = 106.75d0
+     Angle 31 = 116.75d0
+     Angle 32 = 126.75d0
+
+     
+  Energy Cut-Off (From Dissociation Energy) = 20.d10
+  
+  Setting the Energy Reference to 0.0? = yes
+  
+  Plotting Only Triatomic Component of PES? = no

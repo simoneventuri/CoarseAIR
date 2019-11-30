@@ -1,0 +1,54 @@
+###########################################################################################
+######                                                                               ######
+######                     Input File for Deriving Quantities                        ######
+######                                                                               ######
+###########################################################################################
+
+
+###########################################################################################
+#   MERGING PESs
+###########################################################################################
+
+   Nb of PESs to Merge = 1
+
+
+###########################################################################################
+#   RUNNING KONIG
+###########################################################################################
+
+   Reading Formatted Rates? = yes
+   Reading Unformatted Rates? = no
+   #  Path to Rates Folder = ''
+   
+   Writing Formatted Merged Rates? = yes
+   Writing Unformatted Merged Rates? = no
+   Writing Unique Rate-File for Multiple Temperatures? = yes
+   
+   Computing Dissociation Thermal Rates? = no
+   
+   Writing Arrhenius Coefficients? = yes
+   Writing Arrhenius for KONIG? = yes
+   
+   Running KONIG? = no
+     Nb of Processors for KONIG = 1
+   
+   Binning the StS Rates? = no
+     Nb of Bins for Binning StS, Molecule 1 = 60
+     Path to the Folder of the Coarse-Grained System = /Users/sventuri/WORKSPACE/QCT/run_CG_New/Test/
+
+  # Min Value for Bin Rate Coefficient = 1.d-17
+
+   Nb of Chemical Components = 2
+     Comp 1  Name = N
+     Comp 1  Initial Mole Fraction = 1.d-100
+     Comp 2  Name = N2
+     Comp 2  Initial Mole Fraction = 0.5d0
+
+   KONIG Inital Temperature [K] = 300.d0
+
+   Writing Exothermic Processes? = yes
+   Writing Endothermic Processes? = no
+   Writing Dissociation Processes? = yes
+   Writing Exchange Processes? = yes
+   Writing CO+C Dissociation? = no
+   Writing O2+M Dissociation? = no

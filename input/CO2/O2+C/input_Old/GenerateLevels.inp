@@ -1,0 +1,36 @@
+###########################################################################################
+######                                                                               ######
+######                 Input File for Generating Energy Levels                       ######
+######                                                                               ######
+###########################################################################################
+
+
+    Compute Levels, Molecule 1 = yes
+      New Levels File Name, Molecule 1 = CO_Temp.inp
+    Compute Levels, Molecule 2 = yes
+      New Levels File Name, Molecule 2 = O2_Temp.inp
+
+    Left Extreme in the Integration Grid = 0.d0
+    Right Extreme in the Integration Grid = 100.d0
+    #Nb of Points in the Integration Grid = 500
+    Spatial Delta in the Integration Grid = 5.d-3
+    
+    Min Value for Energy in the Energy Level Search = 0.0d0
+    Delta Energy for the Energy Level Search = 5.d-6
+    Energy Tolerance for the Energy Level Search = 5.d-13
+#    Delta Energy for the Energy Level Search = 1.d-5
+#    Energy Tolerance for the Energy Level Search = 1.d-12
+    
+    Min Vibrational Quantum Nb = 0
+    Min Rotational Quantum Nb = 0
+    Max Vibrational Quantum Nb = 200
+    Max Rotational Quantum Nb = 400
+    
+    Print Levels = yes
+    
+    Location of Boundary Condition, Point Nb 1 = 1.d0
+    Value of Boundary Condition, Point Nb 1 = 0.d0
+    Location of Boundary Condition, Point Nb 2 = 2.d0
+    Value of Boundary Condition, Point Nb 2 = 1.d-100
+    Location of Boundary Condition, Point Nb 3 = -1.d0
+    Value of Boundary Condition, Point Nb 3 = 1.d-10

@@ -1,0 +1,111 @@
+
+           COMPILATION and INSTALLATION
+    ==========================================
+    
+  !!! CMAKE ver must be > 3.5
+
+  !!! Required environmenatal variables:
+      - FC, Flag for Fortran Compiler (gfortran/ifort)
+      - GSL_DIR, GSL_INC and GSL_LIB (old version of Arrhenius was working only with gsl ver < 1.15; now it should work with any ver)
+      - OBLAS_LIB and OBLAS_INC        (IF RUNNING ON THOR)
+      - WORKSPACE_PATH, with the path to WORKSPACE folder (E.g.: /home/venturi/WORKSPACE)
+
+
+  - Clone the "CoarseAIR" directory in the WORSKPACE;
+  
+     WORKSPACE
+       |
+       |___ CoarseAIR
+       |      |
+       |      |___ coarseair
+       |             |
+       |             |___ app
+       |             |
+       |             |___ ...
+       |             |
+       |             |___ README
+       |             |
+       |             |___ ...
+       |
+       |___ ...
+         
+
+  - From the coarseair folder (cd ./CoarseAIR/coarseair), source BuildingInstalling.sh by typing "source ./scripts/building/BuildingInstalling.sh”;
+  
+  
+  - From the coarseair folder, update CoarseAIR's enveiromental variables by typing "COARSEAIR_debug" or "COARSEAIR_release", based on the preferred CoarseAIR distribution;
+
+
+  - Type the command “COARSEAIR_INSTALL” for building and installing the CoarseAIR code.
+
+
+
+                    EXECUTION
+    ========================================
+ 
+  - Create a “Run” directory inside CoarseAIR
+  
+      CoarseAIR
+        |
+        |____ build
+        |
+        |____ coarseair
+        |
+        |____ install
+        |
+        |____ Run
+			                          
+	
+  - Copy the "input" folder inside the run directory (from CoarseAIR, "scp -r ./coarseair/input/#System#/input ./Run", where #System# 
+      refers to the name of the chemical system of interest) and modify the input files inside the folder.
+        (N.B.: Change the Database Path in ./Run/input/CoarseAIR.inp)
+
+
+  - For running the code:
+
+	    - Copy the bash file inside the Run directory (scp -r ./coarseair/scripts/launching/CoarseAIR.sh ./Run).
+
+	    - Modify the bash file by changing the number of processors.
+	        (N.B.: If the number of nodes is larger than 1, .pbs will be automatically created and submitted.)
+
+  	    - Type the command for uploading the compiler (“CoarseAIR_release” or “CoarseAIR_release”).
+
+	    - Execute the bash file from the Run directory ("cd ./Run; bash CoarseAIR.sh").
+
+  	    
+  	    
+  	             POSTPROCESSING
+    ========================================
+    
+    - Create a “Postprocessing” directory inside CoarseAIR/Run
+    
+    - Copy there the MATLAB postprocessing (main) file (scp CoarseAIR/coarseair/scripts/postprocessing/PostCGQCT/Exec/PostCGQCT.m COARSEAIR/Run/Postprocessing).
+    
+        CoarseAIR
+            |
+            |____ build
+            |
+            |____ coarseair
+            |
+            |____ install
+            |
+            |____ Run
+                    |
+                    |____ input
+                    |
+                    |____ Test
+                    |
+                    |____ CoarseAIR.sh
+                    |
+                    |____ Postprocessing
+                          |
+                          |____ PostCGQCT.m
+                          
+                          
+    - If this is the first time you are using MATLAB postprocessing for CoarseAIR, add (with subfolders) the path to CoarseAIR/coarseair/scripts/postprocessing/PostCGQCT
+      (From MATLAB's home, go to "Set Path")
+      
+    - Check if the chemical system you want to run is present in CoarseAIR/coarseair/scripts/postprocessing/PostCGQCT/input/UpdateAllInput.m. If not, modify such file.
+    
+    - Change the input parameters in PostCGQCT.m and run it.
+    

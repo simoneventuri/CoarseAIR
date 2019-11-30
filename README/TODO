@@ -1,0 +1,15 @@
+
+    TO DO
+    =========================
+    
+    - (Finalize Testing)
+
+    - (Modify Input Module)
+        
+    - Test for Multiple Internal Temperatures
+    
+    - Implement a Fitting Algorithm, Tt-Tint-CrossSec
+    
+    - Generalize to 4 Atoms System
+    
+    - Make Trajectories runnable on GPU

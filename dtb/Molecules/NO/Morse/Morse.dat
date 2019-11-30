@@ -1,0 +1,10 @@
+# Morse Parameters (re, De, Beta)
+
+# re [A]
+re = 1.158d0
+
+# De [kcal/mol]
+De = 143.759d0
+
+# Beta [1/A]
+Beta = 2.942d0

@@ -1,0 +1,143 @@
+### LIST OF OBJECTS IN CoarseAIR CODE
+
+SYSTEM -> 
+	Initialized
+	Name
+
+
+
+SPECIES ->
+	Idx       
+	Name                      
+	Mass      
+	RedMass   
+	NAtoms    
+	To_Atoms                  
+	Atoms                     
+	DiaPot                   
+	LEVELSCONTAINER (ListStates) ->
+
+
+
+PAIRS ->     
+	Name                      
+	Idx
+	Opposite 
+	To_Atoms    
+	To_Species  
+	To_Molecule               
+	To_BinnedMolecule         
+	NLevels     
+	DIATPOT ->     
+
+
+
+MOLECULE -> 
+	Initialized
+	Name
+	To_Pair
+	DiaPot
+	LEVELSCONTAINER ->
+		NStates    
+		inj         
+		inv        
+		Tint        
+		jInMethod
+		jIn
+		iodd               
+		vInMethod
+		vIn
+		StateIn     
+		UnitArbDist
+		maxjqn      
+		maxvqn      
+		mineint     
+		mineinteV   
+		CutRatio    
+		QBoundRatio 
+		BoundRatio  
+		CrossSec            
+		RateConst           
+		RateConst_Norm      
+		RateConst_Final     
+		RateConst_Sigma     
+		RateConst_Arr
+		RateConst_Sigma_Arr
+		RateConst_Arr_Rnd
+		CArr                
+		NBound              
+		NQBound             
+		Q                   
+		LEVEL (State) ->
+			jqn           
+			vqn           
+			eint          
+			eint_scaled   
+			einteV        
+			einteV_scaled 
+			eintK         
+			egam          
+			rmin          
+			rmax          
+			vmin          
+			vmax          
+			tau           
+			ri            
+			ro            
+			rlim          
+			g             
+			to_level      
+			ToBin         
+			gInit         
+			Q_CG          
+		DEGENERACY ->
+			Initialized
+			Name
+
+
+	BINSCONTAINER ->
+		NBins
+		qns_to_Bin 
+		Lvl_to_Bin               
+		OverallRate
+		OverallRateSigma2             
+		To_Pair
+		To_Molecule
+		Q
+		QInit
+		Ttra
+		DEGENERACY ->
+			Initialized
+			Name
+		BINSCONTAINERT (TTra) ->
+			Pop
+			Tint
+		BIN ->
+			MineinteV       
+			MinLevEintev    
+			vqnFirst        
+			jqnFirst       
+			EeVFirst     
+			EFirst         
+			jqnLast         
+			vqnFirst_rkp    
+			jqnFirst_rkp    
+			NLevels         
+			ToteinteV       
+			Q              
+			QRatio          
+			ToteinteVInit   
+			QInit           
+			QRatioInit      
+			CrossSec  
+			CrossSec_Final 
+			CrossSec_Sigma2
+			RateConst       
+			RateConst_Norm  
+			RateConst_Final 
+			RateConst_Sigma2
+			RateConst_Arr
+			RateConst_ArrSigma2
+			RateConst_Arr_Rnd
+			CArr
+			Hybrid          
