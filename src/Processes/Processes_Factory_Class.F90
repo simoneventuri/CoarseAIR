@@ -49,7 +49,7 @@ Subroutine Define_Processes( Input, Collision, Processes, i_Debug )
   use Nb4Atoms_Processes_Class   ,only:    Nb4Atoms_Processes_Type                                                               
 
   type(Input_Type)                                  ,intent(in)     ::    Input
-  Type(Collision_Type)                              ,intent(in)     ::    Collision
+  Type(Collision_Type)                              ,intent(inout)  ::    Collision
   class(Processes_Type)                ,allocatable ,intent(out)    ::    Processes
   logical                                 ,optional ,intent(in)     ::    i_Debug
 

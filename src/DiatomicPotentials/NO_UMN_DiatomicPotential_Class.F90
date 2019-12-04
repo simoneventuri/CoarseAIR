@@ -40,7 +40,7 @@ Module NO_UMN_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_NO
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'NO_UMN'
+  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   real(rkp) ,dimension(1:10)                ,parameter      ::    cs   = [ 0.322338e0_rkp, 5.878590e0_rkp, -12.790761e0_rkp, 13.320811e0_rkp, -7.516309e0_rkp, 1.875839e0_rkp, -0.052723e0_rkp, -0.037783e0_rkp, 0.48294e0_rkp, 1.98697e0_rkp] 

@@ -555,7 +555,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   
   integer      ,dimension(64)                               ::    SeedVec
   
-  character(150)                                            ::    PES_Model_Temp                
+  character(150)                                            ::    PES_Model_Temp 
+
+  logical                                                   ::    ExFlg
+  character(150)                                            ::    MolFldr              
 
   integer                                                   ::    len
   logical                                                   ::    i_Debug_Loc = .true.
@@ -1168,21 +1171,22 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             
             
           case("Distinguish Exchanges?")
-            This%ConsiderExc = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExc  = ", This%ConsiderExc )
-            if (((trim(adjustl(This%ConsiderExc))) .eq. 'yes') .or. ((trim(adjustl(This%ConsiderExc))) .eq. 'YES')) This%ConsiderExcFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExcFlg  = ", This%ConsiderExcFlg )
+            call Error("'Distinguish Exchanges?' is OBSOLETE. Please, change INPUT-FILE with 'Distinguish Exchanges between Each Other?' and/or 'Distinguish Exchanges from Inelastic?'")
+            ! This%ConsiderExc = line_input(i_eq+2:150)
+            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExc  = ", This%ConsiderExc )
+            ! if (((trim(adjustl(This%ConsiderExc))) .eq. 'yes') .or. ((trim(adjustl(This%ConsiderExc))) .eq. 'YES')) This%ConsiderExcFlg = .true.
+            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExcFlg  = ", This%ConsiderExcFlg )
 
         case("Distinguish Exchanges between Each Other?")
             line_input = line_input(i_eq+2:150)
             if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
-            if (((trim(adjustl(line_input))) .eq. 'yes') .or. ((trim(adjustl(line_input))) .eq. 'YES')) This%MergeExchsFlg = .true.
+            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchsFlg = .true.
             if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
 
         case("Distinguish Exchanges from Inelastic?")
             line_input = line_input(i_eq+2:150)
             if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
-            if (((trim(adjustl(line_input))) .eq. 'yes') .or. ((trim(adjustl(line_input))) .eq. 'YES')) This%MergeExchToInelFlg = .true.
+            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchToInelFlg = .true.
             if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
 
 !          case("Distinguish Quasi-Bound?")
@@ -1576,7 +1580,6 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   
     if (This%NBins(iMol) == 0) then
       if (i_Debug_Loc) call Logger%Write( "Found the ", iMol, "-th Molecule with 0 Levels / Bins. Going to read the overall Nb of Levels.")
-
             
       FileName = trim(adjustl(This%OutputDir)) // '/' // trim(adjustl(This%System)) // '/' // trim(adjustl(This%Molecules_Name(iMol))) // '/NLevels.inp '
       if (i_Debug_Loc) call Logger%Write( "Opening File: ", FileName )
@@ -1587,19 +1590,22 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
         else
       close(Unit)
           FileName = trim(adjustl(This%OutputDir)) // '/' // trim(adjustl(This%System)) // '/' // trim(adjustl(This%Molecules_Name(iMol))) // '/levels_cut.inp '
-          open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
-            if ((Status/=0) .and. (i_Debug_Loc)) call Logger%Write( trim(adjustl(This%OutputDir)) // "/" // trim(adjustl(This%System)) // "/" // trim(adjustl(This%Molecules_Name(iMol))) // "/levels_cut.inp NOT FOUND. Nb of Levels set to 0 (For Now)!" )
-            NLevels = 0
-            do
-              read(Unit,'(A100)',iostat=Status) Line
-              if (Line(2:2) /= '#') then
-                NLevels = NLevels + 1
-              end if
-              if (Status /= 0) exit
-            end do
-          close(Unit)
-          NLevels = NLevels - 1
-          This%NBins(iMol) = NLevels   
+          INQUIRE( FILE=trim(adjustl(FileName)), EXIST=ExFlg )
+          if (ExFlg) then
+            open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
+              if ((Status/=0) .and. (i_Debug_Loc)) call Logger%Write( trim(adjustl(This%OutputDir)) // "/" // trim(adjustl(This%System)) // "/" // trim(adjustl(This%Molecules_Name(iMol))) // "/levels_cut.inp NOT FOUND. Nb of Levels set to 0 (For Now)!" )
+              NLevels = 0
+              do
+                read(Unit,'(A100)',iostat=Status) Line
+                if (Line(2:2) /= '#') then
+                  NLevels = NLevels + 1
+                end if
+                if (Status /= 0) exit
+              end do
+            close(Unit)
+            NLevels = NLevels - 1
+            This%NBins(iMol) = NLevels   
+          end if
         end if
       
       WRITE(This%NBins_char(iMol), '(I6)') This%NBins(iMol)
@@ -1608,7 +1614,6 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
     end if
     
   end do
-
 
   do iAt = 1,This%NAtoms
     if (This%AtomsMass(iAt) == Zero) then

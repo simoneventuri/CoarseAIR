@@ -166,7 +166,7 @@ Subroutine Initialize_BNN_PES( This, Input, Atoms, iPES, i_Debug )
   if (Status/=0) call Error( "Error allocating This%W3" )
 
 
-  NN_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(1))) // '/' // trim(adjustl(Input%PES_ParamsFldr))
+  NN_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(1))) // '/' // trim(adjustl(Input%PES_ParamsFldr))
   This%NN_Weights_Folder = NN_Weights_Folder
   
   if (i_Debug_Loc) call Logger%Write( "Reading BNN PES Parameters" )

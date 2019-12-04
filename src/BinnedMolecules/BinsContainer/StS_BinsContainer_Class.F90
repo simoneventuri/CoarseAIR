@@ -81,11 +81,14 @@ Subroutine Initialize_StS_BinsContainer( This, Input, LevelsContainer, iMol, Wri
   !i_Debug_Loc   =     Logger%On()
 
 
+  This%NBins = Input%NBins(iMol)
+
+
   ! Allocate Bins
   if (.not. allocated(This%Bin)) then 
     allocate(This%Bin(Input%NBins(iMol)), Stat=Status )
     if (Status/=0) call Error( "Error allocating This%Bin" )
-    if (i_Debug_Loc)  call Logger%Write( "Allocated ", Input%NBins(iMol), " Bins for the Molecule Nb", iMol )
+    if (i_Debug_Loc)  call Logger%Write( "Allocated ", This%NBins, " Bins for the Molecule Nb", iMol )
   end if
 
 
@@ -113,7 +116,7 @@ Subroutine Initialize_StS_BinsContainer( This, Input, LevelsContainer, iMol, Wri
 
   ! Writing all the bin vqns and jqns in the related Bin_*.dat file
   This%Bin%NLevels = 1
-  do iBins = 1,Input%NBins(iMol)
+  do iBins = 1,This%NBins
     write(iBins_char,'(I5)') iBins
     
     if (WriteFlg) then

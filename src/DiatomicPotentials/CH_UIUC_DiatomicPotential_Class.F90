@@ -41,7 +41,7 @@ Module CH_UIUC_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'CH_UIUC'
+  character(*)  ,parameter  ::    Name_DiaPot = 'UIUC'
 
   integer                        ,parameter  :: PolOrd =  20 !13
   real(rkp)                      ,parameter  :: re     =  1.301179737758152_rkp !1.498759159484161_rkp

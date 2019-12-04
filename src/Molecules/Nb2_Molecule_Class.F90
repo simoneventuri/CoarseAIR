@@ -190,8 +190,8 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   ! ==============================================================================================================
   !   7.4. CREATING LOCAL FOLDER FOR THE MOLECULE
   ! ==============================================================================================================
-  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/Molecules/' // This%Name // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
-  allocate( This%PathToMolFldr,    source = adjustl(trim( trim(adjustl(Input%OutputDir)) // '/Molecules/' // This%Name // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
+  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/Molecules/' // This%Name                   // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
+  allocate( This%PathToMolFldr,    source = adjustl(trim( trim(adjustl(Input%OutputDir)) // '/'           // trim(adjustl(Input%System)) // '/' // trim(adjustl(This%Name))        // '/' )) )
   if (i_Debug_Loc) call Logger%Write( "Path to Folder for Original      Molecule, This%PathToMolDtbFldr = ", This%PathToMolDtbFldr )
   if (i_Debug_Loc) call Logger%Write( "Path to Folder for Pre-Processed Molecule, This%PathToMolFldr    = ", This%PathToMolFldr    )
 

@@ -58,7 +58,6 @@ Program PreprocLevels
                Procedure       =       'PreprocLevels',     &                                   ! loading the calling procedure name
                Indentation     =       2           )                                            ! and setting the initial indentation level
   
-
 ! ==============================================================================================================
 !  READING THE PROGRAM ARGUMENTS
 ! ==============================================================================================================
@@ -127,6 +126,7 @@ Program PreprocLevels
   call Collision%Initialize( Input, i_Debug=i_Debug_PL, i_Debug_Deep=i_Debug_PL_Deep )
   if (i_Debug_PL) call Logger%Write( "Done with Collision%Initialize" )
 ! ==============================================================================================================  
+
 
 
   call CPU_Time( EndTime )

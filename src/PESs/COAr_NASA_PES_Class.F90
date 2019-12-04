@@ -142,7 +142,7 @@ Subroutine Initialize_COAr_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   end do
   
   
-  NASA_COAr_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
+  NASA_COAr_file = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
   if (i_Debug_Loc) call Logger%Write( "Reading NASA COAr PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", NASA_COAr_file)
   open( File=NASA_COAr_file, NewUnit=Unit, status='OLD', iostat=Status )

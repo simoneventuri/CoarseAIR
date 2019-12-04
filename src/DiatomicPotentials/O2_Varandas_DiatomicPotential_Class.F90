@@ -40,7 +40,7 @@ Module O2_Varandas_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_O2_Varandas
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'O2_Varandas'
+  character(*)  ,parameter  ::    Name_DiaPot    = 'Varandas'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   real(rkp)                            ,parameter              :: D     = -0.142912d0

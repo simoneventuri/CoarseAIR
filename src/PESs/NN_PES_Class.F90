@@ -136,7 +136,7 @@ Subroutine Initialize_NN_PES( This, Input, Atoms, iPES, i_Debug )
   allocate(This%W3(This%NHL(2)), stat=Status)
   if (Status/=0) call Error( "Error allocating This%W3" )
 
-  NN_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/NN/' // trim(adjustl(Input%PES_ParamsFldr)) // '/' // trim(adjustl(This%NHL_Char1)) // '_' // trim(adjustl(This%NHL_Char2)) // '/'
+  NN_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/NN/' // trim(adjustl(Input%PES_ParamsFldr)) // '/' // trim(adjustl(This%NHL_Char1)) // '_' // trim(adjustl(This%NHL_Char2)) // '/'
   if (i_Debug_Loc) call Logger%Write( "Reading NN PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening files in the folder: ", NN_Weights_Folder)
   

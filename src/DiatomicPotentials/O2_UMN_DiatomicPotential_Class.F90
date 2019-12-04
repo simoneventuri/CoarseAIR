@@ -40,7 +40,7 @@ Module O2_UMN_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_O2_UMN
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'O2_UMN'
+  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN'
   logical       ,parameter  ::    i_Debug_Global = .False.
  
   contains

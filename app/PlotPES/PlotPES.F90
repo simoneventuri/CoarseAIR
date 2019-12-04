@@ -53,12 +53,6 @@ Program PlotPES
   
 !  call CPU_Time( StartTime )
   
-  if (i_Debug_PP) call Logger%Initialize( "PlotPES.log",           &                                      ! Opening the Log File using
-                              Status          =       'REPLACE',   &                                      ! replacing any previous log file
-                              Position        =       'REWIND',    &                                      ! rewinding to the top of the file
-                              Procedure       =       'PlotPES',   &                                      ! loading the calling procedure name
-                              Indentation     =       2   )                                               ! and setting the initial indentation level
-
 ! ==============================================================================================================
 !   INITIALIZING INPUT
 ! ==============================================================================================================
@@ -76,7 +70,14 @@ Program PlotPES
   Input%TaskType = 1
 ! ==============================================================================================================
 
-   call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/')
+  call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/')
+
+  if (i_Debug_PP) call Logger%Initialize( trim(adjustl(Input%OutputDir)) // "/PlotPES/PlotPES.log", &     ! Opening the Log File using
+                              Status          =       'REPLACE',   &                                      ! replacing any previous log file
+                              Position        =       'REWIND',    &                                      ! rewinding to the top of the file
+                              Procedure       =       'PlotPES',   &                                      ! loading the calling procedure name
+                              Indentation     =       2   )                                               ! and setting the initial indentation level
+
 
 ! ==============================================================================================================
 !   INITIALIZING COLLISION

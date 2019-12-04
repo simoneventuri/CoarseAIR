@@ -38,7 +38,7 @@ Module N2_UMN_ForN4_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_N2
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'N2_UMN_ForN4'
+  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN_ForN4'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   real(rkp) ,dimension(0:6)                 ,parameter      ::    cs   = [  2.70963254293_rkp, 1.32620177271e-1_rkp, 2.96757048793e-1_rkp, 1.97112432229e-1_rkp, -5.02002309588e-1_rkp, 3.80734244606e-1_rkp, 1.21001628750_rkp ]

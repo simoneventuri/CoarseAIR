@@ -37,10 +37,17 @@ Module Processes_Class
   Type    ,abstract                                         ::    Processes_Type
     logical                                                 ::    Initialized         !< Indicator whether the object is initialized
 
+    integer                ,dimension(:)      ,allocatable  ::    IdxVec, IdxVecSorted
+
     logical                                                 ::    MergeExchToInelFlg = .False. ! If True, merging Equal Exchanges together and to Inelastic Processes
                                                                                                !
     logical                                                 ::    MergeExchsFlg      = .False. ! If True, merging Equal Exchanges together
                                                                                                ! 
+    
+    integer                                                 ::    NProcType               !
+                                                                                          ! 
+    integer                ,dimension(:)      ,allocatable  ::    ProcTypeVec             !
+                                                                                          !                                                               
     integer                ,dimension(3)                    ::    ExcTypeVec              ! Type of Exchange (ex: N2+N  -> ExcTypeVec=[1,1,1]; CO+O  -> ExcTypeVec=[1,1,2]; 
                                                                                           !                       N2+NO -> ExcTypeVec=[1,1,1]; N2+O2 -> ExcTypeVec=[1,2,2]).
                                                                                           !
@@ -61,9 +68,8 @@ Module Processes_Class
     Type(Process_Type)     ,dimension(:)      ,allocatable  ::    ProcessesVecTemp        ! Vector of Processes
     Type(Process_Type)     ,dimension(:)      ,allocatable  ::    ProcessesVecCleaned     ! Vector of Processes
                                                                                           !
-    integer                ,dimension(:)      ,allocatable  ::    ExchMask                ! Mask For Exchange
-
     integer                                                 ::    NProc_Cleaned     = 0   ! 
+    real(rkp)              ,dimension(:,:)    ,allocatable  ::    OvProcRates
 
     integer                                                 ::    Status            = -1
     character(:)                              ,allocatable  ::    OutputDir
@@ -109,7 +115,7 @@ Subroutine Initialize_Processes( This, Input, Collision, i_Debug )
 
   class(Processes_Type)                             ,intent(out)   :: This
   Type(Input_Type)                                  ,intent(in)    :: Input
-  Type(Collision_Type)                              ,intent(in)    :: Collision
+  Type(Collision_Type)                              ,intent(inout) :: Collision
   logical                                 ,optional ,intent(in)    :: i_Debug
  
   logical                                                          :: i_Debug_Loc
@@ -125,18 +131,24 @@ Subroutine Initialize_Processes( This, Input, Collision, i_Debug )
 End Subroutine
 
 
-Subroutine Mask4Excahge_Processes( This, Input, i_Debug )
+Subroutine Mask4Excahge_Processes( This, Input, Collision, i_Debug )
 
   use Input_Class                 ,only: Input_Type
+  use Collision_Class             ,only: Collision_Type
 
   class(Processes_Type)                             ,intent(inout)  :: This
   Type(Input_Type)                                  ,intent(in)     :: Input
+  Type(Collision_Type)                              ,intent(inout)  :: Collision
   logical                                 ,optional ,intent(in)     :: i_Debug
   
-  integer                                                           :: iP
+  integer                                                           :: iP, jP
   integer                                                           :: Status
-  integer                                                           :: iLevel, jLevel, kLevel
+  integer                                                           :: iMol1, iMol, jMol
   logical                                                           :: i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "Mask4Excahge_Processes" )
+  !i_Debug_Loc   =     Logger%On()
 
   if (i_Debug_Loc) call Logger%Exiting
   
@@ -208,7 +220,7 @@ Subroutine Convert_CrossSect_To_Rates_Processes( This, Input, Collision, Velocit
   
   class(Processes_Type)                                 ,intent(inout) ::    This
   type(Input_Type)                                      ,intent(in)    ::    Input
-  type(Collision_Type)                                  ,intent(in)    ::    Collision
+  type(Collision_Type)                                  ,intent(inout) ::    Collision
   real(rkp)                  ,dimension(:)              ,intent(in)    ::    Velocity
   logical                                     ,optional ,intent(in)    ::    i_Debug
   logical                                     ,optional ,intent(in)    ::    i_Debug_Deep
@@ -242,7 +254,7 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
   integer                                   ,intent(in)     ::    iTInt
   logical                         ,optional ,intent(in)     ::    i_Debug
 
-  integer                                                   ::    iP
+  integer                                                   ::    iP, jP
   integer                                                   ::    Status
   integer                                                   ::    Unit
   character(:)                                 ,allocatable ::    FileName
@@ -281,7 +293,8 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
     
     write(Unit,'(A)') '#  Process,            Rate,         Rate SD'
     do iP = 1,This%NProc_Cleaned
-      write(Unit,'(I10,A1,es16.10,A1,es16.10)') This%ProcessesVecCleaned(iP)%Idx, ',', This%ProcessesVecCleaned(iP)%Temperature(iTTra)%Rate, ',', sqrt( This%ProcessesVecCleaned(iP)%Temperature(iTTra)%RateSD )
+      jP = This%IdxVecSorted(iP)
+      write(Unit,'(I10,A1,es16.10,A1,es16.10)') This%ProcessesVecCleaned(jP)%Idx, ',', This%ProcessesVecCleaned(jP)%Temperature(iTTra)%Rate, ',', sqrt( This%ProcessesVecCleaned(jP)%Temperature(iTTra)%RateSD )
     end do
   
   close(Unit)

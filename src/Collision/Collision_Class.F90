@@ -94,7 +94,6 @@ Module Collision_Class
     integer                   ,dimension(:) ,allocatable  ::    DiffPairs
     !integer                   ,dimension(0:51)            ::    Arrangements
     integer                   ,dimension(0:101)           ::    Arrangements
-
 !   ********************************************
     real(rkp)                 ,dimension(:) ,allocatable  ::    mMiMn                         !< Opposite of mass ratio: -Mi/Mn, with Mn mass of the last atom. Dim=(NAtoms-1). Old name xmss
     logical                                               ::    NormalKineticEnergy = .False. ! In the old code, this indicator used to be true if 'tpq(1,1) = 1.02030201d0'
@@ -494,7 +493,6 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     call This%InitializeMolecules( Input, i_Debug=i_Debug_Loc )
     ! ==============================================================================================================
   end if
-  
 
 
   if (TaskType_Loc == 4) then

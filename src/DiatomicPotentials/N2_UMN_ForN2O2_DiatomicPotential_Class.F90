@@ -38,7 +38,7 @@ Module N2_UMN_ForN2O2_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_N2
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'N2_UMN_ForN2O2'
+  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN_ForN2O2'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   !!! For N2+O

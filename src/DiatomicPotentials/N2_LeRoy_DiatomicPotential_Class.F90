@@ -41,7 +41,7 @@ Module N2_LeRoy_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'N2 - LeRoy'
+  character(*)  ,parameter  ::    Name_DiaPot = 'LeRoy'
 
   integer   ,parameter                                      ::    nrep  =  12
   real(rkp) ,parameter                                      ::    co    =  49.0_rkp

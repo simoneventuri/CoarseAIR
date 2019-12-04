@@ -41,7 +41,7 @@ Module CO_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'CO'
+  character(*)  ,parameter  ::    Name_DiaPot = 'NASA'
 
   integer                   ,parameter  :: nf     = 12
   real(rkp) ,dimension(nf) ,parameter   :: coef   = (/  -4.5761074811943886e-2_rkp,    0.22111734303145603_rkp, &

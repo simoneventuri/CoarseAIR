@@ -94,11 +94,11 @@ Subroutine Initialize_Morse_DiatomicPotential( This, Input, SpeciesName, iMol, M
   !     READING MORSE INPUT FILE
   ! ==============================================================================================================
   if (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'NONE') then
-    Morse_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(This%SpeciesName)) // '/Morse/Morse.dat'
+    Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Morse/Morse.dat'
   elseif (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'Local') then
     Morse_file = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/LEPS.dat'
   else
-    Morse_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(This%SpeciesName)) // '/Morse/' // trim(adjustl(Input%DiatPot_ParamsFile(iMol)))
+    Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Morse/' // trim(adjustl(Input%DiatPot_ParamsFile(iMol)))
   end if
   if (i_Debug_Loc) call Logger%Write( "Reading the Morse Parameters file" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", Morse_file )

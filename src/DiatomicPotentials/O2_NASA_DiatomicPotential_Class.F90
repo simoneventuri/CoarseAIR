@@ -41,7 +41,7 @@ Module O2_NASA_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot   = 'O2_NASA'
+  character(*)  ,parameter  ::    Name_DiaPot   = 'NASA'
 
   integer                         ,parameter   :: nfitco  = 6
   real(rkp) ,dimension(nfitco+1)  ,parameter   :: coefo2  = (/  -187.888473490235_rkp, -47.6881525811959_rkp, &

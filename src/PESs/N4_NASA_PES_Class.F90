@@ -1,7 +1,7 @@
 ! -*-F90-*-
 !===============================================================================================================
 ! 
-! Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+! Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR)  
 ! 
 ! Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
 !
@@ -32,8 +32,8 @@ Module N4_NASA_PES_Class
   implicit none
 
   ! Pre-processor conditional compilation to suppress verbosity
-#undef N4_PES_VERBOSE   
-!#define N4_EXP_FIX
+!#undef N4_PES_VERBOSE   
+!!#define N4_EXP_FIX
 
   private
   public    ::    N4_NASA_PES_Type
@@ -53,38 +53,37 @@ Module N4_NASA_PES_Class
 
   integer                                 ,parameter      :: lwork  = 50
 
-  real(rkp)                               ,parameter      :: retd   = 2.76149524_rkp
-  real(rkp)                               ,parameter      :: betatd = 1.075722195_rkp
-  real(rkp)                               ,parameter      :: detd   = 0.0955135476_rkp
+  real(rkp)                               ,parameter      :: retd   = 2.76149524d0
+  real(rkp)                               ,parameter      :: betatd = 1.075722195d0
+  real(rkp)                               ,parameter      :: detd   = 0.0955135476d0
+                                                
+  real(rkp)                               ,parameter      :: x6     =  75.63d0
+  real(rkp)                               ,parameter      :: f2     =  0.129334171818588d0
+  real(rkp)                               ,parameter      :: f220   =  5.220578416136951d-2
+  real(rkp)                               ,parameter      :: f221   = -1.159697407223882d-2
+  real(rkp)                               ,parameter      :: f222   =  1.450724604023408d-3
 
-  real(rkp)                               ,parameter      :: x6     =  75.63_rkp
-  real(rkp)                               ,parameter      :: f2     =  0.129334171818588_rkp
-  real(rkp)                               ,parameter      :: f220   =  5.220578416136951e-2_rkp
-  real(rkp)                               ,parameter      :: f221   = -1.159697407223882e-2_rkp
-  real(rkp)                               ,parameter      :: f222   =  1.450724604023408e-3_rkp
-
-  real(rkp)                               ,parameter      :: x8     =  2489_rkp
+  real(rkp)                               ,parameter      :: x8     =  2489d0
   real(rkp)                               ,parameter      :: g2     =  0.624578507475241d0
   real(rkp)                               ,parameter      :: g220   =  0.157105504988713d0
-  real(rkp)                               ,parameter      :: g221   = -2.188839577146523e-2_rkp
-  real(rkp)                               ,parameter      :: g222   =  1.003716064096833e-3_rkp
+  real(rkp)                               ,parameter      :: g221   = -2.188839577146523d-2
+  real(rkp)                               ,parameter      :: g222   =  1.003716064096833d-3
   real(rkp)                               ,parameter      :: bswth  =  Four
-  real(rkp)                               ,parameter      :: eps    =  1.e-6_rkp ! eps added to rbig in case rbig=0   RLJ 8/09
-  real(rkp)                               ,parameter      :: dpmn   = -14.9681846800000_rkp
-  real(rkp)                               ,parameter      :: vibdispt = Two*sqrt(abs(dpmn))/(dpmn*dpmn)
+  real(rkp)                               ,parameter      :: eps    =  1.d-6 ! eps added to rbig in case rbig=0   RLJ 8/09
+  real(rkp)                               ,parameter      :: dpmn   = -14.9681846800000d0
+  real(rkp)                               ,parameter      :: vibdispt = Two*dsqrt(dabs(dpmn))/(dpmn*dpmn)
   real(rkp)                               ,parameter      :: damp   =  Six
   real(rkp)                               ,parameter      :: damp4  =  damp*damp*damp*damp   
   real(rkp)                               ,parameter      :: damp5  =  damp4*damp            
   real(rkp)                               ,parameter      :: damp6  =  damp5*damp            
-  real(rkp)                               ,parameter      :: beta   = -2.18_rkp
-  real(rkp)                               ,parameter      :: beta70 = beta*70.0_rkp          
-  real(rkp)                               ,parameter      :: re     =  2.1_rkp
+  real(rkp)                               ,parameter      :: beta   = -2.18d0
+  real(rkp)                               ,parameter      :: beta70 = beta*70.d0          
+  real(rkp)                               ,parameter      :: re     =  2.1d0
   real(rkp)                               ,parameter      :: re2    =  Two*re     
-  real(rkp) ,dimension(20)                ,parameter      :: coef   = [1.0345018_rkp,9.7550153_rkp,2.3947270e-1_rkp,-4.4270639e-1_rkp,4.2206130_rkp,    &
-                                                                       -9.6318443_rkp,-1.7070046e+1_rkp,1.5595772_rkp,9.0354414e-1_rkp,-3.7645959_rkp,  &
-                                                                       6.2330259e-1_rkp,1.5681477_rkp,8.1289901e-1_rkp,-2.7320998e-1_rkp,8.4521948_rkp, &
-                                                                       5.7363853_rkp,-1.3138353_rkp,-7.5160389e-1_rkp,1.3283815e-1_rkp,0.0038_rkp]
-
+  real(rkp) ,dimension(20)                ,parameter      :: coef   = [1.0345018d0,9.7550153d0,2.394727d-1,-4.4270639d-1,4.2206130d0,    &
+                                                                       -9.6318443d0,-1.7070046d1,1.5595772d0,9.0354414d-1,-3.7645959d0,  &
+                                                                       6.2330259d-1,1.5681477d0,8.1289901d-1,-2.7320998d-1,8.4521948d0,  &
+                                                                       5.7363853d0,-1.3138353d0,-7.5160389d-1,1.3283815d-1,0.0038d0]
   integer                                 ,parameter      :: idp  = 10
   integer                                 ,parameter      :: idq  = 5
   integer                                 ,parameter      :: idd  = 5
@@ -92,22 +91,21 @@ Module N4_NASA_PES_Class
   real(rkp)                               ,parameter      :: ao   = Two
   real(rkp)                               ,parameter      :: a1   = Six
   real(rkp)                               ,parameter      :: a0   = Two
-  real(rkp)                               ,parameter      :: einf = -109.036558873442_rkp
-  real(rkp)                               ,parameter      :: c6   = -58.893858362275_rkp  
-  real(rkp)                               ,parameter      :: d    = 2.5_rkp
-  real(rkp)                               ,parameter      :: co   = 49_rkp
-  real(rkp) ,dimension(idp)               ,parameter      :: pes  = [146.736533087545_rkp,101.160591312956_rkp,-251.323812509419_rkp,-499.020252425371_rkp,-210.074594675137_rkp, &
-                                                                     135.174682961986_rkp,214.7693593595_rkp,425.317131479472_rkp,570.993394092895_rkp,266.199319038817_rkp]
+  real(rkp)                               ,parameter      :: einf = -109.036558873442d0
+  real(rkp)                               ,parameter      :: c6   = -58.893858362275d0  
+  real(rkp)                               ,parameter      :: d    = 2.5d0
+  real(rkp)                               ,parameter      :: co   = 49.d0
+  real(rkp) ,dimension(idp)               ,parameter      :: pes  = [146.736533087545d0,101.160591312956d0,-251.323812509419d0,-499.020252425371d0,-210.074594675137d0, &
+                                                                     135.174682961986d0,214.7693593595d0,425.317131479472d0,570.993394092895d0,266.199319038817d0]
   real(rkp)                               ,parameter      :: a2   = Two
-  real(rkp) ,dimension(idq)               ,parameter      :: qm   = [17.3398942423333_rkp,10.2017829193229_rkp,-4.7194296899574_rkp,-9.61643152091987_rkp,-2.12839249419926_rkp]
+  real(rkp) ,dimension(idq)               ,parameter      :: qm   = [17.3398942423333d0,10.2017829193229d0,-4.7194296899574d0,-9.61643152091987d0,-2.12839249419926d0]
   real(rkp)                               ,parameter      :: a3   = Two
-  real(rkp) ,dimension(idd)               ,parameter      :: dip  = [-42.6175278814367_rkp,873.328188249918_rkp,984.492872053711_rkp,518.057930455541_rkp,124.185667297002_rkp]
-  real(rkp)                               ,parameter      :: dp1   = (873.238_rkp*exp(-2.2_rkp)*2.1_rkp - 42.6175_rkp)
+  real(rkp) ,dimension(idd)               ,parameter      :: dip  = [-42.6175278814367d0,873.328188249918d0,984.492872053711d0,518.057930455541d0,124.185667297002d0]
+  real(rkp)                               ,parameter      :: dp1   = (873.238d0*dexp(-2.2d0)*2.1d0 - 42.6175d0)
   real(rkp)                               ,parameter      :: dp2   = dp1
-  real(rkp)                               ,parameter      :: preqq = 1.5_rkp*sqrt(Two)
-
+  real(rkp)                               ,parameter      :: preqq = 1.5d0*dsqrt(Two)
   real(rkp)                               ,parameter      :: db2td = -Two*detd*betatd !-0.205492086153018d0 
-  
+ 
   contains
 
 ! **************************************************************************************************************
@@ -159,19 +157,19 @@ Subroutine Initialize_N4_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   end do
 
   call diatccsdd(re, veccsd, Temp, 1)              
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) ' * Initialize_N4_NASA_PES * ccsd potential at "re": ', veccsd 
-#endif
+!#endif
 
   call This%Pairs(1)%Vd%Compute_Vd_dVd( re, veuse, Temp )                                   
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) ' * Initialize_N4_NASA_PES * diatomic potential at "re": ',veuse  
-#endif
+!#endif
 
   This%shiftof0 = Two * (veccsd - veuse)                                            
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) ' * Initialize_N4_NASA_PES * shift of diatomic zero of energy: ', This%shiftof0/Two, '; shift of VTd: ', This%shiftof0
-#endif
+!#endif
 
   if (i_Debug_Loc) call Logger%Exiting()
 
@@ -203,10 +201,10 @@ Function N4_NASA_Potential_From_R( This, R, Q ) result( V )
   real(rkp) ,dimension(12)                                   ::    dVdQin
   real(rkp)                                                  ::    t1, t2
 
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(*,*) 'Inside N4_NASA_Potential_From_R'
   write(*,*) 'Q = ', Q
-#endif
+!#endif
 
   call n4fitd(This%shiftof0, Q(1:3), Q(4:6), Q(7:9), Q(10:12), V, dVdQin)
 
@@ -224,7 +222,7 @@ Function N4_NASA_Potential_From_R_OnlyTriat( This, R, Q ) result( V )
 
   real(rkp)                                                  ::    t1, t2
   
-  V = 0.0
+  V = 0.d0
   
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -248,9 +246,9 @@ Subroutine Compute_N4_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp), dimension(3)                                    ::    dVdR4
 
   dVdR = Zero
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(*,*) 'Inside Compute_N4_NASA_PES_1d'
-#endif
+!#endif
   
   call n4fitd(This%shiftof0, Q(1:3), Q(4:6), Q(7:9), Q(10:12), V, dVdQin)
 
@@ -313,34 +311,34 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     cart(i,3) = xyz3(i)                                                
     cart(i,4) = xyz4(i)                                                
   end do  
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '** n4fitd **** cart(:,1) = ', cart(:,1)
   write(6,*) '** n4fitd **** cart(:,2) = ', cart(:,2)
   write(6,*) '** n4fitd **** cart(:,3) = ', cart(:,3)
   write(6,*) '** n4fitd **** cart(:,4) = ', cart(:,4)
 
   write(6,*) '** n4fitd **** Entering vtdd'
-#endif
+!#endif
   !call vtdd(  xyz1, xyz2, xyz3, xyz4, vmat(1,1), dpart)
   call vtdd(  xyz1, xyz2, xyz3, xyz4, vmat(1,1), dpart(:,1))  
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Done with vtdd'
   write(6,*) '** n4fitd **** Entering vn2n2d for the 1st time'
-#endif
+!#endif
   call vn2n2d(xyz1, xyz2, xyz3, xyz4, vmat(2,2), dpart(:,2), 0)  
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Done with vn2n2d'
   write(6,*) '** n4fitd **** Entering vn2n2d for the 2nd time'
-#endif
+!#endif
   call vn2n2d(xyz1, xyz3, xyz2, xyz4, vmat(3,3), dpart(:,3), 0)  
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Done with vn2n2d'
   write(6,*) '** n4fitd **** Entering vn2n2d for the 3rd time'
-#endif
+!#endif
   call vn2n2d(xyz1, xyz4, xyz2, xyz3, vmat(4,4), dpart(:,4), 0)  
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Done with vn2n2d'
-#endif
+!#endif
 
   do i=1,3
     sv           = dpart(i+3,3)
@@ -351,26 +349,26 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     dpart(i+6,4) = dpart(i+9,4)
     dpart(i+9,4) = sv
   end do
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '** n4fitd **** dpart = ', dpart
-#endif
+!#endif
   !stop
   vmat(1,1) = vmat(1,1) - shiftof0                                      
   do i=2,4
     vmat(1,i) = 6.0847866d-02
     vmat(i,1) = 6.0847866d-02
   end do
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** vmat = ', vmat
-#endif   
+!#endif   
   do i=1,4
     do j=1,4
       vmatc(j,i) = vmat(j,i)
     end do
   end do
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** vmatc = ', vmatc
-#endif  
+!#endif  
   !     
   ! Call to MKL (Find the eigenvalues and eigenvectors)
   ! ---------------------------------------------------
@@ -378,20 +376,20 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
   ! call dsyevx('V','I','L',4,vmat,4,vl,ul,1,1,zero,neig, eig,vec,4, work,lwork,iwork,ifail,info)
   ! LAPACK  dsyevx (JOBZ, RANGE, UPLO, N, A, LDA, VL, VU, IL, IU, ABSTOL, M, W, Z, LDZ, WORK, LWORK, IWORK, IFAIL, INFO)      
   ! ---------------------------------------------------------------
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Entering dsyevx'
-#endif
+!#endif
   call dsyevx('V', 'I', 'L', 4, vmat, 4, vl, ul, 1, 1, Zero, neig, eig, vec, 4, work, lwork, iwork, ifail, info)
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** Done with dsyevx '
-#endif
+!#endif
 
   do i=1,4
     vec(i) = vec(i)**2
   end do
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '** n4fitd **** vec = ', vec
-#endif
+!#endif
 
   if (info .ne. 0) then
     write(6,*) '** n4fitd **** info = ', info, '; STOPPING!'
@@ -399,20 +397,20 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
   end if
 
   fit = eig(1)
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '** n4fitd **** fit = ', fit
-#endif
+!#endif
 
   do i=1,12
 
     dfit(i) = dpart(i,1)*vec(1) + dpart(i,2)*vec(2) + dpart(i,3)*vec(3) + dpart(i,4)*vec(4)
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
     write(6,*) '** n4fitd **** dfit(i) = ', dfit(i), ' for i=', i
-#endif
+!#endif
 
     if ( (dfit(i) .ne. dfit(i)) .or. (dfit(i) .gt. 1.d20) .or. (dfit(i) .lt. -1.d20) ) then
       
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
       write(6,*) '** n4fitd **** got nan for dfit ', i
       write(6,*) '** n4fitd **** dparts ', dpart(i,1), dpart(i,2), dpart(i,3), dpart(i,4)
       write(6,*) '** n4fitd **** vecs ', vec(1), vec(2), vec(3), vec(4)
@@ -421,7 +419,7 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
       do k=1,4
         write(6,*) (vmat(k,j), j=1,4)
       end do
-#endif
+!#endif
 
       if ( (dpart(i,2) .ne. dpart(i,2)) .or. (dpart(i,2) .gt. 1d20) .or. (dpart(i,2) .le. -1d20) ) then
         call vn2n2d( xyz1, xyz2, xyz3, xyz4, vmat(2,2), dpart(1,2), 1)
@@ -520,9 +518,9 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
   r23 = sqrt(r23)
   r24 = sqrt(r24)
   r34 = sqrt(r34)
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '**** vtdd **** r12 = ', r12, '; r13 = ', r13, '; r14 = ', r14, '; r23 = ', r23, '; r24 = ', r24, '; r34 = ', r34
-#endif
+!#endif
 
   do i=1,3
     dr12(i)   = (x1(i) - x2(i)) / r12
@@ -538,9 +536,9 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
     dr24(i+9) = -dr24(i+3)
     dr34(i+9) = -dr34(i+6)
   end do
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '**** vtdd **** dr12 = ', dr12, '; dr13 = ', dr13, '; dr14 = ', dr14, '; dr23 = ', dr23, '; dr24 = ', dr24, '; dr34 = ', dr34
-#endif
+!#endif
 
   ex12 = exp( -betatd * (r12 - retd) )
   vx12 = (ex12 - One)**2 * detd
@@ -554,10 +552,10 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
   vx24 = (ex24 - One)**2 * detd
   ex34 = exp( -betatd * (r34 - retd) )
   vx34 = (ex34 - One)**2 * detd
-  fit  = vx12 + vx13 + vx14 + vx23 + vx24 + vx34 - 218.47601249_rkp + 0.10_rkp ! from my ccsd(t) caln and empirical shift to get X peak height about right
-#ifdef N4_PES_VERBOSE
+  fit  = vx12 + vx13 + vx14 + vx23 + vx24 + vx34 - 218.47601249d0 + 0.10d0 ! from my ccsd(t) caln and empirical shift to get X peak height about right
+!#ifdef N4_PES_VERBOSE
   write(6,*) '**** vtdd **** fit = ', fit
-#endif
+!#endif
 
 ! compute derivatives wrt atomic cartesian coordinates
   dvx12dr = db2td * ex12 * (ex12 - One)
@@ -585,9 +583,9 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
   do i=1,12
     dfit(i) = dvx12(i) + dvx13(i) + dvx14(i) + dvx23(i) + dvx24(i) + dvx34(i)
   end do     
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '**** vtdd **** dfit = ', dfit
-#endif
+!#endif
 
   return
 End Subroutine
@@ -722,9 +720,9 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   r6 = sqrt(r6)
   r4 = sqrt(r4)
   r2 = sqrt(r2)
-#ifdef N4_PES_VERBOSE  
+!#ifdef N4_PES_VERBOSE  
   write(6,*) '**** vn2n2d ** r1 = ', r1, '; r2 = ', r2, '; r3 = ', r3, '; r4 = ', r4, '; r5 = ', r5, '; r6 = ', r6 
-#endif
+!#endif
 
   dot1 = Zero
   dot2 = Zero
@@ -740,10 +738,10 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
     dot2    = dot2 + ( x3(j)  - x4(j)  ) * ( rcd(j) - rab(j) )
   end do
   rbig = sqrt(rbig)
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '**** vn2n2d ** dot1 = ', dot1, '; dot2 = ', dot2
   write(6,*) '**** vn2n2d ** rbig = ', rbig
-#endif
+!#endif
 
   theta1arg = dot1 / (r1 * rbig)                                          
   if ( abs(theta1arg) .gt. One ) then                                     
@@ -753,9 +751,9 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
       theta1arg = -One                                                  
     end if                                                           
   end if    
-#ifdef N4_PES_VERBOSE
+!#ifdef N4_PES_VERBOSE
   write(6,*) '**** vn2n2d ** theta1arg = ', theta1arg
-#endif
+!#endif
 
   theta1 = acos(theta1arg)                                            
   if (theta1 .ne. theta1) then
@@ -1065,11 +1063,11 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   ex1 = exp(beta * r3) + exp(beta * r4) + exp(beta * r5) + exp(beta * r6)
   pairwise = ex1 * 7.d1
   sargtyp  = (r1 + r2) / (rbig + eps)  
-#ifndef N4_EXP_FIX
+!#ifndef N4_EXP_FIX
   swth     = One / (One + exp(bswth * (sargtyp - 1.2d0))) 
-#else
-  swth     = One / (One + exp(min(bswth * (sargtyp - 1.2d0),300.0_rkp))) 
-#endif
+!#else
+  swth     = One / (One + exp(min(bswth * (sargtyp - 1.2d0),300.d0))) 
+!#endif
   if (swth .gt. 1.d-12) then                                             
     dswth = -swth * swth * bswth * exp(bswth * (sargtyp - 1.2d0))                 
   else                                                              
@@ -1236,8 +1234,8 @@ Subroutine diatccsdd(r, ans, dansdr, iwant)
     d4 = d2 * d2
     d6 = d2 * d4
     
-    c8  = c6 * 20.0_rkp
-    c10 = c6 * 500.0_rkp
+    c8  = c6 * 20.d0
+    c10 = c6 * 500.d0
     vlr = einf + c6 / (r6+d6) + c8 / (r4+d4)**2 + c10 / (r2+d2)**5
     
     vrep    = co * exp( -ao * r ) / r

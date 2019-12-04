@@ -42,6 +42,9 @@ Module AtomsPair_Class
     integer                                           ::    To_Molecule               ! Index mapping from current pair to the Molecule Nb ...
     integer                                           ::    To_BinnedMolecule         ! Index mapping from current pair to the Binned Molecule Nb ...
     integer                                           ::    NLevels     =   0
+    integer                                           ::    NProc       =   0
+    integer                                           ::    NPrevProc   =   0
+    integer                                           ::    To_Pair_Exch=   0
     class(DiatomicPotential_Type)       ,allocatable  ::    DiaPot                    ! Intra-molecular diatomic potenitla object
   contains
     private

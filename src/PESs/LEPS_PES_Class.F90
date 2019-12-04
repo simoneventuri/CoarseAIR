@@ -148,7 +148,7 @@ Subroutine Initialize_LEPS_PES( This, Input, Atoms, iPES, i_Debug )
   elseif (adjustl(trim(Input%PES_ParamsFile)) == 'Local') then
     LEPS_file = adjustl(trim(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) //  '/LEPS.dat'    
   else 
-    LEPS_file = adjustl(trim(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/LEPS/' // trim(adjustl(Input%PES_ParamsFile))
+    LEPS_file = adjustl(trim(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/LEPS/' // trim(adjustl(Input%PES_ParamsFile))
   end if
   if (i_Debug_Loc) call Logger%Write( "Reading the 'LEPS' Parameters file" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", LEPS_file )

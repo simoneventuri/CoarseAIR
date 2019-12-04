@@ -55,7 +55,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
   integer               ,dimension(:)   ,allocatable                     ::    vqnMax
   integer                                                                ::    Status
   type(Level_Type)                                                       ::    State
-  logical                                                                ::    vNotEmpty = .True.
+  logical                                                                ::    vNotEmpty
   integer                                                                ::    ix
   integer                                                                ::    ivqn, ijqn
   real(rkp)                                                              ::    EMin, EMax
@@ -133,7 +133,8 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
   ! ! ==============================================================================================================
   ! !   LOOP ON J QUANTUM NUMBER
   ! ! ==============================================================================================================
-  ijqn   = Input%ijqnMin
+  vNotEmpty = .True.
+  ijqn      = Input%ijqnMin
   do while ( (ijqn <= Input%ijqnMax) .and. (vNotEmpty) ) 
   EMin = Input%EStart
   
@@ -162,6 +163,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
       allocate(x(NGridLocal))
       allocate(EDiat(NGridLocal))
       allocate(y(NGridLocal))
+
       
       if (Input%BoundayConditions(2,3) <= 0.d0) then
         psiFinal = real(NGridLocal,rkp)
@@ -194,6 +196,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
       ivqn          = Input%ivqnMin
       ELevelCurrent = -1.e10_rkp
       EintPrevious  = -1.e100_rkp
+      if (i_Debug_Loc) call Logger%Write( "ELevelCurrent = ", ELevelCurrent, "; State%Vmax = ", State%Vmax )
       do while ( (ivqn <= Input%ivqnMax) .and. (ELevelCurrent <= State%Vmax))! .and. (ELevelCurrent > EintPrevious + Input%DeltaE)) 
         EintPrevious = ELevelCurrent
         EStart       = Zero
@@ -344,7 +347,8 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
   close(Unit_Levels)
   
   close(Unit_vqn)
-  
+
+  deallocate( vqnMax )
 
   if (i_Debug_Loc) call Logger%Exiting
 

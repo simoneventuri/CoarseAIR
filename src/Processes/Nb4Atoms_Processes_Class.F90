@@ -62,10 +62,9 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
 
   class(Nb4Atoms_Processes_Type)                    ,intent(out)    :: This
   Type(Input_Type)                                  ,intent(in)     :: Input
-  Type(Collision_Type)                              ,intent(in)     :: Collision
+  Type(Collision_Type)                              ,intent(inout)  :: Collision
   logical                                 ,optional ,intent(in)     :: i_Debug
   
-  character(10)          ,dimension(3)                              :: CollNameA, CollNameB
   integer                                                           :: iP, iOpp
   integer                                                           :: iMol, iMolOpp
   integer                                                           :: iLevel, jLevel, kLevel
@@ -96,6 +95,9 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   This%PESoI        = Input%PESoI
   allocate( This%PESoI_char, source = adjustl(trim(Input%PESoI_char)) )
 
+  This%MergeExchsFlg      = Input%MergeExchsFlg
+  This%MergeExchToInelFlg = Input%MergeExchToInelFlg
+
   iP1 = Collision%Pairs(1)%To_Molecule
   iP6 = Collision%Pairs(1)%To_Molecule
   This%IniMolecules = adjustl(trim(Collision%MoleculesContainer(iP1)%Molecule%Name)) // '-' // adjustl(trim(Collision%MoleculesContainer(iP6)%Molecule%Name))
@@ -121,8 +123,67 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
 
 
   ! !---------------------------------------------------------------------------------------------------! !
-  !!!                      Finding Pairs Corresponding to Equal Exchanges                               !!!
+  !!!                         Finding Nb of Processes (Per Pair and Total)                              !!!
   ! !---------------------------------------------------------------------------------------------------! !
+  This%NProc_Tot = 0
+  do iP = 1,3
+    iOpp                   = Collision%Pairs(iP)%Opposite
+    iMol                   = Collision%Pairs(iP)%To_Molecule
+    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates  + 1
+    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%LevelsContainer%NStates  + 1
+    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                         + 1
+    This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
+  end do
+  allocate( This%Proc_To_LineVec(0:This%NProc_Tot), Stat=Status  )
+  if (Status/=0) call Error( "Error allocating Proc_To_LineVec in FindEqExchanges_Nb3_Processes" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,"+1)" )
+  This%Proc_To_LineVec = 0
+  ! !---------------------------------------------------------------------------------------------------! !
+
+
+  ! !---------------------------------------------------------------------------------------------------! !
+  !!!                                    Creating a Mask for Exchange                                   !!!
+  ! !---------------------------------------------------------------------------------------------------! !
+  call This%Mask4Excahge( Input, Collision, i_Debug=i_Debug_Loc )
+  ! !---------------------------------------------------------------------------------------------------! !
+
+
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+! !===================================================================================================! !
+
+
+! !---------------------------------------------------------------------------------------------------! !
+!!!                                    Creating a Mask for Exchange                                   !!!
+! !---------------------------------------------------------------------------------------------------! !
+Subroutine Mask4Excahge_Nb4Atoms( This, Input, Collision, i_Debug )
+
+  use Input_Class                 ,only: Input_Type
+  use Collision_Class             ,only: Collision_Type
+
+  class(Nb4Atoms_Processes_Type)                    ,intent(inout)  :: This
+  Type(Input_Type)                                  ,intent(in)     :: Input
+  Type(Collision_Type)                              ,intent(inout)  :: Collision
+  logical                                 ,optional ,intent(in)     :: i_Debug
+  
+  character(10)          ,dimension(3)                              :: CollNameA, CollNameB
+  integer                                                           :: iP, jP, kP, gP, iPOpp, jPOpp, kPOpp
+  integer                                                           :: Status, NTotTemp
+  integer                                                           :: iMol1, jMol1, iMol, jMol, kMol, lMol
+  integer                                                           :: ProcType
+  logical                                                           :: i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "Mask4Excahge_Nb4Atoms" )
+  !i_Debug_Loc   =     Logger%On() 
+
+  
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! Creating:
+  !!!   - This%ExcTypeVec
+  !!!
   CollNameA(1) = trim(adjustl(Collision%Pairs(1)%Name)) // trim(adjustl(Collision%Pairs(6)%Name))
   CollNameB(1) = trim(adjustl(Collision%Pairs(6)%Name)) // trim(adjustl(Collision%Pairs(1)%Name))
   CollNameA(2) = trim(adjustl(Collision%Pairs(2)%Name)) // trim(adjustl(Collision%Pairs(2)%Name))
@@ -147,41 +208,139 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
     This%ExcTypeVec(3) = -This%ExcTypeVec(2)
   end if
   if (i_Debug_Loc) call Logger%Write( "Constructed This%ExcTypeVec! This%ExcTypeVec = ", This%ExcTypeVec )   
-  ! !---------------------------------------------------------------------------------------------------! !
 
 
-  ! !---------------------------------------------------------------------------------------------------! !
-  !!!                         Finding Nb of Processes (Per Pair and Total)                              !!!
-  ! !---------------------------------------------------------------------------------------------------! !
-  This%NProc_Tot = 0
-  do iP = 1,3
-    iOpp                   = Collision%Pairs(iP)%Opposite
-    iMol                   = Collision%Pairs(iP)%To_Molecule
-    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates  + 1
-    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%LevelsContainer%NStates  + 1
-    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                         + 1
-    This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
-  end do
-  allocate( This%Proc_To_LineVec(0:This%NProc_Tot), Stat=Status  )
-  if (Status/=0) call Error( "Error allocating Proc_To_LineVec in FindEqExchanges_Nb3_Processes" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,"+1)" )
-  This%Proc_To_LineVec = 0
-  ! !---------------------------------------------------------------------------------------------------! !
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! Creating:
+  !!!   - Collision%Pairs(...)%NProc
+  !!!   - Collision%Pairs(...)%To_Pair_Exch
+  !!!   - This%NProcType
+  !!!
+  This%NProcType = 1
+  iMol1 = Collision%Pairs(1)%To_Molecule
+  Collision%Pairs(1)%NProc = Collision%MoleculesContainer(iMol1)%Molecule%BinsContainer%NBins + 1
+  jMol1 = Collision%Pairs(6)%To_Molecule
+  Collision%Pairs(6)%NProc = Collision%MoleculesContainer(jMol1)%Molecule%BinsContainer%NBins + 1
 
-
-  ! !---------------------------------------------------------------------------------------------------! !
-  !!!                                    Creating a Mask for Exchange                                   !!!
-  ! !---------------------------------------------------------------------------------------------------! !
-  if ( (Input%MergeExchToInelFlg) .or. (Input%MergeExchsFlg) ) then
-    call This%Mask4Excahge( Input, i_Debug=i_Debug_Loc )
+  iP=2
+  iPOpp = Collision%Pairs(iP)%Opposite
+  iMol  = Collision%Pairs(iP)%To_Molecule
+  Collision%Pairs(iP)%NProc    = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins + 1
+  jMol  = Collision%Pairs(iPOpp)%To_Molecule
+  Collision%Pairs(iPOpp)%NProc = Collision%MoleculesContainer(jMol)%Molecule%BinsContainer%NBins + 1
+  if ( (iMol == iMol1) .and. (jMol == jMol1) .and. (This%MergeExchToInelFlg) ) then
+    Collision%Pairs(iP)%To_Pair_Exch =  1
+  elseif ( (iMol == jMol1) .and. (jMol == iMol1) .and. (This%MergeExchToInelFlg) ) then
+    Collision%Pairs(iP)%To_Pair_Exch = -1
+  else
+    Collision%Pairs(iP)%To_Pair_Exch = iP
+    This%NProcType = This%NProcType + 1
   end if
-  ! !---------------------------------------------------------------------------------------------------! !
+
+  iP=3
+  iPOpp = Collision%Pairs(iP)%Opposite
+  iMol  = Collision%Pairs(iP)%To_Molecule
+  Collision%Pairs(iP)%NProc    = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins + 1
+  jMol  = Collision%Pairs(iPOpp)%To_Molecule
+  Collision%Pairs(iPOpp)%NProc = Collision%MoleculesContainer(jMol)%Molecule%BinsContainer%NBins + 1
+  if ( (iMol == iMol1) .and. (jMol == jMol1) .and. (This%MergeExchToInelFlg) ) then
+    Collision%Pairs(iP)%To_Pair_Exch =  1
+  elseif ( (iMol == jMol1) .and. (jMol == iMol1) .and. (This%MergeExchToInelFlg) ) then
+    Collision%Pairs(iP)%To_Pair_Exch = -1
+  else
+    kP=2
+    kMol  = Collision%Pairs(kP)%To_Molecule
+    kPOpp = Collision%Pairs(kP)%Opposite
+    lMol  = Collision%Pairs(kPOpp)%To_Molecule
+    if ( (iMol == kMol) .and. (jMol == lMol) .and. (This%MergeExchsFlg) ) then
+      Collision%Pairs(iP)%To_Pair_Exch =   Collision%Pairs(kP)%To_Pair_Exch
+    elseif ( (iMol == lMol) .and. (jMol == kMol) .and. (This%MergeExchsFlg) ) then
+      Collision%Pairs(iP)%To_Pair_Exch = - Collision%Pairs(kP)%To_Pair_Exch
+    else
+      Collision%Pairs(iP)%To_Pair_Exch = iP
+      This%NProcType = This%NProcType + 1
+    end if
+  end if
+
+  if (i_Debug_Loc) call Logger%Write( "Constructed Collision%Pairs(...)%To_Pair_Exch!" )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(1)%To_Pair_Exch = ", Collision%Pairs(1)%To_Pair_Exch )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(2)%To_Pair_Exch = ", Collision%Pairs(2)%To_Pair_Exch )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(3)%To_Pair_Exch = ", Collision%Pairs(3)%To_Pair_Exch )   
+  if (i_Debug_Loc) call Logger%Write( "This%NProcType = ", This%NProcType )   
+
+
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! Creating:
+  !!!   - This%ProcTypeVec: 
+  !!! 
+  allocate(This%ProcTypeVec(This%NProcType))
+  allocate(This%OvProcRates(This%NProcType,2))
+
+  ProcType            = 1
+  This%ProcTypeVec(1) = ProcType
+  iMol1 = Collision%Pairs(1)%To_Molecule
+  jMol1 = Collision%Pairs(6)%To_Molecule
+
+  iP=2
+  iPOpp = Collision%Pairs(iP)%Opposite
+  iMol  = Collision%Pairs(iP)%To_Molecule
+  jMol  = Collision%Pairs(iPOpp)%To_Molecule
+  if (.not. ( (iMol == iMol1) .and. (jMol == jMol1) .and. (This%MergeExchToInelFlg) ) ) then
+    kMol  = Collision%Pairs(kP)%To_Molecule
+    kPOpp = Collision%Pairs(kP)%Opposite
+    lMol  = Collision%Pairs(kPOpp)%To_Molecule
+    ProcType                   = ProcType + 1
+    This%ProcTypeVec(ProcType) = ProcType 
+  end if
+
+  iP=3
+  iPOpp = Collision%Pairs(iP)%Opposite
+  iMol  = Collision%Pairs(iP)%To_Molecule
+  jMol  = Collision%Pairs(iPOpp)%To_Molecule
+  if ( (.not. ( (iMol == iMol1) .and. (jMol == jMol1) .and. (This%MergeExchToInelFlg) ) ) .and. &
+       (.not. ( (jMol == iMol1) .and. (iMol == jMol1) .and. (This%MergeExchToInelFlg) ) ) ) then
+    kP=2
+    kMol  = Collision%Pairs(kP)%To_Molecule
+    kPOpp = Collision%Pairs(kP)%Opposite
+    lMol  = Collision%Pairs(kPOpp)%To_Molecule
+    if ( (.not. ( (iMol == kMol) .and. (jMol == lMol) .and. (This%MergeExchsFlg) ) ) .and. &
+         (.not. ( (jMol == kMol) .and. (iMol == lMol) .and. (This%MergeExchsFlg) ) ) ) then
+      ProcType                   = ProcType + 1
+      This%ProcTypeVec(ProcType) = ProcType 
+    end if
+  end if
+  if (i_Debug_Loc) call Logger%Write( "Constructed This%ProcTypeVec!                  This%ProcTypeVec = ", This%ProcTypeVec )   
+
+
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!! Creating:
+  !!!   - Collision%Pairs(...)%NPrevProc
+  !!!
+  iP=1
+  Collision%Pairs(iP)%NPrevProc     = 0 
+  NTotTemp                          = Collision%Pairs(1)%NProc * Collision%Pairs(6)%NProc + 1
+  do iP=2,3
+    iPOpp = Collision%Pairs(iP)%Opposite
+    if (Collision%Pairs(iP)%To_Pair_Exch == Collision%Pairs(iP-1)%To_Pair_Exch) then
+      jP                            = Collision%Pairs(iP)%To_Pair_Exch
+      Collision%Pairs(iP)%NPrevProc = Collision%Pairs(jP)%NPrevProc
+    else
+      Collision%Pairs(iP)%NPrevProc = NTotTemp
+      NTotTemp                      = NTotTemp + Collision%Pairs(iP)%NProc * Collision%Pairs(iPOpp)%NProc + 1
+    end if
+  end do
+  if (i_Debug_Loc) call Logger%Write( "Constructed Collision%Pairs(...)%To_Pair_Exch and Collision%Pairs(...)%NProc!" )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(1)%NPrevProc = ", Collision%Pairs(1)%NPrevProc, "; Collision%Pairs(1)%NProc = ", Collision%Pairs(1)%NProc )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(2)%NPrevProc = ", Collision%Pairs(2)%NPrevProc, "; Collision%Pairs(2)%NProc = ", Collision%Pairs(2)%NProc )   
+  if (i_Debug_Loc) call Logger%Write( "                                               Collision%Pairs(3)%NPrevProc = ", Collision%Pairs(3)%NPrevProc, "; Collision%Pairs(3)%NProc = ", Collision%Pairs(3)%NProc )   
 
 
   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
-! !===================================================================================================! !
+!--------------------------------------------------------------------------------------------------------------------------------!
 
 
 ! !---------------------------------------------------------------------------------------------------! !
@@ -330,8 +489,8 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
 
 
   iP       = int(Arr / 16.0_rkp)
-  iOpp  = Collision%Pairs(iP)%Opposite
-  NProcPre = sum( This%NProc_iP(0:iP-1) )
+  iOpp     = Collision%Pairs(iP)%Opposite
+  NProcPre = Collision%Pairs(iP)%NPrevProc
   Temp     = mod(Arr , 16)
   iType    = mod(Temp, 4)
   jType    = int(Temp, 4)
@@ -401,174 +560,6 @@ End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 
 
-! !---------------------------------------------------------------------------------------------------! !
-!!!                                    Creating a Mask for Exchange                                   !!!
-! !---------------------------------------------------------------------------------------------------! !
-Subroutine Mask4Excahge_Nb4Atoms( This, Input, i_Debug )
-
-  use Input_Class                 ,only: Input_Type
-
-  class(Nb4Atoms_Processes_Type)                    ,intent(inout)  :: This
-  Type(Input_Type)                                  ,intent(in)     :: Input
-  logical                                 ,optional ,intent(in)     :: i_Debug
-  
-  integer                                                           :: iP
-  integer                                                           :: Status
-  integer                                                           :: iLevel, jLevel, kLevel
-  logical                                                           :: i_Debug_Loc
-
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Mask4Excahge_Nb4Atoms" )
-  !i_Debug_Loc   =     Logger%On() 
-
-  if (Input%MergeExchToInelFlg) then
-    This%MergeExchToInelFlg = .True.
-
-    This%NProc_Tot_Unique = This%NProc_iP(1)
-    if (This%ExcTypeVec(2) /= 1) then
-      This%NProc_Tot_Unique = This%NProc_Tot_Unique + This%NProc_iP(2)
-    end if
-    if ( (This%ExcTypeVec(3) /= 1) .and. (This%ExcTypeVec(3) /= 2) ) then
-      This%NProc_Tot_Unique = This%NProc_Tot_Unique + This%NProc_iP(3)
-    end if
-    allocate( This%ExchMask(0:This%NProc_Tot_Unique), Stat=Status  )
-    if (Status/=0) call Error( "Error allocating ExchMask in Initialize_Nb4Atoms" )
-    if (i_Debug_Loc) call Logger%Write( "Allocated ExchMask with Dimension = (",This%NProc_Tot_Unique,"+1)" )
-
-
-    iP     = 1
-    do iLevel = 1,This%NProc_iPOpp(iP,1)
-      do jLevel = 1,This%NProc_iPOpp(iP,2)
-        kLevel                                       = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-        This%ExchMask( kLevel )                      = kLevel
-      end do
-    end do
-
-    iP     = 2
-    if (This%ExcTypeVec(iP) == 1) then
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                     = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(1) ) = kLevel
-        end do
-      end do
-    elseif (This%ExcTypeVec(iP) == -1) then
-      do jLevel = 1,This%NProc_iPOpp(iP,2)
-        do iLevel = 1,This%NProc_iPOpp(iP,1)
-          kLevel                                     = (jLevel - 1)*This%NProc_iPOpp(iP,1) + iLevel
-          This%ExchMask( kLevel + This%NProc_iP(1) ) = kLevel
-        end do
-      end do
-    else
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(1) )                    = kLevel + This%NProc_iP(1)
-        end do
-      end do
-    end if
-
-    iP     = 3
-    if (This%ExcTypeVec(iP) == 1) then
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel
-        end do
-      end do
-    elseif (This%ExcTypeVec(iP) == -1) then
-      do jLevel = 1,This%NProc_iPOpp(iP,2)
-        do iLevel = 1,This%NProc_iPOpp(iP,1)
-          kLevel                                                        = (jLevel - 1)*This%NProc_iPOpp(iP,1) + iLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel
-        end do
-      end do
-    elseif (This%ExcTypeVec(iP) == 2) then
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(1)
-        end do
-      end do
-    elseif (This%ExcTypeVec(iP) == -2) then
-      do jLevel = 1,This%NProc_iPOpp(iP,2)
-        do iLevel = 1,This%NProc_iPOpp(iP,1)
-          kLevel                                                        = (jLevel - 1)*This%NProc_iPOpp(iP,1) + iLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(1)
-        end do
-      end do
-    else
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(2) + This%NProc_iP(1)
-        end do
-      end do
-    end if
-
-
-  elseif (Input%MergeExchsFlg) then
-    This%MergeExchsFlg = .True.
-
-    This%NProc_Tot_Unique = This%NProc_iP(1)
-    This%NProc_Tot_Unique = This%NProc_Tot_Unique   + This%NProc_iP(2)
-    if (This%ExcTypeVec(3) /= 2) then
-      This%NProc_Tot_Unique = This%NProc_Tot_Unique + This%NProc_iP(3)
-    end if
-    allocate( This%ExchMask(0:This%NProc_Tot_Unique), Stat=Status  )
-    if (Status/=0) call Error( "Error allocating ExchMask in Initialize_Nb4Atoms" )
-    if (i_Debug_Loc) call Logger%Write( "Allocated ExchMask with Dimension = (",This%NProc_Tot_Unique,"+1)" )
-
-    iP = 1
-    do iLevel = 1,This%NProc_iPOpp(iP,1)
-      do jLevel = 1,This%NProc_iPOpp(iP,2)
-        kLevel                                                          = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-        This%ExchMask( kLevel )                                         = kLevel
-      end do
-    end do
-
-    iP = 2
-    do iLevel = 1,This%NProc_iPOpp(iP,1)
-      do jLevel = 1,This%NProc_iPOpp(iP,1)
-        kLevel                                                          = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-        This%ExchMask( kLevel + This%NProc_iP(1) )                      = kLevel + This%NProc_iP(1)
-      end do
-    end do
-
-    iP = 3
-    if (This%ExcTypeVec(iP) == 2) then
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(1)
-        end do
-      end do
-    elseif (This%ExcTypeVec(iP) == -2) then
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (jLevel - 1)*This%NProc_iPOpp(iP,1) + iLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(1)
-        end do
-      end do
-    else
-      do iLevel = 1,This%NProc_iPOpp(iP,1)
-        do jLevel = 1,This%NProc_iPOpp(iP,2)
-          kLevel                                                        = (iLevel - 1)*This%NProc_iPOpp(iP,2) + jLevel
-          This%ExchMask( kLevel + This%NProc_iP(2) + This%NProc_iP(1) ) = kLevel + This%NProc_iP(1) + This%NProc_iP(1)
-        end do
-      end do
-    end if
-
-  end if
-  ! !---------------------------------------------------------------------------------------------------! !
-
-  
-  if (i_Debug_Loc) call Logger%Exiting
-
-End Subroutine
-!--------------------------------------------------------------------------------------------------------------------------------!
-
-
 ! ==============================================================================================================
 !   READING INITIAL AND FINAL CONDITIONS AND CROSS SECTIONS FROM statistics.out
 ! ==============================================================================================================
@@ -577,10 +568,11 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
   use Input_Class           ,only:  Input_Type
   use Collision_Class       ,only:  Collision_Type
   use Parameters_Module     ,only:  Zero
+  use Sorting_Module
   
   class(Nb4Atoms_Processes_Type)                        ,intent(inout) ::    This
   type(Input_Type)                                      ,intent(in)    ::    Input
-  type(Collision_Type)                                  ,intent(in)    ::    Collision
+  type(Collision_Type)                                  ,intent(inout) ::    Collision
   real(rkp)                  ,dimension(:)              ,intent(in)    ::    Velocity
   logical                                     ,optional ,intent(in)    ::    i_Debug
   logical                                     ,optional ,intent(in)    ::    i_Debug_Deep
@@ -602,6 +594,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
   integer       ,dimension(2)                               ::    iLevelFin
   character(6)  ,dimension(2)                               ::    iLevelFinChar  
   integer                                                   ::    Idx
+  integer                                                   ::    ProblematicIn, ProblematicFin
   logical                                                   ::    i_Debug_Loc
   logical                                                   ::    i_Debug_Loc_Deep
 
@@ -611,9 +604,6 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
   i_Debug_Loc_Deep = i_Debug_Global; if ( present(i_Debug_Deep) )i_Debug_Loc_Deep = i_Debug_Deep
   !i_Debug_Loc   =     Logger%On()
   
-
-  if (i_Debug_Loc) call Logger%Write( "Initializing the Processes. Calling Processes%Initialize" )
-  call This%Initialize( Input, Collision, i_Debug=i_Debug_Loc )
 
   !do iTtra = 1,Input%NTtra
   !  if (i_Debug_Loc) call Logger%Write( "  iTtra = ", iTtra )
@@ -663,13 +653,14 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
             if (i_Debug_Loc_Deep) call Logger%Write( "    CrossSect and CrossSectSD = ", CrossSectTemp(1:2) )   
 
 
+            !!! Checking if Initial and Final States are Accettable
+            call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI, vqnIn,  jqnIn,  ArrIn,  ProblematicIn  )!, i_Debug=i_Debug_Loc )
+            call Mask4FinProc_Nb4Atoms( Collision,              vqnFin, jqnFin, ArrFin, ProblematicFin )!, i_Debug=i_Debug_Loc )
+
+
             !!! Postprocessing Final State for Reconstructing Process !!!!
             call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
 
-            !!! Filtering Exchanges !!!!
-            if ( (This%MergeExchToInelFlg) .or. (This%MergeExchsFlg) ) then
-              Idx = This%ExchMask(Idx)
-            end if
 
             !!! New Process ??? !!!!
             Proc_To_Line = This%Proc_To_LineVec(Idx)
@@ -688,15 +679,33 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
 
           !!! Creating an Array of Unique Processes and Deallocating Temporary One
           allocate( This%ProcessesVecCleaned(This%NProc_Cleaned), Stat=Status  )
-          if (Status/=0) call Error( "Error allocating ProcessesVecCleaned in Convert_CrossSect_In_Rates_Nb3Atoms" )
+          if (Status/=0) call Error( "Error allocating ProcessesVecCleaned in Convert_CrossSect_In_Rates_Nb4Atoms" )
           if (i_Debug_Loc) call Logger%Write( "    Allocated ProcessesVecCleaned with Dimension = (",This%NProc_Cleaned,")" )
+
+          allocate( This%IdxVec(This%NProc_Cleaned), Stat=Status  )
+          if (Status/=0) call Error( "Error allocating IdxVec in Convert_CrossSect_In_Rates_Nb4Atoms" )
+          if (i_Debug_Loc) call Logger%Write( "    Allocated IdxVec with Dimension = (",This%NProc_Cleaned,")" )
+          allocate( This%IdxVecSorted(This%NProc_Cleaned), Stat=Status  )
+          if (Status/=0) call Error( "Error allocating IdxVecSorted in Convert_CrossSect_In_Rates_Nb4Atoms" )
+          if (i_Debug_Loc) call Logger%Write( "    Allocated IdxVecSorted with Dimension = (",This%NProc_Cleaned,")" )
+          
           
           do iProc=1,This%NProc_Cleaned
+            This%IdxVec(iProc)              = This%ProcessesVecTemp(iProc)%Idx
             This%ProcessesVecCleaned(iProc) = This%ProcessesVecTemp(iProc)
           end do
+
+          call hpsort(This%IdxVec, This%IdxVecSorted)
           
+          deallocate(This%IdxVec, Stat=Status)
+          if (Status/=0) call Error( "Error deallocating This%IdxVec in Convert_CrossSect_In_Rates_Nb4Atoms" )
+          if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVec" )
+          deallocate(This%IdxVecSorted, Stat=Status)
+          if (Status/=0) call Error( "Error deallocating This%IdxVecSorted in Convert_CrossSect_In_Rates_Nb4Atoms" )
+          if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVecSorted" )
+
           deallocate(This%ProcessesVecTemp, Stat=Status)
-          if (Status/=0) call Error( "Error deallocating This%ProcessesVecTemp in Convert_CrossSect_In_Rates_Nb3Atoms" )
+          if (Status/=0) call Error( "Error deallocating This%ProcessesVecTemp in Convert_CrossSect_In_Rates_Nb4Atoms" )
           if (i_Debug_Loc) call Logger%Write( "    Deallocated This%ProcessesVecTemp" )
 
         end if
@@ -720,7 +729,7 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, vqnFin, jqnFin, ArrFin, Problematic, i_Debug )
+Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Problematic)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
@@ -729,11 +738,8 @@ Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrI
   integer     ,dimension(2)                         ,intent(inout)  :: vqnIn
   integer     ,dimension(2)                         ,intent(inout)  :: jqnIn
   integer                                           ,intent(inout)  :: ArrIn
-  integer     ,dimension(2)                         ,intent(inout)  :: vqnFin
-  integer     ,dimension(2)                         ,intent(inout)  :: jqnFin
-  integer                                           ,intent(inout)  :: ArrFin
   integer                                           ,intent(out)    :: Problematic
-  logical                                 ,optional ,intent(in)     :: i_Debug
+  ! logical                                 ,optional ,intent(in)     :: i_Debug
   
   integer                                                           :: Temp
   integer                                                           :: iPIn, iPFin, jPIn, jPFin
@@ -742,9 +748,9 @@ Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrI
   integer                                                           :: iBinIn, iBinFin, iBinTemp, jBinIn, jBinFin, jBinTemp
   logical                                                           :: i_Debug_Loc
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Mask4StatisticsReading_Nb4Atoms" )
-  !i_Debug_Loc   =     Logger%On() 
+  ! i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  ! if (i_Debug_Loc) call Logger%Entering( "Mask4InProc_Nb4Atoms" )
+  ! !i_Debug_Loc   =     Logger%On() 
 
   Problematic = -1
 
@@ -777,6 +783,38 @@ Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrI
     vqnIn(2) = Collision%MoleculesContainer(jMolIn)%Molecule%BinsContainer%Bin(jBinIn)%vqnFirst
     jqnIn(2) = Collision%MoleculesContainer(jMolIn)%Molecule%BinsContainer%Bin(jBinIn)%jqnFirst
   end if
+
+  
+  ! if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+! !===================================================================================================! !
+
+
+! !---------------------------------------------------------------------------------------------------! !
+!!!                           Creating a Mask for Statistic Results                                   !!!
+! !---------------------------------------------------------------------------------------------------! !
+Pure Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Problematic)!, i_Debug )
+
+  use Collision_Class             ,only: Collision_Type
+
+  Type(Collision_Type)                              ,intent(in)     :: Collision
+  integer     ,dimension(2)                         ,intent(inout)  :: vqnFin
+  integer     ,dimension(2)                         ,intent(inout)  :: jqnFin
+  integer                                           ,intent(inout)  :: ArrFin
+  integer                                           ,intent(out)    :: Problematic
+  ! logical                                 ,optional ,intent(in)     :: i_Debug
+  
+  integer                                                           :: Temp
+  integer                                                           :: iPIn, iPFin, jPIn, jPFin
+  integer                                                           :: iTypeIn, iTypeFin, jTypeIn, jTypeFin
+  integer                                                           :: iMolIn, iMolFin, jMolIn, jMolFin
+  integer                                                           :: iBinIn, iBinFin, iBinTemp, jBinIn, jBinFin, jBinTemp
+  logical                                                           :: i_Debug_Loc
+
+  ! i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  ! if (i_Debug_Loc) call Logger%Entering( "Mask4FinProc_Nb4Atoms" )
+  ! !i_Debug_Loc   =     Logger%On() 
 
 
   iPFin    = int(ArrFin / 16)
@@ -829,7 +867,7 @@ Subroutine Mask4StatisticsReading_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrI
   ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
 
   
-  if (i_Debug_Loc) call Logger%Exiting
+  ! if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
 ! !===================================================================================================! !

@@ -1077,7 +1077,7 @@ Subroutine ReadPoints( Input, Collision, NPairs, NAtoms, i_Debug )
   
   
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "PlotPESSub" )
+  if (i_Debug_Loc) call Logger%Entering( "ReadPoints" )
   !i_Debug_Loc   =     Logger%On()
 
 
@@ -1152,7 +1152,10 @@ Subroutine ReadPoints( Input, Collision, NPairs, NAtoms, i_Debug )
         end if
         write(*,*) 'Reading Points from the File: ', FileName
         open( File=FileName, NewUnit=UnitRead, status='OLD', iostat=StatusRead ) 
-        
+        if (StatusRead /= 0) then 
+           write(*,'(A)')"File "//trim(FileName)//" NOT found!"
+           call Error('ReadPoints: File ./RSampled.csv not Found!')
+        endif
         
   !      FileNameE = trim(adjustl(Input%OutputDir)) // '/ESampled.csv.' // trim(adjustl(iPESChar))
   !      write(*,*) 'Reading E Points from the File: ', FileNameE
