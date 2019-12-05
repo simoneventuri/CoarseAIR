@@ -25,8 +25,10 @@ NNode=1                                                                         
 iNode=1                                                                                           # Current Node
 ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
 NProc=1                                                                                           # Nb of Processors
-SlncFlg=0                                                                                         # Silence bash file echoes? (0/1 for no/yes)
-MergeAllFlg=0                                                                                     # Merging All the Trajectories in 1 File (0/1 for no/yes)
+SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
+MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
+RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
+BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 
 
@@ -37,7 +39,6 @@ export COARSEAIR_INPUT_DIR=$(pwd)/input
 export COARSEAIR_INPUT_FILE=$(pwd)/input/CoarseAIR.inp
 export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
 export COARSEAIR_BIN_OUTPUT_DIR=$(pwd)/Test
-export RmTrajFlg=0                                                                                # Remove Trajectories Files? (0/1 for no/yes)
 #-------------------------------------------------------------------------------------------------#
 
 
@@ -45,7 +46,7 @@ export RmTrajFlg=0                                                              
 ###################################### DEFINING FUNCTIONS #########################################
 function SetData() {
   mkdir -p ${COARSEAIR_OUTPUT_DIR}
-  mkdir -p ${COARSEAIR_OUTPUT_DIR}/"../output"
+  #mkdir -p ${COARSEAIR_OUTPUT_DIR}/"../output"
   [[ -z "${COARSEAIR_BUILD_CONFIG}" ]] && echo "The CoarseAIR modulefile has not been loaded => Stopping" && exit 1
   
   if [ "${SlncFlg}" == "1" ]; then
@@ -211,13 +212,6 @@ for Tran in "${Tran_vec[@]}"; do :
   fi
     echo "[CoarseAIR]: ===== Internal Temperature           = " ${Tint} " ======================== "
     echo '[CoarseAIR] '     
-    
-    
-    if [ ${TranFlg} -eq 0 ]; then 
-      mkdir -p ${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}
-    else
-      mkdir -p ${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}
-    fi
       
       
     # --- Preprocessing Levels ------------------------------------------------------------------ #
@@ -226,7 +220,14 @@ for Tran in "${Tran_vec[@]}"; do :
       LoadPreprocLevels
     fi
     #=============================================================================================#
-    
+
+
+    if [ ${TranFlg} -eq 0 ]; then 
+      mkdir -p ${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}
+    else
+      mkdir -p ${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}
+    fi
+
 
     #=============================================================================================#
     if [ ${Mthd1} == "State-Specific" ] || [ ${Mthd1} == "Vib-Specific" ] ; then

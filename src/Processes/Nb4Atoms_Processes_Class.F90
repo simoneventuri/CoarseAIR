@@ -73,6 +73,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   integer                                                           :: iP1, iP6
   integer                                                           :: NLevelsOpp
   character(10)                                                     :: InProcChar
+  character(20)                                                     :: Temp1Char, Temp2Char
   logical                                                           :: i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -117,8 +118,14 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   allocate(This%TInt(This%NTInt));      This%TInt      = int(Input%TtraVec)
   allocate(This%TIntChar(This%NTInt));  This%TIntChar  = Input%TtraVecIntChar
 
-  allocate(This%QRatio(2,   This%NTTra, This%NTInt)); This%QRatio     = Zero
-  allocate(This%QRatioChar( This%NTTra, This%NTInt)); This%QRatioChar = '                                    '
+  !allocate(This%QRatio(2,   This%NTTra, This%NTInt)); This%QRatio     = Zero
+  !allocate(This%QRatioChar( This%NTTra, This%NTInt)); This%QRatioChar = '                                    '
+  allocate(This%QRatio(2)); This%QRatio     = Zero
+  This%QRatio(1) = Collision%MoleculesContainer(iP1)%Molecule%BinsContainer%Bin(This%InBins(1))%QRatio
+  This%QRatio(2) = Collision%MoleculesContainer(iP6)%Molecule%BinsContainer%Bin(This%InBins(2))%QRatio
+  write(Temp1Char, '(es20.10)') This%QRatio(1)
+  write(Temp2Char, '(es20.10)') This%QRatio(2)
+  This%QRatioChar = adjustl(trim( adjustl(trim(Temp1Char)) // ',' // adjustl(trim(Temp2Char)) ))
   ! !---------------------------------------------------------------------------------------------------! !
 
 
@@ -666,9 +673,10 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
             Proc_To_Line = This%Proc_To_LineVec(Idx)
             if (Proc_To_Line < 1) then
               !!! New Process! Allocating it !!!!
-              call This%ProcessesVecTemp(iLine)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-              This%Proc_To_LineVec(Idx) = iLine
               This%NProc_Cleaned        = This%NProc_Cleaned + 1
+              call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+              This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
+              
             else
               !!! Old Process! Adding Cross Section !!!!
               call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )

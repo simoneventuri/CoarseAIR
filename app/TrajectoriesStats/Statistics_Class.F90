@@ -33,34 +33,37 @@ Module Statistics_Class
   public    ::    Statistics_Type
 
   Type  ::    Statistics_Type                                       
-    character(:)                ,allocatable  ::    AssignmentMethod                                                              !< Method for States Assigment.
-    integer(rkp)                              ::    NTrajectoriesToAnalyze                                                        !< Maximum Nb of Trajectories to Analyze. -1 means Analyze all Trajectories on File.
-    logical                                   ::    IdenticalDiatoms                                                              !< ???
-    integer(rkp)                                   ::    NCond                                                                         !< Number of Overall Conditions (j/v/arrangment) on the Trajectories.
-    integer(rkp)   ,dimension(:)     ,allocatable  ::    iskip                                         !Dim[NCond]                     !< Vector of Flags (0/1) for skipping the Conditions (j/v/arrangment) on the Trajectories.
-    logical   ,dimension(:)     ,allocatable  ::    PresEvOdd                                     !Dim[NCond]                     !< True if Condition corresponds to Rotational Q.N. that has to keep oddness / evenness. 
-    integer(rkp)                              ::    QuantumNumberMax = 300                                                        !< Maximum Value Allowed for QNs. Above, an Error is Raised. 
-    integer(rkp)                              ::    NTraj                                                                         !< Nb of Trajectories.
-    integer(rkp)                              ::    NRings                                                                        !< Nb of Impact Parameters' Rings.
-    real(rkp) ,dimension(:)     ,allocatable  ::    bSampled                                      !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories.
-    real(rkp) ,dimension(:)     ,allocatable  ::    bMax                                          !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories.
-    real(rkp) ,dimension(:,:)   ,allocatable  ::    Qini                                          !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions.
-    real(rkp) ,dimension(:,:)   ,allocatable  ::    Qfin                                          !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions.
-    integer(rkp)   ,dimension(:),allocatable  ::    IniStateCode                                  !Dim[NTraj]                     !< Vector of Identification Nbs for the Trajectories' Initial States.
-    integer(rkp)   ,dimension(:),allocatable  ::    SortedIndx_IniStateCode                       !Dim[NTraj]                     !< Sorted Indx for the Vector of Identification Nbs.
-    real(rkp) ,dimension(:)     ,allocatable  ::    RingArea                                      !Dim[<= NRings]                 !< Vector of Impact Parameters' Rings Areas.
-    integer(rkp)                              ::    ifact                                                                         !< Temporary Integer used for computing the Trajectory's IniStateCode.
-    type(File_Type)                           ::    ResidOutFile
-    type(File_Type)                           ::    ProbaOutFile
-    type(File_Type)                           ::    TrajeOutFile
-    type(File_Type)                           ::    StatOutFile
-    type(File_Type)                           ::    bSensitivityFile
+    character(:)                    ,allocatable  ::    AssignmentMethod                                                              !< Method for States Assigment.
+    integer(rkp)                                  ::    NTrajectoriesToAnalyze                                                        !< Maximum Nb of Trajectories to Analyze. -1 means Analyze all Trajectories on File.
+    logical                                       ::    IdenticalDiatoms                                                              !< ???
+    integer(rkp)                                  ::    NCond                                                                         !< Number of Overall Conditions (j/v/arrangment) on the Trajectories.
+    integer(rkp)    ,dimension(:)   ,allocatable  ::    iskip                                         !Dim[NCond]                     !< Vector of Flags (0/1) for skipping the Conditions (j/v/arrangment) on the Trajectories.
+    logical         ,dimension(:)   ,allocatable  ::    PresEvOdd                                     !Dim[NCond]                     !< True if Condition corresponds to Rotational Q.N. that has to keep oddness / evenness. 
+    integer(rkp)                                  ::    QuantumNumberMax = 300                                                        !< Maximum Value Allowed for QNs. Above, an Error is Raised. 
+    integer(rkp)                                  ::    NTraj                                                                         !< Nb of Trajectories.
+    integer(rkp)                                  ::    NRings                                                                        !< Nb of Impact Parameters' Rings.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bSampled                                      !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bMax                                          !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories.
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qini                                          !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions.
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qfin                                          !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions.
+    integer(rkp)    ,dimension(:)   ,allocatable  ::    IniStateCode                                  !Dim[NTraj]                     !< Vector of Identification Nbs for the Trajectories' Initial States.
+    integer(rkp)    ,dimension(:)   ,allocatable  ::    SortedIndx_IniStateCode                       !Dim[NTraj]                     !< Sorted Indx for the Vector of Identification Nbs.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    RingArea                                      !Dim[<= NRings]                 !< Vector of Impact Parameters' Rings Areas.
+    integer(rkp)                                  ::    ifact                                                                         !< Temporary Integer used for computing the Trajectory's IniStateCode.
+    type(File_Type)                               ::    ResidOutFile
+    type(File_Type)                               ::    ProbaOutFile
+    type(File_Type)                               ::    TrajeOutFile
+    type(File_Type)                               ::    StatOutFile
+    type(File_Type)                               ::    bSensitivityFile
+    logical                                       ::    StatReadsBinaryFlg  = .False.
+    logical                                       ::    StatWritesBinaryFlg = .False.
   contains
     private
     procedure ,public   ::    Initialize    =>    InitializeStatistics
     procedure ,public   ::    Process       =>    ProcessStatistics
     procedure           ::    AddFinState
     procedure           ::    ReadInputs
+    procedure           ::    ReadInputsUnformatted
     procedure           ::    SetRings
     procedure           ::    IdentifyInitialStates
     procedure           ::    PrepareOutputFiles
@@ -117,9 +120,16 @@ Subroutine InitializeStatistics( This, Input, i_Debug, i_Debug_Deep )
 ! ==============================================================================================================
 !   SETTING THE IMPACT PARAMETERS RINGS
 ! ==============================================================================================================
+  This%StatReadsBinaryFlg  = Input%StatReadsBinaryFlg
+  This%StatWritesBinaryFlg = Input%StatWritesBinaryFlg
+
   if (i_Debug_Loc) call Logger%Write( "Reading the statistings input data" )
   if (i_Debug_Loc) call Logger%Write( "-> Calling This%ReadInputs" )
-  call This%ReadInputs(i_Debug_Loc)
+  if (This%StatReadsBinaryFlg) then
+    call This%ReadInputsUnformatted(i_Debug_Loc)
+  else
+    call This%ReadInputs(i_Debug_Loc)
+  end if
   if (i_Debug_Loc) call Logger%Write( "-> Done reading the statistics input data" )
 ! ==============================================================================================================
 
@@ -171,6 +181,8 @@ Subroutine ReadInputs( This, i_Debug )
   logical                                                               ::    i_Debug_Loc
   integer(rkp)                                                          ::    iTraj, Idx, iPES
   logical                                                               ::    Limit                                               ! TRUE if There is a limit on the Nb of Trajs to Analyze
+  Integer                                                               ::    iCond
+  Integer                                                               ::    UnitWrite, StatusWrite
   type(File_Type)                                                       ::    DataFile
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -221,19 +233,151 @@ Subroutine ReadInputs( This, i_Debug )
 ! ==============================================================================================================
 !   IDENTIFYING AND SORTING INITIAL STATES AND IMPACT PARAMETER RINGS
 ! ==============================================================================================================
+  if (This%StatWritesBinaryFlg) then
+    open( NewUnit=UnitWrite, File='./trajectories.bin', Action='WRITE', access="Stream", form="Unformatted", iostat=StatusWrite )
+    if (StatusWrite/=0) call Error( "Error writing the binary data file for statistics: " // './trajectories.bin'  ) 
+      write(UnitWrite) int(This%NTraj, 4)
+  end if
+
   if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
   rewind(DataFile%Unit)                                                                                           
   read(DataFile%Unit,*)                                                                                         
   do iTraj = 1,This%NTraj                                                                                       
     read(DataFile%Unit,*,iostat=DataFile%Status) Idx, iPES, This%bMax(iTraj), This%bSampled(iTraj), This%Qini(:,iTraj), This%Qfin(:,iTraj)
-    if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )      
+    if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
+
+    if (This%StatWritesBinaryFlg) then
+      write(UnitWrite) Idx
+      write(UnitWrite) iPES
+      write(UnitWrite) This%bMax(iTraj)
+      write(UnitWrite) This%bSampled(iTraj)
+      do iCond=1,This%NCond
+        write(UnitWrite) This%Qini(iCond,iTraj)
+      end do
+      do iCond=1,This%NCond
+        write(UnitWrite) This%Qfin(iCond,iTraj)
+      end do
+    end if
+
   end do                                                                                                        
   if (i_Debug_Loc) then
     call Logger%Write( "-> Done reading the trajectory data" )
     call Logger%Write( "-> Last line: iTraj = ", "This%bMax(iTraj) = ", This%bMax(This%NTraj), "This%bSampled(iTraj) = ", This%bSampled(This%NTraj), Fi="i9", Fr="es15.8")
   end if
   call DataFile%Close()
+
+  if (This%StatWritesBinaryFlg) close(UnitWrite)
 ! ==============================================================================================================
+
+  if (i_Debug_Loc) call Logger%Exiting()
+
+End Subroutine
+! ***********************************************************************************************************************************************!
+
+
+! ***********************************************************************************************************************************************!
+Subroutine ReadInputsUnformatted( This, i_Debug )
+
+  use, intrinsic :: iso_fortran_env ,only:  IOStat_End
+
+  class(Statistics_Type)                                ,intent(inout)  ::    This
+  logical                                       ,optional ,intent(in)   ::    i_Debug
+
+  logical                                                               ::    i_Debug_Loc
+  integer(rkp)                                                          ::    iTraj, Idx, iPES
+  logical                                                               ::    Limit                                               ! TRUE if There is a limit on the Nb of Trajs to Analyze
+  Integer                                                               ::    iCond
+  Integer                                                               ::    POSTemp, TotBytes
+  Integer                                                               ::    UnitWrite, StatusWrite
+  type(File_Type)                                                       ::    DataFile
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
+  !i_Debug_Loc   =     Logger%On()
+
+
+! ==============================================================================================================
+!     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
+! ==============================================================================================================
+  if (i_Debug_Loc) call Logger%Write( "Setting the number of trajectories to be analyzed" )
+  Limit   =   This%NTrajectoriesToAnalyze > 0 
+  iTraj   =   0
+
+  if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
+  DataFile%Name     =   'trajectories.bin'
+  open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', access="Stream", form="Unformatted", iostat=DataFile%Status )
+  if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
+    
+    read(DataFile%Unit, POS=1) iTraj
+    if (i_Debug_Loc) call Logger%Write( "-> The Unformatted File Contains ", iTraj, " Trajectories" )
+    
+    if ( Limit .and. iTraj > This%NTrajectoriesToAnalyze ) then
+      This%NTraj = This%NTrajectoriesToAnalyze 
+    else
+      This%NTraj = int(iTraj, 4)
+    end if    
+    if (i_Debug_Loc) call Logger%Write( "-> Number of trajectories: This%NTraj = ", This%NTraj )
+    ! ==============================================================================================================
+
+
+    ! ==============================================================================================================
+    !     ALLOCATE THE DATA
+    ! ==============================================================================================================
+    allocate( This%bMax(This%NTraj) )
+    allocate( This%bSampled(This%NTraj) )
+    allocate( This%Qini(This%NCond,This%NTraj) )
+    allocate( This%Qfin(This%NCond,This%NTraj) )
+    ! ==============================================================================================================
+
+
+    ! ==============================================================================================================
+    !   IDENTIFYING AND SORTING INITIAL STATES AND IMPACT PARAMETER RINGS
+    ! ==============================================================================================================
+    if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
+    
+    TotBytes = int(2 * rkp) + int(2 * rkp) + int(This%NCond * rkp) + int(This%NCond * rkp)
+    do iTraj = 1,This%NTraj
+
+      POSTemp = 4 + (iTraj-1)*TotBytes + 1
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) Idx
+      
+      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + rkp
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) iPES
+      
+      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + int(2*rkp)
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bMax(iTraj)
+      
+      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp)
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bSampled(iTraj)  
+      
+      do iCond = 1,This%NCond
+        PosTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp) + iCond*rkp
+        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qini(iCond,iTraj)  
+      end do
+      
+      do iCond = 1,This%NCond
+        PosTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp) + int(This%NCond*rkp) + iCond*rkp
+        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qfin(iCond,iTraj)  
+      end do                                                                              
+      
+      if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )      
+      if (i_Debug_Loc) then
+        call Logger%Write( "-> Done reading the trajectory data" )
+        call Logger%Write( "-> Last line: iTraj = ", "This%bMax(iTraj) = ", This%bMax(This%NTraj), "This%bSampled(iTraj) = ", This%bSampled(This%NTraj), Fi="i9", Fr="es15.8")
+      end if
+    end do
+    
+  call DataFile%Close()
+  ! ==============================================================================================================
+
+
+  ! ==============================================================================================================
+  open( NewUnit=UnitWrite, File='./NConvTraj.dat', Action='WRITE', form="Formatted", iostat=StatusWrite )
+  if (StatusWrite/=0) call Error( "Error writing the Nb of Converged Trajectories: " // './NConvTraj.dat' )
+    write(UnitWrite, '(I10)') This%NTraj
+  close(UnitWrite)     
+  ! ==============================================================================================================
+
 
   if (i_Debug_Loc) call Logger%Exiting()
 
@@ -429,40 +573,40 @@ Subroutine PrepareOutputFiles( This, i_Debug )
   !i_Debug_Loc   =     Logger%On()
 
 
-! ==============================================================================================================
-!   PREPARING THE OUTPUT FILE TO WRITE RESIDUALS ('statistics-residuals.out')
-! ==============================================================================================================
-  if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write residuals" )
-  This%ResidOutFile%Name = 'statistics-residuals.out'
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%ResidOutFile%Name = ", This%ResidOutFile%Name )
-  open( NewUnit=This%ResidOutFile%Unit, File=This%ResidOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%ResidOutFile%Status )
-  if (This%ResidOutFile%Status/=0) call Error( "Error opening file: " // This%ResidOutFile%Name )
-  N  = This%NCond
-  Ni = Convert_To_String(int(N+2,4))
-  Nr = Convert_To_String(int(N,4))
-  This%ResidOutFile%Format = "(1x,"//Ni//"i6,1p"//Nr//"e15.7)"
-  if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%ResidOutFile%Format = ", This%ResidOutFile%Format )
-  if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
-  write(This%ResidOutFile%Unit,"('#',"//Ni//"a6,1p"//Nr//"a15)") ("i("//Convert_To_String(int(i,4))//")",i=1,N), "NRMS", "NCont",("RMS("//Convert_To_String(int(i,4))//")",i=1,N)
-  flush(This%ResidOutFile%Unit)
-! ==============================================================================================================
+! ! ==============================================================================================================
+! !   PREPARING THE OUTPUT FILE TO WRITE RESIDUALS ('statistics-residuals.out')
+! ! ==============================================================================================================
+!   if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write residuals" )
+!   This%ResidOutFile%Name = 'statistics-residuals.out'
+!   if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%ResidOutFile%Name = ", This%ResidOutFile%Name )
+!   open( NewUnit=This%ResidOutFile%Unit, File=This%ResidOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%ResidOutFile%Status )
+!   if (This%ResidOutFile%Status/=0) call Error( "Error opening file: " // This%ResidOutFile%Name )
+!   N  = This%NCond
+!   Ni = Convert_To_String(int(N+2,4))
+!   Nr = Convert_To_String(int(N,4))
+!   This%ResidOutFile%Format = "(1x,"//Ni//"i6,1p"//Nr//"e15.7)"
+!   if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%ResidOutFile%Format = ", This%ResidOutFile%Format )
+!   if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
+!   write(This%ResidOutFile%Unit,"('#',"//Ni//"a6,1p"//Nr//"a15)") ("i("//Convert_To_String(int(i,4))//")",i=1,N), "NRMS", "NCont",("RMS("//Convert_To_String(int(i,4))//")",i=1,N)
+!   flush(This%ResidOutFile%Unit)
+! ! ==============================================================================================================
 
 
-! ==============================================================================================================
-!   PREPARING THE OUTPUT FILE TO WRITE PROBABILITIES DATA ('statistics-probabilities.out')
-! ==============================================================================================================
-  if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write probabilities data" )
-  This%ProbaOutFile%Name = 'statistics-probabilities.out'
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%ProbaOutFile%Name = ", This%ProbaOutFile%Name )
-  open( NewUnit=This%ProbaOutFile%Unit, File=This%ProbaOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%ProbaOutFile%Status )
-  if (This%ProbaOutFile%Status/=0) call Error( "Error opening file: " // This%ProbaOutFile%Name )
-  Ni  =   Convert_To_String(int(N+1,4))
-  This%ProbaOutFile%Format = "(1x,"//Ni//"(i5,3x),*(e15.7,3x))"
-  if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%ProbaOutFile%Format = ", This%ProbaOutFile%Format )
-  if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
-  write(This%ProbaOutFile%Unit,"('#',"//Ni//"(a5,3x),*(a15,3x))") 'idx', ("i("//Convert_To_String(int(i,4))//")",i=1,N), 'Cross', 'CrossSD'
-  flush(This%ProbaOutFile%Unit)
-! ==============================================================================================================
+! ! ==============================================================================================================
+! !   PREPARING THE OUTPUT FILE TO WRITE PROBABILITIES DATA ('statistics-probabilities.out')
+! ! ==============================================================================================================
+!   if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write probabilities data" )
+!   This%ProbaOutFile%Name = 'statistics-probabilities.out'
+!   if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%ProbaOutFile%Name = ", This%ProbaOutFile%Name )
+!   open( NewUnit=This%ProbaOutFile%Unit, File=This%ProbaOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%ProbaOutFile%Status )
+!   if (This%ProbaOutFile%Status/=0) call Error( "Error opening file: " // This%ProbaOutFile%Name )
+!   Ni  =   Convert_To_String(int(N+1,4))
+!   This%ProbaOutFile%Format = "(1x,"//Ni//"(i5,3x),*(e15.7,3x))"
+!   if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%ProbaOutFile%Format = ", This%ProbaOutFile%Format )
+!   if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
+!   write(This%ProbaOutFile%Unit,"('#',"//Ni//"(a5,3x),*(a15,3x))") 'idx', ("i("//Convert_To_String(int(i,4))//")",i=1,N), 'Cross', 'CrossSD'
+!   flush(This%ProbaOutFile%Unit)
+! ! ==============================================================================================================
 
 
 ! ==============================================================================================================
@@ -473,6 +617,7 @@ Subroutine PrepareOutputFiles( This, i_Debug )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%StatOutFile%Name = ", This%StatOutFile%Name )
   open( NewUnit=This%StatOutFile%Unit, File=This%StatOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%StatOutFile%Status )
   if (This%StatOutFile%Status/=0) call Error( "Error opening file: " // This%StatOutFile%Name )
+  N   = This%NCond
   Ni  =   Convert_To_String(int(N*2,4))
   This%StatOutFile%Format = "(1x,"//Ni//"(i5,3x),*(e15.7,3x))"
   if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%StatOutFile%Format = ", This%StatOutFile%Format )
@@ -482,26 +627,26 @@ Subroutine PrepareOutputFiles( This, i_Debug )
 ! ==============================================================================================================
 
 
-! ==============================================================================================================
-!   PREPARING THE OUTPUT FILE TO WRITE STRATA CONTRIBUTES TO CROSS SECTIONS ('statistics-bSensitivity.out')
-! ==============================================================================================================
-  if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write strata contributes to cross sections" )
-  This%bSensitivityFile%Name     =   'statistics-bSensitivity.out'
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%bSensitivityFile%Name = ", This%bSensitivityFile%Name )
-  open( NewUnit=This%bSensitivityFile%Unit, File=This%bSensitivityFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%bSensitivityFile%Status )
-  if (This%bSensitivityFile%Status/=0) call Error( "Error opening file: " // This%bSensitivityFile%Name )
-  Ni  =   Convert_To_String(int(N*2,4))
-  This%bSensitivityFile%Format = "(1x,"//Ni//"(i5,3x),*(e15.7,3x))"
-  if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%bSensitivityFile%Format = ", This%bSensitivityFile%Format )
-  if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
-  write(This%bSensitivityFile%Unit,"('#',(a10,3x))") 'NRings'
-  flush(This%bSensitivityFile%Unit)
-  write(This%bSensitivityFile%Unit,"('$',(i10,3x))") This%NRings
-  flush(This%bSensitivityFile%Unit)
-  write(This%bSensitivityFile%Unit,"('#',"//Ni//"(a5,3x),*(a15,3x))") ("f("//Convert_To_String(int(i,4))//")",i=1,N),("i("//Convert_To_String(int(i,4))//")",i=1,N), &
-                                                                      ("Cross("//Convert_To_String(int(i,4))//")",i=1,This%NRings),("CrossVar("//Convert_To_String(int(i,4))//")",i=1,This%NRings)
-  flush(This%bSensitivityFile%Unit)
-! ==============================================================================================================
+! ! ==============================================================================================================
+! !   PREPARING THE OUTPUT FILE TO WRITE STRATA CONTRIBUTES TO CROSS SECTIONS ('statistics-bSensitivity.out')
+! ! ==============================================================================================================
+!   if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write strata contributes to cross sections" )
+!   This%bSensitivityFile%Name     =   'statistics-bSensitivity.out'
+!   if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%bSensitivityFile%Name = ", This%bSensitivityFile%Name )
+!   open( NewUnit=This%bSensitivityFile%Unit, File=This%bSensitivityFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%bSensitivityFile%Status )
+!   if (This%bSensitivityFile%Status/=0) call Error( "Error opening file: " // This%bSensitivityFile%Name )
+!   Ni  =   Convert_To_String(int(N*2,4))
+!   This%bSensitivityFile%Format = "(1x,"//Ni//"(i5,3x),*(e15.7,3x))"
+!   if (i_Debug_Loc) call Logger%Write( "-> Setting the write format to: This%bSensitivityFile%Format = ", This%bSensitivityFile%Format )
+!   if (i_Debug_Loc) call Logger%Write( "-> Writing the header")
+!   write(This%bSensitivityFile%Unit,"('#',(a10,3x))") 'NRings'
+!   flush(This%bSensitivityFile%Unit)
+!   write(This%bSensitivityFile%Unit,"('$',(i10,3x))") This%NRings
+!   flush(This%bSensitivityFile%Unit)
+!   write(This%bSensitivityFile%Unit,"('#',"//Ni//"(a5,3x),*(a15,3x))") ("f("//Convert_To_String(int(i,4))//")",i=1,N),("i("//Convert_To_String(int(i,4))//")",i=1,N), &
+!                                                                       ("Cross("//Convert_To_String(int(i,4))//")",i=1,This%NRings),("CrossVar("//Convert_To_String(int(i,4))//")",i=1,This%NRings)
+!   flush(This%bSensitivityFile%Unit)
+! ! ==============================================================================================================
 
 
   if (i_Debug_Loc) call Logger%Exiting()
@@ -1071,7 +1216,7 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
     RMS(iCond) = sqrt( RMS(iCond) / max(1,NRMS) )
   end do
   
-  write(This%ResidOutFile%Unit,This%ResidOutFile%Format) IniState(1:NCond), NRMS, NCont, RMS(1:NCond)
+  !write(This%ResidOutFile%Unit,This%ResidOutFile%Format) IniState(1:NCond), NRMS, NCont, RMS(1:NCond)
   ! ==============================================================================================================
   
 
@@ -1122,7 +1267,7 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
       
     end do
     
-    write(This%bSensitivityFile%Unit,This%bSensitivityFile%Format) FinCondVec, IniState, [(RingArea(iRings) * FinWeight(iRings,jFinStates), iRings=1,NRings)], [(FinWeight(iRings,jFinStates) * (One-FinWeight(iRings,jFinStates)) * RingArea(iRings) * RingArea(iRings) / max(1,TrajsPerb(iRings)), iRings=1,NRings)]
+    !write(This%bSensitivityFile%Unit,This%bSensitivityFile%Format) FinCondVec, IniState, [(RingArea(iRings) * FinWeight(iRings,jFinStates), iRings=1,NRings)], [(FinWeight(iRings,jFinStates) * (One-FinWeight(iRings,jFinStates)) * RingArea(iRings) * RingArea(iRings) / max(1,TrajsPerb(iRings)), iRings=1,NRings)]
    
     write(This%StatOutFile%Unit,This%StatOutFile%Format) FinCondVec, IniState, Cross, CrossSD
     ! ==============================================================================================================
@@ -1144,13 +1289,13 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
     if (i_Debug_Deep_Loc) call Logger%Write( "   Cross = ", Cross, "; CrossSD = ", CrossSD, "; SDPerc = ", SDPerc, "; bSampledMax = ", bSampledMax, Fr="es15.8" )
 
 
-    ! ==============================================================================================================
-    !     WRITING ... ???
-    ! ==============================================================================================================
-    i2 = 2                                                                                                                        ! i2 ???
-    if ( FinCondVec(1) < 0 ) i2 = 1                                                                                                     
-    write(This%ProbaOutFile%Unit,This%ProbaOutFile%Format) i2, FinCondVec, Cross, CrossSD
-    ! ==============================================================================================================
+    ! ! ==============================================================================================================
+    ! !     WRITING ... ???
+    ! ! ==============================================================================================================
+    ! i2 = 2                                                                                                                        ! i2 ???
+    ! if ( FinCondVec(1) < 0 ) i2 = 1                                                                                                     
+    ! write(This%ProbaOutFile%Unit,This%ProbaOutFile%Format) i2, FinCondVec, Cross, CrossSD
+    ! ! ==============================================================================================================
     
 
   end do

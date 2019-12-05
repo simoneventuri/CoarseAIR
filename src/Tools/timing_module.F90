@@ -47,9 +47,4 @@ Module Timing_Module
 
   real(rkp)     ::    t_total     =     Zero
 
-
-
-
-
-
 End Module

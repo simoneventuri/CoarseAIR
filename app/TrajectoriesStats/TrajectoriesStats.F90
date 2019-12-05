@@ -45,8 +45,10 @@ Program TrajectoriesStats
   real(rkp)                               ::    Tran
   character(10)                           ::    Tran_char
   integer                                 ::    Status
-  logical                                 ::    i_Debug_TS      = .False.
-  logical                                 ::    i_Debug_TS_Deep = .False.
+  integer                                 ::    StatReadsBinary
+  character(1)                            ::    StatReadsBinaryChar
+  logical                                 ::    i_Debug_TS      = .True.
+  logical                                 ::    i_Debug_TS_Deep = .True.
 !  real(rkp)                               ::    StartTime, EndTime
 
 
@@ -70,6 +72,16 @@ Program TrajectoriesStats
   read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
   if (Status/=0) call Error( "Error reading the argument Input%Tint" )
   if (i_Debug_TS) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint )
+
+  call getarg( 3, StatReadsBinaryChar )
+  read(StatReadsBinaryChar, "(I1)", iostat=Status) StatReadsBinary
+  if (Status/=0) call Error( "Error reading the argument StatReadsBinary" )
+  if (StatReadsBinary == 1) then
+    Input%StatReadsBinaryFlg = .True.
+    if (i_Debug_TS) call Logger%Write( "Input%StatReadsBinaryFlg = ", Input%StatReadsBinaryFlg, "; Reading Trajectories From Binary Files" )
+  else
+    if (i_Debug_TS) call Logger%Write( "Input%StatReadsBinaryFlg = ", Input%StatReadsBinaryFlg, "; Reading Trajectories From ASCI Files" )
+  end if
 ! ==============================================================================================================
 
 

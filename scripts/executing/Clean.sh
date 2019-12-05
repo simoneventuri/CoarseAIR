@@ -30,14 +30,14 @@ function RmAll {
   export MaxLevel1=${5}
   
   echo "  [Clean]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
-  echo "  [Clean]: TranFlg            = "${TranFlg}
-  echo "  [Clean]: Tran               = "${Tran}
-  echo "  [Clean]: Tint               = "${Tint}
-  echo "  [Clean]: MinLevel1          = "${MinLevel1}
-  echo "  [Clean]: MaxLevel1          = "${MaxLevel1}
-  echo "  [Clean]: MinLevel2          = "${MinLevel2}
-  echo "  [Clean]: MaxLevel2          = "${MaxLevel2}
-
+  echo "  [Clean]: TranFlg               = "${TranFlg}
+  echo "  [Clean]: Tran                  = "${Tran}
+  echo "  [Clean]: Tint                  = "${Tint}
+  echo "  [Clean]: MinLevel1             = "${MinLevel1}
+  echo "  [Clean]: MaxLevel1             = "${MaxLevel1}
+  echo "  [Clean]: MinLevel2             = "${MinLevel2}
+  echo "  [Clean]: MaxLevel2             = "${MaxLevel2}
+   
 
   iLevels1=${MinLevel1}
   while [ ${iLevels1} -le ${MaxLevel1} ]
@@ -89,13 +89,13 @@ function Clean {
   export MaxLevel1=${5}
   
   echo "  [Clean]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
-  echo "  [Clean]: TranFlg            = "${TranFlg}
-  echo "  [Clean]: Tran               = "${Tran}
-  echo "  [Clean]: Tint               = "${Tint}
-  echo "  [Clean]: MinLevel1          = "${MinLevel1}
-  echo "  [Clean]: MaxLevel1          = "${MaxLevel1}
-  echo "  [Clean]: MinLevel2          = "${MinLevel2}
-  echo "  [Clean]: MaxLevel2          = "${MaxLevel2}
+  echo "  [Clean]: TranFlg               = "${TranFlg}
+  echo "  [Clean]: Tran                  = "${Tran}
+  echo "  [Clean]: Tint                  = "${Tint}
+  echo "  [Clean]: MinLevel1             = "${MinLevel1}
+  echo "  [Clean]: MaxLevel1             = "${MaxLevel1}
+  echo "  [Clean]: MinLevel2             = "${MinLevel2}
+  echo "  [Clean]: MaxLevel2             = "${MaxLevel2}
 
 
   iLevels1=${MinLevel1}

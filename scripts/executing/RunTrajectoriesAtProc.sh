@@ -50,14 +50,14 @@ iLevels2=${12}
 NProcTot=${NProc}
 
 echo "      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = "${COARSEAIR_OUTPUT_DIR}
-echo "      [RunTrajectoriesAtProc.sh]: iNode             = "${iNode}
-echo "      [RunTrajectoriesAtProc.sh]: iProc             = "${iProc}
-echo "      [RunTrajectoriesAtProc.sh]: NProcTot          = "${NProcTot}
-echo "      [RunTrajectoriesAtProc.sh]: TranFlg           = "${TranFlg}
-echo "      [RunTrajectoriesAtProc.sh]: Tran              = "${Tran}
-echo "      [RunTrajectoriesAtProc.sh]: Tint              = "${Tint}
-echo "      [RunTrajectoriesAtProc.sh]: iLevels1          = "${iLevels1}
-echo "      [RunTrajectoriesAtProc.sh]: iLevels2          = "${iLevels2}
+echo "      [RunTrajectoriesAtProc.sh]: iNode                = "${iNode}
+echo "      [RunTrajectoriesAtProc.sh]: iProc                = "${iProc}
+echo "      [RunTrajectoriesAtProc.sh]: NProcTot             = "${NProcTot}
+echo "      [RunTrajectoriesAtProc.sh]: TranFlg              = "${TranFlg}
+echo "      [RunTrajectoriesAtProc.sh]: Tran                 = "${Tran}
+echo "      [RunTrajectoriesAtProc.sh]: Tint                 = "${Tint}
+echo "      [RunTrajectoriesAtProc.sh]: iLevels1             = "${iLevels1}
+echo "      [RunTrajectoriesAtProc.sh]: iLevels2             = "${iLevels2}
 
 RunTrajectoriesCommand="coarseair-runtrajectories.x"
 

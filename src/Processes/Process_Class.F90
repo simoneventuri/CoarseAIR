@@ -33,10 +33,10 @@ Module Process_Class
   public    ::    Process_Type
 
   Type      ::    Process_Type
-    character(:)                          ,allocatable ::    Name                      ! Name of Process
-    integer                                            ::    Idx        =   -1         ! Idx  of Process
-    integer                                            ::    ProcType   =   -1
-    integer                                            ::    ExcType    =   -1
+    character(:)                          ,allocatable ::    Name                ! Name of Process
+    integer                                            ::    Idx                 ! Idx  of Process
+    integer                                            ::    ProcType   
+    integer                                            ::    ExcType    
     integer                 ,dimension(:) ,allocatable ::    To_Pair     
     integer                 ,dimension(:) ,allocatable ::    To_Species
     integer                 ,dimension(:) ,allocatable ::    To_Level

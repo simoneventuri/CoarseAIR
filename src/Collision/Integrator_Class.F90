@@ -172,10 +172,10 @@ Subroutine InitializeIntegrator( This, Input, i_Debug )
     allocate( Format , source = "( a8,3x,a4,3x,3(a11,3x),*(a14,3x) )" )
     if (Input%NInitMolecules.eq.1) then 
        write(File%Unit,'(A)',iostat=File%Status)  &
-       '#  iTraj   iPES      bmax      b_i      j_i      v_i      arr_i     j_f       v_f        arr_f'
+       '#    iTraj, iPES,       bmax,        b_i,           j_i,           v_i,         arr_i,           j_f,           v_f,         arr_f'
     elseif (Input%NInitMolecules.eq.2) then
        write(File%Unit,'(A)',iostat=File%Status)  &
-       '#  iTraj   iPES      bmax      b_i      j_i      v_i      j_ib      v_ib      arr_i      j_f      v_f      j_fb      v_fb     arr_f'
+       '#    iTraj, iPES,       bmax,        b_i,          j1_i,          v1_i,          j2_i,          v2_i,         arr_i,          j1_f,          v1_f,          j2_f,          v2_f,         arr_f'
     else
        call Error( "Error from 'InitializeIntegrator':: case Input%NInitMolecules > 2 NOT available!" )  
     endif
@@ -818,31 +818,47 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
     ! (convention taken from David Schwenke's QCT code)
     if ( Collision%NAtoms == 3 ) then
 
-      write(This%AnalysisOutputFile%Unit,"(i8,3x,i4,3x,2(es12.5,3x),*(es15.8,3x))")                     &
-                                      iTrajStart+Traj%Idx(iTraj), Traj%iPES(iTraj),                     &
-                                      bmax, This%TrajIni%b,                                             & 
-                                      This%TrajIni%Molecules(1)%AngMom, This%TrajIni%Molecules(1)%viba, & 
-                                      This%TrajIni%Molecules(1)%iPair*16.0_rkp + iTypeIni(1) + Half,    &
-                                      This%TrajFin%Molecules(1)%AngMom, This%TrajFin%Molecules(1)%viba, & 
-                                      This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + Half
+      write(This%AnalysisOutputFile%Unit, 1)                                                                        &
+                                              iTrajStart+Traj%Idx(iTraj),                                       ',',&
+                                              Traj%iPES(iTraj),                                                 ',',&
+                                              bmax,                                                             ',',& 
+                                              This%TrajIni%b,                                                   ',',& 
+                                              This%TrajIni%Molecules(1)%AngMom,                                 ',',&
+                                              This%TrajIni%Molecules(1)%viba,                                   ',',& 
+                                              This%TrajIni%Molecules(1)%iPair*16.0_rkp + iTypeIni(1) + Half,    ',',&
+                                              This%TrajFin%Molecules(1)%AngMom,                                 ',',&
+                                              This%TrajFin%Molecules(1)%viba,                                   ',',& 
+                                              This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + Half
       flush(This%AnalysisOutputFile%Unit)
 
     else
 
-      write(This%AnalysisOutputFile%Unit,"(i8,3x,i4,3x,2(es12.5,3x),*(es15.8,3x))")                                         & 
-                                      iTrajStart+Traj%Idx(iTraj), Traj%iPES(iTraj),                                         & 
-                                      bmax, This%TrajIni%b,                                                                 & 
-                                      This%TrajIni%Molecules(1)%AngMom, This%TrajIni%Molecules(1)%viba,                     &
-                                      This%TrajIni%Molecules(2)%AngMom, This%TrajIni%Molecules(2)%viba,                     &
-                                      This%TrajIni%Molecules(1)%iPair*16.0_rkp + iTypeIni(1) + 4.0_rkp*iTypeIni(2) + Half,  &
-                                      This%TrajFin%Molecules(1)%AngMom, This%TrajFin%Molecules(1)%viba,                     &
-                                      This%TrajFin%Molecules(2)%AngMom, This%TrajFin%Molecules(2)%viba,                     &
-                                      This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + 4.0_rkp*iTypeFin(2) + Half
+      write(This%AnalysisOutputFile%Unit, 1)                                                                                            & 
+                                              iTrajStart+Traj%Idx(iTraj),                                                           ',',&
+                                              Traj%iPES(iTraj),                                                                     ',',& 
+                                              bmax,                                                                                 ',',& 
+                                              This%TrajIni%b,                                                                       ',',& 
+                                              This%TrajIni%Molecules(1)%AngMom,                                                     ',',&
+                                              This%TrajIni%Molecules(1)%viba,                                                       ',',&
+                                              This%TrajIni%Molecules(2)%AngMom,                                                     ',',&
+                                              This%TrajIni%Molecules(2)%viba,                                                       ',',&
+                                              This%TrajIni%Molecules(1)%iPair*16.0_rkp + iTypeIni(1) + 4.0_rkp*iTypeIni(2) + Half,  ',',&
+                                              This%TrajFin%Molecules(1)%AngMom,                                                     ',',&
+                                              This%TrajFin%Molecules(1)%viba,                                                       ',',&
+                                              This%TrajFin%Molecules(2)%AngMom,                                                     ',',&
+                                              This%TrajFin%Molecules(2)%viba,                                                       ',',&
+                                              This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + 4.0_rkp*iTypeFin(2) + Half
       flush(This%AnalysisOutputFile%Unit)                       
     end if
     ! ==============================================================================================================
 
   end if
+
+
+  !1 format(i8, 3x, i4, 3x, 2(es12.5,3x), *(es15.8,3x) )
+  !2 format(i8, 3x, i4, 3x, 2(es12.5,3x), *(es15.8,3x) )
+  1 format(I10, A, I5, 2(A, es11.5), *(A, es14.8) )
+  
 
 
 !  if (i_Debug_Loc) then

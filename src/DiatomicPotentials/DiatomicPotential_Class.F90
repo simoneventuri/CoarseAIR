@@ -266,11 +266,11 @@ Subroutine Period( This, Eint, Vc_R2, RecompPropFlg, rMin, VMin, rMax, VMax, rIn
 
   logical                                                   ::    i_Debug_Loc
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Period")  !, Active = i_Debug_Loc )
-  !i_Debug_Loc   =     Logger%On()
+  ! i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  ! if (i_Debug_Loc) call Logger%Entering( "Period")  !, Active = i_Debug_Loc )
+  ! !i_Debug_Loc   =     Logger%On()
 
-  if (i_Debug_Loc)  call Logger%Write( " -> Eint                              = ", Eint)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Eint                              = ", Eint)
 
 
   if ( RecompPropFlg ) then  
@@ -278,7 +278,7 @@ Subroutine Period( This, Eint, Vc_R2, RecompPropFlg, rMin, VMin, rMax, VMax, rIn
     ! Looking for Diat. Potential Maximum and its Spatial Coordinate
     RrangeExtreme = [rMin*1.01d0, 20.d0] 
     call This%FindMaximum( RrangeExtreme, Vc_R2, EpsStatPtsGlobal, r22, vmax, ierr )
-    if (i_Debug_Loc)  call Logger%Write( " -> VMax                              = ", vmax, "; r(VMax) = ", r22)
+    ! if (i_Debug_Loc)  call Logger%Write( " -> VMax                              = ", vmax, "; r(VMax) = ", r22)
 
   
     ! Looking for Diat. Potential Minimum and its Spatial Coordinate
@@ -286,7 +286,7 @@ Subroutine Period( This, Eint, Vc_R2, RecompPropFlg, rMin, VMin, rMax, VMax, rIn
     Rrange0   =   [r11,r22]
     r21       =   rMin
     call This%FindMinimum( Rrange0, Vc_R2, EpsStatPtsGlobal, r21, vmin, ierr )
-    if (i_Debug_Loc)  call Logger%Write( " -> VMin                              = ", vmin, "; r(VMin) = ", r21)
+    ! if (i_Debug_Loc)  call Logger%Write( " -> VMin                              = ", vmin, "; r(VMin) = ", r21)
 
     r12       =   r21
 
@@ -296,12 +296,12 @@ Subroutine Period( This, Eint, Vc_R2, RecompPropFlg, rMin, VMin, rMax, VMax, rIn
     ! Looking for Inner Tourning Point
     call This%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
     rIn  =   r1
-    if (i_Debug_Loc)  call Logger%Write( " -> rIn                                = ", rIn)
+    ! if (i_Debug_Loc)  call Logger%Write( " -> rIn                                = ", rIn)
 
     ! Looking for Outer Tourning Point
     call This%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
     rOut  =   r2
-    if (i_Debug_Loc)  call Logger%Write( " -> rOut                               = ", rOut)
+    ! if (i_Debug_Loc)  call Logger%Write( " -> rOut                               = ", rOut)
                                        
 
   else
@@ -325,44 +325,42 @@ Subroutine Period( This, Eint, Vc_R2, RecompPropFlg, rMin, VMin, rMax, VMax, rIn
   end if
 
   
-  if (i_Debug_Loc)  call Logger%Write( " -> DeltaE                            = ", h )
-  if (i_Debug_Loc)  call Logger%Write( " -> E+ = E + DeltaE                   = ", Ep )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> DeltaE                            = ", h )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> E+ = E + DeltaE                   = ", Ep )
 
   r1 = Zero
   r2 = Zero
   call This%TurningPoint( Rrange1, Vc_R2, Ep, r1, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
   call This%TurningPoint( Rrange2, Vc_R2, Ep, r2, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
-  if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E+          = ", r1 )
-  if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E+          = ", r2 )
-  if (i_Debug_Loc)  call Logger%Write( " -> ierr for Outer Tourning Point for E+ = ", ierr )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E+          = ", r1 )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E+          = ", r2 )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> ierr for Outer Tourning Point for E+ = ", ierr )
 
   Ap = This%ActionIntegral( r1, r2, Vc_R2, Ep, NPtsQuadGlobal, Two * This%RedMass, QuadratureType=1 )
-  if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E+               = ", Ap )
-
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E+               = ", Ap )
 
 
   Em = Eint - h
-  if (i_Debug_Loc)  call Logger%Write( " -> E- = E - DeltaE                      = ", Em )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> E- = E - DeltaE                      = ", Em )
 
   r1 = Zero
   r2 = Zero
   Rrange2   =   [rMin,rOut]
   call This%TurningPoint( Rrange1, Vc_R2, Em, r1, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
   call This%TurningPoint( Rrange2, Vc_R2, Em, r2, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
-  if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E-          = ", r1 )
-  if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E-          = ", r2 )
-  if (i_Debug_Loc)  call Logger%Write( " -> ierr for Outer Tourning Point for E- = ", ierr )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E-          = ", r1 )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E-          = ", r2 )
+  ! if (i_Debug_Loc)  call Logger%Write( " -> ierr for Outer Tourning Point for E- = ", ierr )
 
   Am = This%ActionIntegral( r1, r2, Vc_R2, Em, NPtsQuadGlobal, Two * This%RedMass, QuadratureType=1 )
-  if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E-               = ", Am )
-
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E-               = ", Am )
 
   
   Tau = Half * ( Ap - Am ) / h
-  if (i_Debug_Loc)  call Logger%Write( " -> Tau                                  = ", Tau)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Tau                                  = ", Tau)
   
 
-  if (i_Debug_Loc) call Logger%Exiting
+  ! if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -389,16 +387,16 @@ Subroutine ResonanceWidth( This, Eint, Vc_R2, rMin, rMax, Tau, Egam, i_Debug )
 
   logical                                                   ::    i_Debug_Loc
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "ResonanceWidth")  !, Active = i_Debug_Loc )
-  !i_Debug_Loc   =     Logger%On()
+  ! i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  ! if (i_Debug_Loc) call Logger%Entering( "ResonanceWidth")  !, Active = i_Debug_Loc )
+  ! !i_Debug_Loc   =     Logger%On()
 
   r11   = rMin 
-  if (i_Debug_Loc)  call Logger%Write( " -> r11                               = ", r11)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> r11                               = ", r11)
 
   r21   = rMax
   r12   = rMax
-  if (i_Debug_Loc)  call Logger%Write( " -> r12 = r21                         = ", r12)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> r12 = r21                         = ", r12)
 
   ! r22   = 1.e2 Original from David
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Simone
@@ -413,29 +411,29 @@ Subroutine ResonanceWidth( This, Eint, Vc_R2, rMin, rMax, Tau, Egam, i_Debug )
     VTemp = This%EffectivePotential( rTemp, Vc_R2 )
   end do
   r22 = rTemp
-  if (i_Debug_Loc)  call Logger%Write( " -> r11                               = ", r11)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> r11                               = ", r11)
   !!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Simone
 
   Rrange1   =   [r11,r21]
   Rrange2   =   [r12,r22]
-  if (i_Debug_Loc)  call Logger%Write( " -> Rrange1                           = ", Rrange1)
-  if (i_Debug_Loc)  call Logger%Write( " -> Rrange2                           = ", Rrange2)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Rrange1                           = ", Rrange1)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Rrange2                           = ", Rrange2)
 
   call This%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal )
-  if (i_Debug_Loc)  call Logger%Write( " -> r1                                = ", r1)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> r1                                = ", r1)
 
   call This%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal ) 
-  if (i_Debug_Loc)  call Logger%Write( " -> r2                                = ", r2)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> r2                                = ", r2)
 
   Ap = This%ActionIntegralGamma( r1, r2, Vc_R2, Eint, NPtsQuadGlobal, Two * This%RedMass, QuadratureType=3 )
-  if (i_Debug_Loc)  call Logger%Write( " -> Ap                                = ", Ap)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Ap                                = ", Ap)
 
   Egam = Ap / Tau
-  if (i_Debug_Loc)  call Logger%Write( " -> Egam                              = ", Egam)
+  ! if (i_Debug_Loc)  call Logger%Write( " -> Egam                              = ", Egam)
 
 
-  if (i_Debug_Loc) call Logger%Exiting
+  ! if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -532,7 +530,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine TurningPoint( This, Rrange, Vc_R2, Eint, Rt, ier, NBisection, NNewton)
+Pure Subroutine TurningPoint( This, Rrange, Vc_R2, Eint, Rt, ier, NBisection, NNewton)
 ! This procedure searchs for turning point, that is, one of the spatial points in which the kinetics energy is equal to zero.
 ! r1 is starting place of search, and r2 signals the end of the search ( in which case the search fails).
 ! r2 should not signficantly be beyond the turning point.
@@ -611,8 +609,10 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Function ActionIntegral( This, Ri, Ro, Vc_R2, Eint, n, TwoMu, QuadratureType ) result(Actionn)
+Pure Function ActionIntegral( This, Ri, Ro, Vc_R2, Eint, n, TwoMu, QuadratureType ) result(Actionn)
 ! This procedure computes the action integral using a n point gauss-legendre quadrature.
+
+  use GaussQuadrature_Module ,only: gaussq
 
   class(DiatomicPotential_Type)             ,intent(in)     ::    This                            !< Diatomic-Potential object
   real(rkp)                                 ,intent(in)     ::    Ri                              !< Inner turning points [bohr]
@@ -705,9 +705,11 @@ End Function
 
 
 !________________________________________________________________________________________________________________________________!
-Function ActionIntegralGamma( This, Ri, Ro, Vc_R2, Eint, n, TwoMu, QuadratureType ) result(Action)
+Pure Function ActionIntegralGamma( This, Ri, Ro, Vc_R2, Eint, n, TwoMu, QuadratureType ) result(Action)
 ! This procedure computes the action integral using a n point gauss-legendre quadrature.
-
+  
+  use GaussQuadrature_Module ,only: gaussq
+  
   class(DiatomicPotential_Type)             ,intent(in)     ::    This                            !< Diatomic-Potential object
   real(rkp)                                 ,intent(in)     ::    Ri                              !< Inner turning points [bohr]
   real(rkp)                                 ,intent(in)     ::    Ro                              !< Outer turning points

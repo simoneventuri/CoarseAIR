@@ -24,11 +24,11 @@ function ComputeTrajsPBS {
 
   echo "  [ComputeTrajsPBS]: COARSEAIR_OUTPUT_DIR = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajsPBS]: COARSEAIR_SH_DIR     = "${COARSEAIR_SH_DIR}
-  echo "  [ComputeTrajsPBS]: NNode             = "${NNode}
-  echo "  [ComputeTrajsPBS]: ProcType          = "${ProcType}
-  echo "  [ComputeTrajsPBS]: NProc             = "${NProc}
-  echo "  [ComputeTrajsPBS]: MinLevel1         = "${MinLevel1}
-  echo "  [ComputeTrajsPBS]: MaxLevel1         = "${MaxLevel1}
+  echo "  [ComputeTrajsPBS]: NNode                = "${NNode}
+  echo "  [ComputeTrajsPBS]: ProcType             = "${ProcType}
+  echo "  [ComputeTrajsPBS]: NProc                = "${NProc}
+  echo "  [ComputeTrajsPBS]: MinLevel1            = "${MinLevel1}
+  echo "  [ComputeTrajsPBS]: MaxLevel1            = "${MaxLevel1}
   
   
   cd ${COARSEAIR_OUTPUT_DIR}/..
@@ -70,13 +70,13 @@ function ComputeTrajsPBS {
     
     sed -e '4s/$/'${iLevelMin}'/'                           'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
     sed -e '6s/$/'${iLevelMin}'/'                           'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
-    sed -e '145s/$/'${iLevelMin}'/'                         'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs'
-    sed -e '146s/$/'${iLevelMax}'/'                         'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
+    sed -e '147s/$/'${iLevelMin}'/'                         'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs'
+    sed -e '148s/$/'${iLevelMax}'/'                         'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
     
-    sed -e '147s/$/'${Tran}'/'                              'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
-    sed -e '148s/$/'${Tint}'/'                              'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
+    sed -e '149s/$/'${Tran}'/'                              'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
+    sed -e '150s/$/'${Tint}'/'                              'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
 
-    sed -e '149s/$/'${iNode}'/'                             'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${iLevelMin}'.pbs'
+    sed -e '151s/$/'${iNode}'/'                             'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${iLevelMin}'.pbs'
 
     qsub ./'RunTrajectories-'${iLevelMin}'.pbs'
     
@@ -102,21 +102,21 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
-  echo "  [ComputeTrajs]: NNode              = "${NNode}
-  echo "  [ComputeTrajs]: iNode              = "${iNode}
-  echo "  [ComputeTrajs]: NProc              = "${NProc}
-  echo "  [ComputeTrajs]: System             = "${System}
-  echo "  [ComputeTrajs]: Tran               = "${Tran}
-  echo "  [ComputeTrajs]: Tint               = "${Tint}
-  echo "  [ComputeTrajs]: NLevels1           = "${NLevels1}
-  echo "  [ComputeTrajs]: MinLevel1          = "${MinLevel1}
-  echo "  [ComputeTrajs]: MaxLevel1          = "${MaxLevel1}
-  echo "  [ComputeTrajs]: NLevels2           = "${NLevels2}
-  echo "  [ComputeTrajs]: MinLevel2          = "${MinLevel2}
-  echo "  [ComputeTrajs]: MaxLevel2          = "${MaxLevel2}
-  echo "  [ComputeTrajs]: StochPESFlg        = "${StochPESFlg}
-  echo "  [ComputeTrajs]: NPESs              = "${NPESs}
-  echo "  [ComputeTrajs]: iPESStart          = "${iPESStart}
+  echo "  [ComputeTrajs]: NNode                 = "${NNode}
+  echo "  [ComputeTrajs]: iNode                 = "${iNode}
+  echo "  [ComputeTrajs]: NProc                 = "${NProc}
+  echo "  [ComputeTrajs]: System                = "${System}
+  echo "  [ComputeTrajs]: Tran                  = "${Tran}
+  echo "  [ComputeTrajs]: Tint                  = "${Tint}
+  echo "  [ComputeTrajs]: NLevels1              = "${NLevels1}
+  echo "  [ComputeTrajs]: MinLevel1             = "${MinLevel1}
+  echo "  [ComputeTrajs]: MaxLevel1             = "${MaxLevel1}
+  echo "  [ComputeTrajs]: NLevels2              = "${NLevels2}
+  echo "  [ComputeTrajs]: MinLevel2             = "${MinLevel2}
+  echo "  [ComputeTrajs]: MaxLevel2             = "${MaxLevel2}
+  echo "  [ComputeTrajs]: StochPESFlg           = "${StochPESFlg}
+  echo "  [ComputeTrajs]: NPESs                 = "${NPESs}
+  echo "  [ComputeTrajs]: iPESStart             = "${iPESStart}
   
   if [ ${MinLevel1} -eq 0 ]; then 
     echo "  [ComputeTrajs]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/LevelsToRunList.inp
@@ -268,14 +268,14 @@ function RunTrajectoriesAtProc() {
   NProcTot=${NProc}
   
   echo "      [RunTrajectoriesAtProc]: COARSEAIR_OUTPUT_DIR = "${COARSEAIR_OUTPUT_DIR}
-  echo "      [RunTrajectoriesAtProc]: NNode             = "${NNode}
-  echo "      [RunTrajectoriesAtProc]: iNode             = "${iNode}
-  echo "      [RunTrajectoriesAtProc]: iProc             = "${iProc}
-  echo "      [RunTrajectoriesAtProc]: NProcTot          = "${NProcTot}
-  echo "      [RunTrajectoriesAtProc]: Tran              = "${Tran}
-  echo "      [RunTrajectoriesAtProc]: Tint              = "${Tint}
-  echo "      [RunTrajectoriesAtProc]: iLevel1           = "${iLevel1}
-  echo "      [RunTrajectoriesAtProc]: iLevel2           = "${iLevel2}
+  echo "      [RunTrajectoriesAtProc]: NNode                = "${NNode}
+  echo "      [RunTrajectoriesAtProc]: iNode                = "${iNode}
+  echo "      [RunTrajectoriesAtProc]: iProc                = "${iProc}
+  echo "      [RunTrajectoriesAtProc]: NProcTot             = "${NProcTot}
+  echo "      [RunTrajectoriesAtProc]: Tran                 = "${Tran}
+  echo "      [RunTrajectoriesAtProc]: Tint                 = "${Tint}
+  echo "      [RunTrajectoriesAtProc]: iLevel1              = "${iLevel1}
+  echo "      [RunTrajectoriesAtProc]: iLevel2              = "${iLevel2}
   
   RunTrajectoriesCommand="coarseair-runtrajectories.x"
 
@@ -359,14 +359,14 @@ function SplitTrajsPESs {
   echo " "
   echo "  [SplitTrajsPESs]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
   echo "  [SplitTrajsPESs]: COARSEAIR_SH_DIR         = "${COARSEAIR_SH_DIR}
-  echo "  [SplitTrajsPESs]: TranFlg               = "${TranFlg}
-  echo "  [SplitTrajsPESs]: Tran                  = "${Tran}
-  echo "  [SplitTrajsPESs]: Tint                  = "${Tint}
-  echo "  [SplitTrajsPESs]: iPESStart             = "${iPESStart}
-  echo "  [SplitTrajsPESs]: MinLevel1             = "${MinLevel1}
-  echo "  [SplitTrajsPESs]: MaxLevel1             = "${MaxLevel1}
-  echo "  [SplitTrajsPESs]: MinLevel2             = "${MinLevel2}
-  echo "  [SplitTrajsPESs]: MaxLevel2             = "${MaxLevel2}
+  echo "  [SplitTrajsPESs]: TranFlg                  = "${TranFlg}
+  echo "  [SplitTrajsPESs]: Tran                     = "${Tran}
+  echo "  [SplitTrajsPESs]: Tint                     = "${Tint}
+  echo "  [SplitTrajsPESs]: iPESStart                = "${iPESStart}
+  echo "  [SplitTrajsPESs]: MinLevel1                = "${MinLevel1}
+  echo "  [SplitTrajsPESs]: MaxLevel1                = "${MaxLevel1}
+  echo "  [SplitTrajsPESs]: MinLevel2                = "${MinLevel2}
+  echo "  [SplitTrajsPESs]: MaxLevel2                = "${MaxLevel2}
 
   echo "  [SplitTrajsPESs]: -> Splitting PESs in the Trajectory Files"
 
@@ -407,12 +407,13 @@ function PostTrajectoriesPBS {
 
   echo "  [PostTrajectoriesPBS]: COARSEAIR_OUTPUT_DIR = "${COARSEAIR_OUTPUT_DIR}
   echo "  [PostTrajectoriesPBS]: COARSEAIR_SH_DIR     = "${COARSEAIR_SH_DIR}
-  echo "  [PostTrajectoriesPBS]: NNode             = "${NNode}
-  echo "  [PostTrajectoriesPBS]: ProcType          = "${ProcType}
-  echo "  [PostTrajectoriesPBS]: NProc             = "${NProc}
-  echo "  [PostTrajectoriesPBS]: MinLevel1         = "${MinLevel1}
-  echo "  [PostTrajectoriesPBS]: MaxLevel1         = "${MaxLevel1}
-  
+  echo "  [PostTrajectoriesPBS]: NNode                = "${NNode}
+  echo "  [PostTrajectoriesPBS]: ProcType             = "${ProcType}
+  echo "  [PostTrajectoriesPBS]: NProc                = "${NProc}
+  echo "  [PostTrajectoriesPBS]: MinLevel1            = "${MinLevel1}
+  echo "  [PostTrajectoriesPBS]: MaxLevel1            = "${MaxLevel1}
+  echo "  [PostTrajectoriesPBS]: BinaryTrajFlg        = "${BinaryTrajFlg}
+
   
   cd ${COARSEAIR_OUTPUT_DIR}/..
   if [ "${ProcType}" = "none" ]; then
@@ -453,13 +454,13 @@ function PostTrajectoriesPBS {
     
     sed -e '4s/$/'${iLevelMin}'/'                           'PostTrajectoriesTEMP-2.pbs'  > 'PostTrajectoriesTEMP-3.pbs'
     sed -e '6s/$/'${iLevelMin}'/'                           'PostTrajectoriesTEMP-3.pbs'  > 'PostTrajectoriesTEMP-4.pbs'
-    sed -e '145s/$/'${iLevelMin}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs'
-    sed -e '146s/$/'${iLevelMax}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
+    sed -e '147s/$/'${iLevelMin}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs'
+    sed -e '148s/$/'${iLevelMax}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
     
-    sed -e '147s/$/'${Tran}'/'                              'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
-    sed -e '148s/$/'${Tint}'/'                              'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
+    sed -e '149s/$/'${Tran}'/'                              'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
+    sed -e '150s/$/'${Tint}'/'                              'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
 
-    sed -e '149s/$/'${iNode}'/'                             'PostTrajectoriesTEMP-8.pbs'  > 'PostTrajectories-'${iLevelMin}'.pbs'
+    sed -e '151s/$/'${iNode}'/'                             'PostTrajectoriesTEMP-8.pbs'  > 'PostTrajectories-'${iLevelMin}'.pbs'
 
     qsub ./'PostTrajectories-'${iLevelMin}'.pbs'
     
@@ -485,24 +486,25 @@ function PostTrajectoriesAtNode {
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
-  echo "  [PostTrajectoriesAtNode]: NNode              = "${NNode}
-  echo "  [PostTrajectoriesAtNode]: iNode              = "${iNode}
-  echo "  [PostTrajectoriesAtNode]: NProc              = "${NProc}
-  echo "  [PostTrajectoriesAtNode]: System             = "${System}
-  echo "  [PostTrajectoriesAtNode]: Tran               = "${Tran}
-  echo "  [PostTrajectoriesAtNode]: Tint               = "${Tint}
-  echo "  [PostTrajectoriesAtNode]: Molecule1          = "${Molecule1}
-  echo "  [PostTrajectoriesAtNode]: NLevels1           = "${NLevels1}
-  echo "  [PostTrajectoriesAtNode]: MinLevel1          = "${MinLevel1}
-  echo "  [PostTrajectoriesAtNode]: MaxLevel1          = "${MaxLevel1}
-  echo "  [PostTrajectoriesAtNode]: Molecule2          = "${Molecule2}
-  echo "  [PostTrajectoriesAtNode]: NLevels2           = "${NLevels2}
-  echo "  [PostTrajectoriesAtNode]: MinLevel2          = "${MinLevel2}
-  echo "  [PostTrajectoriesAtNode]: MaxLevel2          = "${MaxLevel2}
-  echo "  [PostTrajectoriesAtNode]: StochPESFlg        = "${StochPESFlg}
-  echo "  [PostTrajectoriesAtNode]: NPESs              = "${NPESs}
-  echo "  [PostTrajectoriesAtNode]: iPESStart          = "${iPESStart}
-  echo "  [PostTrajectoriesAtNode]: RmTrajFlg          = "${RmTrajFlg}
+  echo "  [PostTrajectoriesAtNode]: NNode                 = "${NNode}
+  echo "  [PostTrajectoriesAtNode]: iNode                 = "${iNode}
+  echo "  [PostTrajectoriesAtNode]: NProc                 = "${NProc}
+  echo "  [PostTrajectoriesAtNode]: System                = "${System}
+  echo "  [PostTrajectoriesAtNode]: Tran                  = "${Tran}
+  echo "  [PostTrajectoriesAtNode]: Tint                  = "${Tint}
+  echo "  [PostTrajectoriesAtNode]: Molecule1             = "${Molecule1}
+  echo "  [PostTrajectoriesAtNode]: NLevels1              = "${NLevels1}
+  echo "  [PostTrajectoriesAtNode]: MinLevel1             = "${MinLevel1}
+  echo "  [PostTrajectoriesAtNode]: MaxLevel1             = "${MaxLevel1}
+  echo "  [PostTrajectoriesAtNode]: Molecule2             = "${Molecule2}
+  echo "  [PostTrajectoriesAtNode]: NLevels2              = "${NLevels2}
+  echo "  [PostTrajectoriesAtNode]: MinLevel2             = "${MinLevel2}
+  echo "  [PostTrajectoriesAtNode]: MaxLevel2             = "${MaxLevel2}
+  echo "  [PostTrajectoriesAtNode]: StochPESFlg           = "${StochPESFlg}
+  echo "  [PostTrajectoriesAtNode]: NPESs                 = "${NPESs}
+  echo "  [PostTrajectoriesAtNode]: iPESStart             = "${iPESStart}
+  echo "  [PostTrajectoriesAtNode]: RmTrajFlg             = "${RmTrajFlg}
+  echo "  [PostTrajectoriesAtNode]: BinaryTrajFlg         = "${BinaryTrajFlg}
 
   echo "  [PostTrajectoriesAtNode]: -> Postprocessing Levels from "${MinLevel1}" to "${MaxLevel1}" for Molecule 1 and from "${MinLevel2}" to "${MaxLevel2}" for Molecule 2"
 
@@ -545,7 +547,7 @@ function PostTrajectoriesAtNode {
       MaxLevel2=${MaxLevel2Tot}
     fi
 
-    bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} &
+    bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} &
     
     MinLevel1=$((MaxLevel1+1))
     #MinLevel2=$((MaxLevel2+1)) 
@@ -568,20 +570,21 @@ function PostTrajectories {
   echo "      [PostTrajectories]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
   echo "      [PostTrajectories]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
   echo "      [PostTrajectories]: COARSEAIR_SH_DIR         = "${COARSEAIR_SH_DIR}
-  echo "      [PostTrajectories]: System                = "${System}
-  echo "      [PostTrajectories]: TranFlg               = "${TranFlg}
-  echo "      [PostTrajectories]: Tran                  = "${Tran}
-  echo "      [PostTrajectories]: Tint                  = "${Tint}
-  echo "      [PostTrajectories]: StochPESFlg           = "${StochPESFlg}
-  echo "      [PostTrajectories]: NPESs                 = "${NPESs}
-  echo "      [PostTrajectories]: iNode                 = "${iNode}
-  echo "      [PostTrajectories]: iProc                 = "${iProc}
-  echo "      [PostTrajectories]: iPESStart             = "${iPESStart}
-  echo "      [PostTrajectories]: Molecule1             = "${Molecule1}
-  echo "      [PostTrajectories]: iLevel1               = "${iLevel1}
-  echo "      [PostTrajectories]: Molecule2             = "${Molecule2}
-  echo "      [PostTrajectories]: iLevel2               = "${iLevel2}
-  echo "      [PostTrajectories]: Velocity              = "${Velocity}
+  echo "      [PostTrajectories]: System                   = "${System}
+  echo "      [PostTrajectories]: TranFlg                  = "${TranFlg}
+  echo "      [PostTrajectories]: Tran                     = "${Tran}
+  echo "      [PostTrajectories]: Tint                     = "${Tint}
+  echo "      [PostTrajectories]: StochPESFlg              = "${StochPESFlg}
+  echo "      [PostTrajectories]: NPESs                    = "${NPESs}
+  echo "      [PostTrajectories]: iNode                    = "${iNode}
+  echo "      [PostTrajectories]: iProc                    = "${iProc}
+  echo "      [PostTrajectories]: iPESStart                = "${iPESStart}
+  echo "      [PostTrajectories]: Molecule1                = "${Molecule1}
+  echo "      [PostTrajectories]: iLevel1                  = "${iLevel1}
+  echo "      [PostTrajectories]: Molecule2                = "${Molecule2}
+  echo "      [PostTrajectories]: iLevel2                  = "${iLevel2}
+  echo "      [PostTrajectories]: Velocity                 = "${Velocity}
+  echo "      [PostTrajectories]: BinaryTrajFlg            = "${BinaryTrajFlg}
 
   echo "      [PostTrajectories]: -> Postprocessing Molecule 1, Level "${iLevel1}" and Molecule 2, Level "${iLevel2}
 
@@ -619,7 +622,7 @@ function PostTrajectories {
       echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
       echo "      [PostTrajectories]: -> Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}": Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
       
-      if [ ${NTraj} -gt 0 ]; then
+      if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
         
         echo "      [PostTrajectories]: Calling TrajectoriesStats"
         TrajectoriesStats
@@ -648,7 +651,6 @@ function PostTrajectories {
 
   if [ ${StochPESFlg} -eq 1 ]; then
     #scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.Orig ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/AdjstTrj*
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
   fi
@@ -661,15 +663,16 @@ function PostTrajectories {
 function TrajectoriesStats {
 
   echo "        [TrajectoriesStats]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "        [TrajectoriesStats]: Tran                  = "${Tran}
-  echo "        [TrajectoriesStats]: Tint                  = "${Tint}
+  echo "        [TrajectoriesStats]: Tran                     = "${Tran}
+  echo "        [TrajectoriesStats]: Tint                     = "${Tint}
+  echo "        [TrajectoriesStats]: BinaryTrajFlg            = "${BinaryTrajFlg}
 
   TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
 
   cd ${COARSEAIR_BIN_OUTPUT_DIR}
   
   echo "        [TrajectoriesStats]: Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
-  eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} 
+  eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg}
   echo "        [TrajectoriesStats]: Done with TrajectoriesStats"
   
 }
@@ -680,15 +683,16 @@ function TrajectoriesStats {
 function FromCrossToRates {
 
   echo "        [FromCrossToRates]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "        [FromCrossToRates]: Tran                  = "${Tran}
-  echo "        [FromCrossToRates]: Tint                  = "${Tint}
-  echo "        [FromCrossToRates]: iLevel1               = "${iLevel1}
-  echo "        [FromCrossToRates]: iLevel2               = "${iLevel2}
-  echo "        [FromCrossToRates]: iPES                  = "${iPES}
-  echo "        [FromCrossToRates]: iNode                 = "${iNode}
-  echo "        [FromCrossToRates]: iProc                 = "${iProc}
-  echo "        [FromCrossToRates]: TranFlg               = "${TranFlg}
-  echo "        [FromCrossToRates]: Velocity              = "${Velocity}
+  echo "        [FromCrossToRates]: Tran                     = "${Tran}
+  echo "        [FromCrossToRates]: Tint                     = "${Tint}
+  echo "        [FromCrossToRates]: iLevel1                  = "${iLevel1}
+  echo "        [FromCrossToRates]: iLevel2                  = "${iLevel2}
+  echo "        [FromCrossToRates]: iPES                     = "${iPES}
+  echo "        [FromCrossToRates]: iNode                    = "${iNode}
+  echo "        [FromCrossToRates]: iProc                    = "${iProc}
+  echo "        [FromCrossToRates]: TranFlg                  = "${TranFlg}
+  echo "        [FromCrossToRates]: Velocity                 = "${Velocity}
+  echo "        [FromCrossToRates]: BinaryTrajFlg            = "${BinaryTrajFlg}
 
 
   PostTrajectoriesCommand="coarseair-posttrajectories.x"
@@ -705,7 +709,7 @@ function FromCrossToRates {
   
       typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
 
-      if (( $NTraj > 0 )); then
+      if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
         eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
       else

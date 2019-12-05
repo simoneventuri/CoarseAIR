@@ -39,9 +39,6 @@ Module System_Class
   contains
     private
     procedure              ,public                          ::    Initialize                   =>    Initialize_System
-    procedure              ,public                          ::    AssignPairsArrangements      =>    AssignPairsArrangements_System
-    procedure              ,public                          ::    AdjustArrangements           =>    AdjustArrangements_System
-
   End Type
 
   logical   ,parameter                                      ::    i_Debug_Global = .False.

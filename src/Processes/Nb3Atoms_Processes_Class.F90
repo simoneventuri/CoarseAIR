@@ -110,8 +110,11 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   allocate(This%TIntChar(This%NTInt));  This%TIntChar  = Input%TtraVecIntChar
   if (i_Debug_Loc) call Logger%Write( "This%TIntChar = ", This%TIntChar )   
 
-  allocate(This%QRatio(1,   This%NTTra, This%NTInt)); This%QRatio     = Zero
-  allocate(This%QRatioChar( This%NTTra, This%NTInt)); This%QRatioChar = '                                    '
+  !allocate(This%QRatio(1,   This%NTTra, This%NTInt)); This%QRatio     = Zero
+  !allocate(This%QRatioChar( This%NTTra, This%NTInt)); This%QRatioChar = '                                    '
+  allocate(This%QRatio(1)); This%QRatio     = Zero
+  This%QRatio(1) = Collision%MoleculesContainer(1)%Molecule%BinsContainer%Bin(This%InBins(1))%QRatio
+  write(This%QRatioChar, '(es37.10)') This%QRatio(1)
   ! !---------------------------------------------------------------------------------------------------! !
 
 
@@ -543,14 +546,17 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
             !!! New Process ??? !!!!
             Proc_To_Line = This%Proc_To_LineVec(Idx)
+            if (i_Debug_Loc_Deep) call Logger%Write( "    Idx          = ", Idx, '; Proc_To_Line =', Proc_To_Line )  
             if (Proc_To_Line < 1) then
               !!! New Process! Allocating it !!!!
-              call This%ProcessesVecTemp(iLine)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-              This%Proc_To_LineVec(Idx) = iLine
               This%NProc_Cleaned        = This%NProc_Cleaned + 1
+              call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+              This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
+              if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
             else
               !!! Old Process! Adding Cross Section !!!!
               call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+              if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
             end if
 
 
@@ -575,7 +581,6 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
             This%IdxVec(iProc)              = This%ProcessesVecTemp(iProc)%Idx
             This%ProcessesVecCleaned(iProc) = This%ProcessesVecTemp(iProc)
           end do
-
 
           call hpsort(This%IdxVec, This%IdxVecSorted)
 

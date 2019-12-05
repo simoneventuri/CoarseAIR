@@ -22,11 +22,13 @@
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
 NNode=1                                                                                           # Nb of Nodes
-ProcType='san'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
+iNode=1                                                                                           # Current Node
+ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
 NProc=20                                                                                          # Nb of Processors
-SlncFlg=0                                                                                         # Silence bash file echoes? (0/1 for no/yes)
-RmTrajFlg=0                                                                                       # Remove Trajectories Files? (0/1 for no/yes)
-MergeAllFlg=0                                                                                     # Merging All the Trajectories in 1 File (0/1 for no/yes)
+SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
+MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
+RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
+BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 
 

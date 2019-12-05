@@ -17,7 +17,7 @@ Module Sorting_Module
 
 ! Heapsort algorithm
 
-Subroutine hpsort_R8( ra, Idx )
+Pure Subroutine hpsort_R8( ra, Idx )
 
   real(rkp)   ,dimension(:)             ,intent(inout)  ::    ra
   integer     ,dimension(:)   ,optional ,intent(out)    ::    Idx
@@ -149,7 +149,7 @@ End Subroutine
 ! End Subroutine
 
 
-Subroutine hpsort_I4( ra, Idx )
+Pure Subroutine hpsort_I4( ra, Idx )
 
   integer   ,dimension(:)             ,intent(inout)  ::    ra
   integer   ,dimension(:)   ,optional ,intent(out)    ::    Idx
@@ -221,7 +221,7 @@ Subroutine hpsort_I4( ra, Idx )
 End Subroutine
 
 
-Subroutine hpsort_I8( ra, Idx )
+Pure Subroutine hpsort_I8( ra, Idx )
 
   integer(rkp)   ,dimension(:)             ,intent(inout)  ::    ra
   integer(rkp)   ,dimension(:)   ,optional ,intent(out)    ::    Idx

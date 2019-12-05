@@ -25,9 +25,9 @@ function GenerateLevels {
   echo "  [GenerateLevels]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
   echo "  [GenerateLevels]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [GenerateLevels]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
-  echo "  [GenerateLevels]: NNode              = "${NNode}
-  echo "  [GenerateLevels]: NProc              = "${NProc}
-  echo "  [GenerateLevels]: System             = "${System}
+  echo "  [GenerateLevels]: NNode                 = "${NNode}
+  echo "  [GenerateLevels]: NProc                 = "${NProc}
+  echo "  [GenerateLevels]: System                = "${System}
   
   echo "  [GenerateLevels]: Calling ComputeLevelsAtNode"        
   ComputeLevelsAtNode
@@ -85,10 +85,10 @@ function ComputeLevelsAtProc {
   
   echo "      [ComputeLevelsAtProc]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
   echo "      [ComputeLevelsAtProc]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "      [ComputeLevelsAtProc]: NNode                 = "${NNode}
-  echo "      [ComputeLevelsAtProc]: iNode                 = "${iNode}
-  echo "      [ComputeLevelsAtProc]: NProc                 = "${NProc}
-  echo "      [ComputeLevelsAtProc]: iProc                 = "${iProc}
+  echo "      [ComputeLevelsAtProc]: NNode                    = "${NNode}
+  echo "      [ComputeLevelsAtProc]: iNode                    = "${iNode}
+  echo "      [ComputeLevelsAtProc]: NProc                    = "${NProc}
+  echo "      [ComputeLevelsAtProc]: iProc                    = "${iProc}
 
 
   ComputeLevelsCommand="coarseair-computelevels.x"

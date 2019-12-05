@@ -32,18 +32,16 @@ Module Degeneracy_Class
 
   private
   public  ::    Degeneracy_Type
+  public  ::    Compute_PartFunc_State
   
   Type    ,abstract                                         ::    Degeneracy_Type
     logical                                                 ::    Initialized         !< Indicator whether the object is initialized
     character(:)                              ,allocatable  ::    Name                !< Name of current Degeneracy
   contains
     private
-    
-    procedure                                ,public        ::    Initialize        =>    Initialize_Degeneracy
-    procedure                                ,public        ::    Output            =>    Output_Degeneracy
-    
+    procedure                                ,public        ::    Initialize             =>    Initialize_Degeneracy
+    procedure                                ,public        ::    Output                 =>    Output_Degeneracy    
     procedure(Compute)     ,deferred ,nopass ,public        ::    Compute_Degeneracy_State
-    
   End Type
   
   Abstract Interface
@@ -91,6 +89,18 @@ Subroutine Output_Degeneracy( This, Unit )
   idum = Unit
   ldum = This%Initialized
 End Subroutine
+
+
+Pure Function Compute_PartFunc_State( g, EeV, T ) result( Q )
+
+  real(rkp)                                 ,intent(in)     ::    g
+  real(rkp)                                 ,intent(in)     ::    EeV
+  real(rkp)                                 ,intent(in)     ::    T
+  real(rkp)                                                 ::    Q
+
+  Q = g * exp( - EeV * Ue / (UKb * T) ) 
+
+End Function
 
 
 End Module

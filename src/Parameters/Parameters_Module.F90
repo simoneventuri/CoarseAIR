@@ -93,14 +93,14 @@ Module Parameters_Module
 
   integer ,dimension(3)    ,parameter ::     Atom_To_Species_3At  = [1,1,2]
   integer ,dimension(2)    ,parameter ::     NAtomsPerSpecies_3At = [2,1]
-  integer ,dimension(2,2)  ,parameter ::     AtomsToSpecies_3At   = Reshape( [1,3, 2,0], [2,2] )
+  integer ,dimension(2,2)  ,parameter ::     AtomsToSpecies_3At   = Reshape( [1,2, 3,0], [2,2] )
   integer ,dimension(3)    ,parameter ::     OppositePair_3At     = [3,2,1]
   integer ,dimension(3,3)  ,parameter ::     Atoms_To_Pair_3At    = Reshape([0,1,2, 1,0,3, 2,3,0], [3,3] )
   integer ,dimension(2,3)  ,parameter ::     Pair_To_Atoms_3At    = Reshape([1,2, 1,3, 2,3], [2,3] )
 
   integer ,dimension(4)    ,parameter ::     Atom_To_Species_4At  = [1,1,2,2]
   integer ,dimension(2)    ,parameter ::     NAtomsPerSpecies_4At = [2,2]
-  integer ,dimension(2,2)  ,parameter ::     AtomsToSpecies_4At   = Reshape([1,3, 2,4], [2,2] )
+  integer ,dimension(2,2)  ,parameter ::     AtomsToSpecies_4At   = Reshape([1,2, 3,4], [2,2] )
   integer ,dimension(6)    ,parameter ::     OppositePair_4At     = [6,5,4,3,2,1]
   integer ,dimension(4,4)  ,parameter ::     Atoms_To_Pair_4At    = Reshape( [0,1,2,3, 1,0,4,5, 2,4,0,6, 3,5,6,0], [4,4] )
   integer ,dimension(2,6)  ,parameter ::     Pair_To_Atoms_4At    = Reshape( [1,2, 1,3, 1,4, 2,3, 2,4, 3,4], [2,6] )

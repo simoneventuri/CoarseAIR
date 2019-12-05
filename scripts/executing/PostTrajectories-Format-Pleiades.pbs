@@ -11,8 +11,10 @@ NNode=1
 ###################################################################################################  <<<--- WRITE HERE !!!!
 NProc=
 ###################################################################################################  <<<--- WRITE HERE !!!!
-SlncFlg=0
-RmTrajFlg=0
+SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
+MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
+RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
+BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 
 
@@ -77,11 +79,11 @@ function PrintParameters() {
   echo '-----------------------' 
   echo ' Paths:' 
   echo '-----------------------' 
-  echo ' Working directory    = ' ${COARSEAIR_WORKING_DIR} 
-  echo ' Input directory      = ' ${COARSEAIR_INPUT_DIR} 
-  echo ' CoarseAIR Input file    = ' ${COARSEAIR_INPUT_FILE} 
-  echo ' CoarseAIR .sh directory = ' ${COARSEAIR_SH_DIR} 
-  echo ' Output directory     = ' ${COARSEAIR_OUTPUT_DIR} 
+  echo ' Working directory         = ' ${COARSEAIR_WORKING_DIR} 
+  echo ' Input directory           = ' ${COARSEAIR_INPUT_DIR} 
+  echo ' CoarseAIR Input file      = ' ${COARSEAIR_INPUT_FILE} 
+  echo ' CoarseAIR .sh directory   = ' ${COARSEAIR_SH_DIR} 
+  echo ' Output directory          = ' ${COARSEAIR_OUTPUT_DIR} 
   echo '-----------------------' 
 } 
  

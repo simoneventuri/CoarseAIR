@@ -43,7 +43,7 @@ Module BinsContainer_Factory_Class
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, FldrPath, BinsContainer, WriteFlg, i_Debug )
+Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, DtbFldrPath, FldrPath, BinsContainer, WriteFlg, i_Debug )
 
   use Input_Class                    ,only:    Input_Type
   use LevelsContainer_Class          ,only:    LevelsContainer_Type
@@ -57,11 +57,13 @@ Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, FldrPath, Bins
   Type(Input_Type)                            ,intent(inout)  ::    Input
   Type(LevelsContainer_Type)                  ,intent(inout)  ::    LevelsContainer
   integer                                     ,intent(in)     ::    iMol
+  character(*)                                ,intent(in)     ::    DtbFldrPath
   character(*)                                ,intent(in)     ::    FldrPath
   class(BinsContainer_Type)    ,allocatable   ,intent(out)    ::    BinsContainer
   logical                           ,optional ,intent(in)     ::    WriteFlg
   logical                           ,optional ,intent(in)     ::    i_Debug
 
+  integer                                                     ::    Status
   logical                                                     ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -70,12 +72,14 @@ Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, FldrPath, Bins
 
   if (i_Debug_Loc) call Logger%Write( "Sorting Method for Molecule Nb ", iMol, ": Input%BSortMethod(iMol) = ", Input%BSortMethod(iMol) )
   
-  select case (Input%BSortMethod(iMol))    
+  select case( adjustl(trim( Input%BSortMethod(iMol) )) )  
     case('State-Specific')
       Input%NBins(iMol) = LevelsContainer%NStates
       if (i_Debug) call Logger%Write( "Sorting Method for Molecule Nb", iMol, " is State-Specific. Setting NBins = ", Input%NBins )
       if (i_Debug_Loc) call Logger%Write( "Treating the Levels State-Specific" )
       allocate( StS_BinsContainer_Type :: BinsContainer )
+      BinsContainer%NBins = Input%NBins(iMol)
+
 
     case('Vib-Specific')
       Input%NBins(iMol) = LevelsContainer%maxvqn + 1
@@ -90,7 +94,7 @@ Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, FldrPath, Bins
     case('From-File')
       if (i_Debug_Loc) call Logger%Write( "Reading the Mapping Level-To-Bin from File" )
       allocate( FromFile_BinsContainer_Type :: BinsContainer )
-
+     
     case('Hybrid')
       if (i_Debug_Loc) call Logger%Write( "Sorting the Levels Based on a Hybrid Strategy" )
       allocate( Hybrid_BinsContainer_Type :: BinsContainer )
@@ -100,18 +104,17 @@ Subroutine Construct_BinsContainer( Input, LevelsContainer, iMol, FldrPath, Bins
       if (i_Debug_Loc) call Logger%Write( "Input%BSortMethod not specified for Molecule Nb ", iMol, "; Levels are going to be sorted StS" )
 
   end select
-
   write(Input%NBins_char(iMol), '(I6)') Input%NBins(iMol)
   if (i_Debug) call Logger%Write( "Input%NBins_char(iMol) for Molecule Nb", iMol, " = ", Input%NBins_char(iMol) )
+  
 
-
-  allocate( BinsContainer%PathToBinMolFldr, source = trim(adjustl( trim(adjustl(FldrPath)) // adjustl(trim( Input%Molecules_Name(iMol) )) // '_' // trim(adjustl(Input%NBins_char(iMol))) // '/' )) )
-  if (i_Debug_Loc)  call Logger%Write( "Creating Folder ", BinsContainer%PathToBinMolFldr )
-  call system('mkdir -p ' // BinsContainer%PathToBinMolFldr )
+  if (i_Debug_Loc) call Logger%Write( "Calling BinsContainer%MainInitialize" )
+  call BinsContainer%MainInitialize( Input, iMol, DtbFldrPath, FldrPath, i_Debug=i_Debug_Loc )
 
 
   if (i_Debug_Loc) call Logger%Write( "Calling BinsContainer%Initialize" )
   call BinsContainer%Initialize( Input, LevelsContainer, iMol, WriteFlg, i_Debug=i_Debug_Loc )
+
 
   if (i_Debug_Loc) call Logger%Exiting()
 

@@ -48,8 +48,9 @@ Module Level_Class
     real(rkp)     ::    rlim          =   Zero        !
     real(rkp)     ::    g             =   Zero        ! degeneracy of the i'th quantum state
     real(rkp)     ::    to_level      =   Zero        ! in case the Levels Container is a Container for either only Bound States or only Quasi-Bound States, to_level maps (B/QB)Levels -> (Molecule)Levels
-    integer       ::    ToBin         =   0
-    real(rkp)     ::    gInit         =   Zero        ! degeneracy of the i'th quantum state
+    integer       ::    To_Bin        =   0
+    real(rkp)     ::    Q             =   Zero        ! Part Function of the i'th quantum state @ Current Temperature
+    real(rkp)     ::    QInit         =   Zero        ! Part Function of the i'th quantum state @ Initial Temperature (From Input File)
     real(rkp)     ::    Q_CG          =   Zero
   End Type
 

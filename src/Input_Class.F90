@@ -117,11 +117,9 @@ Module Input_Class
 
 ! SORT INPUTS
 ! =================
-    character(50),dimension(:) ,allocatable   ::    BSortMethod                         !< Methods for sorting the Levels of each molecule
-    integer    ,dimension(:,:) ,allocatable   ::    BSortInfo                           !< Info about such sorting (Ex: Starting/Final Level, Nb of Bins, etc.)
-    character(50),dimension(:) ,allocatable   ::    BEnergyFile                         !< File Name with the Bins Minima Energies
-    character(50),dimension(:) ,allocatable   ::    LevToBinFile
-    character(50),dimension(:) ,allocatable   ::    BQNFile
+    character(50) ,dimension(:)  ,allocatable ::    BSortMethod                         !< Methods for sorting the Levels of each molecule
+    integer       ,dimension(:,:),allocatable ::    BSortInfo                           !< Info about such sorting (Ex: Starting/Final Level, Nb of Bins, etc.)
+    character(150),dimension(:,:),allocatable ::    BinDataFile
     
 ! DRIVER INPUTS
 ! =================
@@ -218,22 +216,24 @@ Module Input_Class
     real(rkp)                                 ::    tthres                              !<
     real(rkp)                                 ::    tthresau                            !<
 
-! ADJUST TRJS INPUTS
-! =================
-    character(:)               ,allocatable   ::    ConsiderExc
-    logical                                   ::    ConsiderExcFlg
-    logical                                   ::    MergeExchsFlg         = .false.
-    logical                                   ::    MergeExchToInelFlg    = .false.
-    character(3)                              ::    ConsiderQB  = 'yes'
-
 ! STATISTICS INPUTS
 ! =================
+    logical                                   ::    StatReadsBinaryFlg    = .False.
+    logical                                   ::    StatWritesBinaryFlg   = .False.
     integer                                   ::    NCond
     integer      ,dimension(:) ,allocatable   ::    iskip
     logical      ,dimension(:) ,allocatable   ::    PresEvOdd
     character(:)                ,allocatable  ::    AssignmentMethod                    !< Method for states assigment
     integer                                   ::    NTrajectoriesToAnalyze = -1         !< Max Nb of trajectories to analyze. -1 means analyze all trajectories on file.
     logical                                   ::    IdenticalDiatoms       = .false.
+
+! POSTPROCESSING TRJS INPUTS
+! =================
+    character(:)               ,allocatable   ::    ConsiderExc
+    logical                                   ::    ConsiderExcFlg
+    logical                                   ::    MergeExchsFlg         = .false.
+    logical                                   ::    MergeExchToInelFlg    = .false.
+    character(3)                              ::    ConsiderQB  = 'yes'
 
 ! MERGE PESs
 ! =================
@@ -536,9 +536,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   character(150)                                            ::    PresEvOdd_case
 
   character(:) ,allocatable                                 ::    BSortMethod_case
-  character(:) ,allocatable                                 ::    BEnergyFile_case
-  character(:) ,allocatable                                 ::    LevToBinFile_case
-  character(:) ,allocatable                                 ::    BQNFile_case
+  character(:) ,allocatable                                 ::    BinDataFile_case
   character(:) ,allocatable                                 ::    MinLevel_case, MaxLevel_case
   character(:) ,allocatable                                 ::    Minvqn_case, Maxvqn_case
 
@@ -650,15 +648,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (Status/=0) call Error( "Error allocating This%Molecule_NAtoms" )
             allocate( This%BSortMethod(This%NMolecules), Stat=Status )
             if (Status/=0) call Error( "Error allocating This%SortMethod" )
-            allocate( This%BEnergyFile(This%NMolecules), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%BEnergyFile" )
-            This%BEnergyFile = 'E_low.dat'
-            allocate( This%LevToBinFile(This%NMolecules), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%LevToBinFile" )
-            This%LevToBinFile = 'LevToBin.dat'
-            allocate( This%BQNFile(This%NMolecules), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%BQNFile" )
-            This%BQNFile = 'QN_low.dat'
+            allocate( This%BinDataFile(This%NMolecules,2), Stat=Status )
+            if (Status/=0) call Error( "Error allocating This%BinDataFile" )
+            This%BinDataFile(:,1) = 'LevToBin.dat'
+            This%BinDataFile(:,1) = '            '
             allocate( This%NBins(This%NMolecules), Stat=Status)
             if (Status/=0) call Error( "Error allocating This%NBins" )
             allocate( This%NBins_char(This%NMolecules), Stat=Status)
@@ -1216,7 +1209,14 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
           case("Final States Assigment Mthd")
             This%AssignmentMethod = line_input(i_eq+2:150)
             if (i_Debug_Loc) call Logger%Write( "Final States Assigment Mthd:      This%AssignmentMethod  = ", This%AssignmentMethod )
-            
+
+
+          case("Writing Trajectory Files in Binary Format?")
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
+              This%StatWritesBinaryFlg = .True.
+            end if
+
 
 !          case("Nb Max of Trajectories per Level / Bin to use for Stastics")
 !            line_input = line_input(i_eq+2:150)
@@ -1335,22 +1335,22 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "Final vqn, Molecule Nb", iMol, ":      This%BSortInfo(iMol,2)  = ", This%BSortInfo(iMol,2) )
           end if
 
-          BEnergyFile_case = "File with Bins Energy Minima, Molecule" // iMol_char
-          if (adjustl(trim(i_case)) == TRIM(BEnergyFile_case)) then
-            This%BEnergyFile(iMol) = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( " File with Bins Energy Minima, Molecule Nb", iMol, ":      This%BEnergyFile(i)  = ", This%BEnergyFile(iMol) )
+          BinDataFile_case = "File with Bins Energy Minima, Molecule" // iMol_char
+          if (adjustl(trim(i_case)) == TRIM(BinDataFile_case)) then
+            This%BinDataFile(iMol,1) = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( " File with Bins Energy Minima, Molecule Nb", iMol, ":      This%BinDataFile(i,1)  = ", This%BinDataFile(iMol,1) )
           end if
           
-          LevToBinFile_case = "File with Level-Bin Mapping, Molecule" // iMol_char
-          if (adjustl(trim(i_case)) == TRIM(LevToBinFile_case)) then
-            This%LevToBinFile(iMol) = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( " File with Bins Energy Minima, Molecule Nb", iMol, ":      This%LevToBinFile(i)  = ", This%LevToBinFile(iMol) )
+          BinDataFile_case = "File with Level-Bin Mapping, Molecule" // iMol_char
+          if (adjustl(trim(i_case)) == TRIM(BinDataFile_case)) then
+            This%BinDataFile(iMol,1) = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( " File with Bins Energy Minima, Molecule Nb", iMol, ":      This%BinDataFile(i,1)  = ", This%BinDataFile(iMol,1) )
           end if
           
-          BQNFile_case = "File with Bins QNs Bounds, Molecule" // iMol_char
-          if (adjustl(trim(i_case)) == TRIM(BQNFile_case)) then
-            This%BQNFile(iMol) = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( " File with QNs Bounds, Molecule Nb", iMol, ":      This%BQNFile(i)  = ", This%BQNFile(iMol) )
+          BinDataFile_case = "File with Bins QNs Bounds, Molecule" // iMol_char
+          if (adjustl(trim(i_case)) == TRIM(BinDataFile_case)) then
+            This%BinDataFile(iMol,2) = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( " File with QNs Bounds, Molecule Nb", iMol, ":      This%BinDataFile(i,2)  = ", This%BinDataFile(iMol,2) )
           end if
 
           NBins_case = "Nb of Bins, Molecule" // iMol_char

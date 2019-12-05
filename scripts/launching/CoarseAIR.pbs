@@ -27,11 +27,14 @@
 
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
-NNode=10                                                                                          # Nb of Nodes
-NProc=16                                                                                          # Nb of Processors
-SlncFlg=0                                                                                         # Silence bash file echoes? (0/1 for no/yes)
-RmTrajFlg=0                                                                                       # Remove Trajectories Files? (0/1 for no/yes)
-MergeAllFlg=1                                                                                     # Merging All the Trajectories in 1 File (0/1 for no/yes)
+NNode=20                                                                                          # Nb of Nodes
+iNode=1                                                                                           # Current Node
+ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
+NProc=20                                                                                          # Nb of Processors
+SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
+MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
+RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
+BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 
 
@@ -97,11 +100,11 @@ function PrintParameters() {
   echo '-----------------------'
   echo ' Paths:'
   echo '-----------------------'
-  echo ' Working directory    = ' ${COARSEAIR_WORKING_DIR}
-  echo ' Input directory      = ' ${COARSEAIR_INPUT_DIR}
-  echo ' CoarseAIR Input file    = ' ${COARSEAIR_INPUT_FILE}
-  echo ' CoarseAIR .sh directory = ' ${COARSEAIR_SH_DIR}
-  echo ' Output directory     = ' ${COARSEAIR_OUTPUT_DIR}
+  echo ' Working directory         = ' ${COARSEAIR_WORKING_DIR}
+  echo ' Input directory           = ' ${COARSEAIR_INPUT_DIR}
+  echo ' CoarseAIR Input file      = ' ${COARSEAIR_INPUT_FILE}
+  echo ' CoarseAIR .sh directory   = ' ${COARSEAIR_SH_DIR}
+  echo ' Output directory          = ' ${COARSEAIR_OUTPUT_DIR}
   echo '-----------------------'
 }
 

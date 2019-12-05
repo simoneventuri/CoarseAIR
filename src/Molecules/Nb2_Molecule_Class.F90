@@ -76,6 +76,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   type(DiatomicPotential_Factory_Type)                      ::    DiaPot_Factory
   type(BinsContainer_Factory_Type)                          ::    BinsContainer_Factory
   character(150)                                            ::    FileName
+  logical                                                   ::    WriteFlg
   logical                                                   ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -204,7 +205,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
     
     
     ! ==============================================================================================================
-    !   7.4. CONSTRUCTING THE LEVEL CONTAINER
+    !   7.5. CONSTRUCTING THE LEVELS CONTAINER
     ! ==============================================================================================================
     if (Input%TaskType == 3) then
       call system('scp ' // This%PathToMolDtbFldr // '/' // adjustl(trim( Input%LevelsFileName(iMol) )) // ' ' // This%PathToMolFldr )
@@ -230,22 +231,33 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
 
 
     ! ==============================================================================================================
-    !   7.5 CONSTRUCTING THE BIN CONTAINER
+    !   7.6 CONSTRUCTING THE BINS CONTAINER
     ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Calling This%BinsContainer%Initialize" )
 
-    call BinsContainer_Factory%Construct( Input, This%LevelsContainer, iMol, This%PathToMolFldr, This%BinsContainer, WriteFlg=.True., i_Debug=i_Debug_Loc )
+    if (Input%TaskType == 3) then
+      WriteFlg = .True.
+    else
+      WriteFlg = .False.
+    end if
+    call BinsContainer_Factory%Construct( Input, This%LevelsContainer, iMol, This%PathToMolDtbFldr, This%PathToMolFldr, This%BinsContainer, WriteFlg=WriteFlg, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "-> This%BinsContainer%Initialize" )
     ! ==============================================================================================================
 
 
-    ! ! ==============================================================================================================
-    ! !   7.6 READING THE PARTITION FUNCTION
-    ! ! ==============================================================================================================
-    ! if (i_Debug_Loc) call Logger%Write( "Calling This%BinsContainer%Initialize" )
-    ! call This%BinsContainer%ReadPartFunEnergy( Input, This%LevelsContainer, iMol, i_Debug=i_Debug_Loc )
-    ! if (i_Debug_Loc) call Logger%Write( "-> This%BinsContainer%Initialize" )
-    ! ! ==============================================================================================================
+    ! ==============================================================================================================
+    !   7.7 COMPUTING / READING THE PARTITION FUNCTIONS
+    ! ==============================================================================================================
+    if (Input%TaskType == 3) then
+      if (i_Debug_Loc) call Logger%Write( "Calling This%BinsContainer%ComputePartFunEnergy" )
+      call This%BinsContainer%ComputePartFunEnergy( Input, This%LevelsContainer, iMol, i_Debug=i_Debug_Loc )
+      if (i_Debug_Loc) call Logger%Write( "-> This%BinsContainer%ComputePartFunEnergy" )
+    else 
+      if (i_Debug_Loc) call Logger%Write( "Calling This%BinsContainer%ReadPartFunEnergy" )
+      call This%BinsContainer%ReadPartFunEnergy( Input, This%LevelsContainer, iMol, i_Debug=i_Debug_Loc )
+      if (i_Debug_Loc) call Logger%Write( "-> This%BinsContainer%ReadPartFunEnergy" )
+    end if
+    ! ==============================================================================================================
 
   end if
 

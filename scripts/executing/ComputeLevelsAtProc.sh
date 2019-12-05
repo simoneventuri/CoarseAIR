@@ -51,10 +51,10 @@ iProc=${7}
 
 echo "      [ComputeLevelsAtProc.sh]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
 echo "      [ComputeLevelsAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-echo "      [ComputeLevelsAtProc.sh]: NNode                 = "${NNode}
-echo "      [ComputeLevelsAtProc.sh]: iNode                 = "${iNode}
-echo "      [ComputeLevelsAtProc.sh]: NProc                 = "${NProc}
-echo "      [ComputeLevelsAtProc.sh]: iProc                 = "${iProc}
+echo "      [ComputeLevelsAtProc.sh]: NNode                    = "${NNode}
+echo "      [ComputeLevelsAtProc.sh]: iNode                    = "${iNode}
+echo "      [ComputeLevelsAtProc.sh]: NProc                    = "${NProc}
+echo "      [ComputeLevelsAtProc.sh]: iProc                    = "${iProc}
 
 
 ComputeLevelsCommand="coarseair-computelevels.x"

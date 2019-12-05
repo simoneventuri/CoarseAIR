@@ -386,130 +386,53 @@ Subroutine WriteList( This, FileName, SortLevelsFlg, i_Debug)
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   if (Status/=0) call Error( "Error opening file: " // FileName ) 
   
-    write(Unit,'(a)') ('######################################################################################################################################################')
-    write(Unit,'(a)') ('# jqn   : the rotational q.n. of the i''th quantum state')
-    write(Unit,'(a)') ('# vqn   : the vibrational q.n. of the i''th quantum state')
-    write(Unit,'(a)') ('# eint  : internal energy of i''th quantum state [Eh]')
-    write(Unit,'(a)') ('# egam  : Half width of i''th quantum state')
-    write(Unit,'(a)') ('# rmin  : the position of the potential minimum (included centrifugal potential) for i''th quantum state')
-    write(Unit,'(a)') ('# vmin  : the value of the potential minimun (inc. cent. pot.)')
-    write(Unit,'(a)') ('# vmax  : the value of the local potential maximum (inc. cent. pot.)')
-    write(Unit,'(a)') ('# tau   : the vibrational period of the i''th quantum state')
-    write(Unit,'(a)') ('# ri    : inner turning point')
-    write(Unit,'(a)') ('# ro    : outter turning point')
-    write(Unit,'(a)') ('# rmax  : location of maximum in centrifugal barrier')
-    write(Unit,'(a)') ('######################################################################################################################################################')
-    write(Unit,'(a)') ('#   vqn  jqn      eint           egam           rmin           rmax           vmin           vmax            tau             ri             ro')
-    write(Unit,'(a)') ('######################################################################################################################################################')
+    !write(Unit,'(a)') ('######################################################################################################################################################')
+    !write(Unit,'(a)') ('# jqn   : the rotational q.n. of the i''th quantum state')
+    !write(Unit,'(a)') ('# vqn   : the vibrational q.n. of the i''th quantum state')
+    !write(Unit,'(a)') ('# eint  : internal energy of i''th quantum state [Eh]')
+    !write(Unit,'(a)') ('# egam  : Half width of i''th quantum state')
+    !write(Unit,'(a)') ('# rmin  : the position of the potential minimum (included centrifugal potential) for i''th quantum state')
+    !write(Unit,'(a)') ('# vmin  : the value of the potential minimun (inc. cent. pot.)')
+    !write(Unit,'(a)') ('# vmax  : the value of the local potential maximum (inc. cent. pot.)')
+    !write(Unit,'(a)') ('# tau   : the vibrational period of the i''th quantum state')
+    !write(Unit,'(a)') ('# ri    : inner turning point')
+    !write(Unit,'(a)') ('# ro    : outter turning point')
+    !write(Unit,'(a)') ('# rmax  : location of maximum in centrifugal barrier')
+    !write(Unit,'(a)') ('######################################################################################################################################################')
+    !write(Unit,'(a)') ('#   vqn  jqn      eint           egam           rmin           rmax           vmin           vmax            tau             ri             ro')
+    !write(Unit,'(a)') ('######################################################################################################################################################')
     
+    write(Unit,'(A)') ('#================================================================================================================================================')
+    write(Unit,'(A)') ('#')                                                                                              
+    write(Unit,'(A)') ('#================================================================================================================================================')
+    write(Unit,'(A)') ('# vqn, jqn,         E[Eh],      EGam[au],      rMin[a0],      rMax[a0],      VMin[Eh],      VMax[Eh],       Tau[au],       rIn[a0],      rOut[a0]')
+
     do iState = 1,NStates
     
-      write(Unit,'(X,2I5,*(es15.7))') This%States(IdxVec(iState))%vqn,  &
-                                      This%States(IdxVec(iState))%jqn,  &
-                                      This%States(IdxVec(iState))%eint, &
-                                      This%States(IdxVec(iState))%egam, &
-                                      This%States(IdxVec(iState))%rmin, &
-                                      This%States(IdxVec(iState))%rmax, &
-                                      This%States(IdxVec(iState))%Vmin, &
-                                      This%States(IdxVec(iState))%Vmax, &
-                                      This%States(IdxVec(iState))%tau,  &
-                                      This%States(IdxVec(iState))%ri,   &
-                                      This%States(IdxVec(iState))%ro
-                                      
+      write(Unit, 1)  This%States(IdxVec(iState))%vqn,  &
+                      This%States(IdxVec(iState))%jqn,  &
+                      This%States(IdxVec(iState))%eint, &
+                      This%States(IdxVec(iState))%egam, &
+                      This%States(IdxVec(iState))%rmin, &
+                      This%States(IdxVec(iState))%rmax, &
+                      This%States(IdxVec(iState))%Vmin, &
+                      This%States(IdxVec(iState))%Vmax, &
+                      This%States(IdxVec(iState))%tau,  &
+                      This%States(IdxVec(iState))%ri,   &
+                      This%States(IdxVec(iState))%ro
+                      
     end do
     
   close(Unit)
+
+
+  1 format(1X, I4, A, I4, 9(A, es14.7) )
 
 
   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
-
-
-! !________________________________________________________________________________________________________________________________!
-! Subroutine WriteList( This, Input, iMol, i_Debug )
-
-!   use Input_Class    ,only:  Input_Type
-  
-!   class(LevelsContainer_Type)               ,intent(in)     ::    This
-!   type(Input_Type)                          ,intent(in)     ::    Input
-!   integer                                   ,intent(in)     ::    iMol
-!   logical                         ,optional ,intent(in)     ::    i_Debug
-  
-!   integer                                                   ::    NFinal
-!   integer                                                   ::    Ncut
-!   real(rkp)                                                 ::    Timl
-!   character(:)                                 ,allocatable ::    levels_orig_file, levels_cut_file
-!   integer                                                   ::    iLevels
-!   integer                                                   ::    Status
-!   integer                                                   ::    Unit
-!   logical                                                   ::    i_Debug_Loc
-
-!   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-!   if (i_Debug_Loc) call Logger%Entering( "WriteList")  !, Active = i_Debug_Loc )
-!   !i_Debug_Loc   =     Logger%On()
-
-
-!   if (i_Debug_Loc) call Logger%Write( "Ecut for Molecule Nb", iMol, " = ", Input%Ecut(iMol), " Eh" )
-!   if (i_Debug_Loc) call Logger%Write( "Ecut for Molecule Nb", iMol, " = ", Input%Ecut(iMol)*Hartree_To_eV, " eV" )
-!   if (i_Debug_Loc) call Logger%Write( "Ecut for Molecule Nb", iMol, " = ", Input%Ecut(iMol)*Hartree_To_eV - This%States(1)%einteV, " eV, when refered to the first level" )
-!   if (i_Debug_Loc) call Logger%Write( "  " )
-!   if (i_Debug_Loc) call Logger%Write( "Tcut for Molecule Nb", iMol, " = ", Input%Tcut(iMol), " a.u." )
-
-!   levels_cut_file  = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/levels_cut.inp'
-!   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", levels_cut_file )
-!   open( File=levels_cut_file, NewUnit=Unit, status='REPLACE', iostat=Status )
-!   if (Status/=0) call Error( "Error opening file: " // levels_cut_file ) 
-  
-!     write(Unit,'(a)') ('######################################################################################################################################################')
-!     write(Unit,'(a)') ('# jqn   : the rotational q.n. of the i''th quantum state')
-!     write(Unit,'(a)') ('# vqn   : the vibrational q.n. of the i''th quantum state')
-!     write(Unit,'(a)') ('# eint  : internal energy of i''th quantum state [Eh]')
-!     write(Unit,'(a)') ('# egam  : Half width of i''th quantum state')
-!     write(Unit,'(a)') ('# rmin  : the position of the potential minimum (included centrifugal potential) for i''th quantum state')
-!     write(Unit,'(a)') ('# vmin  : the value of the potential minimun (inc. cent. pot.)')
-!     write(Unit,'(a)') ('# vmax  : the value of the local potential maximum (inc. cent. pot.)')
-!     write(Unit,'(a)') ('# tau   : the vibrational period of the i''th quantum state')
-!     write(Unit,'(a)') ('# ri    : inner turning point')
-!     write(Unit,'(a)') ('# ro    : outter turning point')
-!     write(Unit,'(a)') ('# rmax  : location of maximum in centrifugal barrier')
-!     write(Unit,'(a)') ('######################################################################################################################################################')
-!     write(Unit,'(a)') ('#    vqn  jqn   eint            egam            rmin          rmax          vmin            vmax            tau           ri             ro')
-!     write(Unit,'(a)') ('######################################################################################################################################################')
-  
-!     NCut   = 0
-!     NFinal = 0
-!     do iLevels = 1,This%NStates
-    
-!       if (This%States(iLevels)%egam .eq. Zero) then
-!         Timl=One/1.e-80_rkp
-!       else
-!         Timl=One/This%States(iLevels)%egam
-!       end if
-                    
-!       if ((This%States(iLevels)%eint .gt. Input%Ecut(iMol)) .and. (Timl .gt. Input%Tcut(iMol))) then
-!         write(Unit,2) int(This%States(iLevels)%vqn),  int(This%States(iLevels)%jqn),  This%States(iLevels)%eint, &
-!                     This%States(iLevels)%egam, This%States(iLevels)%rmin, This%States(iLevels)%rmax, &
-!                     This%States(iLevels)%vmin, This%States(iLevels)%vmax, This%States(iLevels)%tau,  &
-!                     This%States(iLevels)%ri,   This%States(iLevels)%ro
-!         2 format(1X,2I5,9es15.7)
-        
-!         NFinal = NFinal + 1
-!       else 
-!         NCut   = NCut   + 1
-!       end if
-             
-!     end do
-    
-!   close(Unit)
-  
-!   if (i_Debug_Loc) call Logger%Write( "Nb of Levels that have been cut for Molecule Nb", iMol, " = ", Ncut)
-
-!   if (i_Debug_Loc) call Logger%Exiting
-
-! End Subroutine
-! !--------------------------------------------------------------------------------------------------------------------------------!
 
 
 !________________________________________________________________________________________________________________________________!

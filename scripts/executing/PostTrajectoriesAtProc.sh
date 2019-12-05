@@ -51,33 +51,35 @@ NLevels2=${21}
 MinLevel2=${22}
 MaxLevel2=${23}
 RmTrajFlg=${24}
+BinaryTrajFlg=${25}                                                            
 
 
 
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
-echo "    [PostTrajectoriesAtProc.sh]: System             = "${System}
-echo "    [PostTrajectoriesAtProc.sh]: StochPESFlg        = "${StochPESFlg}
-echo "    [PostTrajectoriesAtProc.sh]: NPESs              = "${NPESs}
-echo "    [PostTrajectoriesAtProc.sh]: iPESStart          = "${iPESStart}
-echo "    [PostTrajectoriesAtProc.sh]: TranFlg            = "${TranFlg}
-echo "    [PostTrajectoriesAtProc.sh]: Tran               = "${Tran}
-echo "    [PostTrajectoriesAtProc.sh]: Tint               = "${Tint}
-echo "    [PostTrajectoriesAtProc.sh]: Velocity           = "${Velocity}
-echo "    [PostTrajectoriesAtProc.sh]: NNode              = "${NNode}
-echo "    [PostTrajectoriesAtProc.sh]: iNode              = "${iNode}
-echo "    [PostTrajectoriesAtProc.sh]: NProc              = "${NProc}
-echo "    [PostTrajectoriesAtProc.sh]: iProc              = "${iProc}
-echo "    [PostTrajectoriesAtProc.sh]: Molecule1          = "${Molecule1}
-echo "    [PostTrajectoriesAtProc.sh]: NLevels1           = "${NLevels1}
-echo "    [PostTrajectoriesAtProc.sh]: MinLevel1          = "${MinLevel1}
-echo "    [PostTrajectoriesAtProc.sh]: MaxLevel1          = "${MaxLevel1}
-echo "    [PostTrajectoriesAtProc.sh]: Molecule2          = "${Molecule2}
-echo "    [PostTrajectoriesAtProc.sh]: NLevels2           = "${NLevels2}
-echo "    [PostTrajectoriesAtProc.sh]: MinLevel2          = "${MinLevel2}
-echo "    [PostTrajectoriesAtProc.sh]: MaxLevel2          = "${MaxLevel2}
-echo "    [PostTrajectoriesAtProc.sh]: RmTrajFlg          = "${RmTrajFlg}
+echo "    [PostTrajectoriesAtProc.sh]: System                = "${System}
+echo "    [PostTrajectoriesAtProc.sh]: StochPESFlg           = "${StochPESFlg}
+echo "    [PostTrajectoriesAtProc.sh]: NPESs                 = "${NPESs}
+echo "    [PostTrajectoriesAtProc.sh]: iPESStart             = "${iPESStart}
+echo "    [PostTrajectoriesAtProc.sh]: TranFlg               = "${TranFlg}
+echo "    [PostTrajectoriesAtProc.sh]: Tran                  = "${Tran}
+echo "    [PostTrajectoriesAtProc.sh]: Tint                  = "${Tint}
+echo "    [PostTrajectoriesAtProc.sh]: Velocity              = "${Velocity}
+echo "    [PostTrajectoriesAtProc.sh]: NNode                 = "${NNode}
+echo "    [PostTrajectoriesAtProc.sh]: iNode                 = "${iNode}
+echo "    [PostTrajectoriesAtProc.sh]: NProc                 = "${NProc}
+echo "    [PostTrajectoriesAtProc.sh]: iProc                 = "${iProc}
+echo "    [PostTrajectoriesAtProc.sh]: Molecule1             = "${Molecule1}
+echo "    [PostTrajectoriesAtProc.sh]: NLevels1              = "${NLevels1}
+echo "    [PostTrajectoriesAtProc.sh]: MinLevel1             = "${MinLevel1}
+echo "    [PostTrajectoriesAtProc.sh]: MaxLevel1             = "${MaxLevel1}
+echo "    [PostTrajectoriesAtProc.sh]: Molecule2             = "${Molecule2}
+echo "    [PostTrajectoriesAtProc.sh]: NLevels2              = "${NLevels2}
+echo "    [PostTrajectoriesAtProc.sh]: MinLevel2             = "${MinLevel2}
+echo "    [PostTrajectoriesAtProc.sh]: MaxLevel2             = "${MaxLevel2}
+echo "    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = "${RmTrajFlg}
+echo "    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = "${BinaryTrajFlg}
 
 source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
@@ -143,10 +145,13 @@ if [ ${MinLevel1} -eq 0 ]; then
 
 
         if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/AdjstTrj*
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
+          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
+          if [ ${BinaryTrajFlg} -eq 1 ]; then
+            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out*
+          fi
         fi
 
     
@@ -193,10 +198,13 @@ else
       PostTrajectories
       
       if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/AdjstTrj*
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
+        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
+        if [ ${BinaryTrajFlg} -eq 1 ]; then
+          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out*
+        fi
       fi
 
 

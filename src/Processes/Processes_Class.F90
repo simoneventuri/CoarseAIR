@@ -90,8 +90,10 @@ Module Processes_Class
     integer                                                 ::    NTInt
     real(rkp)              ,dimension(:)      ,allocatable  ::    TInt
     character(20)          ,dimension(:)      ,allocatable  ::    TIntChar
-    real(rkp)              ,dimension(:,:,:)  ,allocatable  ::    QRatio
-    character(37)          ,dimension(:,:)    ,allocatable  ::    QRatioChar
+    real(rkp)              ,dimension(:)      ,allocatable  ::    QRatio
+    character(37)                                           ::    QRatioChar
+    !real(rkp)              ,dimension(:,:,:)  ,allocatable  ::    QRatio
+    !character(37)          ,dimension(:,:)    ,allocatable  ::    QRatioChar
 
   contains
     private
@@ -272,24 +274,24 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
   call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString)
 
   if (This%PESoI == 0) then
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/InProc' // This%InProcChar // '.dat' ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.dat' ))
     if (This%NPESs == 1) then
       PES_Name = adjustl(trim(This%PES_Name))
     else
       PES_Name = '           Merged'
     end if
   else 
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/InProc' // This%InProcChar // '.dat.' // This%PESoI_char ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.dat.' // This%PESoI_char ))
     PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
   end if
   if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   
-    write(Unit,'(A)')                                          '#           System |               PES | Initial Molecules |      No Processes |   No Trajectories |'
-    write(Unit,'(A1,A17, A3,A17, A3,A17, A3,I17, A3,I17, A2)') '$', adjustr(This%System), ' | ', adjustr(PES_Name), ' | ', adjustr(This%IniMolecules), ' | ', This%NProc_Tot, ' | ', This%NTraj, ' |'
+    write(Unit,'(A)')                                          '#           System |               PES |     In. Molecules |      No Processes |   No Trajectories |'
+    write(Unit,'(A1,A17, A3,A17, A3,A17, A3,I17, A3,I17, A2)') '#', adjustr(This%System), ' | ', adjustr(PES_Name), ' | ', adjustr(This%IniMolecules), ' | ', This%NProc_Tot, ' | ', This%NTraj, ' |'
 
-    write(Unit,'(A)') '$     Initial Bins |                       PartFunc Ratios | Trans Temperature |   Int Temperature |'
-    write(Unit,'(A1,A17, A3,A37, A3,es17.10, A3,es17.10, A2)') '$', adjustr(This%InBinsChar), ' | ', This%QRatioChar(iTTra, iTInt), ' | ', This%TTra(iTTra), ' | ', This%TInt(iTInt), ' |'
+    write(Unit,'(A)') '#   In. Lev.s/Bins |                   Part. Func.s Ratios | Trans Temperature |   Int Temperature |'
+    write(Unit,'(A1,A17, A3,A37, A3,es17.10, A3,es17.10, A2)') '#', adjustr(This%InBinsChar), ' | ', This%QRatioChar, ' | ', This%TTra(iTTra), ' | ', This%TInt(iTInt), ' |'
     
     write(Unit,'(A)') '#  Process,            Rate,         Rate SD'
     do iP = 1,This%NProc_Cleaned
