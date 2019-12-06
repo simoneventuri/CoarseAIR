@@ -168,14 +168,18 @@ Subroutine Compute_Level_To_Bin_Energy_BinsContainer( This, LevelsContainer, i_D
   if (i_Debug_Loc) call Logger%Entering( "Compute_Level_To_Bin_Energy_BinsContainer" )
   !i_Debug_Loc   =     Logger%On()
   
-  do iLevels = 1,LevelsContainer%NStates
-    iBins = 1
-    do while ( LevelsContainer%States(iLevels)%einteV > This%Bin(iBins+1)%MineinteV )
-      iBins = iBins+1
-      if ( iBins == This%NBins ) exit 
+  if (This%NBins == 1) then
+    LevelsContainer%States(:)%To_Bin = 1
+  else
+    do iLevels = 1,LevelsContainer%NStates
+      iBins = 1
+      do while ( LevelsContainer%States(iLevels)%einteV > This%Bin(iBins+1)%MineinteV )
+        iBins = iBins+1
+        if ( iBins == This%NBins ) exit 
+      end do
+      LevelsContainer%States(iLevels)%To_Bin = iBins
     end do
-    LevelsContainer%States(iLevels)%To_Bin = iBins
-  end do
+  end if
   
 
   if (i_Debug_Loc) call Logger%Exiting
