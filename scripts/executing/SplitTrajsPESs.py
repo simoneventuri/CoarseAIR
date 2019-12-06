@@ -30,7 +30,7 @@ if __name__ == '__main__':
     iPESStart  = int(sys.argv[2])
     #print('    [SplitTrajsPESs.py]: iPESStart = ', iPESStart )
 
-    TrajData = read_file(FolderPath + '/trajectories.out')
+    TrajData = read_file(FolderPath + '/trajectories.csv')
     TrajVec  = TrajData[:,0].astype(int)
     iPESVec  = TrajData[:,1].astype(int)
     bMaxVec  = TrajData[:,2]
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     for iPES in range(max(iPESVec)):
         #print('    [SplitTrajsPESs.py]: iPES = ', iPES+1, ' Done')
 
-        PathToFile = FolderPath + '/trajectories.out.' + str(iPES+iPESStart) 
+        PathToFile = FolderPath + '/trajectories.csv.' + str(iPES+iPESStart) 
         print(PathToFile)
         with open(PathToFile, 'w') as the_file:
             the_file.write('#  iTraj   iPES          bmax           b_i              j_i              v_i            arr_i              j_f              v_f            arr_f\n')

@@ -82,7 +82,9 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   ! !---------------------------------------------------------------------------------------------------! !
   !!!                                     Allocating Main Quantities                                    !!!
   ! !---------------------------------------------------------------------------------------------------! !  
-  allocate(  This%OutputDir, source = adjustl(trim(Input%OutputDir)) ) 
+  allocate(  This%OutputDir,      source = adjustl(trim(Input%OutputDir))      ) 
+  allocate(  This%LevelOutputDir, source = adjustl(trim(Input%LevelOutputDir)) ) 
+  This%FirstIssueFlg = .True.
 
   This%NTraj        = Input%NTraj
   This%System       = adjustl(trim(Input%System))
@@ -124,7 +126,7 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   This%NProc_Tot = 0
   do iP = 1,3
     iMol = Collision%Pairs(iP)%To_Molecule
-    This%NProc_iPOpp(iP,1) = Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates + 1
+    This%NProc_iPOpp(iP,1) = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins + 1
     This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1)
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP)
   end do
@@ -318,7 +320,7 @@ Subroutine ConstructVecOfProcs_Nb3Atoms( This, Input, Collision, i_Debug )
   do iP = 1,3
     iMol      = Collision%Pairs(iP)%To_Molecule
     MolName   = Collision%MoleculesContainer(iMol)%Molecule%Name
-    NLeveli   = Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates
+    NLeveli   = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins
     
     do iLevel = 0,NLeveli
       call CreateName_Nb3Atoms( trim(adjustl(MolName)), trim(adjustl(Input%AtomsName(iOpp(iP)))), iLevel, iLevelChar, Name )
@@ -389,43 +391,51 @@ Subroutine FindingFinalLevel_Nb3Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   !i_Debug_Loc   =     Logger%On()
 
   iP       = int(Arr / 16.0_rkp)
-  NProcPre = Collision%Pairs(iP)%NPrevProc
-  iType    = mod(Arr , 16)
+  if (iP > 0) then
+    NProcPre = Collision%Pairs(iP)%NPrevProc
+    iType    = mod(Arr , 16)
 
-  iMol      = Collision%Pairs(iP)%To_Molecule
-  MolName   = Collision%MoleculesContainer(iMol)%Molecule%Name
+    iMol      = Collision%Pairs(iP)%To_Molecule
+    MolName   = Collision%MoleculesContainer(iMol)%Molecule%Name
 
-  if ( (iType > 1) ) then
-    if (i_Debug_Loc) call Logger%Write( "iType>1; Found Dissociation")  
-    
-    iLevel    = 0
-    NProcCurr = 1
-    ProcType  = 0
-    ExcType   = 0
-    
-  else
-    if (i_Debug_Loc) call Logger%Write( "iType<=1")  
-
-    iLevel    = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
-    NProcCurr = iLevel + 1
-    if (iP == 1) then
-      ProcType = 1
-      ExcType  = 0
+    if ( (iType > 1) ) then
+      if (i_Debug_Loc) call Logger%Write( "iType>1; Found Dissociation")  
+      
+      iLevel    = 0
+      NProcCurr = 1
+      ProcType  = 0
+      ExcType   = 0
+      
     else
-      ProcType = 2
-      ExcType  = This%ExcTypeVec(iP)
+      if (i_Debug_Loc) call Logger%Write( "iType<=1")  
+
+      iLevel    = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
+      NProcCurr = iLevel + 1
+      if (iP == 1) then
+        ProcType = 1
+        ExcType  = 0
+      else
+        ProcType = 2
+        ExcType  = This%ExcTypeVec(iP)
+      end if
+      if (i_Debug_Loc) call Logger%Write( "iMol      = ", iMol)
+      if (i_Debug_Loc) call Logger%Write( "iLevel    = ", iLevel) 
+      if (i_Debug_Loc) call Logger%Write( "NProcCurr = ", NProcCurr) 
+
     end if
-    if (i_Debug_Loc) call Logger%Write( "iMol      = ", iMol)
-    if (i_Debug_Loc) call Logger%Write( "iLevel    = ", iLevel) 
-    if (i_Debug_Loc) call Logger%Write( "NProcCurr = ", NProcCurr) 
 
+    iLevelFin     = [iLevel]
+    call CreateName_Nb3Atoms( trim(adjustl(MolName)), trim(adjustl(Input%AtomsName(iOpp(iP)))), iLevel, iLevelChar, Name )
+    iLevelFinChar = [iLevelChar]
+    Idx           = NProcPre + NProcCurr
+    Pairs         = iP
+  else
+    Name = Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name
+    iLevelFin     = [  0]
+    iLevelFinChar = ['0']
+    Idx           =  0
+    Pairs         = [0]
   end if
-
-  iLevelFin     = [iLevel]
-  call CreateName_Nb3Atoms( trim(adjustl(MolName)), trim(adjustl(Input%AtomsName(iOpp(iP)))), iLevel, iLevelChar, Name )
-  iLevelFinChar = [iLevelChar]
-  Idx           = NProcPre + NProcCurr
-  Pairs         = iP
 
 
   if (i_Debug_Loc) call Logger%Exiting
@@ -467,7 +477,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
   integer      ,dimension(1)                                ::    iLevelFin
   character(6) ,dimension(1)                                ::    iLevelFinChar  
   integer                                                   ::    Idx
-  integer                                                   ::    ProblematicIn, ProblematicFin
+  integer                                                   ::    IssueIn, IssueFin
   logical                                                   ::    i_Debug_Loc
   logical                                                   ::    i_Debug_Loc_Deep
 
@@ -490,11 +500,18 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
 
       !!! Opening File of Statistics
-      FileName = trim(adjustl(Input%LevelOutputDir)) // '/statistics.out'
+      FileName = trim(adjustl(Input%LevelOutputDir)) // '/statistics.csv'
       if (i_Debug_Loc) call Logger%Write( "  Reading File: ", FileName )
       Open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
         if (Status/=0) then
           if (i_Debug_Loc) call Logger%Write( "The statistics.out File is not present for this Initial Level / Bin." )
+          FileName = adjustl(trim( trim(adjustl(This%LevelOutputDir)) // '/StatIssues.csv' ))
+          if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
+          open( File=FileName, NewUnit=This%UnitIssues, status='unknown', access='append', iostat=Status )
+            if (Status/=0) call Error( "Error writing the binary data file for Rates: " // FileName  ) 
+            write(This%UnitIssues, '(A)') '#    vIn(:),    jIn(:),     ArrIn,   IssueIn,   vFin(:),   jFin(:),    ArrFin,  IssueFin'          
+            write(This%UnitIssues, '(X, I9, *(A, I9))') -1, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0
+          close(This%UnitIssues)
         else
           read(Unit,*,iostat=Status)
 
@@ -529,36 +546,43 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
 
             !!! Checking if Initial and Final States are Accettable
-            call Mask4InProc_Nb3Atoms(  Collision, Input%BinOI(1), vqnIn,  jqnIn,  ArrIn,  ProblematicIn  )!, i_Debug=i_Debug_Loc )
-            call Mask4FinProc_Nb3Atoms( Collision,                 vqnFin, jqnFin, ArrFin, ProblematicFin )!, i_Debug=i_Debug_Loc )
+            call Mask4InProc_Nb3Atoms(  Collision, Input%BinOI(1), vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
+            call Mask4FinProc_Nb3Atoms( Collision,                 vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
 
 
-            !!! Postprocessing Final State for Reconstructing Process !!!!
-            call This%FindingFinalLevel( Input, Collision, [vqnFin], [jqnFin], ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
-            if (i_Debug_Loc_Deep) call Logger%Write( "    Name          = ", Name )  
-            if (i_Debug_Loc_Deep) call Logger%Write( "    ProcType      = ", ProcType )  
-            if (i_Debug_Loc_Deep) call Logger%Write( "    ExcType       = ", ExcType )  
-            if (i_Debug_Loc_Deep) call Logger%Write( "    iP            = ", iP ) 
-            if (i_Debug_Loc_Deep) call Logger%Write( "    iLevelFin     = ", iLevelFin )  
-            if (i_Debug_Loc_Deep) call Logger%Write( "    iLevelFinChar = ", iLevelFinChar )  
-            if (i_Debug_Loc_Deep) call Logger%Write( "    Idx           = ", Idx )  
+            if ( (IssueIn < 1) .and. (IssueFin < 1) ) then
+
+              !!! Postprocessing Final State for Reconstructing Process !!!!
+              call This%FindingFinalLevel( Input, Collision, [vqnFin], [jqnFin], ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
+              if (i_Debug_Loc_Deep) call Logger%Write( "    Name          = ", Name )  
+              if (i_Debug_Loc_Deep) call Logger%Write( "    ProcType      = ", ProcType )  
+              if (i_Debug_Loc_Deep) call Logger%Write( "    ExcType       = ", ExcType )  
+              if (i_Debug_Loc_Deep) call Logger%Write( "    iP            = ", iP ) 
+              if (i_Debug_Loc_Deep) call Logger%Write( "    iLevelFin     = ", iLevelFin )  
+              if (i_Debug_Loc_Deep) call Logger%Write( "    iLevelFinChar = ", iLevelFinChar )  
+              if (i_Debug_Loc_Deep) call Logger%Write( "    Idx           = ", Idx )  
 
 
-            !!! New Process ??? !!!!
-            Proc_To_Line = This%Proc_To_LineVec(Idx)
-            if (i_Debug_Loc_Deep) call Logger%Write( "    Idx          = ", Idx, '; Proc_To_Line =', Proc_To_Line )  
-            if (Proc_To_Line < 1) then
-              !!! New Process! Allocating it !!!!
-              This%NProc_Cleaned        = This%NProc_Cleaned + 1
-              call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-              This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
-              if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
+              !!! New Process ??? !!!!
+              Proc_To_Line = This%Proc_To_LineVec(Idx)
+              if (i_Debug_Loc_Deep) call Logger%Write( "    Idx          = ", Idx, '; Proc_To_Line =', Proc_To_Line )  
+              if (Proc_To_Line < 1) then
+                !!! New Process! Allocating it !!!!
+                This%NProc_Cleaned        = This%NProc_Cleaned + 1
+                call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+                This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
+                if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
+              else
+                !!! Old Process! Adding Cross Section !!!!
+                call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+                if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
+              end if
+
             else
-              !!! Old Process! Adding Cross Section !!!!
-              call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-              if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
-            end if
+              if (i_Debug_Loc_Deep) call Logger%Write( "    Found an Issue with the Trajectory; writing it in a Separate File." )  
+              call This%WritingIssue( [vqnIn], [jqnIn], ArrIn, IssueIn, [vqnFin], [jqnFin], ArrFin, IssueFin, i_Debug=i_Debug_Loc )
 
+            end if
 
 
           end do
@@ -597,15 +621,24 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
 
       !!! Writing Rates !!!!
-      call This%InProc_WritingRates( iTTra, iTInt, i_Debug=i_Debug_Loc )
-
-      deallocate(This%IdxVec, Stat=Status)
-      if (Status/=0) call Error( "Error deallocating This%IdxVec in Convert_CrossSect_In_Rates_Nb3Atoms" )
-      if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVec" )
+      if (Input%PostWritesBinaryFlg) then
+        call This%WritingRates_Binary( iTTra, iTInt, i_Debug=i_Debug_Loc )
+      else
+        call This%WritingRates( iTTra, iTInt, i_Debug=i_Debug_Loc )
+      end if
       
-      deallocate(This%IdxVecSorted, Stat=Status)
-      if (Status/=0) call Error( "Error deallocating This%IdxVecSorted in Convert_CrossSect_In_Rates_Nb3Atoms" )
-      if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVecSorted" )
+
+      if ( allocated(This%IdxVec) ) then
+        deallocate(This%IdxVec, Stat=Status)
+        if (Status/=0) call Error( "Error deallocating This%IdxVec in Convert_CrossSect_In_Rates_Nb3Atoms" )
+        if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVec" )
+        
+        deallocate(This%IdxVecSorted, Stat=Status)
+        if (Status/=0) call Error( "Error deallocating This%IdxVecSorted in Convert_CrossSect_In_Rates_Nb3Atoms" )
+        if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVecSorted" )
+      end if
+
+      close(This%UnitIssues)
 
     !end do
 
@@ -622,7 +655,7 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Pure Subroutine Mask4InProc_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Problematic )!, i_Debug )
+Pure Subroutine Mask4InProc_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Issue )!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
@@ -631,7 +664,7 @@ Pure Subroutine Mask4InProc_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
   integer                                           ,intent(inout)  :: vqnIn
   integer                                           ,intent(inout)  :: jqnIn
   integer                                           ,intent(inout)  :: ArrIn
-  integer                                           ,intent(out)    :: Problematic
+  integer                                           ,intent(out)    :: Issue
   ! logical                                 ,optional ,intent(in)     :: i_Debug
   
   integer                                                           :: iPIn, iPFin
@@ -644,7 +677,7 @@ Pure Subroutine Mask4InProc_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
   ! if (i_Debug_Loc) call Logger%Entering( "Mask4InProc_Nb3Atoms" )
   ! !i_Debug_Loc   =     Logger%On() 
 
-  Problematic = -1
+  Issue = -1
 
   iPIn    = int(ArrIn / 16)
   iTypeIn = mod(ArrIn , 16)
@@ -653,13 +686,13 @@ Pure Subroutine Mask4InProc_Nb3Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
   BinTemp = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%qns_to_Bin(vqnIn,jqnIn)
 
   if ( iTypeIn > 1 ) then
-    Problematic = 1 ! Current Trajectory Starts from Dissociation
+    Issue = 1 ! Current Trajectory Starts from Dissociation
   elseif ( Collision%Pairs(iPIn)%To_Molecule /= iMolIn ) then
-    Problematic = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
+    Issue = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
   elseif ( BinTemp == -1 ) then
-    Problematic = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
+    Issue = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
   elseif ( BinTemp /= BinIn ) then
-    Problematic = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
+    Issue = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
   else
     ! Current Trajectory has an Initial Condition that is accettable!
     vqnIn = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(BinIn)%vqnFirst
@@ -676,7 +709,7 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Pure Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Problematic)!, i_Debug )
+Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
@@ -684,7 +717,7 @@ Pure Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Proble
   integer                                           ,intent(inout)  :: vqnFin
   integer                                           ,intent(inout)  :: jqnFin
   integer                                           ,intent(inout)  :: ArrFin
-  integer                                           ,intent(out)    :: Problematic
+  integer                                           ,intent(out)    :: Issue
   ! logical                                 ,optional ,intent(in)     :: i_Debug
   
   integer                                                           :: iPIn, iPFin
@@ -697,28 +730,30 @@ Pure Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Proble
   ! if (i_Debug_Loc) call Logger%Entering( "Mask4FinProc_Nb3Atoms" )
   ! !i_Debug_Loc   =     Logger%On() 
 
-  Problematic = -1
+  Issue = -1
 
   iPFin    = int(ArrFin / 16)
   iTypeFin = mod(ArrFin , 16)
-  iMolFin  = Collision%Pairs(iPFin)%To_Molecule
-  BinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin)
+  if (iPFin > 0) then
+    iMolFin  = Collision%Pairs(iPFin)%To_Molecule
+    BinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin)
 
-  if (iTypeFin < 2) then
-    if ( BinTemp .eq. -1 ) then
-      if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin-1) .eq. -1 ) then
-        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-        vqnFin = 0
-        jqnFin = 0
-        ArrFin = int( iPFin * 16) + 2
+    if (iTypeFin < 2) then
+      if ( BinTemp .eq. -1 ) then
+        if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin-1) .eq. -1 ) then
+          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+          vqnFin = 0
+          jqnFin = 0
+          ArrFin = int( iPFin * 16) + 2
+        else
+          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+        endif
       else
-        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
-      endif
-    else
-      ! Current Trajectory has a Final Condition that is accettable!
-      BinFin = BinTemp
-      vqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%vqnFirst
-      jqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%jqnFirst
+        ! Current Trajectory has a Final Condition that is accettable!
+        BinFin = BinTemp
+        vqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%vqnFirst
+        jqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%jqnFirst
+      end if
     end if
   end if
 

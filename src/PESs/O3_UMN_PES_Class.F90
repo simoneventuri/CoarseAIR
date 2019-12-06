@@ -107,7 +107,7 @@ Subroutine Initialize_O3_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   end do
   
   
-  UMN_O3_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
+  UMN_O3_file = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
   if (i_Debug_Loc) call Logger%Write( "Reading UMN O3 PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", UMN_O3_file)
   open( File=UMN_O3_file, NewUnit=Unit, status='OLD', iostat=Status )

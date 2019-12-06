@@ -118,7 +118,6 @@ function Clean {
       
       
       if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/AdjstTrj*
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics-*
       fi

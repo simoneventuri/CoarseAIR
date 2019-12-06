@@ -73,6 +73,9 @@ Module Processes_Class
 
     integer                                                 ::    Status            = -1
     character(:)                              ,allocatable  ::    OutputDir
+    character(:)                              ,allocatable  ::    LevelOutputDir
+    logical                                                 ::    FirstIssueFlg
+    integer                                                 ::    UnitIssues
     integer                                                 ::    NTraj
     character(17)                                           ::    System
     integer                                                 ::    NPESs
@@ -102,7 +105,9 @@ Module Processes_Class
     procedure              ,public                          ::    ConstructVecOfProcs          =>    ConstructVecOfProcs_Processes
     procedure              ,public                          ::    FindingFinalLevel            =>    FindingFinalLevel_Processes
     procedure              ,public                          ::    Convert_CrossSect_To_Rates   =>    Convert_CrossSect_To_Rates_Processes
-    procedure              ,public                          ::    InProc_WritingRates
+    procedure              ,public                          ::    WritingRates
+    procedure              ,public                          ::    WritingRates_Binary
+    procedure              ,public                          ::    WritingIssue
   End Type
 
   logical   ,parameter                                      ::    i_Debug_Global = .False.
@@ -247,7 +252,7 @@ End Subroutine
 !   WRITING BINS RATES
 ! ==============================================================================================================
 !______________________________________________________________________________________________________________!
-Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
+Subroutine WritingRates( This, iTTra, iTInt, i_Debug )
 
   use Parameters_Module     ,only:  Zero
 
@@ -265,7 +270,7 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
   logical                                                   ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if ( i_Debug_Loc ) call Logger%Entering( "InProc_WritingRates" )
+  if ( i_Debug_Loc ) call Logger%Entering( "WritingRates" )
   !i_Debug_Loc   =     Logger%On()  
 
   allocate(TsString, source = trim(adjustl( 'T_' // trim(adjustl(This%TTraChar(iTTra))) // '_' // trim(adjustl(This%TIntChar(iTInt))) // '/' )) )
@@ -274,18 +279,19 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
   call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString)
 
   if (This%PESoI == 0) then
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.dat' ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.csv' ))
     if (This%NPESs == 1) then
       PES_Name = adjustl(trim(This%PES_Name))
     else
       PES_Name = '           Merged'
     end if
   else 
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.dat.' // This%PESoI_char ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.csv.' // This%PESoI_char ))
     PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
   end if
   if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+  if (Status/=0) call Error( "Error writing the ASCI data file for Rates: " // FileName  ) 
   
     write(Unit,'(A)')                                          '#           System |               PES |     In. Molecules |      No Processes |   No Trajectories |'
     write(Unit,'(A1,A17, A3,A17, A3,A17, A3,I17, A3,I17, A2)') '#', adjustr(This%System), ' | ', adjustr(PES_Name), ' | ', adjustr(This%IniMolecules), ' | ', This%NProc_Tot, ' | ', This%NTraj, ' |'
@@ -300,6 +306,117 @@ Subroutine InProc_WritingRates( This, iTTra, iTInt, i_Debug )
     end do
   
   close(Unit)
+
+  if ( i_Debug_Loc ) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+! ==============================================================================================================
+!   WRITING BINS RATES IN BINARY FORMAT
+! ==============================================================================================================
+!______________________________________________________________________________________________________________!
+Subroutine WritingRates_Binary( This, iTTra, iTInt, i_Debug )
+
+  use Parameters_Module     ,only:  Zero
+
+  class(Processes_Type)                     ,intent(in)     ::    This
+  integer                                   ,intent(in)     ::    iTTra
+  integer                                   ,intent(in)     ::    iTInt
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  integer                                                   ::    iP, jP
+  integer                                                   ::    Status
+  integer                                                   ::    Unit
+  character(:)                                 ,allocatable ::    FileName
+  character(:)                                 ,allocatable ::    TsString
+  character(17)                                             ::    PES_Name
+  logical                                                   ::    i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if ( i_Debug_Loc ) call Logger%Entering( "WritingRates_Binary" )
+  !i_Debug_Loc   =     Logger%On()  
+
+  allocate(TsString, source = trim(adjustl( 'T_' // trim(adjustl(This%TTraChar(iTTra))) // '_' // trim(adjustl(This%TIntChar(iTInt))) // '/' )) )
+
+  call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/')
+  call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString)
+
+  if (This%PESoI == 0) then
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.bin' ))
+  else 
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.bin.' // This%PESoI_char ))
+  end if
+  if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
+  open( NewUnit=Unit, File=FileName, Action='WRITE', access="Stream", form="Unformatted", iostat=Status )
+  if (Status/=0) call Error( "Error writing the binary data file for Rates: " // FileName  ) 
+
+    write(Unit) int(This%NTraj, rkp)
+    write(Unit) int(This%NProc_Cleaned, rkp)
+    do iP = 1,This%NProc_Cleaned
+      jP = This%IdxVecSorted(iP)
+
+      write(Unit) int(This%ProcessesVecCleaned(jP)%Idx, rkp)
+      write(Unit) This%ProcessesVecCleaned(jP)%Temperature(iTTra)%Rate
+      write(Unit) sqrt( This%ProcessesVecCleaned(jP)%Temperature(iTTra)%RateSD )
+    end do
+  
+  close(Unit)
+
+  if ( i_Debug_Loc ) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+
+! ==============================================================================================================
+!   WRITING BINS RATES IN BINARY FORMAT
+! ==============================================================================================================
+!______________________________________________________________________________________________________________!
+Subroutine WritingIssue( This, vqnIn, jqnIn, ArrIn, IssueIn, vqnFin, jqnFin, ArrFin, IssueFin, i_Debug )
+
+  use Input_Class           ,only:  Input_Type
+  use Collision_Class       ,only:  Collision_Type
+  use Parameters_Module     ,only:  Zero
+  
+  class(Processes_Type)                      ,intent(inout) ::     This
+  integer   ,dimension(:)                    ,intent(in)    ::    vqnIn
+  integer   ,dimension(:)                    ,intent(in)    ::    jqnIn
+  integer                                    ,intent(in)    ::    ArrIn
+  integer                                    ,intent(in)    ::  IssueIn
+  integer   ,dimension(:)                    ,intent(in)    ::   vqnFin
+  integer   ,dimension(:)                    ,intent(in)    ::   jqnFin
+  integer                                    ,intent(in)    ::   ArrFin
+  integer                                    ,intent(in)    :: IssueFin
+  logical                          ,optional ,intent(in)    ::  i_Debug
+
+  integer                                                ::    iP, jP
+  integer                                                ::    Status
+  integer                                                ::    Unit
+  character(:)                              ,allocatable ::    FileName
+  character(:)                              ,allocatable ::    TsString
+  character(17)                                          ::    PES_Name
+  logical                                                ::    i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if ( i_Debug_Loc ) call Logger%Entering( "WritingIssue" )
+  !i_Debug_Loc   =     Logger%On()  
+
+  if (This%FirstIssueFlg) then
+    FileName = adjustl(trim( trim(adjustl(This%LevelOutputDir)) // '/StatIssues.csv' ))
+    if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
+    open( File=FileName, NewUnit=This%UnitIssues, status='unknown', access='append', iostat=Status )
+    if (Status/=0) call Error( "Error writing the binary data file for Rates: " // FileName  ) 
+    write(This%UnitIssues, '(A)') '#    vIn(:),    jIn(:),     ArrIn,   IssueIn,   vFin(:),   jFin(:),    ArrFin,  IssueFin'
+
+    This%FirstIssueFlg = .False.
+  end if
+    
+  write(This%UnitIssues, 1) vqnIn(:), ',', jqnIn(:), ',', ArrIn, ',', IssueIn, ',', vqnFin, ',', jqnFin, ',', ArrFin, ',', IssueFin
+
+  1 Format(X, I9, *(A, I9))
 
   if ( i_Debug_Loc ) call Logger%Exiting
 

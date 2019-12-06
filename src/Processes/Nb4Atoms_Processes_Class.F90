@@ -86,7 +86,9 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   ! !---------------------------------------------------------------------------------------------------! !
   !!!                                     Allocating Main Quantities                                    !!!
   ! !---------------------------------------------------------------------------------------------------! !  
-  allocate(  This%OutputDir, source = adjustl(trim(Input%OutputDir)) ) 
+  allocate(  This%OutputDir,      source = adjustl(trim(Input%OutputDir))      ) 
+  allocate(  This%LevelOutputDir, source = adjustl(trim(Input%LevelOutputDir)) ) 
+  This%FirstIssueFlg = .True.
 
   This%NTraj        = Input%NTraj
   This%System       = adjustl(trim(Input%System))
@@ -106,7 +108,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   This%InBinsChar   = adjustl(trim( adjustl(trim(Input%BinOI_char(1))) // ',' // adjustl(trim(Input%BinOI_char(2))) ))
   iOpp              = Collision%Pairs(1)%Opposite
   iMol              = Collision%Pairs(iOpp)%To_Molecule
-  NLevelsOpp        = Collision%MoleculesContainer(iMolOpp)%Molecule%LevelsContainer%NStates
+  NLevelsOpp        = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins
   This%InProc       = ( This%InBins(1) - 1) * NLevelsOpp + This%InBins(2)
   write(InProcChar, "(I10)") This%InProc
   allocate( This%InProcChar, source = adjustl(trim(InProcChar)) )
@@ -136,9 +138,9 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   do iP = 1,3
     iOpp                   = Collision%Pairs(iP)%Opposite
     iMol                   = Collision%Pairs(iP)%To_Molecule
-    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates  + 1
-    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%LevelsContainer%NStates  + 1
-    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                         + 1
+    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins  + 1
+    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins  + 1
+    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                     + 1
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
   end do
   allocate( This%Proc_To_LineVec(0:This%NProc_Tot), Stat=Status  )
@@ -387,8 +389,8 @@ Subroutine ConstructVecOfProcs_Nb4Atoms( This, Input, Collision, i_Debug )
     iMol                   = Collision%Pairs(iP)%To_Molecule
     iMolOpp                = Collision%Pairs(iOpp)%To_Molecule
 
-    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%LevelsContainer%NStates + 1
-    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%LevelsContainer%NStates + 1
+    This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins + 1
+    This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins + 1
 
     This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2) + 1
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
@@ -496,70 +498,78 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
 
 
   iP       = int(Arr / 16.0_rkp)
-  iOpp     = Collision%Pairs(iP)%Opposite
-  NProcPre = Collision%Pairs(iP)%NPrevProc
-  Temp     = mod(Arr , 16)
-  iType    = mod(Temp, 4)
-  jType    = int(Temp, 4)
+  if (iP > 0) then
+    iOpp     = Collision%Pairs(iP)%Opposite
+    NProcPre = Collision%Pairs(iP)%NPrevProc
+    Temp     = mod(Arr , 16)
+    iType    = mod(Temp, 4)
+    jType    = int(Temp, 4)
 
-  iMol     = Collision%Pairs(iP)%To_Molecule
-  MolNameA = Collision%MoleculesContainer(iMol)%Molecule%Name
+    iMol     = Collision%Pairs(iP)%To_Molecule
+    MolNameA = Collision%MoleculesContainer(iMol)%Molecule%Name
 
-  iMolOpp  = Collision%Pairs(iOpp)%To_Molecule
-  MolNameB = Collision%MoleculesContainer(iMolOpp)%Molecule%Name
+    iMolOpp  = Collision%Pairs(iOpp)%To_Molecule
+    MolNameB = Collision%MoleculesContainer(iMolOpp)%Molecule%Name
 
-  iA    = Collision%Pair_To_Atoms(iP,1)
-  jA    = Collision%Pair_To_Atoms(iP,2)
-  kA    = Collision%Pair_To_Atoms(iOpp,1)
-  lA    = Collision%Pair_To_Atoms(iOpp,2)
+    iA    = Collision%Pair_To_Atoms(iP,1)
+    jA    = Collision%Pair_To_Atoms(iP,2)
+    kA    = Collision%Pair_To_Atoms(iOpp,1)
+    lA    = Collision%Pair_To_Atoms(iOpp,2)
 
-  if (iType > 1) then
+    if (iType > 1) then
+      
+      iLevel     = 0
+      NProcCurrA = 1
+      ProcType   = 0
+      if (jType > 1) then
+        !!! Double Dissociation
+        jLevel     = 0
+        NProcCurrB = 1
+        ExcType    = 0
+      
+      else
+        !!! 1st Pair Dissociated, 2nd Bound
+        jLevel     = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%qns_to_Bin(vqn(2),jqn(2))
+        NProcCurrB = jLevel + 1
+        ExcType    = 1
+      end if
     
-    iLevel     = 0
-    NProcCurrA = 1
-    ProcType   = 0
-    if (jType > 1) then
-      !!! Double Dissociation
+    elseif (jType > 1) then
+      !!! 1st Pair Bound, 2nd Dissociated
+      iLevel     = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
+      NProcCurrA = iLevel + 1
       jLevel     = 0
       NProcCurrB = 1
-      ExcType    = 0
+      ProcType   = 0
+      ExcType    = 2
     
     else
-      !!! 1st Pair Dissociated, 2nd Bound
+      !!! Either Inelastic or Exchange
+      iLevel     = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
+      NProcCurrA = iLevel + 1
       jLevel     = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%qns_to_Bin(vqn(2),jqn(2))
-      NProcCurrB = jLevel + 1
-      ExcType    = 1
+      if (iP == 1) then
+        ProcType = 1
+        ExcType  = 0
+      else
+        ProcType = 2
+        ExcType  = abs(This%ExcTypeVec(iP))
+      end if
+
     end if
-  
-  elseif (jType > 1) then
-    !!! 1st Pair Bound, 2nd Dissociated
-    iLevel     = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
-    NProcCurrA = iLevel + 1
-    jLevel     = 0
-    NProcCurrB = 1
-    ProcType   = 0
-    ExcType    = 2
-  
+
+    call CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelChar, jLevelChar, Name )  
+    iLevelFin     = [iLevel,     jLevel]
+    iLevelFinChar = [iLevelChar, jLevelChar]
+    Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB + 1)
+    Pairs         = [iP, iOpp]
   else
-    !!! Either Inelastic or Exchange
-    iLevel     = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
-    NProcCurrA = iLevel + 1
-    jLevel     = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%qns_to_Bin(vqn(2),jqn(2))
-    if (iP == 1) then
-      ProcType = 1
-      ExcType  = 0
-    else
-      ProcType = 2
-      ExcType  = abs(This%ExcTypeVec(iP))
-    end if
-
+    Name = Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name // '+' // Collision%Atoms(4)%Name
+    iLevelFin     = [  0,   0]
+    iLevelFinChar = ['0', '0']
+    Idx           = 0
+    Pairs         = [0, 0]
   end if
-
-  call CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelChar, jLevelChar, Name )  
-  iLevelFin     = [iLevel,     jLevel]
-  iLevelFinChar = [iLevelChar, jLevelChar]
-  Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB + 1)
-  Pairs         = [iP, iOpp]
 
   if (i_Debug_Loc) call Logger%Exiting
   
@@ -601,7 +611,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
   integer       ,dimension(2)                               ::    iLevelFin
   character(6)  ,dimension(2)                               ::    iLevelFinChar  
   integer                                                   ::    Idx
-  integer                                                   ::    ProblematicIn, ProblematicFin
+  integer                                                   ::    IssueIn, IssueFin
   logical                                                   ::    i_Debug_Loc
   logical                                                   ::    i_Debug_Loc_Deep
 
@@ -627,6 +637,13 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
       Open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
         if (Status/=0) then
           if (i_Debug_Loc) call Logger%Write( "The statistics.out File is not present for this Initial Level / Bin." )
+          FileName = adjustl(trim( trim(adjustl(This%LevelOutputDir)) // '/StatIssues.csv' ))
+          if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
+          open( File=FileName, NewUnit=This%UnitIssues, status='unknown', access='append', iostat=Status )
+            if (Status/=0) call Error( "Error writing the binary data file for Rates: " // FileName  ) 
+            write(This%UnitIssues, '(A)') '#    vIn(:),    jIn(:),     ArrIn,   IssueIn,   vFin(:),   jFin(:),    ArrFin,  IssueFin'          
+            write(This%UnitIssues, '(X, I9, *(A, I9))') -1, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0, ',', 0
+          close(This%UnitIssues)
         else
           read(Unit,*,iostat=Status)
           NLine = 0
@@ -661,25 +678,32 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
 
 
             !!! Checking if Initial and Final States are Accettable
-            call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI, vqnIn,  jqnIn,  ArrIn,  ProblematicIn  )!, i_Debug=i_Debug_Loc )
-            call Mask4FinProc_Nb4Atoms( Collision,              vqnFin, jqnFin, ArrFin, ProblematicFin )!, i_Debug=i_Debug_Loc )
+            call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI, vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
+            call Mask4FinProc_Nb4Atoms( Collision,              vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
+
+            if ( (IssueIn < 1) .and. (IssueFin < 1) ) then
+
+              !!! Postprocessing Final State for Reconstructing Process !!!!
+              call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
 
 
-            !!! Postprocessing Final State for Reconstructing Process !!!!
-            call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
+              !!! New Process ??? !!!!
+              Proc_To_Line = This%Proc_To_LineVec(Idx)
+              if (Proc_To_Line < 1) then
+                !!! New Process! Allocating it !!!!
+                This%NProc_Cleaned        = This%NProc_Cleaned + 1
+                call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+                This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
+                
+              else
+                !!! Old Process! Adding Cross Section !!!!
+                call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+              end if
 
-
-            !!! New Process ??? !!!!
-            Proc_To_Line = This%Proc_To_LineVec(Idx)
-            if (Proc_To_Line < 1) then
-              !!! New Process! Allocating it !!!!
-              This%NProc_Cleaned        = This%NProc_Cleaned + 1
-              call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-              This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
-              
             else
-              !!! Old Process! Adding Cross Section !!!!
-              call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+              if (i_Debug_Loc_Deep) call Logger%Write( "    Found an Issue with the Trajectory; writing it in a Separate File." )  
+              call This%WritingIssue( vqnIn,  jqnIn,  ArrIn,  IssueIn, vqnFin, jqnFin, ArrFin, IssueFin, i_Debug=i_Debug_Loc )
+
             end if
 
           end do
@@ -719,9 +743,15 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
         end if
       Close(Unit)
       if (i_Debug_Loc) call Logger%Write( "    Done Reading File: ", FileName )
+      
 
       !!! Writing Rates !!!!
-      call This%InProc_WritingRates( iTTra, iTInt, i_Debug=i_Debug_Loc )
+      if (Input%PostWritesBinaryFlg) then
+        call This%WritingRates_Binary( iTTra, iTInt, i_Debug=i_Debug_Loc )
+      else
+        call This%WritingRates( iTTra, iTInt, i_Debug=i_Debug_Loc )
+      end if
+
 
     !end do
 
@@ -737,7 +767,7 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Problematic)!, i_Debug )
+Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Issue)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
@@ -746,7 +776,7 @@ Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
   integer     ,dimension(2)                         ,intent(inout)  :: vqnIn
   integer     ,dimension(2)                         ,intent(inout)  :: jqnIn
   integer                                           ,intent(inout)  :: ArrIn
-  integer                                           ,intent(out)    :: Problematic
+  integer                                           ,intent(out)    :: Issue
   ! logical                                 ,optional ,intent(in)     :: i_Debug
   
   integer                                                           :: Temp
@@ -760,7 +790,7 @@ Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
   ! if (i_Debug_Loc) call Logger%Entering( "Mask4InProc_Nb4Atoms" )
   ! !i_Debug_Loc   =     Logger%On() 
 
-  Problematic = -1
+  Issue = -1
 
   iPIn     = int(ArrIn / 16.0_rkp)
   jPIn     = Collision%Pairs(iPIn)%Opposite
@@ -777,13 +807,13 @@ Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Pro
 
 
   if ( ( iTypeIn > 1 ) .or. ( jTypeIn > 1 ) ) then
-    Problematic = 1 ! Current Trajectory Starts from Dissociation
+    Issue = 1 ! Current Trajectory Starts from Dissociation
   elseif ( ( Collision%Pairs(iPIn)%To_Molecule /= iMolIn ) .or. ( Collision%Pairs(jPIn)%To_Molecule /= jMolIn ) ) then
-    Problematic = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
+    Issue = 2 ! Current Trajectory does not have the molecule of interest as Initial Condition
   elseif ( ( iBinTemp == -1 ) .or. ( jBinTemp == -1 ) ) then
-    Problematic = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
+    Issue = 3 ! Current Trajectory has an Initial Condition in which the Q.N.s are not listed in the iMol-th Molecule Energy Levels
   elseif ( ( iBinTemp /= iBinIn ) .or. ( jBinTemp /= jBinIn ) ) then
-    Problematic = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
+    Issue = 4 ! Current Trajectory Starts from a Level/Bin that is not the one of Interest
   else
     ! Current Trajectory has an Initial Condition that is accettable!
     vqnIn(1) = Collision%MoleculesContainer(iMolIn)%Molecule%BinsContainer%Bin(iBinIn)%vqnFirst
@@ -802,7 +832,7 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Pure Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Problematic)!, i_Debug )
+Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
@@ -810,7 +840,7 @@ Pure Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Proble
   integer     ,dimension(2)                         ,intent(inout)  :: vqnFin
   integer     ,dimension(2)                         ,intent(inout)  :: jqnFin
   integer                                           ,intent(inout)  :: ArrFin
-  integer                                           ,intent(out)    :: Problematic
+  integer                                           ,intent(out)    :: Issue
   ! logical                                 ,optional ,intent(in)     :: i_Debug
   
   integer                                                           :: Temp
@@ -826,53 +856,55 @@ Pure Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Proble
 
 
   iPFin    = int(ArrFin / 16)
-  jPFin    = Collision%Pairs(iPFin)%Opposite
-  Temp     = mod(ArrFin , 16)
-  iTypeFin = mod(Temp, 4)
-  jTypeFin = int(Temp, 4)
-  iMolIn   = Collision%Pairs(iPFin)%To_Molecule
-  jMolIn   = Collision%Pairs(jPFin)%To_Molecule
+  if (iPFin > 0) then
+    jPFin    = Collision%Pairs(iPFin)%Opposite
+    Temp     = mod(ArrFin , 16)
+    iTypeFin = mod(Temp, 4)
+    jTypeFin = int(Temp, 4)
+    iMolIn   = Collision%Pairs(iPFin)%To_Molecule
+    jMolIn   = Collision%Pairs(jPFin)%To_Molecule
 
-  iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
-  jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
+    iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
+    jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
 
-  if (iTypeFin < 2) then
-    if ( iBinTemp .eq. -1 ) then
-      if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
-        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-        vqnFin(1) = 0
-        jqnFin(1) = 0
-        iTypeFin  = 2
+    if (iTypeFin < 2) then
+      if ( iBinTemp .eq. -1 ) then
+        if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
+          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+          vqnFin(1) = 0
+          jqnFin(1) = 0
+          iTypeFin  = 2
+        else
+          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+        endif
       else
-        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
-      endif
-    else
-      ! Current Trajectory has a Final Condition that is accettable!
-      iBinFin   = iBinTemp
-      vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%vqnFirst
-      jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%jqnFirst
+        ! Current Trajectory has a Final Condition that is accettable!
+        iBinFin   = iBinTemp
+        vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%vqnFirst
+        jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%jqnFirst
+      end if
     end if
-  end if
 
-  if (jTypeFin < 2) then
-    if ( jBinTemp .eq. -1 ) then
-      if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
-        Problematic = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-        vqnFin(2) = 0
-        jqnFin(2) = 0
-        jTypeFin  = 2
+    if (jTypeFin < 2) then
+      if ( jBinTemp .eq. -1 ) then
+        if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
+          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+          vqnFin(2) = 0
+          jqnFin(2) = 0
+          jTypeFin  = 2
+        else
+          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+        endif
       else
-        Problematic = 11 ! Current Trajectory has a Final Condition that should not exist
-      endif
-    else
-      ! Current Trajectory has a Final Condition that is accettable!
-      jBinFin   = jBinTemp
-      vqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%vqnFirst
-      jqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%jqnFirst
+        ! Current Trajectory has a Final Condition that is accettable!
+        jBinFin   = jBinTemp
+        vqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%vqnFirst
+        jqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%jqnFirst
+      end if
     end if
-  end if
 
-  ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
+    ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
+  end if
 
   
   ! if (i_Debug_Loc) call Logger%Exiting

@@ -306,11 +306,11 @@ function MergeTrajectories {
     while [ $iProc -le ${NProc} ]; do  
       echo "    [MergeTrajectories]: Merging for iProc = "${iProc}
       
-      if [ -f ./Node_$iNode/Proc_$iProc/trajectories.out ]; then
+      if [ -f ./Node_$iNode/Proc_$iProc/trajectories.csv ]; then
       
-        if [ -f ./trajectories.out ]; then
+        if [ -f ./trajectories.csv ]; then
       
-          tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.out >> ./trajectories.out
+          tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.csv >> ./trajectories.csv
           if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
             tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSOl.out >> ./PaQSOl.out
             rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
@@ -318,7 +318,7 @@ function MergeTrajectories {
           
         else
         
-          cat ./Node_${iNode}/Proc_${iProc}/trajectories.out > ./trajectories.out
+          cat ./Node_${iNode}/Proc_${iProc}/trajectories.csv > ./trajectories.csv
           if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
             cat ./Node_$iNode/Proc_$iProc/PaQSOl.out > ./PaQSOl.out
             rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
@@ -326,7 +326,7 @@ function MergeTrajectories {
           
         fi
         
-        #rm -rf ./Node_$iNode/Proc_$iProc/trajectories.out
+        #rm -rf ./Node_$iNode/Proc_$iProc/trajectories.csv
 
       fi
       
@@ -336,8 +336,8 @@ function MergeTrajectories {
   #iNode=$((iNode+1))
   #done
       
-  if [ -f ./trajectories.out ]; then
-    NTraj=$(wc -l < ./trajectories.out)
+  if [ -f ./trajectories.csv ]; then
+    NTraj=$(wc -l < ./trajectories.csv)
     NTraj=$((NTraj-1))
   else 
     NTraj=0
@@ -611,10 +611,10 @@ function PostTrajectories {
     while [ ${NLinesTry} -le 10 ] && [ ${iTry} -le 3 ]; do
       
       if [ ${StochPESFlg} -eq 1 ]; then 
-        scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out
+        scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES} ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
       fi
-      if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out ]; then
-        NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out)
+      if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
+        NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)
         NTraj=$((NTraj-1))
       else 
         NTraj=0
@@ -634,7 +634,7 @@ function PostTrajectories {
       wait
 
       if [ ${StochPESFlg} -eq 1 ]; then 
-        NLinesTry=$(wc -l < ${COARSEAIR_OUTPUT_DIR}"/"${System}"/"${Molecule1}"/Rates/T_"${Tran%.*}"_"${Tint%.*}"/Bin"$iLevel1".dat."$iPES)
+        NLinesTry=$(wc -l < ${COARSEAIR_OUTPUT_DIR}"/"${System}"/"${Molecule1}"/Rates/T_"${Tran%.*}"_"${Tint%.*}"/Bin"$iLevel1".csv."$iPES)
         iTry=$((iTry+1))
       else
         iTry=4
@@ -642,7 +642,7 @@ function PostTrajectories {
     done
       
     if [ ${StochPESFlg} -eq 1 ]; then 
-      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out
+      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
       echo "      [PostTrajectories]: --- iPES "${iPES} " --------------- DONE -- "
     fi
     iPES=$((iPES+1))
@@ -650,7 +650,7 @@ function PostTrajectories {
 
 
   if [ ${StochPESFlg} -eq 1 ]; then
-    #scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.Orig ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out
+    #scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.Orig ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
   fi
@@ -787,15 +787,15 @@ function MergeAllRates {
           cd ${COARSEAIR_BIN_OUTPUT_DIR}
 
 
-          if [ -f ../trajectories-Tot.out ]; then  
-            tail -n+2 ./trajectories.out >> ../trajectories-Tot.out
+          if [ -f ../trajectories-Tot.csv ]; then  
+            tail -n+2 ./trajectories.csv >> ../trajectories-Tot.csv
             if [ -f ./PaQSOl.out ]; then
               echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
               tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
               rm -rf ./PaQSOl.out
             fi
           else
-            cat ./trajectories.out > ../trajectories-Tot.out
+            cat ./trajectories.csv > ../trajectories-Tot.csv
             if [ -f ./PaQSOl.out ]; then
               echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
               tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
@@ -803,7 +803,7 @@ function MergeAllRates {
             fi
           fi
           
-          rm -rf ./trajectories.out
+          rm -rf ./trajectories.csv
         
           #echo "  [ComputeRates]: ---------------------------------------------------------- "
           iLevel2=$((iLevel2+1))

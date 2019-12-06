@@ -186,7 +186,7 @@ Module Input_Class
     logical                                   ::    PESRndIniCondFlg = .False.
     logical                                   ::    StochPESFlg      = .False.
     logical                                   ::    SampleParamsStochPES = .False.
-    integer      ,dimension(2)                ::    NHiddenLayerNeurons
+    integer       ,dimension(2)               ::    NHiddenLayerNeurons
     character(150),dimension(:),allocatable   ::    PES_Model                           !< Potential Energy Surface's Model
     character(150)                            ::    PES_ParamsFldr
     character(150)                            ::    PES_ParamsFile = 'NONE'
@@ -229,11 +229,10 @@ Module Input_Class
 
 ! POSTPROCESSING TRJS INPUTS
 ! =================
-    character(:)               ,allocatable   ::    ConsiderExc
-    logical                                   ::    ConsiderExcFlg
     logical                                   ::    MergeExchsFlg         = .false.
     logical                                   ::    MergeExchToInelFlg    = .false.
-    character(3)                              ::    ConsiderQB  = 'yes'
+    logical                                   ::    PostWritesBinaryFlg   = .False.
+    logical                                   ::    PostReadsBinaryFlg    = .False.
 
 ! MERGE PESs
 ! =================
@@ -792,10 +791,13 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "Generating Derivated Quantities?:      This%System  = ", This%CompQuant )
             
             
+
+        !______________ RUN-TRAJECTORIES ________________________________________________________________________________________________
+        !================================================================================================================================
+
 !          case("Internal Energy Levels Shift")
 !            line_input = line_input(i_eq+2:150)
 !            READ(line_input, '(d20.10)') This%eintShift
-            
             
           case("Using Proportional Allocation?")
             This%ProportionalAllocation = line_input(i_eq+2:150)
@@ -1092,7 +1094,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "Write the Energy Evolution File?:                   This%EnEvoFlg     = ", This%EnEvoFlg )
 
           
-          case("CPU Time Limit ")
+          case("CPU Time Limit")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%TimeMax
             if (i_Debug_Loc) call Logger%Write( "CPU Time Max:      This%TimeMax  = ", This%TimeMax )
@@ -1161,32 +1163,22 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%tmax
             if (i_Debug_Loc) call Logger%Write( "Max trajectory time [a.u.]:       This%tmax = ", This%tmax )
-            
-            
-          case("Distinguish Exchanges?")
-            call Error("'Distinguish Exchanges?' is OBSOLETE. Please, change INPUT-FILE with 'Distinguish Exchanges between Each Other?' and/or 'Distinguish Exchanges from Inelastic?'")
-            ! This%ConsiderExc = line_input(i_eq+2:150)
-            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExc  = ", This%ConsiderExc )
-            ! if (((trim(adjustl(This%ConsiderExc))) .eq. 'yes') .or. ((trim(adjustl(This%ConsiderExc))) .eq. 'YES')) This%ConsiderExcFlg = .true.
-            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExcFlg  = ", This%ConsiderExcFlg )
+        
+        !================================================================================================================================
+        !--------------------------------------------------------------------------------------------------------------------------------
 
-        case("Distinguish Exchanges between Each Other?")
-            line_input = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
-            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchsFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
 
-        case("Distinguish Exchanges from Inelastic?")
-            line_input = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
-            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchToInelFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
 
-!          case("Distinguish Quasi-Bound?")
-!            This%ConsiderQb = line_input(i_eq+2:150)
-!            if (i_Debug_Loc) call Logger%Write( "Distinguish Quasi-Bound?:      This%ConsiderQb  = ", This%ConsiderQb )
+        !______________ STATISTICS ______________________________________________________________________________________________________
+        !================================================================================================================================
           
-          
+          case("Writing Trajectory Files in Binary Format?")
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
+              This%StatWritesBinaryFlg = .True.
+            end if
+            if (i_Debug_Loc) call Logger%Write( "Writing Trajectory Files in Binary Format?:      This%StatWritesBinaryFlg  = ", This%StatWritesBinaryFlg )
+
           case("Nb of Final Conditions on the Trajectories")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(I10)') This%NCond
@@ -1197,33 +1189,68 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (Status/=0) call Error( "Error allocating This%PresEvOdd" )
             This%PresEvOdd = .false.
             
-            
           case("Identical Diatoms?")
             line_input = line_input(i_eq+2:150)
             if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
               This%IdenticalDiatoms = .true.
             end if
-            if (i_Debug_Loc) call Logger%Write( "Identical Diatoms?:      This%ConsiderQb  = ", This%ConsiderQb )
-            
+            if (i_Debug_Loc) call Logger%Write( "Identical Diatoms?:      This%IdenticalDiatoms  = ", This%IdenticalDiatoms )
             
           case("Final States Assigment Mthd")
             This%AssignmentMethod = line_input(i_eq+2:150)
             if (i_Debug_Loc) call Logger%Write( "Final States Assigment Mthd:      This%AssignmentMethod  = ", This%AssignmentMethod )
 
+          ! case("Nb Max of Trajectories per Level / Bin to use for Stastics")
+          !  line_input = line_input(i_eq+2:150)
+          !  READ(line_input, '(I20)') This%NTrajectoriesToAnalyze
+          !  if (i_Debug_Loc) call Logger%Write( "Nb Max of Trajectories to use for Stastics:      This%NTrajectoriesToAnalyze   = ", This%NTrajectoriesToAnalyze  )
 
-          case("Writing Trajectory Files in Binary Format?")
+        !================================================================================================================================
+        !--------------------------------------------------------------------------------------------------------------------------------
+            
+
+        !______________ POST-TRAJECTORIES _______________________________________________________________________________________________
+        !================================================================================================================================
+          case("Distinguish Exchanges?")
+            call Error("'Distinguish Exchanges?' is OBSOLETE. Please, change INPUT-FILE with 'Distinguish Exchanges between Each Other?' and/or 'Distinguish Exchanges from Inelastic?'")
+            ! This%ConsiderExc = line_input(i_eq+2:150)
+            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExc  = ", This%ConsiderExc )
+            ! if (((trim(adjustl(This%ConsiderExc))) .eq. 'yes') .or. ((trim(adjustl(This%ConsiderExc))) .eq. 'YES')) This%ConsiderExcFlg = .true.
+            ! if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges?:      This%ConsiderExcFlg  = ", This%ConsiderExcFlg )
+
+          case("Distinguish Exchanges between Each Other?")
+            line_input = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
+            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchsFlg = .true.
+            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges between Each Other?:      This%MergeExchsFlg  = ", This%MergeExchsFlg )
+
+          case("Distinguish Exchanges from Inelastic?")
+            line_input = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
+            if (((trim(adjustl(line_input))) .eq. 'no') .or. ((trim(adjustl(line_input))) .eq. 'NO')) This%MergeExchToInelFlg = .true.
+            if (i_Debug_Loc) call Logger%Write( "Distinguish Exchanges from Inelastic?:      This%MergeExchToInelFlg  = ", This%MergeExchToInelFlg )
+
+
+          case("Writing Rate Files in Binary Format?")
             line_input = line_input(i_eq+2:150)
             if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
-              This%StatWritesBinaryFlg = .True.
+              This%PostWritesBinaryFlg = .True.
             end if
+            if (i_Debug_Loc) call Logger%Write( "Writing Rate Files in Binary Format?:      This%PostWritesBinaryFlg  = ", This%PostWritesBinaryFlg )
 
+          case("Reading Rate Files in Binary Format?")
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
+              This%PostReadsBinaryFlg = .True.
+            end if
+            if (i_Debug_Loc) call Logger%Write( "Reading Rate Files in Binary Format?:      This%PostReadsBinaryFlg  = ", This%PostReadsBinaryFlg )
 
-!          case("Nb Max of Trajectories per Level / Bin to use for Stastics")
-!            line_input = line_input(i_eq+2:150)
-!            READ(line_input, '(I20)') This%NTrajectoriesToAnalyze
-!            if (i_Debug_Loc) call Logger%Write( "Nb Max of Trajectories to use for Stastics:      This%NTrajectoriesToAnalyze   = ", This%NTrajectoriesToAnalyze  )
-      
-      
+        !================================================================================================================================
+        !--------------------------------------------------------------------------------------------------------------------------------
+            
+
+        !______________ DERIVE QUANTITIES _______________________________________________________________________________________________
+        !================================================================================================================================
           case("KONIG Inital Temperature [K]")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%TInit
@@ -1236,12 +1263,15 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%TInit  = ", This%TInit )
             write(This%TInit_char,"(I10)") floor(This%TInit) 
 
-
-         case("Flag for Running External Code")
+          case("Flag for Running External Code")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(I10)') This%RunExtCodeIntFlg
             if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%RunExtCodeIntFlg  = ", This%RunExtCodeIntFlg )
-      
+        
+        !================================================================================================================================
+        !--------------------------------------------------------------------------------------------------------------------------------   
+   
+
         end select
         
         
@@ -1492,6 +1522,15 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(I10)')  This%iskip(iCond)
             if (i_Debug_Loc) call Logger%Write( "Iskip for Condition ", iCond, ":      This%iskip(i)  = ", This%iskip(iCond) )
+          end if
+
+          PresEvOdd_case = "Preserving Even / Oddness of Condition" // iCond_char // "?"
+          if (adjustl(trim(i_case)) == TRIM(PresEvOdd_case)) then
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'yes') .or. (adjustl(trim(line_input)) == 'YES')) then
+              This%PresEvOdd(iCond) = .true.
+              if (i_Debug_Loc) call Logger%Write( "Preserving Even / Oddness of Condition", iCond )
+            end if
           end if
 
           PresEvOdd_case = "Preserving Even / Oddness of Condition" // iCond_char

@@ -33,7 +33,7 @@ while [ ${iLevels1} -le ${MaxLevel1} ]
   echo "  [CopyResults]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
   
   mkdir '../../../bnn_results/T_10000_10000/Bins_'${iLevels1}'_0'
-  scp  './Bins_'${iLevels1}'_0/trajectories.out' '../../../bnn_results/T_10000_10000/Bins_'${iLevels1}'_0'
+  scp  './Bins_'${iLevels1}'_0/trajectories.csv' '../../../bnn_results/T_10000_10000/Bins_'${iLevels1}'_0'
   
   echo "  [CopyResults]: ------------------------------------------------------------ "
   echo " "

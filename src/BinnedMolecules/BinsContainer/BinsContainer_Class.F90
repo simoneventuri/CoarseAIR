@@ -330,7 +330,7 @@ Subroutine WriteQNsInBin_BinsContainer( This, LevelsContainer, i_Debug )
     write(iBins_char,'(I5)') iBins
 
     
-    FileName = This%PathToBinMolFldr // '/../QNsInBin' // trim(adjustl(iBins_char)) // '.dat'
+    FileName = This%PathToBinMolFldr // '/../QNsInBin' // trim(adjustl(iBins_char)) // '.csv'
     open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
     if (Status/=0) call Error( "Error opening file: " // FileName ) 
     write(Unit,*) "#      vqn       jqn     En [eV]"
@@ -385,7 +385,7 @@ Subroutine WriteQNs_To_Bin_BinsContainer( This, LevelsContainer, i_Debug )
   !i_Debug_Loc   =     Logger%On()  
 
 
-  FileName = This%PathToBinMolFldr // '/QNs_To_Bin.dat'
+  FileName = This%PathToBinMolFldr // '/QNs_To_Bin.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   if (Status/=0) call Error( "Error opening file: " // FileName )  
     do ijqn = 0,LevelsContainer%maxjqn
@@ -429,7 +429,7 @@ Subroutine WriteQNsFirst_BinsContainer( This, LevelsContainer, i_Debug )
   !i_Debug_Loc   =     Logger%On()  
 
 
-  FileName = This%PathToBinMolFldr // '/QNsFirst.dat'
+  FileName = This%PathToBinMolFldr // '/QNsFirst.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   if (Status/=0) call Error( "Error opening file: " // FileName )  
     write(Unit,'(A)') ("# vqn, jqn, No Levels,  % Levels")
@@ -475,7 +475,7 @@ Subroutine WriteQNsEnBin_BinsContainer( This, LevelsContainer, i_Debug )
   !i_Debug_Loc   =     Logger%On()  
 
 
-  FileName = This%PathToBinMolFldr // '/QNsEnBin.dat'
+  FileName = This%PathToBinMolFldr // '/QNsEnBin.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   if (Status/=0) call Error( "Error opening file: " // FileName )  
     write(Unit,'(A)') ("#Level, vqn, jqn,        E [Eh],    Degeneracy,   Bin")
@@ -635,7 +635,7 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
   ! Writing the Mapping Bins -> First Quantum Numbers
   write(T_char,"(I10)") floor(Input%Tint)
   if (i_Debug_Loc)  call Logger%Write( "Write the Mapping Bins -> First Quantum Numbers" )  
-  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.dat'
+  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   write(Unit,'(A)')"# Level/Bin Ratio,       Part. Func,      Energy [eV]"
   if (Status/=0) call Error( "Error opening file: " // FileName )                      
@@ -648,7 +648,7 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
   ! Writing the Mapping Bins -> First Quantum Numbers
   write(T_char,"(I10)") floor(Input%TInit)
   if (i_Debug_Loc)  call Logger%Write( "Write the Mapping Bins -> First Quantum Numbers" )  
-  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.dat'
+  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
   write(Unit,'(A)') "# Level/Bin Ratio,       Part. Func,      Energy [eV]"
   if (Status/=0) call Error( "Error opening file: " // FileName )                      
@@ -702,7 +702,7 @@ Subroutine ReadPartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMol, 
   ! Writing the Mapping Bins -> First Quantum Numbers
   write(T_char,"(I10)") floor(Input%Tint)
   if (i_Debug_Loc)  call Logger%Write( "Reading the Mapping Bins -> First Quantum Numbers" )  
-  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.dat'
+  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   if (i_Debug_Loc)  call Logger%Write( "Open File ", FileName ) 
   open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
   if (Status/=0) call Error( "Error Opening file: " // FileName )                      
@@ -716,7 +716,7 @@ Subroutine ReadPartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMol, 
   ! Writing the Mapping Bins -> First Quantum Numbers
   write(T_char,"(I10)") floor(Input%TInit)
   if (i_Debug_Loc)  call Logger%Write( "Reading the Mapping Bins -> First Quantum Numbers" )  
-  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.dat'
+  FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
     if (Status/=0) call Error( "Error Opening file: " // FileName )  
     read(Unit,*)       
@@ -763,7 +763,7 @@ Subroutine ReadLevelToBin_BinsContainer( This, Input, LevelsContainer, iMol, i_D
   ! Write the Mapping qns and Energy [eV]-> Bin
   if (i_Debug_Loc)  call Logger%Write( "Reading the Mapping Level -> Bin" )  
   FileName = trim(adjustl(Input%SystemCGPath)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/' // &
-             trim(adjustl(Input%Molecules_Name(iMol))) // '_' // trim(adjustl(Input%NBinsCG_char(iMol))) // '/QNsEnBin.dat'
+             trim(adjustl(Input%Molecules_Name(iMol))) // '_' // trim(adjustl(Input%NBinsCG_char(iMol))) // '/QNsEnBin.csv'
   if (i_Debug_Loc)  call Logger%Write( "Opening the File: ", trim(adjustl(FileName)) )
   open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
   if (Status/=0) call Error( "Error Opening File: " // FileName )  

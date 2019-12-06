@@ -194,7 +194,7 @@ Subroutine ReadInputs( This, i_Debug )
 !     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
-  DataFile%Name     =   'trajectories.out'
+  DataFile%Name     =   'trajectories.csv'
   open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', Form='FORMATTED', iostat=DataFile%Status )
   if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
   DataFile%Format   =   "( i9,3x, 2(es15.8,3x), 2(4(i3,3x)))"
@@ -236,7 +236,7 @@ Subroutine ReadInputs( This, i_Debug )
   if (This%StatWritesBinaryFlg) then
     open( NewUnit=UnitWrite, File='./trajectories.bin', Action='WRITE', access="Stream", form="Unformatted", iostat=StatusWrite )
     if (StatusWrite/=0) call Error( "Error writing the binary data file for statistics: " // './trajectories.bin'  ) 
-      write(UnitWrite) int(This%NTraj, 4)
+      write(UnitWrite) int(This%NTraj, rkp)
   end if
 
   if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
@@ -247,8 +247,8 @@ Subroutine ReadInputs( This, i_Debug )
     if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
 
     if (This%StatWritesBinaryFlg) then
-      write(UnitWrite) Idx
-      write(UnitWrite) iPES
+      write(UnitWrite) int(Idx,  rkp)
+      write(UnitWrite) int(iPES, rkp)
       write(UnitWrite) This%bMax(iTraj)
       write(UnitWrite) This%bSampled(iTraj)
       do iCond=1,This%NCond
@@ -338,25 +338,25 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
     TotBytes = int(2 * rkp) + int(2 * rkp) + int(This%NCond * rkp) + int(This%NCond * rkp)
     do iTraj = 1,This%NTraj
 
-      POSTemp = 4 + (iTraj-1)*TotBytes + 1
+      POSTemp = rkp + (iTraj-1)*TotBytes + 1
       read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) Idx
       
-      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + rkp
+      POSTemp = rkp + (iTraj-1)*TotBytes + 1 + rkp
       read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) iPES
       
-      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + int(2*rkp)
+      POSTemp = rkp + (iTraj-1)*TotBytes + 1 + int(2*rkp)
       read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bMax(iTraj)
       
-      POSTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp)
+      POSTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp)
       read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bSampled(iTraj)  
       
       do iCond = 1,This%NCond
-        PosTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp) + iCond*rkp
+        PosTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp) + iCond*rkp
         read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qini(iCond,iTraj)  
       end do
       
       do iCond = 1,This%NCond
-        PosTemp = 4 + (iTraj-1)*TotBytes + 1 + int(3*rkp) + int(This%NCond*rkp) + iCond*rkp
+        PosTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp) + int(This%NCond*rkp) + iCond*rkp
         read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qfin(iCond,iTraj)  
       end do                                                                              
       
@@ -613,7 +613,7 @@ Subroutine PrepareOutputFiles( This, i_Debug )
 !   PREPARING THE OUTPUT FILE TO WRITE CROSS SECTIONS ('statistics.out')
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Preparing the output file to write cross sections" )
-  This%StatOutFile%Name     =   'statistics.out'
+  This%StatOutFile%Name     =   'statistics.csv'
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: This%StatOutFile%Name = ", This%StatOutFile%Name )
   open( NewUnit=This%StatOutFile%Unit, File=This%StatOutFile%Name, Action='WRITE', Status='REPLACE', Form='FORMATTED', iostat=This%StatOutFile%Status )
   if (This%StatOutFile%Status/=0) call Error( "Error opening file: " // This%StatOutFile%Name )
@@ -1287,12 +1287,13 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
     ! Computing SDPerc
     SDPerc = 1.d2 * CrossSD / Cross
     if (i_Debug_Deep_Loc) call Logger%Write( "   Cross = ", Cross, "; CrossSD = ", CrossSD, "; SDPerc = ", SDPerc, "; bSampledMax = ", bSampledMax, Fr="es15.8" )
+    ! ==============================================================================================================
 
 
     ! ! ==============================================================================================================
     ! !     WRITING ... ???
     ! ! ==============================================================================================================
-    ! i2 = 2                                                                                                                        ! i2 ???
+    ! i2 = 2                                                                                                             
     ! if ( FinCondVec(1) < 0 ) i2 = 1                                                                                                     
     ! write(This%ProbaOutFile%Unit,This%ProbaOutFile%Format) i2, FinCondVec, Cross, CrossSD
     ! ! ==============================================================================================================
@@ -1304,5 +1305,6 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
 
 End Subroutine
 ! ***********************************************************************************************************************************************!
+
 
 End Module

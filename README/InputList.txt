@@ -1,0 +1,207 @@
+
+	System = NOH
+
+	Nb of Species = 2
+		Species 1 = NO
+		Species 2 = H
+
+	Nb of Molecules = 
+		Molecule 1 = 
+		Nb of Atoms, Molecule = 2
+		Diatomic Potential Model, Molecule = 
+			Diatomic Potential Parameters File Name, Molecule = 
+		Levels File Name, Molecule 1 = 
+			Min Energy for Cutting Levels, Molecule 1 = 
+			Min Time   for Cutting Levels, Molecule 2 = 
+		Sorting Method, Molecule = 
+			Starting Level, Molecule = 
+			Final    Level, Molecule = 
+				Nb of Bins, Molecule = 
+					Starting Bin, Molecule = 
+					Final    Bin, Molecule =
+					File with Bins Energy Minima, Molecule =
+					File with Level-Bin Mapping, Molecule =
+					File with Bins QNs Bounds, Molecule =
+			Starting vqn, Molecule =
+			Final    vqn, Molecule = 
+
+	Nb of Initial Molecules = 
+
+	Nb of Atoms = 
+		Atom 1 =
+		Mass [a.u.], Atom 1 = 
+			Mass File, Atom 1 =
+
+	Database Path = 
+
+	Nb of Translational Energies = 
+		Translational Energy [Eh] 1 = 
+
+	Nb of Translational Temperatures = 
+		Translational Temperature [K] 1 = 
+	Nb of Internal Temperatures = 
+		Internal Temperature [K] 1 = 
+
+
+
+	Generating Energy Levels? = 
+
+	Preprocessing Energy Levels List? = 
+
+	Running Trajectories? = 
+
+	Postprocessing Trajectories? = 
+
+	Generating Derivated Quantities? = 
+
+
+
+	Using Proportional Allocation? =
+
+	Nb of Total Trajectories = 
+
+	Nb of Trajectories per Level / Bin = 
+
+	Nb of Trajectories per Mini-Batch = 
+
+	Generate a CPU-Clock Dependent Seed? = 
+
+	Initial Random Nb Seed = 
+
+	Initial Random Nb Seed for PES Parameters Sampling = 
+
+	Initial Distance between Target and Projectile = 
+
+	Nb of PESs = 
+		Model, PES 1 =
+		Degeneracy, PES 1 =
+
+	PES Parameters Folder Name =
+		PES Parameters File Name = 
+			Nb Neurons, Hidden Layer 1 =  
+
+	Nb of PESs Samples = 
+
+	Randomize PES Initial Conditions? = 
+
+	Sample Parameters for Stochastic PES? = 
+
+
+
+	Relative Translational Energy Model = 
+
+	Fixed Total Energy [Eh] = 
+
+
+
+
+	Initial Impact Parameter Model = 
+
+	Strata Type = 
+
+	Initial Impact Parameter = 
+
+	Nb of Stratified Sampling Ranges = 
+		Nb of Trajectories in Range 1 =
+		Impact Parameter for Range 1 =
+
+
+
+
+	Total Angular Momentum = 
+
+	Method for Initial Vibrational Quantum Nb = 
+
+	Method for Initial Rotational Quantum Nb = 
+
+	All / Only Even / Only Odd values for Rotational Quantum Nb = 
+
+
+
+
+
+	Initial Vibrational Quantum Nb = 
+
+	Initial Rotational Quantum Nb = 
+
+	Unit for the Arbitraty Distribution = 
+
+	Nb of Quadrature Pts for Action Integral = 
+
+	Lower Bound for Position of Centrifugal Barrier Max = 
+
+	Upper Bound for Position of Centrifugal Barrier Max = 
+
+	Factor for q.b. Levels = 
+
+	Time threshold for q.b. Levels [Eh] = 
+
+	Time threshold for q.b. Levels [Au] = 
+
+
+
+	Write the Initial Parameters File? = 
+
+	Write the Progress File? = 
+
+	Write the PaQ Solution File? = 
+
+	Write the PaQ Evolution File? = 
+
+	Write the PES Evolution File? = 
+
+	Write the Spatial Coordinates Evolution File? = 
+
+	Write the Spatial Coordinates Evolution in a Single File? = 
+
+	Write the Energy Evolution File? = 
+
+
+
+	CPU Time Limit = 
+
+	Restart? = 
+
+	Backward Integrating?  =
+
+	Backward Integration Frequency  =
+
+
+
+	Initial time step = 
+
+	Error control parameter = 
+
+	Stepsize increase damping factor = 
+
+	Nb of extrapolation steps = 
+
+	Try to increase stepsize? = 
+
+	Nb of integration between end checking = 
+
+	Max distance between atom pair [bohr] = 
+
+	Max trajectory time [a.u.] = 
+
+
+	Distinguish Exchanges between Each Other? = 
+
+	Distinguish Exchanges from Inelastic? = 
+
+
+	Nb of Final Conditions on the Trajectories = 
+		Iskip for Condition 1 =
+		Preserving Even / Oddness of Condition 1? = yes
+
+	Identical Diatoms? = 
+
+	Final States Assigment Mthd = 
+
+	Writing Trajectory Files in Binary Format? = 
+
+	KONIG Inital Temperature [K] = 
+
+	Temperature for Distribution Function Computation [K] = 
+
+	Flag for Running External Code = 

@@ -150,7 +150,7 @@ if [ ${MinLevel1} -eq 0 ]; then
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
           if [ ${BinaryTrajFlg} -eq 1 ]; then
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out*
+            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
           fi
         fi
 
@@ -203,7 +203,7 @@ else
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
         if [ ${BinaryTrajFlg} -eq 1 ]; then
-          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out*
+          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
         fi
       fi
 

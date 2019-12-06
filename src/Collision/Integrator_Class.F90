@@ -161,7 +161,7 @@ Subroutine InitializeIntegrator( This, Input, i_Debug )
   if (i_Debug_Loc) call Logger%Write( "Initializing the analysis output file: AnalysisOutputFile" )
   associate( File => This%AnalysisOutputFile )
     if (i_Debug_Loc) call Logger%Write( "-> Calling File%Open" )
-    FileName = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/trajectories.out'
+    FileName = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/trajectories.csv'
     if (i_Debug_Loc) call Logger%Write( " File%Name = ", FileName )
     call File%Open( FileName )
     if (i_Debug_Loc) call Logger%Write( "-> File%Status = ", File%Status )
