@@ -107,7 +107,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   allocate(This%InBins(2)); This%InBins = Input%BinOI
   This%InBinsChar   = adjustl(trim( adjustl(trim(Input%BinOI_char(1))) // ',' // adjustl(trim(Input%BinOI_char(2))) ))
   iOpp              = Collision%Pairs(1)%Opposite
-  iMol              = Collision%Pairs(iOpp)%To_Molecule
+  iMolOpp           = Collision%Pairs(iOpp)%To_Molecule
   NLevelsOpp        = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins
   This%InProc       = ( This%InBins(1) - 1) * NLevelsOpp + This%InBins(2)
   write(InProcChar, "(I10)") This%InProc
