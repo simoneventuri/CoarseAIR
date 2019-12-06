@@ -772,7 +772,7 @@ Subroutine ProcessStatistics( This, i_Debug, i_Debug_Deep )
     ! ==============================================================================================================
     do   
 !@TODO: GENERALIZE: The following would not work if we want to compute cross sections from random initial states!
-      !if ( This%IniStateCode(jIter) /= IniStateCodeTemp ) exit                         ! Repeating untill either the IniCond of the trajectory is the same OR we finished traj
+      if ( This%IniStateCode(jIter) /= IniStateCodeTemp ) exit                         ! Repeating untill either the IniCond of the trajectory is the same OR we finished traj
                                                                                                                                   
       if (i_Debug_Deep_Loc) call Logger%Write( "Calling This%AddFinState: jIter = ",jIter )
       call This%AddFinState( jIter, TrajsPerb, iFinStates, FinWeight, FinStateCode, IniState, RMS, NRMS, NCont, bMaxElastic, ToFinState(This%SortedIndx_IniStateCode(jIter)), i_Debug=i_Debug_Deep_Loc )
