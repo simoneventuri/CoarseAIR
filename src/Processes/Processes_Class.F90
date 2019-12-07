@@ -195,7 +195,7 @@ Subroutine FindingFinalLevel_Processes( This, Input, Collision, vqn, jqn, Arr, N
   integer       ,dimension(:)                       ,intent(in)  :: vqn
   integer       ,dimension(:)                       ,intent(in)  :: jqn
   integer                                           ,intent(in)  :: Arr
-  character(*)                                      ,intent(out) :: Name 
+  character(:)  ,allocatable                        ,intent(out) :: Name 
   integer                                           ,intent(out) :: ProcType
   integer                                           ,intent(out) :: ExcType
   integer       ,dimension(:)                       ,intent(out) :: Pairs
@@ -279,14 +279,14 @@ Subroutine WritingRates( This, iTTra, iTInt, i_Debug )
   call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString)
 
   if (This%PESoI == 0) then
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.csv' ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv' ))
     if (This%NPESs == 1) then
       PES_Name = adjustl(trim(This%PES_Name))
     else
       PES_Name = '           Merged'
     end if
   else 
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.csv.' // This%PESoI_char ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv.' // This%PESoI_char ))
     PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
   end if
   if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
@@ -409,14 +409,21 @@ Subroutine WritingIssue( This, vqnIn, jqnIn, ArrIn, IssueIn, vqnFin, jqnFin, Arr
     if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
     open( File=FileName, NewUnit=This%UnitIssues, status='unknown', access='append', iostat=Status )
     if (Status/=0) call Error( "Error writing the binary data file for Rates: " // FileName  ) 
-    write(This%UnitIssues, '(A)') '#    vIn(:),    jIn(:),     ArrIn,   IssueIn,   vFin(:),   jFin(:),    ArrFin,  IssueFin'
-
+    if (size(vqnIn,1) == 1) then
+      write(This%UnitIssues, '(A)') '#    vIn(1),    jIn(1),     ArrIn,   IssueIn,   vFin(1),   jFin(1),    ArrFin,  IssueFin'
+    else
+      write(This%UnitIssues, '(A)') '#    vIn(1),    jIn(1),    vIn(2),    jIn(2),     ArrIn,   IssueIn,   vFin(1),   jFin(1),   vFin(2),   jFin(2),    ArrFin,  IssueFin'
+    end if
     This%FirstIssueFlg = .False.
   end if
     
-  write(This%UnitIssues, 1) vqnIn(:), ',', jqnIn(:), ',', ArrIn, ',', IssueIn, ',', vqnFin, ',', jqnFin, ',', ArrFin, ',', IssueFin
+  if (size(vqnIn,1) == 1) then
+    write(This%UnitIssues, 1) vqnIn(1), ',', jqnIn(1), ',', ArrIn, ',', IssueIn, ',', vqnFin(1), ',', jqnFin(1), ',', ArrFin, ',', IssueFin
+  else 
+    write(This%UnitIssues, 1) vqnIn(1), ',', jqnIn(1), ',', vqnIn(2), ',', jqnIn(2), ',', ArrIn, ',', IssueIn, ',', vqnFin(1), ',', jqnFin(1), ',', vqnFin(2), ',', jqnFin(2), ',', ArrFin, ',', IssueFin
+  end if
 
-  1 Format(X, I9, *(A, I9))
+  1 Format(X, I10, *(A, I10))
 
   if ( i_Debug_Loc ) call Logger%Exiting
 

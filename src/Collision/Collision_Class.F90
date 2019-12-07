@@ -980,11 +980,13 @@ Subroutine SetInitialConditions( This, iTraj, Input, Traj, i_Debug, i_Debug_Deep
   logical                         ,optional ,intent(in)     ::    i_Debug_Deep
 
   logical                                                   ::    i_Debug_Loc
+  logical                                                   ::    i_Debug_Loc_Deep
   real(rkp)                                                 ::    StartTime, EndTime
 
   call CPU_Time(StartTime)
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  i_Debug_Loc      = i_Debug_Global; if ( present(i_Debug) )      i_Debug_Loc      = i_Debug
+  i_Debug_Loc_Deep = .False.;        if ( present(i_Debug_Deep) ) i_Debug_Loc_Deep = i_Debug_Deep
   if (i_Debug_Loc) call Logger%Entering( "SetInitialConditions" )
   !i_Debug_Loc   =     Logger%On()
 
@@ -993,8 +995,7 @@ Subroutine SetInitialConditions( This, iTraj, Input, Traj, i_Debug, i_Debug_Deep
     !     CASE OF A FORWARD INTEGRATION OF TRAJECTORIES
     ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Calling SetinitCondForward" )
-    call This%SetIniCondForward( iTraj, Input, Traj, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )
-    
+    call This%SetIniCondForward( iTraj, Input, Traj, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Loc_Deep )
   else if ( Traj%BwrdIntegrationFlg ) then
     ! ==============================================================================================================
     !     CASE OF A BACKWARD  INTEGRATION OF TRAJECTORIES

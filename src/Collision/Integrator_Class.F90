@@ -350,9 +350,9 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
 
       do iTraj = 1,NTrajBatch
 
-        if (i_Debug_Loc) call Logger%Write( "Setting Initial Condition for iTraj = ", iTraj, NewLine=.True. )
+        if (i_Debug_Loc) call Logger%Write( "Setting Initial Condition for iTraj = ", iTraj )
         call Collision%SetInitialConditions( iTraj, Input, Traj, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_ODE )
-        
+
         if ((Input%PaQEvoFlg) .or. (Input%XXEvoFlg) .or. (Input%ParamsFlg)) then
           if (i_Debug_Loc) call Logger%Write( "Printing the Initial Parameters. Calling This%PrintingParams" )
           call This%PrintingParams( i_Debug=i_Debug_Loc )

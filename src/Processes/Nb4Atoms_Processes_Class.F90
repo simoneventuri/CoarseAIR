@@ -70,7 +70,6 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   integer                                                           :: iLevel, jLevel, kLevel
   integer                                                           :: Status
   integer                                                           :: NProc
-  integer                                                           :: iP1, iP6
   integer                                                           :: NLevelsOpp
   character(10)                                                     :: InProcChar
   character(20)                                                     :: Temp1Char, Temp2Char
@@ -101,17 +100,25 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   This%MergeExchsFlg      = Input%MergeExchsFlg
   This%MergeExchToInelFlg = Input%MergeExchToInelFlg
 
-  iP1 = Collision%Pairs(1)%To_Molecule
-  iP6 = Collision%Pairs(1)%To_Molecule
-  This%IniMolecules = adjustl(trim(Collision%MoleculesContainer(iP1)%Molecule%Name)) // '-' // adjustl(trim(Collision%MoleculesContainer(iP6)%Molecule%Name))
+  iMol    = Collision%Pairs(1)%To_Molecule
+  if (i_Debug_Loc) call Logger%Write( "Molecule associated to Pair 1 is the Molecule Nb ",iMol )
+  iOpp    = Collision%Pairs(1)%Opposite
+  iMolOpp = Collision%Pairs(iOpp)%To_Molecule
+  if (i_Debug_Loc) call Logger%Write( "Molecule associated to Pair 6 is the Molecule Nb ",iMolOpp )
+
+
+  This%IniMolecules = adjustl(trim(Collision%MoleculesContainer(iMol)%Molecule%Name)) // '-' // adjustl(trim(Collision%MoleculesContainer(iMolOpp)%Molecule%Name))
+  if (i_Debug_Loc) call Logger%Write( "This%IniMolecules = ", This%IniMolecules )
   allocate(This%InBins(2)); This%InBins = Input%BinOI
+  if (i_Debug_Loc) call Logger%Write( "This%InBins = ", This%InBins )
   This%InBinsChar   = adjustl(trim( adjustl(trim(Input%BinOI_char(1))) // ',' // adjustl(trim(Input%BinOI_char(2))) ))
-  iOpp              = Collision%Pairs(1)%Opposite
-  iMolOpp           = Collision%Pairs(iOpp)%To_Molecule
+  
   NLevelsOpp        = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins
   This%InProc       = ( This%InBins(1) - 1) * NLevelsOpp + This%InBins(2)
+  if (i_Debug_Loc) call Logger%Write( "This%InProc = ", This%InProc )
   write(InProcChar, "(I10)") This%InProc
   allocate( This%InProcChar, source = adjustl(trim(InProcChar)) )
+  if (i_Debug_Loc) call Logger%Write( "This%InProcChar = ", This%InProcChar )
 
   This%NTTra = Input%NTTra
   allocate(This%TTra(This%NTTra));      This%TTra     = int(Input%TtraVec)
@@ -123,11 +130,11 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   !allocate(This%QRatio(2,   This%NTTra, This%NTInt)); This%QRatio     = Zero
   !allocate(This%QRatioChar( This%NTTra, This%NTInt)); This%QRatioChar = '                                    '
   allocate(This%QRatio(2)); This%QRatio     = Zero
-  This%QRatio(1) = Collision%MoleculesContainer(iP1)%Molecule%BinsContainer%Bin(This%InBins(1))%QRatio
-  This%QRatio(2) = Collision%MoleculesContainer(iP6)%Molecule%BinsContainer%Bin(This%InBins(2))%QRatio
+  This%QRatio(1) = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%Bin(This%InBins(1))%QRatio
+  This%QRatio(2) = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%Bin(This%InBins(2))%QRatio
   write(Temp1Char, '(es20.10)') This%QRatio(1)
   write(Temp2Char, '(es20.10)') This%QRatio(2)
-  This%QRatioChar = adjustl(trim( adjustl(trim(Temp1Char)) // ',' // adjustl(trim(Temp2Char)) ))
+  This%QRatioChar = adjustl(trim( adjustr(trim(Temp1Char)) // ',' // adjustl(trim(Temp2Char)) ))
   ! !---------------------------------------------------------------------------------------------------! !
 
 
@@ -140,12 +147,13 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
     iMol                   = Collision%Pairs(iP)%To_Molecule
     This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins  + 1
     This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins  + 1
-    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                     + 1
-    This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
+    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)                  
+    This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP)                                  
   end do
-  allocate( This%Proc_To_LineVec(0:This%NProc_Tot), Stat=Status  )
+  This%NProc_Tot = This%NProc_Tot + 1
+  allocate( This%Proc_To_LineVec(0:This%NProc_Tot-1), Stat=Status  )
   if (Status/=0) call Error( "Error allocating Proc_To_LineVec in FindEqExchanges_Nb3_Processes" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,"+1)" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,")" )
   This%Proc_To_LineVec = 0
   ! !---------------------------------------------------------------------------------------------------! !
 
@@ -392,12 +400,13 @@ Subroutine ConstructVecOfProcs_Nb4Atoms( This, Input, Collision, i_Debug )
     This%NProc_iPOpp(iP,1) =    Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%NBins + 1
     This%NProc_iPOpp(iP,2) = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins + 1
 
-    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2) + 1
+    This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1) * This%NProc_iPOpp(iP,2)
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
   end do
-  allocate(This%ProcessesVec(0:This%NProc_Tot), Stat=Status)
+  This%NProc_Tot = This%NProc_Tot + 1
+  allocate(This%ProcessesVec(0:This%NProc_Tot-1), Stat=Status)
   if (Status/=0) call Error( "Error allocating This%ProcessesVec in InitializeProcesses_Nb4Atoms_Processes" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,"+1)" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,")" )
 
 
   iProc = 0
@@ -410,10 +419,10 @@ Subroutine ConstructVecOfProcs_Nb4Atoms( This, Input, Collision, i_Debug )
     iMolOpp  = Collision%Pairs(iOpp)%To_Molecule
     MolNameB = Collision%MoleculesContainer(iMolOpp)%Molecule%Name
 
-    iA = Collision%Pair_To_Atoms(iP,1)
-    jA = Collision%Pair_To_Atoms(iP,2)
-    kA = Collision%Pair_To_Atoms(iOpp,1)
-    lA = Collision%Pair_To_Atoms(iOpp,2)
+    iA = Collision%Pair_To_Atoms(1,iP)
+    jA = Collision%Pair_To_Atoms(2,iP)
+    kA = Collision%Pair_To_Atoms(1,iOpp)
+    lA = Collision%Pair_To_Atoms(2,iOpp)
 
     do iLevel = 0,This%NProc_iPOpp(iP,1)
     
@@ -472,7 +481,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   integer       ,dimension(:)                       ,intent(in)  :: vqn
   integer       ,dimension(:)                       ,intent(in)  :: jqn
   integer                                           ,intent(in)  :: Arr
-  character(*)                                      ,intent(out) :: Name 
+  character(:)                  ,allocatable        ,intent(out) :: Name 
   integer                                           ,intent(out) :: ProcType
   integer                                           ,intent(out) :: ExcType
   integer       ,dimension(:)                       ,intent(out) :: Pairs
@@ -503,7 +512,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     NProcPre = Collision%Pairs(iP)%NPrevProc
     Temp     = mod(Arr , 16)
     iType    = mod(Temp, 4)
-    jType    = int(Temp, 4)
+    jType    = int(Temp / 4)
 
     iMol     = Collision%Pairs(iP)%To_Molecule
     MolNameA = Collision%MoleculesContainer(iMol)%Molecule%Name
@@ -511,10 +520,10 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     iMolOpp  = Collision%Pairs(iOpp)%To_Molecule
     MolNameB = Collision%MoleculesContainer(iMolOpp)%Molecule%Name
 
-    iA    = Collision%Pair_To_Atoms(iP,1)
-    jA    = Collision%Pair_To_Atoms(iP,2)
-    kA    = Collision%Pair_To_Atoms(iOpp,1)
-    lA    = Collision%Pair_To_Atoms(iOpp,2)
+    iA    = Collision%Pair_To_Atoms(1,iP)
+    jA    = Collision%Pair_To_Atoms(2,iP)
+    kA    = Collision%Pair_To_Atoms(1,iOpp)
+    lA    = Collision%Pair_To_Atoms(2,iOpp)
 
     if (iType > 1) then
       
@@ -564,7 +573,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB + 1)
     Pairs         = [iP, iOpp]
   else
-    Name = Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name // '+' // Collision%Atoms(4)%Name
+    allocate(Name, source = adjustl(trim( Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name // '+' // Collision%Atoms(4)%Name )) )
     iLevelFin     = [  0,   0]
     iLevelFinChar = ['0', '0']
     Idx           = 0
@@ -578,7 +587,7 @@ End Subroutine
 
 
 ! ==============================================================================================================
-!   READING INITIAL AND FINAL CONDITIONS AND CROSS SECTIONS FROM statistics.out
+!   READING INITIAL AND FINAL CONDITIONS AND CROSS SECTIONS FROM statistics.csv
 ! ==============================================================================================================
 Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity, i_Debug, i_Debug_Deep)
 
@@ -617,7 +626,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
 
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Convert_CrossSect_To_Rates_Nb3Atoms" )
+  if (i_Debug_Loc) call Logger%Entering( "Convert_CrossSect_To_Rates_Nb4Atoms" )
   i_Debug_Loc_Deep = i_Debug_Global; if ( present(i_Debug_Deep) )i_Debug_Loc_Deep = i_Debug_Deep
   !i_Debug_Loc   =     Logger%On()
   
@@ -632,11 +641,11 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
       NTint = 1
       iTInt = 1
 
-      FileName = trim(adjustl(Input%LevelOutputDir))// '/statistics.out'
+      FileName = trim(adjustl(Input%LevelOutputDir))// '/statistics.csv'
       if (i_Debug_Loc) call Logger%Write( "  Reading File: ", FileName )
       Open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
         if (Status/=0) then
-          if (i_Debug_Loc) call Logger%Write( "The statistics.out File is not present for this Initial Level / Bin." )
+          if (i_Debug_Loc) call Logger%Write( "The statistics.csv File is not present for this Initial Level / Bin." )
           FileName = adjustl(trim( trim(adjustl(This%LevelOutputDir)) // '/StatIssues.csv' ))
           if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
           open( File=FileName, NewUnit=This%UnitIssues, status='unknown', access='append', iostat=Status )
@@ -680,12 +689,10 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
             !!! Checking if Initial and Final States are Accettable
             call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI, vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
             call Mask4FinProc_Nb4Atoms( Collision,              vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
-
             if ( (IssueIn < 1) .and. (IssueFin < 1) ) then
 
               !!! Postprocessing Final State for Reconstructing Process !!!!
               call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
-
 
               !!! New Process ??? !!!!
               Proc_To_Line = This%Proc_To_LineVec(Idx)
@@ -721,20 +728,13 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
           if (Status/=0) call Error( "Error allocating IdxVecSorted in Convert_CrossSect_In_Rates_Nb4Atoms" )
           if (i_Debug_Loc) call Logger%Write( "    Allocated IdxVecSorted with Dimension = (",This%NProc_Cleaned,")" )
           
-          
+
           do iProc=1,This%NProc_Cleaned
             This%IdxVec(iProc)              = This%ProcessesVecTemp(iProc)%Idx
             This%ProcessesVecCleaned(iProc) = This%ProcessesVecTemp(iProc)
           end do
 
           call hpsort(This%IdxVec, This%IdxVecSorted)
-          
-          deallocate(This%IdxVec, Stat=Status)
-          if (Status/=0) call Error( "Error deallocating This%IdxVec in Convert_CrossSect_In_Rates_Nb4Atoms" )
-          if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVec" )
-          deallocate(This%IdxVecSorted, Stat=Status)
-          if (Status/=0) call Error( "Error deallocating This%IdxVecSorted in Convert_CrossSect_In_Rates_Nb4Atoms" )
-          if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVecSorted" )
 
           deallocate(This%ProcessesVecTemp, Stat=Status)
           if (Status/=0) call Error( "Error deallocating This%ProcessesVecTemp in Convert_CrossSect_In_Rates_Nb4Atoms" )
@@ -752,6 +752,15 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
         call This%WritingRates( iTTra, iTInt, i_Debug=i_Debug_Loc )
       end if
 
+
+      if ( allocated(This%IdxVec) ) then
+        deallocate(This%IdxVec, Stat=Status)
+        if (Status/=0) call Error( "Error deallocating This%IdxVec in Convert_CrossSect_In_Rates_Nb4Atoms" )
+        if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVec" )
+        deallocate(This%IdxVecSorted, Stat=Status)
+        if (Status/=0) call Error( "Error deallocating This%IdxVecSorted in Convert_CrossSect_In_Rates_Nb4Atoms" )
+        if (i_Debug_Loc) call Logger%Write( "    Deallocated This%IdxVecSorted" )
+      end if
 
     !end do
 
@@ -796,7 +805,7 @@ Pure Subroutine Mask4InProc_Nb4Atoms( Collision, BinOI, vqnIn, jqnIn, ArrIn, Iss
   jPIn     = Collision%Pairs(iPIn)%Opposite
   Temp     = mod(ArrIn, 16)
   iTypeIn  = mod(Temp, 4)
-  jTypeIn  = int(Temp, 4)
+  jTypeIn  = int(Temp / 4)
   iMolIn   = Collision%Pairs(iPIn)%To_Molecule
   jMolIn   = Collision%Pairs(jPIn)%To_Molecule
   
@@ -854,15 +863,16 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_
   ! if (i_Debug_Loc) call Logger%Entering( "Mask4FinProc_Nb4Atoms" )
   ! !i_Debug_Loc   =     Logger%On() 
 
+  Issue = -1
 
   iPFin    = int(ArrFin / 16)
   if (iPFin > 0) then
     jPFin    = Collision%Pairs(iPFin)%Opposite
     Temp     = mod(ArrFin , 16)
     iTypeFin = mod(Temp, 4)
-    jTypeFin = int(Temp, 4)
-    iMolIn   = Collision%Pairs(iPFin)%To_Molecule
-    jMolIn   = Collision%Pairs(jPFin)%To_Molecule
+    jTypeFin = int(Temp / 4)
+    iMolFin  = Collision%Pairs(iPFin)%To_Molecule
+    jMolFin  = Collision%Pairs(jPFin)%To_Molecule
 
     iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
     jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
@@ -924,7 +934,7 @@ Pure Subroutine CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelC
   integer                    ,intent(in)  :: jLevel
   character(6)               ,intent(out) :: iLevelChar
   character(6)               ,intent(out) :: jLevelChar
-  character(20)              ,intent(out) :: Name
+  character(:)  ,allocatable ,intent(out) :: Name
 
   if (iLevel<10)then
     write(iLevelChar,'(I1)') iLevel
@@ -950,7 +960,7 @@ Pure Subroutine CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelC
     write(jLevelChar,'(I5)') jLevel
   end if
 
-  Name = trim(adjustl(MolNameA)) // "(" // trim(adjustl(iLevelChar)) // ")+" // trim(adjustl(MolNameB)) // "(" // trim(adjustl(jLevelChar)) // ")"
+  allocate( Name, source=trim(adjustl( trim(adjustl(MolNameA)) // "(" // trim(adjustl(iLevelChar)) // ")+" // trim(adjustl(MolNameB)) // "(" // trim(adjustl(jLevelChar)) // ")" )) )
 
 
 end Subroutine

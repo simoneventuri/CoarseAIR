@@ -77,8 +77,7 @@ Subroutine Initialize_Process( This, NInitMolecules, NTTran, Idx, Name, ProcType
   if (i_Debug_Loc) call Logger%Entering( "Initialize_Process")
   !i_Debug_Loc   =     Logger%On()
 
-  allocate( This%Name , source = trim(Name) )
-
+  allocate( This%Name , source = adjustl(trim(Name)) )
   This%Idx      = Idx
 
   This%ProcType = ProcType
@@ -113,7 +112,7 @@ Subroutine Initialize_Process( This, NInitMolecules, NTTran, Idx, Name, ProcType
     call Logger%Write( "This%To_Level     = ", This%To_Level )
     call Logger%Write( "This%To_LevelChar = ", This%To_LevelChar )
   end if
-  
+
   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
@@ -167,8 +166,7 @@ Subroutine Shelving_1stTime_Process( This, NInitMolecules, NTTran, Idx, Name, Pr
 
   if (present(ArrCoeffs)) then
     This%ArrCoeffs = ArrCoeffs
-  end if
-  
+  end if  
 
   if (i_Debug_Loc) call Logger%Exiting
 

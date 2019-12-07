@@ -130,9 +130,10 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
     This%NProc_iP(iP)      = This%NProc_iPOpp(iP,1)
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP)
   end do
-  allocate( This%Proc_To_LineVec(0:This%NProc_Tot), Stat=Status  )
+  This%NProc_Tot = This%NProc_Tot + 1
+  allocate( This%Proc_To_LineVec(0:This%NProc_Tot-1), Stat=Status  )
   if (Status/=0) call Error( "Error allocating Proc_To_LineVec in Initialize_Nb3Atoms" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,"+1)" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,")" )
   This%Proc_To_LineVec = 0
   ! !---------------------------------------------------------------------------------------------------! !
 
@@ -311,9 +312,9 @@ Subroutine ConstructVecOfProcs_Nb3Atoms( This, Input, Collision, i_Debug )
   !i_Debug_Loc   =     Logger%On()
 
 
-  allocate(This%ProcessesVec(0:This%NProc_Tot), Stat=Status)
+  allocate(This%ProcessesVec(0:This%NProc_Tot-1), Stat=Status)
   if (Status/=0) call Error( "Error allocating This%ProcessesVec in InitializeProcesses_Nb3Atoms_Processes" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,"+1)" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,")" )
 
 
   iProc = 0
@@ -365,7 +366,7 @@ Subroutine FindingFinalLevel_Nb3Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   integer       ,dimension(:)                       ,intent(in)  :: vqn
   integer       ,dimension(:)                       ,intent(in)  :: jqn
   integer                                           ,intent(in)  :: Arr
-  character(20)                                     ,intent(out) :: Name 
+  character(:)                    ,allocatable      ,intent(out) :: Name 
   integer                                           ,intent(out) :: ProcType
   integer                                           ,intent(out) :: ExcType
   integer       ,dimension(:)                       ,intent(out) :: Pairs
@@ -470,7 +471,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
   integer                                                   ::    iLine, NLine
   integer                                                   ::    iTtra, NTtra
   integer                                                   ::    iTint, NTint
-  character(20)                                             ::    Name 
+  character(:)               ,allocatable                   ::    Name 
   integer                                                   ::    ProcType
   integer                                                   ::    ExcType
   integer      ,dimension(1)                                ::    iP
