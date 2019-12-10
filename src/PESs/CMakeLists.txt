@@ -12,6 +12,7 @@ add_sources (
   RS_for_CO2_NASA.f
   COAr_NASA_PES_Class.F90
   O3_UMN_PES_Class.F90
+  O4_UMN_PES_Class.F90
   O3_NN_PES_Class.F90
   N2O_UMN_PES_Class.F90
   N2O_Basel_PES_Class.F90

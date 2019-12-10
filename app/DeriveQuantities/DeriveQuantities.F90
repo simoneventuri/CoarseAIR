@@ -150,138 +150,21 @@ Program DeriveQuantities
   end do
 ! ==============================================================================================================
   
-  
-! ==============================================================================================================
-!   INITIALIZING PAIR OBJECT
-! ==============================================================================================================
-  if (i_Debug_DQ) call Logger%Write( "Initializing the Collision%Pairs object. Calling Collision%InitializePairs", NewLine=.True. )
-  call Collision%InitializePairs( Input, i_Debug=i_Debug_DQ )
-  if (i_Debug_DQ) call Logger%Write( "Done with Collision%InitializePairs" )
-! ==============================================================================================================
-
-  
-! ==============================================================================================================
-!   ASSIGNING MOLECULE to PAIRS
-! ==============================================================================================================
-  if (i_Debug_DQ) call Logger%Write( "Finding Corrispondences between Pairs and Molecules", NewLine=.True. )
-  do iMol = 1,Input%NMolecules
-    if (i_Debug_DQ) call Logger%Write( "Molecule Nb", iMol )
-    if (i_Debug_DQ) call Logger%Write( "Calling Molecule_Factory%Define_Molecule" )
-    call Molecule_Factory%Define_Molecule( Input, Molecule_Adjst, iMol, i_Debug=i_Debug_DQ )
-    if (i_Debug_DQ) call Logger%Write( "Calling Molecule%AssignMoleculesToPairs" )
-    call Molecule_Adjst%AssignMoleculesToPairs( Collision, Input, iMol, i_Debug=i_Debug_DQ )
-    if (i_Debug_DQ) call Logger%Write( "Done with Molecule%AssignMoleculesToPairs" )
-    deallocate(Molecule_Adjst)
-    if (i_Debug_DQ) call Logger%Write( "Molecule Deallocated" )
-  end do
-! ==============================================================================================================
-
 
 ! ==============================================================================================================
-!    DEFINING ARRANGEMENTS
+!   INITIALIZING COLLISION OBJECT
 ! ==============================================================================================================
-  if (i_Debug_DQ) call Logger%Write( "Finding Equal Pairs in the System", NewLine=.True. )
-  if (i_Debug_DQ) call Logger%Write( "Calling System_Factory%Define_System" )
-  call System_Factory%Define_System( Input, System_Adjst, i_Debug=i_Debug_DQ )
-  if (i_Debug_DQ) call Logger%Write( "Calling System%AssignPairsArrangements" )
-  call System_Adjst%AssignPairsArrangements( Collision, Input, i_Debug=i_Debug_DQ )
-  if (i_Debug_DQ) call Logger%Write( "Done with System%AssignPairsArrangements" )
+  if (i_Debug_PT) call Logger%Write( "Initializing the Collision object", NewLine=.True. )
+  if (i_Debug_PT) call Logger%Write( "Calling Collision%Initialize" )
+  call Collision%Initialize( Input, i_Debug=i_Debug_PT, i_Debug_Deep=i_Debug_PT_Deep )
+  if (i_Debug_PT) call Logger%Write( "Done with Collision%Initialize" )
 ! ==============================================================================================================
-
-
-! ==============================================================================================================
-!   ALLOCATING LEVELS CONTAINERS
-! ==============================================================================================================
-  if (i_Debug_DQ) call Logger%Write( "Allocating the Molecules Original Energy Levels (containers for q.n.s etc) based on the Nb of Molecules" )
-  allocate(LevelsContainer_Orig(Input%NMolecules), Stat=Status )
-  if (Status/=0) call Error( "Error allocating LevelsContainer_Orig" )
-  if (i_Debug_DQ) call Logger%Write( "Allocated ", Input%NMolecules, " LevelsContainer_Orig" )
-
-  if (i_Debug_DQ) call Logger%Write( "Allocating the Molecules Cut Energy Levels (containers for q.n.s etc) based on the Nb of Molecules" )
-  allocate(LevelsContainerT(Input%NMolecules,Input%NTtra), Stat=Status )
-  if (Status/=0) call Error( "Error allocating LevelsContainerT" )
-  if (i_Debug_DQ) call Logger%Write( "Allocated LevelsContainerT with dimension ( ", Input%NMolecules, ",", Input%NTtra, " )" )
-! ==============================================================================================================
-
-
-! ==============================================================================================================
-!   LOOKING FOR MOLECULES
-! ==============================================================================================================
-  if (i_Debug_DQ) call Logger%Write( "Allocating the Binned-Molecules (containers for bins etc.) based on the Nb of Molecules" )
-  
-  allocate(BinnedMolecule(Input%NMolecules), Stat=Status )
-  if (Status/=0) call Error( "Error allocating BinnedMolecule" )
-  if (i_Debug_DQ) call Logger%Write( "Allocated ", Input%NMolecules, " BinnedMolecule" )
-  
-  
-  if (i_Debug_DQ) call Logger%Write( "Finding Corrispondences between Pairs and Molecules", NewLine=.True. )
-  do iMol = 1,Input%NMolecules
-    if (i_Debug_DQ) call Logger%Write( "Binned Molecule Nb", iMol )
-    
-    
-    !==============================================================================================================
-    ! INITIALIZING BINNED MOLECULE
-    !==============================================================================================================
-    if (i_Debug_DQ) call Logger%Write( "Initialize Bins for the Molecule Nb", iMol )
-    call BinnedMolecule(iMol)%InitializeBins( Input, iMol, i_Debug=i_Debug_DQ  ) 
-    ! ============================================================================================================== 
-    
-    
-    !==============================================================================================================
-    ! ASSIGNING BINNING MOLECULES TO PAIRS
-    !==============================================================================================================
-    if (i_Debug_DQ) call Logger%Write( "Calling Molecule_Factory%Define_Molecule" )
-    call Molecule_Factory%Define_Molecule( Input, Molecule_Adjst, iMol, i_Debug=i_Debug_DQ )
-    if (i_Debug_DQ) call Logger%Write( "Calling Molecule%AssignBinnedMoleculesToPairs" )
-    call Molecule_Adjst%AssignBinnedMoleculesToPairs( Collision, Input, iMol, i_Debug=i_Debug_DQ )
-    deallocate(Molecule_Adjst)
-    if (i_Debug_DQ) call Logger%Write( "Molecule Deallocated" )
-    ! ============================================================================================================== 
-    
-  end do
-  if (i_Debug_DQ) call Logger%Write( "Done with Molecule%AssignBinnedMoleculesToPairs" )
-! ==============================================================================================================
-  
-
-  if (i_Debug_DQ) call Logger%Write( "Iterating on all the Molecules in the Chemical System" )
-  do iMol = 1,Input%NMolecules
-    if (i_Debug_DQ) call Logger%Write( "Molecule Nb", iMol )
-    
-    
-    do iTtra = 1,Input%NTtra
-    
-      ! ==============================================================================================================
-      !   READING MOLECULE ENERGY LEVELS
-      ! ==============================================================================================================
-      if (i_Debug_DQ) call Logger%Write( "Reading the Original Levels List file for Molecule Nb", iMol )
-      FileName = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/' // trim(adjustl(Input%LevelsFileName(iMol)))
-      if (i_Debug_DQ) call Logger%Write( "Reading File: ", FileName )
-      call LevelsContainerT(iMol,iTtra)%Initialize( Input, iMol, FileName, i_Debug=i_Debug_DQ )
-
-      if (i_Debug_DQ) call Logger%Write( "Reading the Cut Levels List file for Molecule Nb", iMol )
-      FileName  = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/levels_cut.inp'
-      if (i_Debug_DQ) call Logger%Write( "Reading File: ", FileName )
-      call LevelsContainerT(iMol,iTtra)%Initialize( Input, iMol, FileName, i_Debug=i_Debug_DQ )
-      ! ==============================================================================================================
-      
-      
-      ! ==============================================================================================================
-      !   READING THE MAPPING STS CG
-      ! ==============================================================================================================
-      if (i_Debug_DQ) call Logger%Write( "Reading File: ", FileName )
-      if (Input%BinStsFlg) call BinnedMolecule(iMol)%ReadLevelToBin( Input, LevelsContainerT(iMol,iTtra), iMol, i_Debug=i_Debug_DQ )
-      ! ==============================================================================================================
-      
-    end do
-
-
-  end do
 
 
   !==============================================================================================================
   ! COUNTING THE RATES "CONTAINERS" REQUIRED
   !==============================================================================================================
-  if ((Input%ReadFormRatesFlg)) call Rates%DifferentiatingFinalStates( Input, Collision, i_Debug=i_Debug_DQ )  
+  if (Input%ReadFormRatesFlg) call Rates%DifferentiatingFinalStates( Input, Collision, i_Debug=i_Debug_DQ )  
   ! ===============================================================================================================
   
   

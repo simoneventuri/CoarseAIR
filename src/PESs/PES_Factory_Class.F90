@@ -55,6 +55,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
   use CO2_NASA_PES_Class   ,only:    CO2_NASA_PES_Type
   use COAr_NASA_PES_Class  ,only:    COAr_NASA_PES_Type
   use O3_UMN_PES_Class     ,only:    O3_UMN_PES_Type
+  use O4_UMN_PES_Class     ,only:    O4_UMN_PES_Type
   use N2O_UMN_PES_Class    ,only:    N2O_UMN_PES_Type
   use N2O_Basel_PES_Class  ,only:    N2O_Basel_PES_Type
   use N4_NASA_PES_Class    ,only:    N4_NASA_PES_Type
@@ -229,7 +230,16 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
             allocate( N4_NASA_PES_Type :: PES )
           case ('UMN')                                                                                                              
             if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PES_Type object" )
-            allocate( N4_NASA_PES_Type :: PES )
+            allocate( N4_UMN_PES_Type :: PES )
+          case default
+            call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
+        end select
+      case('O4', 'O2O2', 'OOOO', 'OaObOcOd')
+        !Input%System = 'N4'
+        select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
+          case ('UMN')                                                                                                              
+            if (i_Debug_Loc) call Logger%Write( "Constructing a O4_UMN_PES_Type object" )
+            allocate( O4_UMN_PES_Type :: PES )
           case default
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select

@@ -68,6 +68,7 @@ Module Processes_Class
     Type(Process_Type)     ,dimension(:)      ,allocatable  ::    ProcessesVecTemp        ! Vector of Processes
     Type(Process_Type)     ,dimension(:)      ,allocatable  ::    ProcessesVecCleaned     ! Vector of Processes
                                                                                           !
+    integer                                                 ::    NProc             = 0   !                                                                                           
     integer                                                 ::    NProc_Cleaned     = 0   ! 
     real(rkp)              ,dimension(:,:)    ,allocatable  ::    OvProcRates
 
@@ -108,6 +109,8 @@ Module Processes_Class
     procedure              ,public                          ::    WritingRates
     procedure              ,public                          ::    WritingRates_Binary
     procedure              ,public                          ::    WritingIssue
+    procedure              ,public                          ::    ReadingRates
+    procedure              ,public                          ::    ReadingRates_Binary
   End Type
 
   logical   ,parameter                                      ::    i_Debug_Global = .False.
@@ -314,7 +317,7 @@ End Subroutine
 
 
 ! ==============================================================================================================
-!   WRITING BINS RATES IN BINARY FORMAT
+!   WRITING LEVEL/BIN RATES IN ASCI FORMAT
 ! ==============================================================================================================
 !______________________________________________________________________________________________________________!
 Subroutine WritingRates_Binary( This, iTTra, iTInt, i_Debug )
@@ -372,7 +375,7 @@ End Subroutine
 
 
 ! ==============================================================================================================
-!   WRITING BINS RATES IN BINARY FORMAT
+!   WRITING LEVEL/BIN RATES IN BINARY FORMAT
 ! ==============================================================================================================
 !______________________________________________________________________________________________________________!
 Subroutine WritingIssue( This, vqnIn, jqnIn, ArrIn, IssueIn, vqnFin, jqnFin, ArrFin, IssueFin, i_Debug )
@@ -429,6 +432,168 @@ Subroutine WritingIssue( This, vqnIn, jqnIn, ArrIn, IssueIn, vqnFin, jqnFin, Arr
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
+
+
+! ==============================================================================================================
+!   READING LEVEL/BIN RATES IN ASCI FORMAT
+! ==============================================================================================================
+!______________________________________________________________________________________________________________!
+Subroutine ReadingRates( This, iTTra, iTInt, i_Debug )
+
+  use Parameters_Module     ,only:  Zero
+
+  class(Processes_Type)                     ,intent(inout)  ::    This
+  integer                                   ,intent(in)     ::    iTTra
+  integer                                   ,intent(in)     ::    iTInt
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  integer                                                   ::    iTemp, jP
+  real(rkp)                                                 ::    Temp1, Temp2
+  integer                                                   ::    Status
+  integer                                                   ::    Unit
+  character(:)                                 ,allocatable ::    FileName
+  character(:)                                 ,allocatable ::    TsString
+  character(17)                                             ::    PES_Name
+  logical                                                   ::    i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if ( i_Debug_Loc ) call Logger%Entering( "ReadingRates" )
+  !i_Debug_Loc   =     Logger%On()  
+
+  allocate(TsString, source = trim(adjustl( 'T_' // trim(adjustl(This%TTraChar(iTTra))) // '_' // trim(adjustl(This%TIntChar(iTInt))) // '/' )) )
+
+  if (This%PESoI == 0) then
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv' ))
+    if (This%NPESs == 1) then
+      PES_Name = adjustl(trim(This%PES_Name))
+    else
+      PES_Name = '           Merged'
+    end if
+  else 
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv.' // This%PESoI_char ))
+    PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
+  end if
+  if ( i_Debug_Loc ) call Logger%Write( "Reading File: ", FileName )
+  open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+  if (Status/=0) call Error( "Error reading the ASCI data file for Rates: " // FileName  ) 
+    read(Unit,*,iostat=Status)
+    read(Unit,*,iostat=Status)
+    read(Unit,*,iostat=Status)
+    read(Unit,*,iostat=Status)    
+    read(Unit,*,iostat=Status)
+    jP=1
+    do 
+      read(Unit, *, iostat=Status) iTemp, Temp1, Temp2
+      if (Status == 0) then
+        This%ProcessesVec(jP)%Idx                       = iTemp
+        This%ProcessesVec(jP)%Temperature(iTTra)%Rate   = Temp1
+        This%ProcessesVec(jP)%Temperature(iTTra)%RateSD = Temp2**2
+      else
+        exit
+      end if
+      jP=jP+1
+    end do
+  close(Unit)
+
+  if ( i_Debug_Loc ) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+! ==============================================================================================================
+!   READING LEVEL/BIN RATES IN BINARY FORMAT
+! ==============================================================================================================
+!______________________________________________________________________________________________________________!
+Subroutine ReadingRates_Binary( This, iTTra, iTInt, i_Debug )
+
+  use Parameters_Module     ,only:  Zero
+
+  class(Processes_Type)                     ,intent(inout)  ::    This
+  integer                                   ,intent(in)     ::    iTTra
+  integer                                   ,intent(in)     ::    iTInt
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  integer                                                   ::    iP, jP
+  integer                                                   ::    Status
+  integer                                                   ::    Unit
+  character(:)                                 ,allocatable ::    FileName
+  character(:)                                 ,allocatable ::    TsString
+  character(17)                                             ::    PES_Name
+  integer                                                   ::    POSTemp
+  logical                                                   ::    i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if ( i_Debug_Loc ) call Logger%Entering( "ReadingRates_Binary" )
+  !i_Debug_Loc   =     Logger%On()  
+
+  allocate(TsString, source = trim(adjustl( 'T_' // trim(adjustl(This%TTraChar(iTTra))) // '_' // trim(adjustl(This%TIntChar(iTInt))) // '/' )) )
+
+  if (This%PESoI == 0) then
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.bin' ))
+  else 
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // This%InProcChar // '.bin.' // This%PESoI_char ))
+  end if
+  if ( i_Debug_Loc ) call Logger%Write( "Reading File: ", FileName )
+  open( NewUnit=Unit, File=FileName, Action='READ', access="Stream", form="Unformatted", iostat=Status )
+  if (Status/=0) call Error( "Error reading the binary data file for Rates: " // FileName  ) 
+
+    POSTemp = rkp
+    read(Unit, POS=POSTemp) This%NTraj
+    POSTemp = int(2*rkp)
+    read(Unit, POS=POSTemp) This%NProc
+    do iP = 1,This%NProc_Cleaned
+      jP = This%IdxVecSorted(iP)
+
+      POSTemp = POSTemp + rkp
+      read(Unit, POS=POSTemp) This%ProcessesVec(jP)%Idx
+      POSTemp = POSTemp + rkp
+      read(Unit, POS=POSTemp) This%ProcessesVec(jP)%Temperature(iTTra)%Rate
+      POSTemp = POSTemp + rkp
+      read(Unit, POS=POSTemp) This%ProcessesVec(jP)%Temperature(iTTra)%RateSD
+                              This%ProcessesVec(jP)%Temperature(iTTra)%RateSD = This%ProcessesVec(jP)%Temperature(iTTra)%RateSD**2
+    end do
+  
+  close(Unit)
+
+  if ( i_Debug_Loc ) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+
+! ! ==============================================================================================================
+! !   READING LEVEL/BIN RATES IN BINARY FORMAT
+! ! ==============================================================================================================
+! !______________________________________________________________________________________________________________!
+! Subroutine MergingPESs( ProcessesRead, ProcessesMerged, iTTra, iTInt, Idx, i_Debug )
+
+!   use Parameters_Module     ,only:  Zero
+
+!   class(Processes_Type)                     ,intent(in)     ::    ProcessesRead
+!   class(Processes_Type)                     ,intent(inout)  ::    ProcessesMerged
+!   integer                                   ,intent(in)     ::    iTTra
+!   integer                                   ,intent(in)     ::    iTInt
+!   integer                                   ,intent(in)     ::    Idx
+!   logical                         ,optional ,intent(in)     ::    i_Debug
+
+!   integer                                                   ::    iProc
+!   logical                                                   ::    i_Debug_Loc
+
+!   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+!   if ( i_Debug_Loc ) call Logger%Entering( "MergingPESs" )
+!   !i_Debug_Loc   =     Logger%On()  
+
+!   do iProc=1,ProcessesRead%NProc
+!     ProcessesMerged(Idx)%Temperature(iTTra)%Rate   = ProcessesMerged(Idx)%Temperature(iTTra)%Rate   + ProcessesRead(iProc)%Temperature(iTTra)%Rate
+!     ProcessesMerged(Idx)%Temperature(iTTra)%RateSD = ProcessesMerged(Idx)%Temperature(iTTra)%RateSD + ProcessesRead(iProc)%Temperature(iTTra)%RateSD
+!   end do
+
+!   if ( i_Debug_Loc ) call Logger%Exiting
+
+! End Subroutine
+! !--------------------------------------------------------------------------------------------------------------------------------!
 
 
 End Module

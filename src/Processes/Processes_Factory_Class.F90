@@ -60,7 +60,6 @@ Subroutine Define_Processes( Input, Collision, Processes, i_Debug )
   if (i_Debug_Loc) call Logger%Entering( "Define_Processes")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
   
-  
   select case ( Input%NAtoms )    
     case(3)
       if (i_Debug_Loc) call Logger%Write( "Defining a Nb3Atoms_Processes_Type object" )
