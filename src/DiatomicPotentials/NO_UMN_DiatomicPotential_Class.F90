@@ -159,7 +159,7 @@ Pure Subroutine Ev2gm2( RAng, V)
   ! Pairwise potential
   uvec(1) = u
   do i = 2,8
-     uvec(i) = uvec(i - 1)*u
+    uvec(i) = uvec(i - 1)*u
   enddo
   V = - de*dot_product(cs(1:8), uvec)
   !V  =  - de * (cs(1)*u + cs(2)*u**2.0d0 + cs(3)*u**3.0d0 + cs(4)*u**4.0d0 + cs(5)*u**5.0d0 + cs(6)*u**6.0d0 + cs(7)*u**7.0d0 + cs(8)*u**8.0d0)

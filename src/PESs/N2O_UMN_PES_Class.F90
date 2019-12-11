@@ -154,7 +154,7 @@ Subroutine Initialize_N2O_UMN_PES( This, Input, Atoms, iPES, i_Debug )
  ! ==============================================================================================================
 
   
-  UMN_N2O_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
+  UMN_N2O_file = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/UMN/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
   
   if (i_Debug_Loc) call Logger%Write( "Reading UMN N2O PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", UMN_N2O_file)

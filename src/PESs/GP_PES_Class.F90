@@ -124,7 +124,7 @@ Subroutine Initialize_GP_PES( This, Input, Atoms, iPES, i_Debug )
   This%PIP = 'DEF'
 
 
-  GP_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '/' // trim(adjustl(Input%PES_ParamsFldr))
+  GP_Weights_Folder = trim(adjustl(Input%DtbPath))  // '/Systems/' // trim(adjustl(Input%System)) // '/PESs/GP/' // trim(adjustl(Input%PES_Model(iPES))) // '/' // trim(adjustl(Input%PES_ParamsFldr(1)))
   if (i_Debug_Loc) call Logger%Write( "Reading O3 GP PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening files in the folder: ", GP_Weights_Folder)
   

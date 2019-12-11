@@ -188,7 +188,7 @@ Module Input_Class
     logical                                   ::    SampleParamsStochPES = .False.
     integer       ,dimension(2)               ::    NHiddenLayerNeurons
     character(150),dimension(:),allocatable   ::    PES_Model                           !< Potential Energy Surface's Model
-    character(150)                            ::    PES_ParamsFldr
+    character(150),dimension(:),allocatable   ::    PES_ParamsFldr
     character(150)                            ::    PES_ParamsFile = 'NONE'
     real(rkp)     ,dimension(:),allocatable   ::    PES_Degeneracy                      !< Potential Energy Surface's Degeneracy
     real(rkp)     ,dimension(:),allocatable   ::    PES_Degeneracy_Vec                  !< Potential Energy Surface's Degeneracy Vector
@@ -541,7 +541,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
 
   integer                                                   ::    iiPES, IHL
   character(2)                                              ::    iiPES_char, iHL_char
-  character(:) ,allocatable                                 ::    PESModel_case, PESDegeneracy_case, NHL_case           
+  character(:) ,allocatable                                 ::    PESModel_case, PESDegeneracy_case, NHL_case, PESFolder_case        
                        
   character(20)                                             ::    iTint_char, iTtra_char, iErel_char
   integer                                                   ::    iTint, iTtra, iErel
@@ -583,6 +583,8 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   This%PES_Degeneracy = One
   allocate( This%PES_Degeneracy_Vec(This%NPESs), stat=Status )
   if (Status/=0) call Error( "Error allocating This%PES_Degeneracy_Vec" )
+  allocate( This%PES_ParamsFldr(This%NPESs), stat=Status )
+  if (Status/=0) call Error( "Error allocating This%PES_ParamsFldr" )
   This%PES_Degeneracy_Vec = One
   
   This%ImpParStrataType = 'Circles'
@@ -869,10 +871,14 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             allocate( This%PES_Degeneracy_Vec(This%NPESs), stat=Status )
             if (Status/=0) call Error( "Error allocating This%PES_Degeneracy_Vec" )
             This%PES_Degeneracy_Vec = Zero
-            
+            deallocate( This%PES_ParamsFldr )
+            allocate( This%PES_ParamsFldr(This%NPESs), stat=Status )
+            if (Status/=0) call Error( "Error allocating This%PES_ParamsFldr" )
+
+
           case("PES Parameters Folder Name")
-            This%PES_ParamsFldr = line_input(i_eq+2:150)
-            This%PES_ParamsFldr = trim(adjustl(This%PES_ParamsFldr))
+            call Error("'PES Parameters Folder Name = ' is OBSOLETE. Please, change INPUT-FILE with 'Parameters Folder Name, PES 1 = '")
+
 
           case("PES Parameters File Name")
             This%PES_ParamsFile = line_input(i_eq+2:150)
@@ -1560,6 +1566,12 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             READ(line_input, '(d20.10)')  This%PES_Degeneracy(iiPES)
             if (i_Debug_Loc) call Logger%Write( "Degeneracy, PES ", iiPES, ":      This%PES_Degeneracy(iiPES)  = ", This%PES_Degeneracy(iiPES) )
             This%PES_Degeneracy_Vec(iiPES) = This%PES_Degeneracy_Vec(max(1,iiPES-1)) + This%PES_Degeneracy(iiPES)
+          end if
+
+          PESFolder_case = "Parameters Folder Name, PES" // iiPES_char
+          if (adjustl(trim(i_case)) == TRIM(PESFolder_case)) then
+            This%PES_ParamsFldr(iiPES) = line_input(i_eq+2:150)
+            if (i_Debug_Loc) call Logger%Write( "Parameters Folder Name, PES ", iiPES, ":      This%PES_ParamsFldr(iiPES)  = ", This%PES_ParamsFldr(iiPES) )
           end if
 
         end do
