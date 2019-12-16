@@ -22,7 +22,7 @@ import numpy as np
 import pandas
 
 
-def ReadPartFuncsAndEnergies(Syst, Temp):
+def Read_PartFuncsAndEnergies(Syst, Temp):
 
     for iMol in range(Syst.NMolecules):
 
@@ -40,3 +40,39 @@ def ReadPartFuncsAndEnergies(Syst, Temp):
 
 
     return Syst
+
+
+
+def Read_qnsEnBin(Syst):
+
+    for iMol in range(Syst.NMolecules):
+
+        PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[iMol].Name + '/' + Syst.Molecule[iMol].Name + '_' + str(Syst.Molecule[iMol].NBins) + '/qnsEnBin.dat'
+        print('Reading Data From File: ', PathToFile)
+        
+        Data = pandas.read_csv(PathToFile, header=None, skiprows=1, delimiter=r"\s+")
+        Data = Data.apply(pandas.to_numeric, errors='coerce')
+
+        Syst.Molecule[iMol].Levelvqn   = np.array([Data.values[:,1]], dtype=np.int16  )
+        Syst.Molecule[iMol].Leveljqn   = np.array([Data.values[:,2]], dtype=np.int16  )
+        Syst.Molecule[iMol].LevelEEh   = np.array([Data.values[:,3]], dtype=np.float64)
+        Syst.Molecule[iMol].Levelg     = np.array([Data.values[:,4]], dtype=np.float64)
+        Syst.Molecule[iMol].LevelToBin = np.array([Data.values[:,5]], dtype=np.int32  )
+
+    return Syst
+
+
+
+def Read_RatesCGQCT(Syst, TTra, TInt, iLevel):
+
+    PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Bin' + str(iLevel+1) + '.dat'
+    print(PathToFile)
+    
+    Data = pandas.read_csv(PathToFile, header=None, skiprows=5, delimiter=r"\s+")
+    Data = Data.apply(pandas.to_numeric, errors='coerce')
+
+    Processes = np.array([Data.values[:,1]])
+    Rates     = np.array([Data.values[:,2]])
+    RatesSD   = np.array([Data.values[:,3]])
+
+    return Processes, Rates, RatesSD

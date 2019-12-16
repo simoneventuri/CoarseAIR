@@ -43,7 +43,12 @@ class molecule(object):
         self.StartBin          = 0
         self.FinalBin          = 0
 
-        self.EeV               = 0
+        self.Levelvqn          = 0
+        self.Leveljqn          = 0
+        self.Levelg            = 0.0
+        self.LevelToBin        = 0
+        self.LevelEEh          = 0.0
+        self.LevelEeV          = 0.0
 
         self.NTTran            = NTTran
         self.T                 = [t_properties() for iTTran in range(NTTran)]
