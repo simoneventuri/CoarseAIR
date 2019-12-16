@@ -4,9 +4,9 @@
 ######                                                                               ######
 ###########################################################################################
 
-   Generating Energy Levels? = no
-   Preprocessing Energy Levels List? = yes
-   Running Trajectories? = yes
+   Generating Energy Levels? = yes
+   Preprocessing Energy Levels List? = no
+   Running Trajectories? = no
    Postprocessing Trajectories? = no
    Generating Derivated Quantities? = no
    
@@ -29,7 +29,7 @@
      Atom 3 = N
        Mass [a.u.] of Atom 3 = 25526.04298d0
    
-   Database Path = /Users/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 = 
@@ -51,9 +51,7 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   #Levels File Name, Molecule 1 = N2_levels_venturi.dat
-   Levels File Name, Molecule 1 = n2.leroy.Sort.dat
-   #Levels File Name, Molecule 1 = n2.leroy.Robyn
+   Levels File Name, Molecule 1 = N2_UMN_Sorted.inp
    
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
@@ -114,7 +112,7 @@
    Initial Distance between Target and Projectile = 23.d0
    
    Nb of PESs = 1
-     Model, PES 1 = NASA
+     Model, PES 1 = UMN
      Degeneracy, PES 1 = 1.0
      ###                                                                      <- Specify here the file for LEPS
      #PES Parameters File Name = LEPS_Orig.Input       
@@ -128,7 +126,7 @@
      # Sample Parameters for Stochastic PES? = no
      # Initial Random Nb Seed for PES Parameters Sampling = 0
      
-   Diatomic Potential Model, Molecule 1 = LeRoy
+   Diatomic Potential Model, Molecule 1 = UMN_ForN4
 
    ### Initial Impact Parameter Model ( Normal / Random / Stratified / FixedAngMom )
    ###   Normal or Random   ->   Initial Impact Parameter = 
@@ -212,8 +210,6 @@
 #   COMPUTING STATISTICS
 ###########################################################################################
 
-   Distinguish Exchanges? = yes
-
    ### Nb of Trajectory Conditions = 3  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 1 Molecule)
    Nb of Final Conditions on the Trajectories = 3
      Iskip for Condition 1 = 1
@@ -227,10 +223,25 @@
    
    ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram
+
+   ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
+   Writing Trajectory Files in Binary Format? = yes
    
 ###########################################################################################
-   
-   Temperature for Distribution Function Computation [K] = 1400.d0
-   
+
+
+###########################################################################################
+#   COMPUTING RATES
+###########################################################################################
+
    Flag for Running External Code = 2
+
+   Distinguish Exchanges between Each Other? = yes
+
+   Distinguish Exchanges from Inelastic? = yes
+
+   Temperature for Distribution Function Computation [K] = 1400.d0
+
+   Writing Rate Files in Binary Format? = no
    
+###########################################################################################

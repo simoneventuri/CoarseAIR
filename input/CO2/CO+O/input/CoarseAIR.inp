@@ -10,27 +10,29 @@
    Postprocessing Trajectories? = no
    Generating Derivated Quantities? = no
 
+###########################################################################################
+
    System = CO2
 
    Nb of Species = 2
-     Species 1 = O2
-     Species 2 = C
+     Species 1 = CO
+     Species 2 = O
 
    Nb of Molecules = 2
-     Molecule 1 = O2
-     Molecule 2 = CO
+     Molecule 1 = CO
+     Molecule 2 = O2
 
-   Nb of Iniial Molecules = 1
+   Nb of Initial Molecules = 1
 
    Nb of Atoms = 3
-     Atom 1 = O
-       Mass [a.u.] of Atom 1  = 29148.94559d0
+     Atom 1 = C
+       Mass [a.u.] of Atom 1  = 21868.661757d0
      Atom 2 = O
        Mass [a.u.] of Atom 2  = 29148.94559d0
-     Atom 3 = C
-       Mass [a.u.] of Atom 3  = 21868.661757d0
+     Atom 3 = O
+       Mass [a.u.] of Atom 3  = 29148.94559d0
 
-   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb/
+   Database Path = /Users/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb/
 
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 =
@@ -39,7 +41,7 @@
    Relative Translational Energy Model = Boltzmann
 
    Nb of Translational Temperatures = 1
-     Translational Temperature [K] 1 = 20000.d0
+     Translational Temperature [K] 1 = 10000.d0
    #Nb of Internal Temperatures = 1
    # Internal Temperature 1 = 10000.d0
 
@@ -52,12 +54,12 @@
 #  CUTTING LEVELS for each of the Molecules
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = O2_levels_venturi_new.dat
+   Levels File Name, Molecule 1 = CO_levels_venturi.dat
    Min Energy for Cutting Levels, Molecule 1 = -100.d0
    Min Time   for Cutting Levels, Molecule 1 = -1.d0
    Nb of Atoms, Molecule 1 = 2
 
-   Levels File Name, Molecule 2 = CO_levels_venturi.dat
+   Levels File Name, Molecule 2 = O2_levels_venturi_new.dat
    Min Energy for Cutting Levels, Molecule 2 = -100.d0
    Min Time   for Cutting Levels, Molecule 2 = -1.d0
    Nb of Atoms, Molecule 2 = 2
@@ -74,7 +76,7 @@
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
      Starting Level, Molecule 1 = 1
-     Final    Level, Molecule 1 = 0
+     Final    Level, Molecule 1 = 1
    #*##
 
    #:##                                                                      <- Uncomment from #: to #* for Running CoarseAIR with vibrational specific binning
@@ -100,9 +102,8 @@
    #*##     
    
    Sorting Method, Molecule 2 = State-Specific
-   #  Starting Level, Molecule 2 = 1
-   #  Final    Level, Molecule 2 = 0
-   
+
+
 ###########################################################################################
 #  RUNNING TRAJECTORIES and ANALYZING TRAJECTORIES
 ###########################################################################################
@@ -157,6 +158,7 @@
    #   Fixed                    ->   Initial Vibrational Quantum Nb =
    #   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
    Method for Initial Vibrational Quantum Nb = Boltzmann
+
    # Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)
    #   Fixed                    ->   Initial Rotational Quantum Nb =
    All / Only Even / Only Odd values for Rotational Quantum Nb = All
@@ -207,8 +209,6 @@
 #   COMPUTING STATISTICS
 ###########################################################################################
 
-   Distinguish Exchanges? = yes
-
    # Nb of Final Conditions on the Trajectories = 3  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 1 Molecule)
    Nb of Final Conditions on the Trajectories = 3
      Iskip for Condition 1 = 1
@@ -219,14 +219,28 @@
      Preserving Even / Oddness of Condition 3 = no
 
    Identical Diatoms? = no
-
-   # Final States Assigment Mthd = Histogram / QSS
+   
+   ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram
+
+   ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
+   Writing Trajectory Files in Binary Format? = yes
+   
+###########################################################################################
 
 
 ###########################################################################################
+#   COMPUTING RATES
+###########################################################################################
 
-   Temperature for Distribution Function Computation [K] = 1400.d0
-   
    Flag for Running External Code = 2
 
+   Distinguish Exchanges between Each Other? = no
+
+   Distinguish Exchanges from Inelastic? = yes
+
+   Temperature for Distribution Function Computation [K] = 1400.d0
+
+   Writing Rate Files in Binary Format? = no
+   
+###########################################################################################

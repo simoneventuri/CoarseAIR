@@ -144,7 +144,6 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   call This%Mask4Excahge( Input, Collision, i_Debug=i_Debug_Loc )
   ! !---------------------------------------------------------------------------------------------------! !
 
-
   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
@@ -488,7 +487,6 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
   i_Debug_Loc_Deep = i_Debug_Global; if ( present(i_Debug_Deep) )i_Debug_Loc_Deep = i_Debug_Deep
   !i_Debug_Loc   =     Logger%On()
 
-
   !do iTtra = 1,Input%NTtra
   !  if (i_Debug_Loc) call Logger%Write( "  iTtra = ", iTtra )
     NTtra = 1 !Input%NTtra
@@ -548,8 +546,7 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
 
             !!! Checking if Initial and Final States are Accettable
             call Mask4InProc_Nb3Atoms(  Collision, Input%BinOI(1), vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
-            call Mask4FinProc_Nb3Atoms( Collision,                 vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
-
+            call Mask4FinProc_Nb3Atoms( Collision, CrossSectTemp,  vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
 
             if ( (IssueIn < 1) .and. (IssueFin < 1) ) then
 
@@ -710,11 +707,12 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
+Subroutine Mask4FinProc_Nb3Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
   Type(Collision_Type)                              ,intent(in)     :: Collision
+  real(rkp)         ,dimension(2)                   ,intent(in)     :: CrossSect
   integer                                           ,intent(inout)  :: vqnFin
   integer                                           ,intent(inout)  :: jqnFin
   integer                                           ,intent(inout)  :: ArrFin
@@ -735,25 +733,29 @@ Subroutine Mask4FinProc_Nb3Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_
 
   iPFin    = int(ArrFin / 16)
   iTypeFin = mod(ArrFin , 16)
-  if (iPFin > 0) then
-    iMolFin  = Collision%Pairs(iPFin)%To_Molecule
-    BinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin)
+  if (CrossSect(1) < 1.e-100) then
+    Issue = 12 ! Current Trajectory has a Final Condition that has 0.0 Cross Section
+  else
+    if (iPFin > 0) then
+      iMolFin  = Collision%Pairs(iPFin)%To_Molecule
+      BinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin)
 
-    if (iTypeFin < 2) then
-      if ( BinTemp .eq. -1 ) then
-        if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin-1) .eq. -1 ) then
-          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-          vqnFin = 0
-          jqnFin = 0
-          ArrFin = int( iPFin * 16) + 2
+      if (iTypeFin < 2) then
+        if ( BinTemp .eq. -1 ) then
+          if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin,jqnFin-1) .eq. -1 ) then
+            Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+            vqnFin = 0
+            jqnFin = 0
+            ArrFin = int( iPFin * 16) + 2
+          else
+            Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+          endif
         else
-          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
-        endif
-      else
-        ! Current Trajectory has a Final Condition that is accettable!
-        BinFin = BinTemp
-        vqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%vqnFirst
-        jqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%jqnFirst
+          ! Current Trajectory has a Final Condition that is accettable!
+          BinFin = BinTemp
+          vqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%vqnFirst
+          jqnFin = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(BinFin)%jqnFirst
+        end if
       end if
     end if
   end if
@@ -770,11 +772,11 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 Pure Subroutine CreateName_Nb3Atoms( MolName, AtomsName, iLevel, iLevelChar, Name )
 
-  character(*)  ,intent(in)  :: MolName
-  character(*)  ,intent(in)  :: AtomsName
-  integer       ,intent(in)  :: iLevel
-  character(6)  ,intent(out) :: iLevelChar
-  character(20) ,intent(out) :: Name
+  character(*)              ,intent(in)  :: MolName
+  character(*)              ,intent(in)  :: AtomsName
+  integer                   ,intent(in)  :: iLevel
+  character(6)              ,intent(out) :: iLevelChar
+  character(:) ,allocatable ,intent(out) :: Name
 
   if (iLevel<10)then
     write(iLevelChar,'(I1)') iLevel
@@ -788,7 +790,7 @@ Pure Subroutine CreateName_Nb3Atoms( MolName, AtomsName, iLevel, iLevelChar, Nam
     write(iLevelChar,'(I5)') iLevel
   end if
 
-  Name = trim(adjustl(MolName)) // "(" // trim(adjustl(iLevelChar)) // ")+" //  trim(adjustl(AtomsName))
+  allocate( Name, source = trim(adjustl(MolName)) // "(" // trim(adjustl(iLevelChar)) // ")+" //  trim(adjustl(AtomsName)) )
 
 end Subroutine
 ! !===================================================================================================! !

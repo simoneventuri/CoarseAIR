@@ -168,7 +168,7 @@ Subroutine Initialize_CO2_NASA_PES( This, Input, Atoms, iPES, i_Debug )
     end if
   end do
   
-  NASA_CO2_file = trim(adjustl(Input%DtbPath))  // '/' // trim(adjustl(Input%System)) // '/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
+  NASA_CO2_file = trim(adjustl(Input%DtbPath))  // '/Systems/CO2/PESs/' // trim(adjustl(Input%PES_Model(iPES))) // '.inp'
   if (i_Debug_Loc) call Logger%Write( "Reading NASA CO2 PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", NASA_CO2_file)
   open( File=NASA_CO2_file, NewUnit=Unit, status='OLD', iostat=Status )

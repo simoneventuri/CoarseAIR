@@ -687,8 +687,8 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
 
 
             !!! Checking if Initial and Final States are Accettable
-            call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI, vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
-            call Mask4FinProc_Nb4Atoms( Collision,              vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
+            call Mask4InProc_Nb4Atoms(  Collision, Input%BinOI,   vqnIn,  jqnIn,  ArrIn,  IssueIn  )!, i_Debug=i_Debug_Loc )
+            call Mask4FinProc_Nb4Atoms( Collision, CrossSectTemp, vqnFin, jqnFin, ArrFin, IssueFin )!, i_Debug=i_Debug_Loc )
             if ( (IssueIn < 1) .and. (IssueFin < 1) ) then
 
               !!! Postprocessing Final State for Reconstructing Process !!!!
@@ -841,11 +841,12 @@ End Subroutine
 ! !---------------------------------------------------------------------------------------------------! !
 !!!                           Creating a Mask for Statistic Results                                   !!!
 ! !---------------------------------------------------------------------------------------------------! !
-Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
+Subroutine Mask4FinProc_Nb4Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, Issue)!, i_Debug )
 
   use Collision_Class             ,only: Collision_Type
 
   Type(Collision_Type)                              ,intent(in)     :: Collision
+  real(rkp)   ,dimension(2)                         ,intent(in)     :: CrossSect
   integer     ,dimension(2)                         ,intent(inout)  :: vqnFin
   integer     ,dimension(2)                         ,intent(inout)  :: jqnFin
   integer                                           ,intent(inout)  :: ArrFin
@@ -866,56 +867,59 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, vqnFin, jqnFin, ArrFin, Issue)!, i_
   Issue = -1
 
   iPFin    = int(ArrFin / 16)
-  if (iPFin > 0) then
-    jPFin    = Collision%Pairs(iPFin)%Opposite
-    Temp     = mod(ArrFin , 16)
-    iTypeFin = mod(Temp, 4)
-    jTypeFin = int(Temp / 4)
-    iMolFin  = Collision%Pairs(iPFin)%To_Molecule
-    jMolFin  = Collision%Pairs(jPFin)%To_Molecule
+  if (CrossSect(1) < 1.e-100) then
+    Issue = 12
+  else
+    if (iPFin > 0) then
+      jPFin    = Collision%Pairs(iPFin)%Opposite
+      Temp     = mod(ArrFin , 16)
+      iTypeFin = mod(Temp, 4)
+      jTypeFin = int(Temp / 4)
+      iMolFin  = Collision%Pairs(iPFin)%To_Molecule
+      jMolFin  = Collision%Pairs(jPFin)%To_Molecule
 
-    iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
-    jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
+      iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
+      jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
 
-    if (iTypeFin < 2) then
-      if ( iBinTemp .eq. -1 ) then
-        if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
-          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-          vqnFin(1) = 0
-          jqnFin(1) = 0
-          iTypeFin  = 2
+      if (iTypeFin < 2) then
+        if ( iBinTemp .eq. -1 ) then
+          if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
+            Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+            vqnFin(1) = 0
+            jqnFin(1) = 0
+            iTypeFin  = 2
+          else
+            Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+          endif
         else
-          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
-        endif
-      else
-        ! Current Trajectory has a Final Condition that is accettable!
-        iBinFin   = iBinTemp
-        vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%vqnFirst
-        jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%jqnFirst
+          ! Current Trajectory has a Final Condition that is accettable!
+          iBinFin   = iBinTemp
+          vqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%vqnFirst
+          jqnFin(1) = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%Bin(iBinFin)%jqnFirst
+        end if
       end if
-    end if
 
-    if (jTypeFin < 2) then
-      if ( jBinTemp .eq. -1 ) then
-        if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
-          Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-          vqnFin(2) = 0
-          jqnFin(2) = 0
-          jTypeFin  = 2
+      if (jTypeFin < 2) then
+        if ( jBinTemp .eq. -1 ) then
+          if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
+            Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+            vqnFin(2) = 0
+            jqnFin(2) = 0
+            jTypeFin  = 2
+          else
+            Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+          endif
         else
-          Issue = 11 ! Current Trajectory has a Final Condition that should not exist
-        endif
-      else
-        ! Current Trajectory has a Final Condition that is accettable!
-        jBinFin   = jBinTemp
-        vqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%vqnFirst
-        jqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%jqnFirst
+          ! Current Trajectory has a Final Condition that is accettable!
+          jBinFin   = jBinTemp
+          vqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%vqnFirst
+          jqnFin(2) = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%Bin(jBinFin)%jqnFirst
+        end if
       end if
-    end if
 
-    ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
+      ArrFin = int( iPFin*16 + 4*jTypeFin + iTypeFin )
+    end if
   end if
-
   
   ! if (i_Debug_Loc) call Logger%Exiting
 

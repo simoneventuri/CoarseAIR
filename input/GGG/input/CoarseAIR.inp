@@ -4,31 +4,33 @@
 ######                                                                               ######
 ###########################################################################################
 
-   Generating Energy Levels? = no
-   Preprocessing Energy Levels List? = yes
+   Generating Energy Levels? = yes
+   Preprocessing Energy Levels List? = no
    Running Trajectories? = no
    Postprocessing Trajectories? = no
    Generating Derivated Quantities? = no
    
 ###########################################################################################
 
-   System = N2O
+   System = GGG
    
    Nb of Species = 2
-     Species 1 = N2
-     Species 2 = O
+     Species 1 = G2
+     Species 2 = G
    
-   Nb of Molecules = 2
-     Molecule 1 = N2
-     Molecule 2 = NO
+   Nb of Molecules = 1
+     Molecule 1 = G2
    
    Nb of Atoms = 3
-     Atom 1 = N
-       Mass [a.u.] of Atom 1  = 25526.04298d0 
-     Atom 2 = N
-       Mass [a.u.] of Atom 2  = 25526.04298d0
-     Atom 3 = O
-       Mass [a.u.] of Atom 3  = 29148.94559d0
+     Atom 1 = G
+       Mass [a.u.], Atom 1 = FromDataFile
+       Mass File, Atom 1 = Local
+     Atom 2 = G
+       Mass [a.u.], Atom 2 = FromDataFile
+       Mass File, Atom 2 = Local
+     Atom 3 = G
+       Mass [a.u.], Atom 3 = FromDataFile
+       Mass File, Atom 3 = Local
    
    Database Path = /Users/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
    
@@ -52,14 +54,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = N2_Levels_UMN_Sorted.inp 
-   Levels File Name, Molecule 2 = NO_Levels_UMN_Sorted.inp
+   Levels File Name, Molecule 1 = G2_Computed
    
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
    
    Nb of Atoms, Molecule 1 = 2
-   Nb of Atoms, Molecule 2 = 2
 
 
 ###########################################################################################
@@ -72,9 +72,8 @@
    #                                                                         <- If Starting Level==0, CoarseAIR reads the levels/bins to run from the "LevelsToRunList.inp" in the input folder
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
-     Starting Level, Molecule 1 = 1                               
+     Starting Level, Molecule 1 = 1                              
      Final    Level, Molecule 1 = 0
-   Sorting Method, Molecule 2 = State-Specific
    #*##
    
    #:##                                                                      <- Uncomment from #: to #* for Running CoarseAIR with vibrational specific binning
@@ -91,7 +90,7 @@
    #  Final    Bin, Molecule 1 = 100
    #*##
    
-   #:##                                                                	    <- Uncomment from #: to #* for Running CoarseAIR with a custom binning strategy, specified in "File with Level-Bin Mapping"
+   #:##                                                                     <- Uncomment from #: to #* for Running CoarseAIR with a custom binning strategy, specified in "File with Level-Bin Mapping"
    #Sorting Method, Molecule 1 = From-File                                      
    #  File with Level-Bin Mapping, Molecule 1 = InelDiss.dat
    #  Nb of Bins, Molecule 1 = 100
@@ -108,29 +107,31 @@
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
    Nb of Trajectories per Level / Bin = 20000
-   #  Nb of Trajectories per Mini-Batch = 10000
+   #  Nb of Trajectories per Mini-Batch = 20000
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
 
-   Initial Distance between Target and Projectile = 25.d0
+   Initial Distance between Target and Projectile = 23.d0
    
    Nb of PESs = 1
-     Model, PES 1 = Basel_13A1
+     Model, PES 1 = LEPS
      Degeneracy, PES 1 = 1.0
-     Model, PES 2 = Basel_13A2
-     Degeneracy, PES 2 = 1.0
-     ###                                                                      <- Specify here the input for Neural Nerwork PES
+     PES Parameters File Name = Local
+     ###                                                                      <- Specify here the file for LEPS
+     #PES Parameters File Name = LEPS_Orig.Input       
+     ###                                                                      <- Specify here the input for Neural Nerwork PES / Bayesian Neural Nerwork PES
      # Nb Neurons, Hidden Layer 1 = 20
      # Nb Neurons, Hidden Layer 2 = 20
      # PES Parameters Folder Name = 5000Points
      ###                                                                      <- Specify here the input for Bayesian Neural Nerwork PES
      # Nb of PESs Samples = 1
      # Randomize PES Initial Conditions? = no
+     # Sample Parameters for Stochastic PES? = no
      # Initial Random Nb Seed for PES Parameters Sampling = 0
      
-   Diatomic Potential Model, Molecule 1 = UMN_ForN2O2
-   Diatomic Potential Model, Molecule 2 = UMN
+   Diatomic Potential Model, Molecule 1 = Morse
+     Diatomic Potential Parameters File Name, Molecule 1 = Local
 
    ### Initial Impact Parameter Model ( Normal / Random / Stratified / FixedAngMom )
    ###   Normal or Random   ->   Initial Impact Parameter = 
@@ -185,7 +186,7 @@
    Write the Progress File?                       = no
    Write the PaQ Solution File?                   = no
    Write the PaQ Evolution File?                  = no
-   Write the Spatial Coordinates Evolution File?  = no
+   Write the Spatial Coordinates Evolution in a Single File? = no
    Write the PES Evolution File?                  = no
    Write the Energy Evolution File?               = no
   
@@ -199,12 +200,8 @@
    ###########################################################################################
    #  ODE Parameters
    ###########################################################################################
-  
    ### If "Try to increase stepsize?" = no, the stepsize will be constant during the integration (e.g.: for plotting trajectories)
-   #Try to increase stepsize? = no
-   #Initial time step = 1.00d0
-   #Error control parameter = 0.0000000100d0
-   #Stepsize increase damping factor = 1.d-100
+   Try to increase stepsize? = yes
    Initial time step = 5.00d0
    Error control parameter = 0.0000000100d0
    Stepsize increase damping factor = 0.5d0
@@ -218,12 +215,10 @@
 #   COMPUTING STATISTICS
 ###########################################################################################
 
-   Distinguish Exchanges? = yes
-
    ### Nb of Trajectory Conditions = 3  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 1 Molecule)
    Nb of Final Conditions on the Trajectories = 3
      Iskip for Condition 1 = 1
-     Preserving Even / Oddness of Condition 1 = yes
+     Preserving Even / Oddness of Condition 1 = no
      Iskip for Condition 2 = 1
      Preserving Even / Oddness of Condition 2 = no
      Iskip for Condition 3 = 1
@@ -233,10 +228,25 @@
    
    ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram
+
+   ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
+   Writing Trajectory Files in Binary Format? = yes
    
 ###########################################################################################
-   
-   Temperature for Distribution Function Computation [K] = 1400.d0
-   
+
+
+###########################################################################################
+#   COMPUTING RATES
+###########################################################################################
+
    Flag for Running External Code = 2
+
+   Distinguish Exchanges between Each Other? = no
+
+   Distinguish Exchanges from Inelastic? = yes
+
+   Temperature for Distribution Function Computation [K] = 1400.d0
+
+   Writing Rate Files in Binary Format? = no
    
+###########################################################################################

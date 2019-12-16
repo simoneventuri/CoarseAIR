@@ -47,8 +47,8 @@ Program PreprocLevels
   integer                                              :: Status
   real(rkp)                                            :: StartTime, EndTime
   
-  logical   ,parameter                                 ::     i_Debug_PL        = .True.
-  logical   ,parameter                                 ::     i_Debug_PL_Deep   = .True.
+  logical   ,parameter                                 ::     i_Debug_PL        = .False.
+  logical   ,parameter                                 ::     i_Debug_PL_Deep   = .False.
 
   call CPU_Time( StartTime )
 

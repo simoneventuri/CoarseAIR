@@ -6,34 +6,30 @@
 
    Generating Energy Levels? = no
    Preprocessing Energy Levels List? = yes
-   Running Trajectories? = no
+   Running Trajectories? = yes
    Postprocessing Trajectories? = no
    Generating Derivated Quantities? = no
    
 ###########################################################################################
 
-   System = CHN
+   System = N3
    
    Nb of Species = 2
-     Species 1 = CH
+     Species 1 = N2
      Species 2 = N
    
-   Nb of Molecules = 3
-     Molecule 1 = CH
-     Molecule 2 = CN
-     Molecule 3 = HN
-
-   Nb of Initial Molecules = 1
-
-   Nb of Atoms = 3
-     Atom 1 = C
-        Mass [a.u.] of Atom 1  = 21868.661757d0
-     Atom 2 = H
-        Mass [a.u.] of Atom 2  = 1835.0397616d0
-     Atom 3 = N
-        Mass [a.u.] of Atom 3  = 25519.042285d0
+   Nb of Molecules = 1
+     Molecule 1 = N2
    
-   Database Path = /Users/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Nb of Atoms = 3
+     Atom 1 = N
+       Mass [a.u.] of Atom 1 = 25526.04298d0
+     Atom 2 = N
+       Mass [a.u.] of Atom 2 = 25526.04298d0
+     Atom 3 = N
+       Mass [a.u.] of Atom 3 = 25526.04298d0
+   
+   Database Path = /home1/mpanesi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 = 
@@ -42,7 +38,7 @@
    Relative Translational Energy Model = Boltzmann
    
    Nb of Translational Temperatures = 1
-     Translational Temperature [K] 1 = 7000.d0
+     Translational Temperature [K] 1 = 10000.d0
    #Nb of Internal Temperatures = 1
    # Internal Temperature 1 = 10000.d0
    
@@ -55,20 +51,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = CH_Levels_UIUC_Sorted.inp
-   Levels File Name, Molecule 2 = CN_Levels_UIUC_Sorted.inp
-   Levels File Name, Molecule 3 = HN_Levels_UIUC_Sorted.inp
+   Levels File Name, Molecule 1 = N2_UMN_N2O2_Sorted.inp
    
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
-   Min Energy for Cutting Levels, Molecule 2 = -10000.d0
-   Min Time   for Cutting Levels, Molecule 2 = -10000.d0
-   Min Energy for Cutting Levels, Molecule 3 = -10000.d0
-   Min Time   for Cutting Levels, Molecule 3 = -10000.d0
    
    Nb of Atoms, Molecule 1 = 2
-   Nb of Atoms, Molecule 2 = 2
-   Nb of Atoms, Molecule 3 = 2
 
 
 ###########################################################################################
@@ -82,9 +70,7 @@
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
      Starting Level, Molecule 1 = 1                              
-     Final    Level, Molecule 1 = 0
-   Sorting Method, Molecule 2 = State-Specific
-   Sorting Method, Molecule 3 = State-Specific
+     Final    Level, Molecule 1 = 1
    #*##
    
    #:##                                                                      <- Uncomment from #: to #* for Running CoarseAIR with vibrational specific binning
@@ -101,7 +87,7 @@
    #  Final    Bin, Molecule 1 = 100
    #*##
    
-   #:##                                                                	    <- Uncomment from #: to #* for Running CoarseAIR with a custom binning strategy, specified in "File with Level-Bin Mapping"
+   #:##                                                                     <- Uncomment from #: to #* for Running CoarseAIR with a custom binning strategy, specified in "File with Level-Bin Mapping"
    #Sorting Method, Molecule 1 = From-File                                      
    #  File with Level-Bin Mapping, Molecule 1 = InelDiss.dat
    #  Nb of Bins, Molecule 1 = 100
@@ -117,7 +103,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 10000
+   Nb of Trajectories per Level / Bin = 20000
    #  Nb of Trajectories per Mini-Batch = 20000
    
    Generate a CPU-Clock Dependent Seed? = no
@@ -126,21 +112,21 @@
    Initial Distance between Target and Projectile = 23.d0
    
    Nb of PESs = 1
-     Model, PES 1 = LEPS
+     Model, PES 1 = NASA
      Degeneracy, PES 1 = 1.0
-     PES Parameters File Name = LEPS.inp
-     ###                                                                      <- Specify here the input for Neural Nerwork PES
+     ###                                                                      <- Specify here the file for LEPS
+     #PES Parameters File Name = LEPS_Orig.Input       
+     ###                                                                      <- Specify here the input for Neural Nerwork PES / Bayesian Neural Nerwork PES
      # Nb Neurons, Hidden Layer 1 = 20
      # Nb Neurons, Hidden Layer 2 = 20
      # PES Parameters Folder Name = 5000Points
      ###                                                                      <- Specify here the input for Bayesian Neural Nerwork PES
      # Nb of PESs Samples = 1
      # Randomize PES Initial Conditions? = no
+     # Sample Parameters for Stochastic PES? = no
      # Initial Random Nb Seed for PES Parameters Sampling = 0
      
-   Diatomic Potential Model, Molecule 1 = UIUC
-   Diatomic Potential Model, Molecule 2 = UIUC
-   Diatomic Potential Model, Molecule 3 = UIUC
+   Diatomic Potential Model, Molecule 1 = UMN_ForN2O2
 
    ### Initial Impact Parameter Model ( Normal / Random / Stratified / FixedAngMom )
    ###   Normal or Random   ->   Initial Impact Parameter = 
@@ -156,19 +142,19 @@
        Nb of Trajectories in Range 3 = 1
        Impact Parameter for Range 3 = -1.d0
        Nb of Trajectories in Range 4 = 1
-       Impact Parameter for Range 4 = -2.5d0
+       Impact Parameter for Range 4 = -3.d0
        Nb of Trajectories in Range 5 = 1
-       Impact Parameter for Range 5 = -4.d0
+       Impact Parameter for Range 5 = -5.d0
        Nb of Trajectories in Range 6 = 1
-       Impact Parameter for Range 6 = -7.d0
+       Impact Parameter for Range 6 = -8.d0
        Nb of Trajectories in Range 7 = 1
-       Impact Parameter for Range 7 = -12.d0
-     #Strata Type = Rings
-     #Nb of Stratified Sampling Ranges = 2
-     #  Nb of Trajectories in Range 1 = 1
-     #  Impact Parameter for Range 1 = -6.00d0
-     #  Nb of Trajectories in Range 2 = 99
-     #  Impact Parameter for Range 2 = -14.d0
+       Impact Parameter for Range 7 = -14.d0
+   #  Strata Type = Rings
+   #  Nb of Stratified Sampling Ranges = 2
+   #    Nb of Trajectories in Range 1 = 1
+   #    Impact Parameter for Range 1 = -6.00d0
+   #    Nb of Trajectories in Range 2 = 99
+   #    Impact Parameter for Range 2 = -14.d0
        
        
    ### Method for Initial Vibrational Quantum Nb (Fixed / Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
@@ -209,44 +195,53 @@
    ###########################################################################################
    #  ODE Parameters
    ###########################################################################################
-  
    ### If "Try to increase stepsize?" = no, the stepsize will be constant during the integration (e.g.: for plotting trajectories)
    Try to increase stepsize? = yes
-   #Initial time step = 5.00d0
-   #Error control parameter = 0.0000000100d0
-   #Stepsize increase damping factor = 1.d-100
    Initial time step = 5.00d0
    Error control parameter = 0.0000000100d0
    Stepsize increase damping factor = 0.5d0
    Nb of extrapolation steps = 3  
    Nb of integration between end checking = 10   
    Max distance between atom pair [bohr] = 30.d0
-   Max trajectory time [a.u.] = 500000.d0
+   Max trajectory time [a.u.] = 400000.d0
 
 
 ###########################################################################################
 #   COMPUTING STATISTICS
 ###########################################################################################
 
-   Distinguish Exchanges? = yes
-
    ### Nb of Trajectory Conditions = 3  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 1 Molecule)
    Nb of Final Conditions on the Trajectories = 3
      Iskip for Condition 1 = 1
-     Preserving Even / Oddness of Condition 1 = no
+     Preserving Even / Oddness of Condition 1 = yes
      Iskip for Condition 2 = 1
      Preserving Even / Oddness of Condition 2 = no
      Iskip for Condition 3 = 1
      Preserving Even / Oddness of Condition 3 = no
    
-   Identical Diatoms? = no
+  Identical Diatoms? = no
    
    ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram
+
+   ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
+   Writing Trajectory Files in Binary Format? = yes
    
 ###########################################################################################
-   
-   Temperature for Distribution Function Computation [K] = 1400.d0
-   
+
+
+###########################################################################################
+#   COMPUTING RATES
+###########################################################################################
+
    Flag for Running External Code = 2
+
+   Distinguish Exchanges between Each Other? = yes
+
+   Distinguish Exchanges from Inelastic? = yes
+
+   Temperature for Distribution Function Computation [K] = 1400.d0
+
+   Writing Rate Files in Binary Format? = no
    
+###########################################################################################
