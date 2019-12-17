@@ -67,19 +67,19 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
 
         if (InputData.WriteExchKin_Flg == True):
 
-            for iExch in range (Syst.NExch):
-                print('  Writing Exchange: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch]].Name + '+' + Syst.Atom[Syst.ExchtoAtom[iExch]].Name )
-                ExchKinetics = InputData.WriteKinFolder + '/kinetics/' + Syst.Name + 'Exch_Type' + str(iExch+1) + '_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
+            for iExch in range (2, Syst.NProcTypes):
+                print('  Writing Exchange: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name )
+                ExchKinetics = InputData.WriteKinFolder + '/kinetics/' + Syst.Name + 'Exch_Type' + str(iExch-1) + '_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
                 csvkinetics  = open(ExchKinetics, 'w')
 
-                ExchFile     = InputData.ReadKinFolder + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[Syst.ExchtoMol[iExch]].Name + '+' + Syst.Atom[Syst.ExchtoAtom[iExch]].Name + '_Exch.csv'
+                ExchFile     = InputData.ReadKinFolder + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '_Exch.csv'
                 with open(ExchFile) as csvfile:
                     readCSV = csv.reader(csvfile, delimiter=',')
                     next(readCSV)
                     for row in readCSV:
 
                         if (float(row[iT+1]) > 0.0):
-                            ProcName = Syst.Molecule[0].Name + '(' + str(row[0]) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch]].Name + '(' + str(row[1]) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch]].Name
+                            ProcName = Syst.Molecule[0].Name + '(' + str(row[0]) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(row[1]) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
                             Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % float(row[iT+1])
                             csvkinetics.write(Line)
                 

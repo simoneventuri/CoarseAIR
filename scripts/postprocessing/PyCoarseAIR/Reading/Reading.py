@@ -21,7 +21,6 @@
 import numpy as np
 import pandas
 
-
 def Read_PartFuncsAndEnergies(Syst, Temp):
 
     for iMol in range(Syst.NMolecules):
@@ -62,21 +61,59 @@ def Read_qnsEnBin(Syst):
 
 
 
-def Read_RatesCGQCT(Syst, TTra, TInt, iLevel):
+def Read_RatesFile_CGQCT(Syst, TTra, TInt, iLevel):
 
     PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Bin' + str(iLevel+1) + '.dat'
-    print(PathToFile)
+    #print(PathToFile)
     
     Data  = pandas.read_csv(PathToFile, header=None, skiprows=5, delimiter=r"\s+")
-    Data  = Data.replace('D', 'E')
-    Data1 = Data[1].apply(pandas.to_numeric, errors='coerce')
-    Data2 = Data[2].replace('D', 'E')
-    Data2 = Data2.apply(pandas.to_numeric, errors='coerce')
-    Data3 = Data[3].replace('D', 'E')
-    Data3 = Data3.apply(pandas.to_numeric, errors='coerce')
+    Data  = Data.apply(pandas.to_numeric, errors='coerce')
 
-    Processes = np.array(Data1.values, dtype=np.int64)
-    Rates     = np.array(Data2.values, dtype=np.float64)
-    RatesSD   = np.array(Data3.values, dtype=np.float64)
+    ProcessesTemp = np.array(Data[1].values, dtype=np.int64)
+    RatesTemp     = np.array(Data[2].values, dtype=np.float64)
+    RatesSDTemp   = np.array(Data[3].values, dtype=np.float64)
 
-    return Processes, Rates, RatesSD
+    return ProcessesTemp, RatesTemp, RatesSDTemp
+
+
+
+def Read_Rates_CGQCT(Syst, Temp):
+
+    for iT in Temp.iTVec:
+        TTra = Temp.TranVec[iT-1]
+        TInt = TTra
+        print('\nTemperature Nb ', iT, '; T = ', TTra, 'K')
+
+        Syst.T[iT-1].Proc[0].Rates = np.zeros((Syst.Molecule[0].NBins, 3))
+        Syst.T[iT-1].Proc[1].Rates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[0].NBins))
+        for iProc in range(2, 4):
+            Syst.T[iT-1].Proc[iProc].Rates     = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[Syst.Pair[iProc-1].ToMol].NBins))
+        for iProc in range(2, Syst.NProcTypes):
+            Syst.T[iT-1].ProcExch[iProc-2].Rates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[Syst.ExchtoMol[iProc-2]].NBins))
+
+        for iBins in range(10):#range(Syst.Molecule[0].NBins):
+            print('\nBins Nb ', iBins+1)
+            RatesTempAll                            = np.zeros(Syst.Pair[-1].NProcTot+1)
+            [ProcessesTemp, RatesTemp, RatesSDTemp] = Read_RatesFile_CGQCT(Syst, TTra, TInt, iBins)
+
+            RatesTempAll[ProcessesTemp[:]-1] = RatesTemp[:]
+
+            RatesSplitted                       = np.split( RatesTempAll, np.array([1, Syst.Pair[0].NProcTot, Syst.Pair[1].NProcTot, Syst.Pair[2].NProcTot]) )
+            Syst.T[iT-1].Proc[0].Rates[iBins,0] = RatesSplitted[0]
+            Syst.T[iT-1].Proc[1].Rates[iBins,:] = RatesSplitted[1]
+            for iProc in range(2, 4):
+                Syst.T[iT-1].Proc[iProc].Rates[iBins,:] = RatesSplitted[iProc]
+        
+        for iProc in range(2, 4):
+            for jProc in range(2, Syst.NProcTypes):
+                #print('iP = ', iProc, '; ToMol     = ', Syst.Pair[iProc-1].ToMol+1)
+                #print('ExchtoMol = ', Syst.ExchtoMol[jProc-2]+1 )
+                if (Syst.Pair[iProc-1].ToMol == Syst.ExchtoMol[jProc-2] ):
+                    Syst.T[iT-1].ProcExch[jProc-2].Rates = Syst.T[iT-1].ProcExch[jProc-2].Rates + Syst.T[iT-1].Proc[iProc].Rates
+
+        Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
+        Syst.T[iT-1].ProcTot[1].Rates = np.sum(Syst.T[iT-1].Proc[1].Rates, axis=1)
+        for jProc in range(2, Syst.NProcTypes):
+            Syst.T[iT-1].ProcTot[jProc].Rates = np.sum(Syst.T[iT-1].ProcExch[jProc-2].Rates, axis=1)
+
+    return Syst

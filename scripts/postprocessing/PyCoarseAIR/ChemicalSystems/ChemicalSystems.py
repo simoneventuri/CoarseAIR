@@ -34,7 +34,8 @@ def CO2_Upload( Temp ):
     NMolecules    = 2
     NPairs        = 3
     NCFDComp      = 4
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
+    NProcTypes    = 4
+    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -74,6 +75,10 @@ def CO2_Upload( Temp ):
     Syst.Pair[1].Name  = 'CO'
     Syst.Pair[2].Name  = 'O2'
 
+    Syst.Pair[0].ToMol = 0
+    Syst.Pair[1].ToMol = 0
+    Syst.Pair[2].ToMol = 1
+
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
@@ -108,7 +113,6 @@ def CO2_Upload( Temp ):
     Syst.MolToCFDComp       = 3
     Syst.MolToCFDComp       = 4
 
-    Syst.NExch              = 2
     Syst.ExchtoMol          = np.array([0,1])
     Syst.ExchtoAtom         = np.array([2,0])
 
@@ -127,7 +131,8 @@ def O2C_Upload( Temp ):
     NMolecules    = 2
     NPairs        = 3
     NCFDComp      = 4
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
+    NProcTypes    = 3
+    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -167,6 +172,10 @@ def O2C_Upload( Temp ):
     Syst.Pair[1].Name  = 'CO'
     Syst.Pair[2].Name  = 'CO'
 
+    Syst.Pair[0].ToMol = 0
+    Syst.Pair[1].ToMol = 1
+    Syst.Pair[2].ToMol = 1
+
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
@@ -201,7 +210,6 @@ def O2C_Upload( Temp ):
     Syst.MolToCFDComp       = 4
     Syst.MolToCFDComp       = 3
 
-    Syst.NExch              = 1
     Syst.ExchtoMol          = np.array([1])
     Syst.ExchtoAtom         = np.array([0])
 
@@ -220,7 +228,8 @@ def CHN_Upload( Temp ):
     NMolecules    = 3
     NPairs        = 3
     NCFDComp      = 6
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
+    NProcTypes    = 2
+    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -262,6 +271,10 @@ def CHN_Upload( Temp ):
     Syst.Pair[0].Name  = 'CH'
     Syst.Pair[1].Name  = 'CN'
     Syst.Pair[2].Name  = 'HN'
+
+    Syst.Pair[0].ToMol = 0
+    Syst.Pair[1].ToMol = 1
+    Syst.Pair[2].ToMol = 2
 
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
@@ -308,7 +321,7 @@ def CHN_Upload( Temp ):
     Syst.MolToCFDComp       = 3
 
 
-    Syst.NExch              = 0
+    Syst.NProcTypes         = 2
 
     return Syst
 ################################################################################################################
@@ -326,7 +339,8 @@ def O3_Upload( Temp ):
     NMolecules    = 1
     NPairs        = 3
     NCFDComp      = 2
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
+    NProcTypes    = 3
+    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -349,11 +363,8 @@ def O3_Upload( Temp ):
 
 
     Syst.Molecule[0].Name             = 'O2'
-
     Syst.Molecule[0].DissEn           = 0.0
-
     Syst.Molecule[0].DegeneracyFactor = 6
-
     Syst.Molecule[0].Mu               = 31.9988e-3
 
 
@@ -361,6 +372,10 @@ def O3_Upload( Temp ):
     Syst.Pair[0].Name  = 'O2'
     Syst.Pair[1].Name  = 'O2'
     Syst.Pair[2].Name  = 'O2'
+
+    Syst.Pair[0].ToMol = 0
+    Syst.Pair[1].ToMol = 0
+    Syst.Pair[2].ToMol = 0
 
     Syst.Pair[0].Color = np.array([0, 0, 256]) / 256
     Syst.Pair[1].Color = np.array([0, 0, 256]) / 256
@@ -386,7 +401,6 @@ def O3_Upload( Temp ):
     Syst.MolToCFDComp       = 2
 
 
-    Syst.NExch              = 1
     Syst.ExchtoMol          = np.array([0])
     Syst.ExchtoAtom         = np.array([2])
 

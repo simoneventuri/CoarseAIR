@@ -24,5 +24,7 @@ class pair(object):
 
     def __init__(self):
 
-        self.Name  = ""
-        self.Color = np.array([1, 1, 1])
+        self.Name     = ""
+        self.Color    = np.array([1, 1, 1])
+        self.NBins    = 0
+        self.NProcTot = 0

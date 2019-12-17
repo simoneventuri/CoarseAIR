@@ -24,7 +24,8 @@ import numpy as np
 
 ## Paths from where to Import Python Modules
 #WORKSPACE = os.environ['WORKSPACE_PATH']
-SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+#SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+SrcDir    = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Objects/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Reading/')
@@ -44,7 +45,7 @@ import ChemicalSystems
 from System            import system
 from Temperatures      import temperatures
 
-from Reading           import Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_RatesCGQCT
+from Reading           import Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
 from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall
 from Computing         import Compute_ThermalDissRates_FromOverall
 from CoarseAIR         import InputData
@@ -75,6 +76,11 @@ for iMol in range(Syst.NMolecules):
     Syst.Molecule[iMol].KinMthd = InputData.KinMthd[iMol]
     ## Nb of Levels/Bins per Molecule
     Syst.Molecule[iMol].NBins   = InputData.NBins[iMol]
+NProcTot = 1
+for iP in range(3):
+	Syst.Pair[iP].NBins    = Syst.Molecule[Syst.Pair[iP].ToMol].NBins
+	NProcTot               = NProcTot + Syst.Pair[iP].NBins
+	Syst.Pair[iP].NProcTot = NProcTot
 Syst.PathToFolder = OutputFldr + Syst.Name
 ##--------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +90,9 @@ Syst.PathToFolder = OutputFldr + Syst.Name
 Syst = Read_qnsEnBin(Syst)
 Syst = Read_PartFuncsAndEnergies(Syst, Temp)
 
-Write_PartFuncsAndEnergies(Syst, Temp, InputData)
-Write_Kinetics_FromOverall(Syst, Temp, InputData)
+Syst = Read_Rates_CGQCT(Syst, Temp)
 
-Compute_ThermalDissRates_FromOverall(Syst, Temp, InputData)
+#Write_PartFuncsAndEnergies(Syst, Temp, InputData)
+#Write_Kinetics_FromOverall(Syst, Temp, InputData)
+
+#Compute_ThermalDissRates_FromOverall(Syst, Temp, InputData)

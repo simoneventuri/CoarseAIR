@@ -25,10 +25,25 @@ from Molecule import molecule
 from Pair     import pair
 from CFDComp  import cfdcomp
 
+class processes(object):
+
+    def __init__(self):
+
+        self.Rates = 0
+
+
+class t_properties(object):
+
+    def __init__(self, NProcTypes):
+
+        self.Proc     = [processes() for iProc in range(4)]
+        self.ProcExch = [processes() for iProc in range(NProcTypes-2)]
+        self.ProcTot  = [processes() for iProc in range(NProcTypes)]
+
 
 class system(object):
 
-    def __init__(self, SystNames, NAtoms, NMolecules, NPairs, NCFDComp, NTTran):
+    def __init__(self, SystNames, NAtoms, NMolecules, NPairs, NCFDComp, NTTran, NProcTypes):
 
         self.Name         = SystNames
 
@@ -46,3 +61,7 @@ class system(object):
         self.MolToCFDComp = 0
 
         self.PathToFolder = ''
+
+        self.NProcTypes   = NProcTypes
+
+        self.T            = [t_properties(NProcTypes) for iT in range(NTTran)]

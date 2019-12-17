@@ -22,26 +22,47 @@ import numpy as np
 
 class InputData(object):
 
-    TranVec            = np.array([1500, 3000, 6000, 8000, 10000, 12000, 14000])
-    iTVec              = np.arange(7) + 1
+    # TranVec            = np.array([1500, 3000, 6000, 8000, 10000, 12000, 14000])
+    # iTVec              = np.arange(7) + 1
 
-    OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/'
+    # OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/'
 
-    SystName           = 'O3'
+    # SystName           = 'O3'
 
-    KinMthd            = ['StS']
-    NBins              = np.array([6115])
+    # KinMthd            = ['StS']
+    # NBins              = np.array([6115])
 
-    PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
+    # PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
+
+    # ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
+    # WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
+    # WriteInelKin_Flg   = False
+    # WriteExchKin_Flg   = False
+    # WriteDissKin_Flg   = True 
+
+    # PlotShowFlg        = False
+
+
+    TranVec            = np.array([10000])
+    iTVec              = np.arange(1) + 1
+
+    OutputFldr         = '/Users/sventuri/WORKSPACE/CG-QCT/run_O2C/Test/'
+
+    SystName           = 'O2C'
+
+    KinMthd            = ['StS', 'StS']
+    NBins              = np.array([6078, 13521])
+
+    PostprocessingFldr = '/Users/sventuri/WORKSPACE/MarsAIR/Results/'
 
     ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
-    WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
+    WriteKinFolder     = '/Users/sventuri/WORKSPACE/CG-QCT/run_O2C/Test/RunKonig/database/'
     WriteInelKin_Flg   = False
     WriteExchKin_Flg   = False
     WriteDissKin_Flg   = True 
 
-
     PlotShowFlg        = False
+
 
     def __init__(self):
 
