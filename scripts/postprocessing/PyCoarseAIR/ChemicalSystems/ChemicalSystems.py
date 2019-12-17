@@ -34,7 +34,7 @@ def CO2_Upload( Temp ):
     NMolecules    = 2
     NPairs        = 3
     NCFDComp      = 4
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTra)
+    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
 
 
 
@@ -87,7 +87,7 @@ def CO2_Upload( Temp ):
 
     Syst.CFDComp[0].Mass    = Syst.Atom[0].Mass
     Syst.CFDComp[1].Mass    = Syst.Atom[1].Mass
-    Syst.CFDComp[2].Mass    = Syst.Atom[1].Mass+Syst.Atom[2].Mass
+    Syst.CFDComp[2].Mass    = Syst.Atom[0].Mass+Syst.Atom[1].Mass
     Syst.CFDComp[3].Mass    = 2.0*Syst.Atom[2].Mass
 
     Syst.CFDComp[0].Deg     = 1
@@ -108,9 +108,105 @@ def CO2_Upload( Temp ):
     Syst.MolToCFDComp       = 3
     Syst.MolToCFDComp       = 4
 
+    Syst.NExch              = 2
+    Syst.ExchtoMol          = np.array([0,1])
+    Syst.ExchtoAtom         = np.array([2,0])
+
     return Syst
 ################################################################################################################
 
+
+################################################################################################################
+### CO + O System (From NASA Ames, Dr. D. Schwenke)
+def O2C_Upload( Temp ):   
+
+    SystName      = 'CO2'          
+    
+
+    NAtoms        = 3
+    NMolecules    = 2
+    NPairs        = 3
+    NCFDComp      = 4
+    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
+
+
+
+    Syst.Atom[0].Name  = 'O'
+    Syst.Atom[1].Name  = 'O'
+    Syst.Atom[2].Name  = 'C'
+
+    Syst.Atom[0].Color = np.array([0, 0, 1])
+    Syst.Atom[1].Color = np.array([0, 0, 1])
+    Syst.Atom[2].Color = np.array([0, 0, 0])
+
+    Syst.Atom[0].Size  = 200
+    Syst.Atom[1].Size  = 200
+    Syst.Atom[2].Size  = 100
+
+    Syst.Atom[0].Mass  = 29148.94559
+    Syst.Atom[1].Mass  = 29148.94559
+    Syst.Atom[2].Mass  = 21868.661757
+
+
+
+    Syst.Molecule[0].Name             = 'O2'
+    Syst.Molecule[1].Name             = 'CO'
+
+    Syst.Molecule[0].DissEn           = 0.0
+    Syst.Molecule[1].DissEn           = 0.0
+
+    Syst.Molecule[0].DegeneracyFactor = 6
+    Syst.Molecule[1].DegeneracyFactor = 1
+
+    Syst.Molecule[0].Mu               = 31.9988e-3
+    Syst.Molecule[1].Mu               = 28.0104e-3 
+
+
+
+    Syst.Pair[0].Name  = 'O2'
+    Syst.Pair[1].Name  = 'CO'
+    Syst.Pair[2].Name  = 'CO'
+
+    Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
+    Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
+    Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
+
+
+
+    Syst.CFDComp[0].Name   = 'C'
+    Syst.CFDComp[1].Name   = 'O'
+    Syst.CFDComp[2].Name   = 'CO'
+    Syst.CFDComp[3].Name   = 'O2'
+
+    Syst.CFDComp[0].Mass    = Syst.Atom[2].Mass
+    Syst.CFDComp[1].Mass    = Syst.Atom[0].Mass
+    Syst.CFDComp[2].Mass    = Syst.Atom[1].Mass+Syst.Atom[2].Mass
+    Syst.CFDComp[3].Mass    = 2.0*Syst.Atom[0].Mass
+
+    Syst.CFDComp[0].Deg     = 1
+    Syst.CFDComp[1].Deg     = 9
+    Syst.CFDComp[2].Deg     = 1
+    Syst.CFDComp[3].Deg     = 1
+
+    Syst.CFDComp[0].Color   = np.array([ 102, 102, 102]) / 256
+    Syst.CFDComp[1].Color   = np.array([   0, 153, 102]) / 256
+    Syst.CFDComp[2].Color   = np.array([ 204,   0,   0]) / 256
+    Syst.CFDComp[3].Color   = np.array([   0,   0, 234]) / 256
+
+    Syst.CFDComp[0].RxLxIdx = -1
+    Syst.CFDComp[1].RxLxIdx = -1
+    Syst.CFDComp[2].RxLxIdx =  1
+    Syst.CFDComp[3].RxLxIdx =  0
+
+    Syst.MolToCFDComp       = 4
+    Syst.MolToCFDComp       = 3
+
+    Syst.NExch              = 1
+    Syst.ExchtoMol          = np.array([1])
+    Syst.ExchtoAtom         = np.array([0])
+
+    return Syst
+################################################################################################################
 
 
 ################################################################################################################
@@ -124,7 +220,7 @@ def CHN_Upload( Temp ):
     NMolecules    = 3
     NPairs        = 3
     NCFDComp      = 6
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTra)
+    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
 
 
 
@@ -211,6 +307,9 @@ def CHN_Upload( Temp ):
 
     Syst.MolToCFDComp       = 3
 
+
+    Syst.NExch              = 0
+
     return Syst
 ################################################################################################################
 
@@ -227,7 +326,7 @@ def O3_Upload( Temp ):
     NMolecules    = 1
     NPairs        = 3
     NCFDComp      = 2
-    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTra)
+    Syst        = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran)
 
 
 
@@ -285,6 +384,11 @@ def O3_Upload( Temp ):
     Syst.CFDComp[1].RxLxIdx =  0
 
     Syst.MolToCFDComp       = 2
+
+
+    Syst.NExch              = 1
+    Syst.ExchtoMol          = np.array([0])
+    Syst.ExchtoAtom         = np.array([2])
 
     return Syst
 ################################################################################################################

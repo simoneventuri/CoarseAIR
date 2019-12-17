@@ -20,16 +20,47 @@
 ##==============================================================================================================
 import numpy as np
 
-class temperatures(object):
+class InputData(object):
+
+    TranVec            = np.array([1500, 3000, 6000, 8000, 10000, 12000, 14000])
+    iTVec              = np.arange(7) + 1
+
+    OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/'
+
+    SystName           = 'O3'
+
+    KinMthd            = ['StS']
+    NBins              = np.array([6115])
+
+    PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
+
+    ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
+    WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
+    WriteInelKin_Flg   = False
+    WriteExchKin_Flg   = False
+    WriteDissKin_Flg   = True 
+
+
+    PlotShowFlg        = False
 
     def __init__(self):
 
-        self.TranFlg = False
+        self.TraVec             = TranVec
+        self.iTVec              = iTVec
+ 
+        self.OutputFldr         = OutputFldr
 
-        self.NTran   = 0
-        self.TranVec = 0
+        self.SystName           = SystName
 
-        self.NInt    = 0
-        self.IntVec  = 0
+        self.KinMthd            = KinMthd
+        self.NBins              = NBins
 
-        self.iTVec   = 0
+        self.PostprocessingFldr = PostprocessingFldr
+
+        self.ReadKinFolder      = ReadKinFolder
+        self.WriteKinFolder     = WriteKinFolder
+        self.WriteInelKin_Flg   = WriteInelKin_Flg
+        self.WriteExchKin_Flg   = WriteExchKin_Flg
+        self.WriteDissKin_Flg   = WriteDissKin_Flg    
+
+        self.PlotShowFlg        = PlotShowFlg

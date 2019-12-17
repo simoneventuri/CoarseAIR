@@ -23,55 +23,68 @@ import sys
 import numpy as np
 
 ## Paths from where to Import Python Modules
-SrcDir = '/home/venturi/WORKSPACE//CoarseAIR/coarseair' #os.environ['COARSEAIR_SOURCE_DIR'] 
-sys.path.insert(1, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Objects/')
-sys.path.insert(2, SrcDir + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems')
-sys.path.insert(2, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Reading')
+#WORKSPACE = os.environ['WORKSPACE_PATH']
+SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Objects/')
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Reading/')
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Writing/')
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Computing/')
+print(sys.argv)
+
+if (len(sys.argv) > 1):
+    InputFile = sys.argv[1]
+    print("Calling PyCoarseAIR with Input File = ", InputFile)
+    sys.path.insert(0, InputFile)
+else:
+    print("Calling PyCoarseAIR without Input File")
+    sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/InputData/')
+
 import ChemicalSystems
 from System            import system
 from Temperatures      import temperatures
 
-from Reading           import Read_qnsEnBin, Read_RatesCGQCT
+from Reading           import Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_RatesCGQCT
+from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall
+from Computing         import Compute_ThermalDissRates_FromOverall
+from CoarseAIR         import InputData
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
 ################################################################################################################
-
 Temp                     = temperatures()
 ## Vector of Temperatures
-Temp.TraVec              = np.array([1500, 3000, 6000, 8000, 10000, 12000, 14000])
-Temp.NTra                = Temp.TraVec.size
-Temp.IntVec              = Temp.TraVec
+Temp.TranVec             = InputData.TranVec
+Temp.NTran               = Temp.TranVec.size
+Temp.IntVec              = Temp.TranVec
 Temp.NInt                = Temp.IntVec.size
+
+Temp.iTVec               = InputData.iTVec
 
 
 ## Path to CoarseAIR Output Folder inside the Run Folder
-PathToOutput             = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/'
+OutputFldr               = InputData.OutputFldr
 ## System Name
-SystName                 = 'O3'
+SystName                 = InputData.SystName
 UploadSystem             = getattr(ChemicalSystems, SystName + '_Upload')
 Syst                     = UploadSystem( Temp ) ### Uploading System Properties
 
 ## Kinetic Method for Each of the Molecules (STS/CGM)
-Syst.Molecule[0].KinMthd = 'STS'
-## Nb of Levels/Bins per Molecule
-Syst.Molecule[0].NBins   = 6115
-Syst.PathToFolder        = PathToOutput + Syst.Name
+for iMol in range(Syst.NMolecules):
+    Syst.Molecule[iMol].KinMthd = InputData.KinMthd[iMol]
+    ## Nb of Levels/Bins per Molecule
+    Syst.Molecule[iMol].NBins   = InputData.NBins[iMol]
+Syst.PathToFolder = OutputFldr + Syst.Name
 ##--------------------------------------------------------------------------------------------------------------
 
 
+
+
 Syst = Read_qnsEnBin(Syst)
+Syst = Read_PartFuncsAndEnergies(Syst, Temp)
 
+Write_PartFuncsAndEnergies(Syst, Temp, InputData)
+Write_Kinetics_FromOverall(Syst, Temp, InputData)
 
-for iBin in range(1):#range(Syst.Molecule[0].NBins):
-
-	for iTra in range(Temp.NTra):
-		TTra = Temp.TraVec[iTra]
-		TInt = TTra
-
-		[Processes, Rates, RatesSD] = Read_RatesCGQCT(Syst, TTra, TInt, iBin)
-		print(Processes)
-		print(Rates)
-
-	#for jProc i
+Compute_ThermalDissRates_FromOverall(Syst, Temp, InputData)

@@ -20,16 +20,12 @@
 ##==============================================================================================================
 import numpy as np
 
-class temperatures(object):
-
-    def __init__(self):
-
-        self.TranFlg = False
-
-        self.NTran   = 0
-        self.TranVec = 0
-
-        self.NInt    = 0
-        self.IntVec  = 0
-
-        self.iTVec   = 0
+Plnck    = 6.62607004e-34
+UKb      = 1.380658e-23
+Ue       = 1.602191e-19
+KeV      = 8.617330e-05
+AvN      = 6.0221409e+23
+AMUToKg  = 1.0 / AvN * 1.e-3
+EhToeV   = 27.2114
+DSWtoKg  = 1.e-3 / 1.8208e+03
+ATMToPa  = 101325.0

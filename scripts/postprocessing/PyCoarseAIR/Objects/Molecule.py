@@ -46,6 +46,7 @@ class molecule(object):
         self.Levelvqn          = 0
         self.Leveljqn          = 0
         self.Levelg            = 0.0
+        self.LevelQ            = 0.0
         self.LevelToBin        = 0
         self.LevelEEh          = 0.0
         self.LevelEeV          = 0.0

@@ -26,18 +26,17 @@ def Read_PartFuncsAndEnergies(Syst, Temp):
 
     for iMol in range(Syst.NMolecules):
 
-        for iTra in range(Temp.NTra):
+        for iTra in range(Temp.NTran):
 
-            PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[iMol].Name + '/' + Syst.Molecule[iMol].Name + '_' + str(Syst.Molecule[iMol].NBins) + '/T' + str(int(Temp.TraVec[iTra])) + '.dat'
+            PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[iMol].Name + '/' + Syst.Molecule[iMol].Name + '_' + str(Syst.Molecule[iMol].NBins) + '/T' + str(int(Temp.TranVec[iTra])) + '.dat'
             print('Reading Data From File: ', PathToFile)
 
             Data = pandas.read_csv(PathToFile, header=None, skiprows=1, delimiter=r"\s+")
             Data = Data.apply(pandas.to_numeric, errors='coerce')
 
-            Syst.Molecule[iMol].T[iTra].QRatio = np.array([Data.values[:,0]])
-            Syst.Molecule[iMol].T[iTra].Q      = np.array([Data.values[:,1]])
-            Syst.Molecule[iMol].EeV            = np.array([Data.values[:,2]])
-
+            Syst.Molecule[iMol].T[iTra].QRatio = np.array(Data.values[:,0])
+            Syst.Molecule[iMol].T[iTra].Q      = np.array(Data.values[:,1])
+            Syst.Molecule[iMol].LevelEeV       = np.array(Data.values[:,2])
 
     return Syst
 
@@ -53,11 +52,11 @@ def Read_qnsEnBin(Syst):
         Data = pandas.read_csv(PathToFile, header=None, skiprows=1, delimiter=r"\s+")
         Data = Data.apply(pandas.to_numeric, errors='coerce')
 
-        Syst.Molecule[iMol].Levelvqn   = np.array([Data.values[:,1]], dtype=np.int16  )
-        Syst.Molecule[iMol].Leveljqn   = np.array([Data.values[:,2]], dtype=np.int16  )
-        Syst.Molecule[iMol].LevelEEh   = np.array([Data.values[:,3]], dtype=np.float64)
-        Syst.Molecule[iMol].Levelg     = np.array([Data.values[:,4]], dtype=np.float64)
-        Syst.Molecule[iMol].LevelToBin = np.array([Data.values[:,5]], dtype=np.int32  )
+        Syst.Molecule[iMol].Levelvqn   = np.array(Data.values[:,1], dtype=np.int16  )
+        Syst.Molecule[iMol].Leveljqn   = np.array(Data.values[:,2], dtype=np.int16  )
+        Syst.Molecule[iMol].LevelEEh   = np.array(Data.values[:,3], dtype=np.float64)
+        Syst.Molecule[iMol].Levelg     = np.array(Data.values[:,4], dtype=np.float64)
+        Syst.Molecule[iMol].LevelToBin = np.array(Data.values[:,5], dtype=np.int32  )
 
     return Syst
 
@@ -68,11 +67,16 @@ def Read_RatesCGQCT(Syst, TTra, TInt, iLevel):
     PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Bin' + str(iLevel+1) + '.dat'
     print(PathToFile)
     
-    Data = pandas.read_csv(PathToFile, header=None, skiprows=5, delimiter=r"\s+")
-    Data = Data.apply(pandas.to_numeric, errors='coerce')
+    Data  = pandas.read_csv(PathToFile, header=None, skiprows=5, delimiter=r"\s+")
+    Data  = Data.replace('D', 'E')
+    Data1 = Data[1].apply(pandas.to_numeric, errors='coerce')
+    Data2 = Data[2].replace('D', 'E')
+    Data2 = Data2.apply(pandas.to_numeric, errors='coerce')
+    Data3 = Data[3].replace('D', 'E')
+    Data3 = Data3.apply(pandas.to_numeric, errors='coerce')
 
-    Processes = np.array([Data.values[:,1]])
-    Rates     = np.array([Data.values[:,2]])
-    RatesSD   = np.array([Data.values[:,3]])
+    Processes = np.array(Data1.values, dtype=np.int64)
+    Rates     = np.array(Data2.values, dtype=np.float64)
+    RatesSD   = np.array(Data3.values, dtype=np.float64)
 
     return Processes, Rates, RatesSD
