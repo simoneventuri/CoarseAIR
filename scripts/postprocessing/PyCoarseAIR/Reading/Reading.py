@@ -269,6 +269,12 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
         print('  [Read_Rates_CGQCT]: Computing Thermal Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
         Syst = Compute_Rates_Thermal(Syst, iT)
 
+        if (InputData.DelRateMatFlg):
+            for iProc in range(4):
+                del Syst.T[iT-1].Proc[iProc].Rates
+            for iProc in range(2, 4):
+                del Syst.T[iT-1].ProcExch[iProc-2].Rates
+
     print('  [Read_Rates_CGQCT]: Saving Thermal Rates')
     Write_Rates_Thermal(Syst, Temp, InputData)
 

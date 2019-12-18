@@ -22,26 +22,30 @@ import numpy as np
 
 class InputData(object):
 
-    TranVec            = np.array([5000, 10000, 12500, 20000])
-    iTVec              = np.arange(4) + 1
+    TranVec            = np.array([2500, 5000, 10000, 12500, 20000])
+    iTVec              = np.arange(5) + 1
 
     OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_CO2_ALL/Test/'
 
     SystNameLong       = 'CO2_NASA'
 
-    PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
+    PostprocessingFldr = '/home/venturi/WORKSPACE/Mars_Database/Results/'
 
-    ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
-    WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
+    ReadKinFolder      = '/home/venturi/WORSKPACE/Mars_Database/Run_0D/database/kinetics/'
+    WriteKinFolder     = '/home/venturi/WORSKPACE/Mars_Database/Run_0D/database/kinetics/'
     WriteInelKin_Flg   = False
     WriteExchKin_Flg   = False
     WriteDissKin_Flg   = True 
 
     PlotShowFlg        = False
 
-    PathToHDF5         = '/home/libo/MarsRates/HDF5_Database/'
+    PathToHDF5         = '/home/venturi/WORSKPACE/Mars_Database/HDF5_Database/'
     ForceReadDatFlg    = False
     SaveHDF5Flg        = True
+
+    DelRateMatFlg      = True
+
+    #sed -i 's/D-/E-/g' *
 
 
     def __init__(self):

@@ -27,7 +27,7 @@ from System import system
 ### CO + O System (From NASA Ames, Dr. D. Schwenke)
 def CO2_NASA_Upload( Temp ):   
 
-    SystName_Long = 'CO2_NASA'
+    SystNameLong = 'CO2_NASA'
     SystName      = 'CO2'          
     
 
@@ -36,7 +36,7 @@ def CO2_NASA_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 4
-    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -130,7 +130,7 @@ def CO2_NASA_Upload( Temp ):
 ### CO + O System (From NASA Ames, Dr. D. Schwenke)
 def O2C_NASA_Upload( Temp ):   
 
-    SystName_Long = 'O2C_NASA'        
+    SystNameLong  = 'O2C_NASA'        
     SystName      = 'CO2'          
     
 
@@ -139,7 +139,7 @@ def O2C_NASA_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 3
-    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -242,7 +242,7 @@ def CHN_UIUC_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 6
     NProcTypes    = 2
-    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -361,7 +361,7 @@ def O3_UMN_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 2
     NProcTypes    = 3
-    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
