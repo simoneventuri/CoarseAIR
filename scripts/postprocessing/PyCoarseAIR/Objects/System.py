@@ -25,11 +25,13 @@ from Molecule import molecule
 from Pair     import pair
 from CFDComp  import cfdcomp
 
+
+
 class processes(object):
 
     def __init__(self):
 
-        self.Rates = 0
+        self.Rates    = 0.0
 
 
 class t_properties(object):
@@ -43,9 +45,10 @@ class t_properties(object):
 
 class system(object):
 
-    def __init__(self, SystNames, NAtoms, NMolecules, NPairs, NCFDComp, NTTran, NProcTypes):
+    def __init__(self, SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, NTTran, NProcTypes):
 
-        self.Name         = SystNames
+        self.NameLong     = SystNameLong
+        self.Name         = SystName
 
         self.NAtoms       = NAtoms
         self.Atom         = [atom() for iA in range(NAtoms)]
@@ -61,7 +64,13 @@ class system(object):
         self.MolToCFDComp = 0
 
         self.PathToFolder = ''
+        self.PathToHDF5   = ''
 
         self.NProcTypes   = NProcTypes
 
         self.T            = [t_properties(NProcTypes) for iT in range(NTTran)]
+
+        self.Proc         = [processes() for iProc in range(NProcTypes)]
+
+        self.RatesTh      = np.zeros((NTTran, NProcTypes))
+        self.RatesQSS     = np.zeros((NTTran, NProcTypes))

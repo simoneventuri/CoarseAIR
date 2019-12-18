@@ -23,6 +23,35 @@ import pandas
 import csv
 import shutil
 
+def Write_Rates_Thermal(Syst, Temp, InputData):
+    
+    PathToFile = InputData.PostprocessingFldr + '/' + InputData.SystNameLong + '_KTh.csv'
+    print('    [Write_Rates_Thermal]: Writing Thermal Rates in File: ' + PathToFile )
+    with open(PathToFile, 'w') as csvTermo:
+        Line       = '# T,KDiss,KInel' 
+        for iExch in range(2, Syst.NProcTypes):
+            Line = Line + ',KExch' + str(iExch-1)
+        Line = Line + '\n'
+        csvTermo.write(Line)
+        TempMat = np.concatenate( (np.expand_dims(np.array(Temp.TranVec, dtype='float'), axis=1), Syst.RatesTh), axis=1 )
+        np.savetxt(csvTermo, TempMat, delimiter=',')
+    csvTermo.close()
+
+    
+                
+def Write_DissRates_Thermal(Syst, Temp, InputData):
+
+    PathToFile = InputData.PostprocessingFldr + '/' + Syst.Molecule[0].Name + '_KTh_Diss.csv'
+    print('    [Write_DissRates_Thermal]: Writing Dissociation Thermal Rates in File: ' + PathToFile )
+    with open(PathToFile, 'w') as csvTermo:
+        Line    = '# T,KDiss\n' 
+        csvTermo.write(Line)
+        TempMat = np.concatenate( (np.expand_dims(np.array(Temp.TranVec, dtype='float'), axis=1), Syst.RatesTh[:,0]), axis=1 )
+        np.savetxt(csvTermo, TempMat, delimiter=',')
+    csvTermo.close()
+
+
+
 def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
 
     for iMol in range(Syst.NMolecules):
@@ -37,7 +66,8 @@ def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
             with open(PathToFile, 'a') as f:
                 Line = 'NB_ENERGY_LEVELS = ' + str(Syst.Molecule[iMol].NBins) + '\n'
                 f.write(Line)
-                np.savetxt(f, np.transpose(np.array([Syst.Molecule[iMol].T[iT-1].Q, Syst.Molecule[iMol].LevelEeV])), fmt='%.8e    %.8e')
+                np.savetxt(f, np.transpose(np.array([Syst.Molecule[iMol].T[iT-1].Q, Syst.Molecule[iMol].T[iT-1].LevelEeV])), fmt='%.8e    %.8e')
+            f.close()
 
 
 
@@ -61,7 +91,8 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
                         ProcName = Syst.Molecule[0].Name + '(' + str(row[0]) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(row[1]) + ')+' + Syst.Atom[2].Name
                         Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(row[iT+1])
                         csvkinetics.write(Line)
-            
+                
+                csvfile.close()
                 csvkinetics.close()
 
 
@@ -83,6 +114,7 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
                             Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % float(row[iT+1])
                             csvkinetics.write(Line)
                 
+                    csvfile.close()
                     csvkinetics.close()
 
 
@@ -102,5 +134,6 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
                         ProcName = Syst.Molecule[0].Name + '(' + str(row[0]) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
                         Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(row[iT])
                         csvkinetics.write(Line)
-            
+                
+                csvfile.close()
                 csvkinetics.close()

@@ -25,8 +25,9 @@ from System import system
 
 ################################################################################################################
 ### CO + O System (From NASA Ames, Dr. D. Schwenke)
-def CO2_Upload( Temp ):   
+def CO2_NASA_Upload( Temp ):   
 
+    SystName_Long = 'CO2_NASA'
     SystName      = 'CO2'          
     
 
@@ -35,7 +36,7 @@ def CO2_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 4
-    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -69,6 +70,11 @@ def CO2_Upload( Temp ):
     Syst.Molecule[0].Mu               = 28.0104e-3 
     Syst.Molecule[1].Mu               = 31.9988e-3
 
+    Syst.Molecule[0].KinMthd          = 'StS'
+    Syst.Molecule[1].KinMthd          = 'StS'
+
+    Syst.Molecule[0].NBins            = 13521
+    Syst.Molecule[1].NBins            = 6078
 
 
     Syst.Pair[0].Name  = 'CO'
@@ -122,8 +128,9 @@ def CO2_Upload( Temp ):
 
 ################################################################################################################
 ### CO + O System (From NASA Ames, Dr. D. Schwenke)
-def O2C_Upload( Temp ):   
+def O2C_NASA_Upload( Temp ):   
 
+    SystName_Long = 'O2C_NASA'        
     SystName      = 'CO2'          
     
 
@@ -132,7 +139,7 @@ def O2C_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 3
-    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -166,6 +173,11 @@ def O2C_Upload( Temp ):
     Syst.Molecule[0].Mu               = 31.9988e-3
     Syst.Molecule[1].Mu               = 28.0104e-3 
 
+    Syst.Molecule[0].KinMthd          = 'StS'
+    Syst.Molecule[1].KinMthd          = 'StS'
+
+    Syst.Molecule[0].NBins            =  6078
+    Syst.Molecule[1].NBins            = 13521
 
 
     Syst.Pair[0].Name  = 'O2'
@@ -219,8 +231,9 @@ def O2C_Upload( Temp ):
 
 ################################################################################################################
 ### CH + N System (From UIUC)
-def CHN_Upload( Temp ):   
+def CHN_UIUC_Upload( Temp ):   
 
+    SystNameLong  = 'CHN_UIUC' 
     SystName      = 'CHN'          
     
 
@@ -229,7 +242,7 @@ def CHN_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 6
     NProcTypes    = 2
-    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -267,6 +280,13 @@ def CHN_Upload( Temp ):
     Syst.Molecule[1].Mu               = 13.01854e-3
     Syst.Molecule[2].Mu               = 26.0174e-3
 
+    Syst.Molecule[0].KinMthd          = 'StS'
+    Syst.Molecule[1].KinMthd          = 'StS'
+    Syst.Molecule[1].KinMthd          = 'StS'
+
+    Syst.Molecule[0].NBins            = 0
+    Syst.Molecule[1].NBins            = 0
+    Syst.Molecule[2].NBins            = 0
 
     Syst.Pair[0].Name  = 'CH'
     Syst.Pair[1].Name  = 'CN'
@@ -330,8 +350,9 @@ def CHN_Upload( Temp ):
 
 ################################################################################################################
 ### O2 + O System (From UMN, Prof. D. Truhlar)
-def O3_Upload( Temp ):   
+def O3_UMN_Upload( Temp ):   
 
+    SystNameLong  = 'O3_UMN' 
     SystName      = 'O3'          
     
 
@@ -340,7 +361,7 @@ def O3_Upload( Temp ):
     NPairs        = 3
     NCFDComp      = 2
     NProcTypes    = 3
-    Syst          = system(SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystName_Long, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
 
@@ -366,7 +387,8 @@ def O3_Upload( Temp ):
     Syst.Molecule[0].DissEn           = 0.0
     Syst.Molecule[0].DegeneracyFactor = 6
     Syst.Molecule[0].Mu               = 31.9988e-3
-
+    Syst.Molecule[0].KinMthd          = 'StS'
+    Syst.Molecule[0].NBins            = 6115
 
 
     Syst.Pair[0].Name  = 'O2'

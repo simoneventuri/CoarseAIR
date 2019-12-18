@@ -24,75 +24,46 @@ import numpy as np
 
 ## Paths from where to Import Python Modules
 #WORKSPACE = os.environ['WORKSPACE_PATH']
-#SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
-SrcDir    = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+#SrcDir    = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Objects/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Reading/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Writing/')
 sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Computing/')
-print(sys.argv)
+sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Initializing/')
 
 if (len(sys.argv) > 1):
     InputFile = sys.argv[1]
-    print("Calling PyCoarseAIR with Input File = ", InputFile)
+    print("\n[PyCoarseAIR]: Calling PyCoarseAIR with Input File = ", InputFile)
     sys.path.insert(0, InputFile)
 else:
-    print("Calling PyCoarseAIR without Input File")
+    print("\n[PyCoarseAIR]: Calling PyCoarseAIR without Input File")
     sys.path.insert(0, SrcDir + '/scripts/postprocessing/PyCoarseAIR/InputData/')
 
-import ChemicalSystems
-from System            import system
-from Temperatures      import temperatures
-
-from Reading           import Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
+from Reading           import Read_Levels, Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
 from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall
-from Computing         import Compute_ThermalDissRates_FromOverall
+from Computing         import Compute_Rates_Thermal_FromOverall
+from Initializing      import Initialize_Data
 from CoarseAIR         import InputData
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
-################################################################################################################
-Temp                     = temperatures()
-## Vector of Temperatures
-Temp.TranVec             = InputData.TranVec
-Temp.NTran               = Temp.TranVec.size
-Temp.IntVec              = Temp.TranVec
-Temp.NInt                = Temp.IntVec.size
+print("\n[PyCoarseAIR]: Initializing Data")
 
-Temp.iTVec               = InputData.iTVec
+[Syst, Temp] = Initialize_Data(InputData)
 
 
-## Path to CoarseAIR Output Folder inside the Run Folder
-OutputFldr               = InputData.OutputFldr
-## System Name
-SystName                 = InputData.SystName
-UploadSystem             = getattr(ChemicalSystems, SystName + '_Upload')
-Syst                     = UploadSystem( Temp ) ### Uploading System Properties
+print("\n[PyCoarseAIR]: Uploading Data")
 
-## Kinetic Method for Each of the Molecules (STS/CGM)
-for iMol in range(Syst.NMolecules):
-    Syst.Molecule[iMol].KinMthd = InputData.KinMthd[iMol]
-    ## Nb of Levels/Bins per Molecule
-    Syst.Molecule[iMol].NBins   = InputData.NBins[iMol]
-NProcTot = 1
-for iP in range(3):
-	Syst.Pair[iP].NBins    = Syst.Molecule[Syst.Pair[iP].ToMol].NBins
-	NProcTot               = NProcTot + Syst.Pair[iP].NBins
-	Syst.Pair[iP].NProcTot = NProcTot
-Syst.PathToFolder = OutputFldr + Syst.Name
-##--------------------------------------------------------------------------------------------------------------
+Syst = Read_Levels(Syst, InputData)
+Syst = Read_qnsEnBin(Syst, InputData)
+Syst = Read_PartFuncsAndEnergies(Syst, Temp, InputData)
+Syst = Read_Rates_CGQCT(Syst, Temp, InputData)
 
-
-
-
-Syst = Read_qnsEnBin(Syst)
-Syst = Read_PartFuncsAndEnergies(Syst, Temp)
-
-Syst = Read_Rates_CGQCT(Syst, Temp)
 
 #Write_PartFuncsAndEnergies(Syst, Temp, InputData)
 #Write_Kinetics_FromOverall(Syst, Temp, InputData)
 
-#Compute_ThermalDissRates_FromOverall(Syst, Temp, InputData)
+#Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)

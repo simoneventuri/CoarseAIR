@@ -26,58 +26,51 @@ import sys
 from matplotlib import rc 
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, '../Parameters/')
+sys.path.insert(0, '../Plotting/')
 
-from Parameters import UKb, Ue
+from Plotting      import Plot_DissRates_Thermal
 
-def Compute_ThermalDissRates_FromOverall(Syst, Temp, InputData):
 
-    Syst.KDissTh = np.zeros(Temp.NTran)
+def Compute_Rates_Overall(Syst, iT):
+
+    Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
+    Syst.T[iT-1].ProcTot[1].Rates = np.sum(Syst.T[iT-1].Proc[1].Rates, axis=1)
+    for jProc in range(2, Syst.NProcTypes):
+        Syst.T[iT-1].ProcTot[jProc].Rates = np.sum(Syst.T[iT-1].ProcExch[jProc-2].Rates, axis=1)
+
+    return Syst
+
+
+
+def Compute_Rates_Thermal(Syst, iT):
+
+    for jProc in range(Syst.NProcTypes):
+        Syst.RatesTh[iT-1,jProc] = sum( Syst.Molecule[0].T[iT-1].LevelQExp * Syst.T[iT-1].ProcTot[jProc].Rates )
+
+    return Syst
+
+
+
+def Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData):
+
+    DissFile = InputData.ReadKinFolder   + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '.csv'
+    print('  [Compute_Rates_Thermal_FromOverall]: Reading Dissociation Rates From File: ' + DissFile)
     for iT in Temp.iTVec:
-
         LevelKDiss = np.zeros(Syst.Molecule[0].NBins)
-
-        DissFile = InputData.ReadKinFolder   + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '.csv'
         with open(DissFile) as csvfile:
             readCSV = csv.reader(csvfile, delimiter=',')
             next(readCSV)
             for row in readCSV:
                 if (float(row[iT]) > 0.0):
                     LevelKDiss[int(row[0])-1] = float(row[iT])
+        csvfile.close()
 
-
-
-        Syst.Molecule[0].LevelQ = Syst.Molecule[0].Levelg * np.exp( - Syst.Molecule[0].LevelEeV * Ue / (Temp.TranVec[iT-1] * UKb) )
-        Syst.Molecule[0].LevelQ = Syst.Molecule[0].LevelQ / np.sum(Syst.Molecule[0].LevelQ)
-
-        Syst.KDissTh[iT-1] = sum( Syst.Molecule[0].LevelQ * LevelKDiss )
+        Syst.RatesTh[iT-1,0] = sum( Syst.Molecule[0].T[iT-1].LevelQExp * LevelKDiss )
     
-    print('Thermal Dissociation Rates = ', Syst.KDissTh)
+    print('  [Compute_Rates_Thermal_FromOverall]: Thermal Dissociation Rates = ', Syst.T[iT-1].ProcTot[0].Rates)
+    Write_DissRates_Thermal(Syst, Temp, InputData)
 
-    PathToFile = InputData.PostprocessingFldr + '/' + Syst.Molecule[0].Name + '_KDiss_Thermal.csv'
-    with open(PathToFile, 'w') as f:
-        TStr = str(Temp.TranVec[Temp.iTVec[0]-1])
-        KStr = str(Syst.KDissTh[Temp.iTVec[0]-1])
-        for iT in Temp.iTVec[1:-1]:
-            TStr = TStr + ',' + str(Temp.TranVec[Temp.iTVec[iT]-1])
-            KStr = KStr + ',' + str(Syst.KDissTh[Temp.iTVec[iT]-1])
-        TStr = TStr + '\n'
-        KStr = KStr + '\n'
-        Line = '# Dissociation Thermal Rates (Line 2) @ Multiple Translational Temperatures (Line 1)\n'
-        f.write(Line)
-        f.write(TStr)
-        f.write(KStr)
+    print('  [Compute_Rates_Thermal_FromOverall]: Plotting Dissociation Thermal Rates')
+    Plot_DissRates_Thermal(Syst, Temp, InputData)
 
-    plt.figure()
-    plt.title(r'$K_{i}^{D}$', fontsize=20)
-    LabelStr = '$K_{i}^{D}$ for ' + Syst.Molecule[0].Name + ', Interpolated'
-    plt.plot(10000/Temp.TranVec, Syst.KDissTh, '-k', label=LabelStr)
-    LabelStr = '$K_{i}^{D}$ for ' + Syst.Molecule[0].Name
-    plt.plot(10000/Temp.TranVec, Syst.KDissTh, 'ok', label=LabelStr)
-    plt.yscale("log")
-    plt.xlabel(r'10,000/T [1/K]', fontsize=20)
-    plt.ylabel(r'$K_{i}^{D} [cm^3/s]$', fontsize=20)
-    if (InputData.PlotShowFlg):
-        plt.show()
-    FigSavePath = InputData.PostprocessingFldr + '/' + Syst.Molecule[0].Name + '_KDiss_Thermal.png'
-    plt.savefig(FigSavePath)
+    return Syst

@@ -24,8 +24,10 @@ class t_properties(object):
 
     def __init__(self):
 
-        self.QRatio = 0
-        self.Q      = 0
+        self.LevelEeV = 0.0
+        self.QRatio   = 0.0
+        self.Q        = 0.0
+        self.QExp     = 0.0
       
 
 class molecule(object):
@@ -45,11 +47,20 @@ class molecule(object):
 
         self.Levelvqn          = 0
         self.Leveljqn          = 0
+        self.LevelEEh          = 0.0
+        self.LevelEeV          = 0.0
+        self.LevelEGam         = 0.0
+        self.LevelrMin         = 0.0
+        self.LevelrMax         = 0.0
+        self.LevelVMin         = 0.0
+        self.LevelVMax         = 0.0
+        self.LevelTau          = 0.0
+        self.LevelrIn          = 0.0
+        self.LevelrOut         = 0.0
+
         self.Levelg            = 0.0
         self.LevelQ            = 0.0
         self.LevelToBin        = 0
-        self.LevelEEh          = 0.0
-        self.LevelEeV          = 0.0
 
         self.NTTran            = NTTran
         self.T                 = [t_properties() for iTTran in range(NTTran)]

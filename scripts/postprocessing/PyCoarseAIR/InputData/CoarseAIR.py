@@ -22,46 +22,26 @@ import numpy as np
 
 class InputData(object):
 
-    # TranVec            = np.array([1500, 3000, 6000, 8000, 10000, 12000, 14000])
-    # iTVec              = np.arange(7) + 1
+    TranVec            = np.array([5000, 10000, 12500, 20000])
+    iTVec              = np.arange(4) + 1
 
-    # OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/'
+    OutputFldr         = '/home/venturi/WORKSPACE/CG-QCT/run_CO2_ALL/Test/'
 
-    # SystName           = 'O3'
+    SystNameLong       = 'CO2_NASA'
 
-    # KinMthd            = ['StS']
-    # NBins              = np.array([6115])
-
-    # PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
-
-    # ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
-    # WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
-    # WriteInelKin_Flg   = False
-    # WriteExchKin_Flg   = False
-    # WriteDissKin_Flg   = True 
-
-    # PlotShowFlg        = False
-
-
-    TranVec            = np.array([10000])
-    iTVec              = np.arange(1) + 1
-
-    OutputFldr         = '/Users/sventuri/WORKSPACE/CG-QCT/run_O2C/Test/'
-
-    SystName           = 'O2C'
-
-    KinMthd            = ['StS', 'StS']
-    NBins              = np.array([6078, 13521])
-
-    PostprocessingFldr = '/Users/sventuri/WORKSPACE/MarsAIR/Results/'
+    PostprocessingFldr = '/home/venturi/WORKSPACE/MarsAIR/Results/'
 
     ReadKinFolder      = '/home/libo/MarsRates/O3_UMN/kinetics/'
-    WriteKinFolder     = '/Users/sventuri/WORKSPACE/CG-QCT/run_O2C/Test/RunKonig/database/'
+    WriteKinFolder     = '/home/venturi/WORKSPACE/CG-QCT/run_O3_ALL/Test/RunKonig/database/'
     WriteInelKin_Flg   = False
     WriteExchKin_Flg   = False
     WriteDissKin_Flg   = True 
 
     PlotShowFlg        = False
+
+    PathToHDF5         = '/home/libo/MarsRates/HDF5_Database/'
+    ForceReadDatFlg    = False
+    SaveHDF5Flg        = True
 
 
     def __init__(self):
@@ -71,7 +51,7 @@ class InputData(object):
  
         self.OutputFldr         = OutputFldr
 
-        self.SystName           = SystName
+        self.SystNameLong       = SystNameLong
 
         self.KinMthd            = KinMthd
         self.NBins              = NBins
@@ -85,3 +65,6 @@ class InputData(object):
         self.WriteDissKin_Flg   = WriteDissKin_Flg    
 
         self.PlotShowFlg        = PlotShowFlg
+
+        self.ForceReadDatFlg    = ForceReadDatFlg
+        self.SaveHDF5Flg        = SaveHDF5Flg
