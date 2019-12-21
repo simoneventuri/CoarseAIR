@@ -56,10 +56,10 @@ def Plot_Rates_Thermal(Syst, Temp, InputData):
     plt.legend(fontsize=20)
     plt.yscale("log")
     plt.xlabel(r'10,000/T [1/K]', fontsize=20)
-    plt.ylabel(r'$K_{i}^{D} [cm^3/s]$', fontsize=20)
-    if (InputData.PlotShowFlg):
+    plt.ylabel(r'$K_{Proc}^{Th} [cm^3/s]$', fontsize=20)
+    if (InputData.PlotShow_Flg):
         plt.show()
-    FigSavePath = InputData.PostprocessingFldr + '/' + InputData.SystNameLong + '_KTh.png'
+    FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh.png'
     plt.savefig(FigSavePath)
     print('    [Plot_Rates_Thermal]: Saved Thermal Rates Plot in: ' + FigSavePath)
 
@@ -78,8 +78,8 @@ def Plot_DissRates_Thermal(Syst, Temp, InputData):
     
     plt.xlabel(r'10,000/T [1/K]', fontsize=20)
     plt.ylabel(r'$K_{i}^{D} [cm^3/s]$', fontsize=20)
-    if (InputData.PlotShowFlg):
+    if (InputData.PlotShow_Flg):
         plt.show()
-    FigSavePath = InputData.PostprocessingFldr + '/' + InputData.SystNameLong + '_KTh_Diss.png'
+    FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh_Diss.png'
     plt.savefig(FigSavePath)
     print('    [Plot_DissRates_Thermal]: Saved Dissociation Thermal Rates Plot in: ' + FigSavePath)

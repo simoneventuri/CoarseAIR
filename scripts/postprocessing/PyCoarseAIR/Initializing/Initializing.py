@@ -22,6 +22,7 @@ import numpy as np
 import pandas
 import csv
 import sys
+import os
 
 from System            import system
 from Temperatures      import temperatures
@@ -41,7 +42,7 @@ def Initialize_Data(InputData):
 
 
     ## Path to CoarseAIR Output Folder inside the Run Folder
-    OutputFldr               = InputData.OutputFldr
+    OutputFldr               = InputData.FinalFldr
     ## System Name
     SystNameLong             = InputData.SystNameLong
     UploadSystem             = getattr(ChemicalSystems, SystNameLong + '_Upload')
@@ -56,12 +57,18 @@ def Initialize_Data(InputData):
             ## Nb of Levels/Bins per Molecule
             Syst.Molecule[iMol].NBins   = InputData.NBins[iMol]
             
+
     NProcTot = 1
     for iP in range(3):
         Syst.Pair[iP].NBins    = Syst.Molecule[Syst.Pair[iP].ToMol].NBins
         NProcTot               = NProcTot + Syst.Pair[iP].NBins
         Syst.Pair[iP].NProcTot = NProcTot
     Syst.PathToFolder = OutputFldr + Syst.Name
-    Syst.PathToHDF5   = InputData.PathToHDF5
+    Syst.PathToHDF5   = InputData.HDF5.ReadFldr
+
+
+    ## Creating Output Folder
+    if not os.path.exists(InputData.FinalFldr):
+        os.makedirs(InputData.FinalFldr)
 
     return Syst, Temp

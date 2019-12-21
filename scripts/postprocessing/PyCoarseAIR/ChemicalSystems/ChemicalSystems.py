@@ -39,7 +39,6 @@ def CO2_NASA_Upload( Temp ):
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
-
     Syst.Atom[0].Name  = 'C'
     Syst.Atom[1].Name  = 'O'
     Syst.Atom[2].Name  = 'O'
@@ -88,7 +87,6 @@ def CO2_NASA_Upload( Temp ):
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
-
 
 
     Syst.CFDComp[0].Name   = 'C'
@@ -142,7 +140,6 @@ def O2C_NASA_Upload( Temp ):
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
-
     Syst.Atom[0].Name  = 'O'
     Syst.Atom[1].Name  = 'O'
     Syst.Atom[2].Name  = 'C'
@@ -158,7 +155,6 @@ def O2C_NASA_Upload( Temp ):
     Syst.Atom[0].Mass  = 29148.94559
     Syst.Atom[1].Mass  = 29148.94559
     Syst.Atom[2].Mass  = 21868.661757
-
 
 
     Syst.Molecule[0].Name             = 'O2'
@@ -191,7 +187,6 @@ def O2C_NASA_Upload( Temp ):
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
-
 
 
     Syst.CFDComp[0].Name   = 'C'
@@ -241,9 +236,8 @@ def CHN_UIUC_Upload( Temp ):
     NMolecules    = 3
     NPairs        = 3
     NCFDComp      = 6
-    NProcTypes    = 2
+    NProcTypes    = 4
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
-
 
 
     Syst.Atom[0].Name  = 'C'
@@ -261,7 +255,6 @@ def CHN_UIUC_Upload( Temp ):
     Syst.Atom[0].Mass  = 21868.661757
     Syst.Atom[1].Mass  = 1835.0397616
     Syst.Atom[2].Mass  = 25519.042285
-
 
 
     Syst.Molecule[0].Name             = 'CH'
@@ -299,7 +292,6 @@ def CHN_UIUC_Upload( Temp ):
     Syst.Pair[0].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[1].Color = np.array([17, 17, 17]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256])  / 256
-
 
 
     Syst.CFDComp[0].Name   = 'C'
@@ -340,9 +332,6 @@ def CHN_UIUC_Upload( Temp ):
 
     Syst.MolToCFDComp       = 3
 
-
-    Syst.NProcTypes         = 2
-
     return Syst
 ################################################################################################################
 
@@ -364,7 +353,6 @@ def O3_UMN_Upload( Temp ):
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
-
     Syst.Atom[0].Name  = 'O'
     Syst.Atom[1].Name  = 'O'
     Syst.Atom[2].Name  = 'O'
@@ -380,7 +368,6 @@ def O3_UMN_Upload( Temp ):
     Syst.Atom[0].Mass  = 29148.94559
     Syst.Atom[1].Mass  = 29148.94559
     Syst.Atom[2].Mass  = 29148.94559
-
 
 
     Syst.Molecule[0].Name             = 'O2'
@@ -402,7 +389,6 @@ def O3_UMN_Upload( Temp ):
     Syst.Pair[0].Color = np.array([0, 0, 256]) / 256
     Syst.Pair[1].Color = np.array([0, 0, 256]) / 256
     Syst.Pair[2].Color = np.array([0, 0, 256]) / 256
-
 
 
     Syst.CFDComp[0].Name   = 'O'

@@ -35,7 +35,7 @@ from Saving        import Save_Levels_HDF5, Save_qnsEnBin_HDF5, Save_PartFuncsAn
 from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5
 from Computing     import Compute_Rates_Overall, Compute_Rates_Thermal
 from Parameters    import Hartree_To_eV, UKb, Ue
-from Writing       import Write_Rates_Thermal
+from Writing       import Write_Rates_Thermal, Write_Kinetics
 from Plotting      import Plot_Rates_Thermal
 
 def Read_Levels(Syst, InputData):
@@ -50,7 +50,7 @@ def Read_Levels(Syst, InputData):
         f.close()
         if (PresentFlg): print('  [Read_Levels]: Found Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') in the HDF5 File')
 
-        if ( (PresentFlg) and (not InputData.ForceReadDatFlg) ):
+        if ( (PresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
             print('  [Read_Levels]: Loading Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') from HDF5 File')
             Load_Levels_HDF5(Syst, iMol)
 
@@ -74,7 +74,7 @@ def Read_Levels(Syst, InputData):
             Syst.Molecule[iMol].LevelrIn   = np.array(Data.values[:,9],  dtype=np.float64)
             Syst.Molecule[iMol].LevelrOut  = np.array(Data.values[:,10], dtype=np.float64)
 
-            if (InputData.SaveHDF5Flg):
+            if (InputData.HDF5.Save_Flg):
                 print('  [Read_Levels]: Saving Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') in the HDF5 File')
                 Save_Levels_HDF5(Syst, iMol)
 
@@ -94,7 +94,7 @@ def Read_qnsEnBin(Syst, InputData):
         f.close()
         if (PresentFlg): print('  [Read_qnsEnBin]: Found Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') in the HDF5 File')
 
-        if ( (PresentFlg) and (not InputData.ForceReadDatFlg) ):
+        if ( (PresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
             print('  [Read_qnsEnBin]: Loading Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') from HDF5 File')
             Load_qnsEnBin_HDF5(Syst, iMol)
 
@@ -111,7 +111,7 @@ def Read_qnsEnBin(Syst, InputData):
             Syst.Molecule[iMol].Levelg     = np.array(Data.values[:,4], dtype=np.float64)
             Syst.Molecule[iMol].LevelToBin = np.array(Data.values[:,5], dtype=np.int32  )
 
-            if (InputData.SaveHDF5Flg):
+            if (InputData.HDF5.Save_Flg):
                 print('  [Read_qnsEnBin]: Saving Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') in the HDF5 File')
                 Save_qnsEnBin_HDF5(Syst, iMol)
 
@@ -136,7 +136,7 @@ def Read_PartFuncsAndEnergies(Syst, Temp, InputData):
             f.close()
             if (TPresentFlg): print('  [Read_PartFuncsAndEnergies]: Found Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
 
-            if ( (TPresentFlg) and (not InputData.ForceReadDatFlg) ):
+            if ( (TPresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
                 print('  [Read_PartFuncsAndEnergies]: Loading Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) from HDF5 File')
                 Load_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt)
 
@@ -152,7 +152,7 @@ def Read_PartFuncsAndEnergies(Syst, Temp, InputData):
                 Syst.Molecule[iMol].T[iT-1].LevelEeV = np.array(Data.values[:,2])
 
 
-                if (InputData.SaveHDF5Flg):
+                if (InputData.HDF5.Save_Flg):
                     print('  [Read_Rates_CGQCT]: Saving Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
                     Save_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt)
 
@@ -164,6 +164,7 @@ def Read_PartFuncsAndEnergies(Syst, Temp, InputData):
 
 
 def Read_RatesFile_CGQCT(Syst, TTra, TInt, iLevel):
+    #sed -i 's/D-/E-/g' *
 
     PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Bin' + str(iLevel+1) + '.dat'
     #print(PathToFile)
@@ -205,7 +206,7 @@ def Read_RatesAtT_CGQCT(Syst, TTra, TInt, iT):
     Syst.T[iT-1].Proc[0].Rates = np.zeros((Syst.Molecule[0].NBins, 3))
     Syst.T[iT-1].Proc[1].Rates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[0].NBins))
     for iProc in range(2, 4):
-        Syst.T[iT-1].Proc[iProc].Rates     = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[Syst.Pair[iProc-1].ToMol].NBins))
+        Syst.T[iT-1].Proc[iProc].Rates       = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[Syst.Pair[iProc-1].ToMol].NBins))
     for iProc in range(2, Syst.NProcTypes):
         Syst.T[iT-1].ProcExch[iProc-2].Rates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[Syst.ExchtoMol[iProc-2]].NBins))
 
@@ -249,7 +250,7 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
         f.close()
         if (TPresentFlg): print('  [Read_Rates_CGQCT]: Found Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
 
-        if ( (TPresentFlg) and (not InputData.ForceReadDatFlg) ):
+        if ( (TPresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
             print('  [Read_Rates_CGQCT]: Loading Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) from HDF5 File')
         
             Load_RatesAtT_HDF5(Syst, TTra, TInt, iT)
@@ -259,26 +260,30 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
 
             Syst = Read_RatesAtT_CGQCT(Syst, TTra, TInt, iT)
 
-            if (InputData.SaveHDF5Flg):
-                print('  [Read_Rates_CGQCT]: Saving Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
+            if (InputData.HDF5.Save_Flg):
+                print('  [Read_Rates_CGQCT]: Saving Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File\n')
                 Save_RatesAtT_HDF5(Syst, iT, TTra, TInt)
 
-        print('  [Read_Rates_CGQCT]: Computing Overall Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
+        print('  [Read_Rates_CGQCT]: Computing Overall Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
         Syst = Compute_Rates_Overall(Syst, iT)
 
-        print('  [Read_Rates_CGQCT]: Computing Thermal Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
+        print('  [Read_Rates_CGQCT]: Computing Thermal Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
         Syst = Compute_Rates_Thermal(Syst, iT)
 
-        if (InputData.DelRateMatFlg):
+        if (InputData.Kin.Write_Flg):
+            print('  [Read_Rates_CGQCT]: Writing Kinetics File for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
+            Write_Kinetics(Syst, Temp, InputData, iT)
+
+        if (InputData.DelRateMat_Flg):
             for iProc in range(4):
                 del Syst.T[iT-1].Proc[iProc].Rates
-            for iProc in range(2, 4):
+            for iProc in range(2, Syst.NProcTypes):
                 del Syst.T[iT-1].ProcExch[iProc-2].Rates
 
-    print('  [Read_Rates_CGQCT]: Saving Thermal Rates')
+    print('  [Read_Rates_CGQCT]: Saving Thermal Rates\n')
     Write_Rates_Thermal(Syst, Temp, InputData)
 
-    print('  [Read_Rates_CGQCT]: Plotting Thermal Rates')
+    print('  [Read_Rates_CGQCT]: Plotting Thermal Rates\n')
     Plot_Rates_Thermal(Syst, Temp, InputData)
 
     return Syst

@@ -23,47 +23,78 @@ import sys
 import numpy as np
 
 ## Paths from where to Import Python Modules
-SrcDir = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair' #os.environ['COARSEAIR_SOURCE_DIR'] 
-sys.path.insert(1, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Objects/')
-sys.path.insert(2, SrcDir + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems')
-sys.path.insert(2, SrcDir + '/scripts/postprocessing/PyCoarseAIR/Reading')
-import ChemicalSystems
-from System            import system
-from Temperatures      import temperatures
-from Reading           import ReadPartFuncsAndEnergies
+WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
+CoarseAIRFldr  = os.environ['COARSEAIR_SOURCE_DIR'] 
+#SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' 
+#SrcDir    = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Objects/')
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Reading/')
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Writing/')
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Computing/')
+sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Initializing/')
+
+if (len(sys.argv) > 1):
+    InputFile = sys.argv[1]
+    print("\n[PyCoarseAIR]: Calling PyCoarseAIR with Input File = ", InputFile)
+    sys.path.insert(0, InputFile)
+else:
+    print("[PyCoarseAIR]: Calling PyCoarseAIR without Input File")
+    sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/InputData/')
+
+from Reading           import Read_Levels, Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
+from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall
+from Computing         import Compute_Rates_Thermal_FromOverall
+from Initializing      import Initialize_Data
+from InputData         import inputdata
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
-################################################################################################################
+##==============================================================================================================
+InputData                       = inputdata()
+InputData.SystNameLong          = 'O3_UMN'
 
-Temp                     = temperatures()
-## Vector of Temperatures
-Temp.NTra                = 1
-Temp.TraVec              = np.array([7000])
-Temp.NInt                = 1
-Temp.IntVec              = np.array([7-00])
+InputData.TranVec               = np.array([10000])
+InputData.iTVec                 = np.arange(1) + 1
 
+InputData.QCTOutFldr            = CoarseAIRFldr + '/CG-QCT/run_O3_ALL/Test/'
+InputData.FinalFldr             = CoarseAIRFldr + '/Mars_Database/Results/'
 
-## Path to CoarseAIR Output Folder inside the Run Folder
-PathToOutput             = '/Users/sventuri/WORKSPACE/CoarseAIR/run_CHN/Test/'
-## System Name
-SystName                 = 'CHN'
-UploadSystem             = getattr(ChemicalSystems, SystName + '_Upload')
-Syst                     = UploadSystem( Temp ) ### Uploading System Properties
+InputData.Kin.Read_Flg          = True
+InputData.Kin.Write_Flg         = True
+InputData.Kin.ReadFldr          = CoarseAIRFldr + '/Mars_Database/Run_0D/database/'
+InputData.Kin.WriteFldr         = CoarseAIRFldr + '/Mars_Database/Run_0D/database/'
+InputData.Kin.WriteDiss_Flg     = False     
+InputData.Kin.WriteInel_Flg     = False
+InputData.Kin.WriteExch_Flg     = True
 
-## Nb of Levels/Bins per Molecule
-Syst.Molecule[0].NBins   = 217
-Syst.Molecule[1].NBins   = 7010
-Syst.Molecule[2].NBins   = 480
-## Kinetic Method for Each of the Molecules (STS/CGM)
-Syst.Molecule[0].KinMthd = 'STS'
-Syst.Molecule[1].KinMthd = 'STS'
-Syst.Molecule[2].KinMthd = 'STS'
-Syst.PathToFolder        = PathToOutput + Syst.Name
+InputData.HDF5.ReadFldr         = CoarseAIRFldr + '/Mars_Database/HDF5_Database/'
+InputData.HDF5.ForceReadDat_Flg = False
+InputData.HDF5.Save_Flg         = True
+
+InputData.PlotShow_Flg          = False
+
+InputData.DelRateMat_Flg        = True
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
-Syst = ReadPartFuncsAndEnergies(Syst, Temp)
+print("\n[PyCoarseAIR]: Initializing Data")
 
+[Syst, Temp] = Initialize_Data(InputData)
+
+
+print("\n[PyCoarseAIR]: Uploading Data")
+
+Syst = Read_Levels(Syst, InputData)
+Syst = Read_qnsEnBin(Syst, InputData)
+Syst = Read_PartFuncsAndEnergies(Syst, Temp, InputData)
+Syst = Read_Rates_CGQCT(Syst, Temp, InputData)
+
+
+if (InputData.Kin.Write_Flg):
+	Write_PartFuncsAndEnergies(Syst, Temp, InputData)
+	#Write_Kinetics_FromOverall(Syst, Temp, InputData)
+
+#Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)

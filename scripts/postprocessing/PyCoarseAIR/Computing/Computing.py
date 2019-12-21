@@ -53,7 +53,7 @@ def Compute_Rates_Thermal(Syst, iT):
 
 def Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData):
 
-    DissFile = InputData.ReadKinFolder   + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '.csv'
+    DissFile = InputData.Kin.ReadFldr   + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '.csv'
     print('  [Compute_Rates_Thermal_FromOverall]: Reading Dissociation Rates From File: ' + DissFile)
     for iT in Temp.iTVec:
         LevelKDiss = np.zeros(Syst.Molecule[0].NBins)
