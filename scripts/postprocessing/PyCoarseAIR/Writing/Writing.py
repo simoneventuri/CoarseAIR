@@ -25,8 +25,8 @@ import shutil
 import os, errno
 
 
-def mkdirs(newdir, mode=0777):
-    try: os.makedirs(newdir, mode)
+def mkdirs(newdir, mode=0o777):
+    try: os.makedirs(newdir, mode, exist_ok=True)
     except OSError, err:
         # Reraise the error unless it's about an already existing directory 
         if err.errno != errno.EEXIST or not os.path.isdir(newdir): 
@@ -145,7 +145,7 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
 def Write_Kinetics_FromOverall(Syst, Temp, InputData):
 
     mkdirs( InputData.Kin.WriteFldr + '/kinetics/' )    
-    
+
     for iT in Temp.iTVec:
         print('\nTemperature Nb ', iT, '; T = ', Temp.TranVec[iT-1], 'K')
 
