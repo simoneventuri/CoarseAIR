@@ -76,10 +76,10 @@ function Load_Initialize_0D() {
 function Call_MeCvode() {
   cd ${PathToRunFldr}
   export OutputFldr='output_'${System}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
-  echo "[RunMECVODE]: MeCvode will be executed in the Folder "${OutputFldr}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr}
   scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/box_' ./
+  echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
   ./box_ ${OMP_NUM_THREADS}
 }
 
