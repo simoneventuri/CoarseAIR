@@ -26,11 +26,8 @@ import os, errno
 
 
 def mkdirs(newdir, mode=0o777):
-    try: os.makedirs(newdir, mode, exist_ok=True)
-    except OSError, err:
-        # Reraise the error unless it's about an already existing directory 
-        if err.errno != errno.EEXIST or not os.path.isdir(newdir): 
-            raise
+    os.makedirs(newdir, mode, exist_ok=True)
+    
 
 
 def Write_Rates_Thermal(Syst, Temp, InputData):
