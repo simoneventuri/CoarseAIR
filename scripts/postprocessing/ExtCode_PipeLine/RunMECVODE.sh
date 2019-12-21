@@ -67,13 +67,13 @@ echo '------------------------------------------------------'
 echo ' '
 
 
-function Load_Initialize_0D{
+function Load_Initialize_0D() {
   source ${ExtCode_SH_DIR}/Initialize_0D_Database_Function.sh
   Initialize_0D_Database_Function
 }
 
 
-function Call_MeCvode{
+function Call_MeCvode() {
   cd ${PathToRunFldr}
   export OutputFldr='output_'${System}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "${OutputFldr}
