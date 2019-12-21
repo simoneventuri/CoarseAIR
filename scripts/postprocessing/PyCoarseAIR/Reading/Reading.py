@@ -34,7 +34,7 @@ sys.path.insert(0, '../Plotting/')
 from Saving        import Save_Levels_HDF5, Save_qnsEnBin_HDF5, Save_PartFuncsAndEnergiesAtT_HDF5, Save_RatesAtT_HDF5
 from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5
 from Computing     import Compute_Rates_Overall, Compute_Rates_Thermal
-from Parameters    import Hartree_To_eV, UKb, Ue
+from Parameters    import *
 from Writing       import Write_Rates_Thermal, Write_Kinetics
 from Plotting      import Plot_Rates_Thermal
 
@@ -287,3 +287,4 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
     Plot_Rates_Thermal(Syst, Temp, InputData)
 
     return Syst
+

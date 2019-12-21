@@ -25,19 +25,14 @@ import sys
 
 from matplotlib import rc 
 import matplotlib.pyplot as plt
-
-plt.rcParams["figure.figsize"]   = (10,10)
-plt.rcParams["font.serif"]       = 'Times New Roman'
-plt.rcParams["xtick.major.size"] = 20 
-plt.rcParams["xtick.labelsize"]  = 20 
-plt.rcParams["ytick.labelsize"]  = 20 
-
+sys.path.insert(0, '../Parameters/')
+from PlotParameters import *
 
 
 def Plot_Rates_Thermal(Syst, Temp, InputData):
 
     plt.figure()
-    plt.title(r'$K_{i}^{Th}$', fontsize=20)
+    plt.title(r'$K_{i}^{Th}$', fontsize=FontSize)
 
     LabelStr = '$K_{D}^{Th}$ for ' + Syst.Molecule[0].Name + ', Interpolated'
     plt.plot(10000/Temp.TranVec, Syst.RatesTh[:,0], '-k', label=LabelStr)
@@ -53,10 +48,11 @@ def Plot_Rates_Thermal(Syst, Temp, InputData):
         LabelStr = '$K_{Ex' + str(jProc-1) + '}^{Th}$ for ' + Syst.Molecule[0].Name
         plt.plot(10000/Temp.TranVec, Syst.RatesTh[:,jProc], 'ok')#, label=LabelStr)
 
-    plt.legend(fontsize=20)
+    plt.legend(fontsize=FontSize)
     plt.yscale("log")
-    plt.xlabel(r'10,000/T [1/K]', fontsize=20)
-    plt.ylabel(r'$K_{Proc}^{Th} [cm^3/s]$', fontsize=20)
+    plt.xlabel(r'10,000/T [1/K]',             fontsize=FontSize)
+    plt.ylabel(r'$K_{Proc}^{Th}$ $[cm^3/s]$', fontsize=FontSize)
+    plt.tight_layout()
     if (InputData.PlotShow_Flg):
         plt.show()
     FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh.png'
@@ -64,10 +60,11 @@ def Plot_Rates_Thermal(Syst, Temp, InputData):
     print('    [Plot_Rates_Thermal]: Saved Thermal Rates Plot in: ' + FigSavePath)
 
 
+
 def Plot_DissRates_Thermal(Syst, Temp, InputData):
 
     plt.figure()
-    plt.title(r'$K_{i}^{D}$', fontsize=20)
+    plt.title(r'$K_{i}^{D}$', fontsize=FontSize)
 
     LabelStr = '$K_{i}^{D}$ for ' + Syst.Molecule[0].Name + ', Interpolated'
     plt.plot(10000/Temp.TranVec, Syst.RatesTh[:,0], '-k', label=LabelStr)
@@ -76,8 +73,9 @@ def Plot_DissRates_Thermal(Syst, Temp, InputData):
     plt.plot(10000/Temp.TranVec, Syst.RatesTh[:,0], 'ok', label=LabelStr)
     plt.yscale("log")
     
-    plt.xlabel(r'10,000/T [1/K]', fontsize=20)
-    plt.ylabel(r'$K_{i}^{D} [cm^3/s]$', fontsize=20)
+    plt.xlabel(r'10,000/T [1/K]',         fontsize=FontSize)
+    plt.ylabel(r'$K_{i}^{D}$ $[cm^3/s]$', fontsize=FontSize)
+    plt.tight_layout()
     if (InputData.PlotShow_Flg):
         plt.show()
     FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh_Diss.png'

@@ -92,7 +92,12 @@ def CO2_NASA_Upload( Temp ):
     Syst.CFDComp[0].Name   = 'C'
     Syst.CFDComp[1].Name   = 'O'
     Syst.CFDComp[2].Name   = 'CO'
-    Syst.CFDComp[3].Name   = 'O2'
+    Syst.CFDComp[3].Name   = '$O_2$'
+
+    Syst.CFDComp[0].ToMol   = -1
+    Syst.CFDComp[1].ToMol   = -1
+    Syst.CFDComp[2].ToMol   =  0
+    Syst.CFDComp[3].ToMol   =  1
 
     Syst.CFDComp[0].Mass    = Syst.Atom[0].Mass
     Syst.CFDComp[1].Mass    = Syst.Atom[1].Mass
@@ -105,9 +110,14 @@ def CO2_NASA_Upload( Temp ):
     Syst.CFDComp[3].Deg     = 1
 
     Syst.CFDComp[0].Color   = np.array([ 102, 102, 102]) / 256
-    Syst.CFDComp[1].Color   = np.array([   0, 153, 102]) / 256
+    Syst.CFDComp[1].Color   = np.array([   0,   0,   0]) / 256
     Syst.CFDComp[2].Color   = np.array([ 204,   0,   0]) / 256
     Syst.CFDComp[3].Color   = np.array([   0,   0, 234]) / 256
+
+    Syst.CFDComp[0].LineStyle = ':'
+    Syst.CFDComp[1].LineStyle = '-.'
+    Syst.CFDComp[2].LineStyle = '-'
+    Syst.CFDComp[3].LineStyle = '--'
 
     Syst.CFDComp[0].RxLxIdx = -1
     Syst.CFDComp[1].RxLxIdx = -1
@@ -192,7 +202,12 @@ def O2C_NASA_Upload( Temp ):
     Syst.CFDComp[0].Name   = 'C'
     Syst.CFDComp[1].Name   = 'O'
     Syst.CFDComp[2].Name   = 'CO'
-    Syst.CFDComp[3].Name   = 'O2'
+    Syst.CFDComp[3].Name   = '$O_2$'
+
+    Syst.CFDComp[0].ToMol   = -1
+    Syst.CFDComp[1].ToMol   = -1
+    Syst.CFDComp[2].ToMol   =  0
+    Syst.CFDComp[3].ToMol   =  1
 
     Syst.CFDComp[0].Mass    = Syst.Atom[2].Mass
     Syst.CFDComp[1].Mass    = Syst.Atom[0].Mass
@@ -205,9 +220,14 @@ def O2C_NASA_Upload( Temp ):
     Syst.CFDComp[3].Deg     = 1
 
     Syst.CFDComp[0].Color   = np.array([ 102, 102, 102]) / 256
-    Syst.CFDComp[1].Color   = np.array([   0, 153, 102]) / 256
+    Syst.CFDComp[1].Color   = np.array([   0,   0,   0]) / 256
     Syst.CFDComp[2].Color   = np.array([ 204,   0,   0]) / 256
     Syst.CFDComp[3].Color   = np.array([   0,   0, 234]) / 256
+
+    Syst.CFDComp[0].LineStyle = ':'
+    Syst.CFDComp[1].LineStyle = '-.'
+    Syst.CFDComp[2].LineStyle = '-'
+    Syst.CFDComp[3].LineStyle = '--'
 
     Syst.CFDComp[0].RxLxIdx = -1
     Syst.CFDComp[1].RxLxIdx = -1
@@ -301,6 +321,13 @@ def CHN_UIUC_Upload( Temp ):
     Syst.CFDComp[1].Name   = 'CN'
     Syst.CFDComp[3].Name   = 'HN'
 
+    Syst.CFDComp[0].ToMol   = -1
+    Syst.CFDComp[1].ToMol   = -1
+    Syst.CFDComp[2].ToMol   = -1
+    Syst.CFDComp[3].ToMol   =  0
+    Syst.CFDComp[4].ToMol   =  1
+    Syst.CFDComp[5].ToMol   =  2
+
     Syst.CFDComp[0].Mass    = Syst.Atom[0].Mass
     Syst.CFDComp[1].Mass    = Syst.Atom[1].Mass
     Syst.CFDComp[2].Mass    = Syst.Atom[2].Mass
@@ -322,6 +349,13 @@ def CHN_UIUC_Upload( Temp ):
     Syst.CFDComp[3].Color   = np.array([   0,   0, 234]) / 256
     Syst.CFDComp[4].Color   = np.array([ 204,   0,   0]) / 256
     Syst.CFDComp[5].Color   = np.array([   0,   0, 234]) / 256
+
+    Syst.CFDComp[0].LineStyle = ':'
+    Syst.CFDComp[1].LineStyle = '-.'
+    Syst.CFDComp[2].LineStyle = '--'
+    Syst.CFDComp[3].LineStyle = '-.'
+    Syst.CFDComp[4].LineStyle = '-'
+    Syst.CFDComp[5].LineStyle = '--'
 
     Syst.CFDComp[0].RxLxIdx = -1
     Syst.CFDComp[1].RxLxIdx = -1
@@ -392,7 +426,10 @@ def O3_UMN_Upload( Temp ):
 
 
     Syst.CFDComp[0].Name   = 'O'
-    Syst.CFDComp[1].Name   = 'O2'
+    Syst.CFDComp[1].Name   = '$O_2$'
+
+    Syst.CFDComp[0].ToMol   = -1
+    Syst.CFDComp[1].ToMol   =  0
 
     Syst.CFDComp[0].Mass    = Syst.Atom[0].Mass
     Syst.CFDComp[1].Mass    = Syst.Atom[1].Mass+Syst.Atom[2].Mass
@@ -400,8 +437,11 @@ def O3_UMN_Upload( Temp ):
     Syst.CFDComp[0].Deg     = 9
     Syst.CFDComp[1].Deg     = 1
 
-    Syst.CFDComp[0].Color   = np.array([   0, 153, 102]) / 256
+    Syst.CFDComp[0].Color   = np.array([   0,   0,   0]) / 256
     Syst.CFDComp[1].Color   = np.array([   0,   0, 234]) / 256
+
+    Syst.CFDComp[0].LineStyle = ':'
+    Syst.CFDComp[1].LineStyle = '-'
 
     Syst.CFDComp[0].RxLxIdx = -1
     Syst.CFDComp[1].RxLxIdx =  0

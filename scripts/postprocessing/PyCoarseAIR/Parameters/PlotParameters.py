@@ -20,44 +20,14 @@
 ##==============================================================================================================
 import numpy as np
 
+from matplotlib import rc 
+import matplotlib.pyplot as plt
 
-class kinetics(object):
+LineWidth                        = 3
+FontSize                         = 20
 
-    def __init__(self):
-
-        self.Read_Flg         = False
-        self.Write_Flg        = False
-        self.ReadFldr         = ''
-        self.WriteFldr        = ''
-        self.WriteInel_Flg    = False
-        self.WriteExch_Flg    = False
-        self.WriteDiss_Flg    = False 
-
-
-class hdf5(object):
-
-    def __init__(self):
-
-        self.ReadFolder       = ''
-        self.WriteFolder      = ''
-        self.ForceReadDat_Flg = False
-        self.Save_Flg         = False
-
-
-
-class ME(object):
-
-    def __init__(self):
-
-        self.Read_Flg         = False
-        self.ReadFolder       = ''
-        self.WriteFolder      = ''
-
-
-
-class inputdata(object):
-
-    def __init__(self):
-        self.Kin              = kinetics()
-        self.HDF5             = hdf5()
-        self.ME               = ME()
+plt.rcParams["figure.figsize"]   = (10,10)
+plt.rcParams["font.serif"]       = 'Times New Roman'
+plt.rcParams["xtick.major.size"] = FontSize 
+plt.rcParams["xtick.labelsize"]  = FontSize 
+plt.rcParams["ytick.labelsize"]  = FontSize 

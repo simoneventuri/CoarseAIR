@@ -47,6 +47,7 @@ from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOve
 from Computing         import Compute_Rates_Thermal_FromOverall
 from Initializing      import Initialize_Data
 from InputData         import inputdata
+from ME_Output         import me_output
 ##--------------------------------------------------------------------------------------------------------------
 
 
@@ -61,8 +62,8 @@ InputData.iTVec                 = np.arange(1) + 1
 InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
-InputData.Kin.Read_Flg          = True
-InputData.Kin.Write_Flg         = True
+InputData.Kin.Read_Flg          = False
+InputData.Kin.Write_Flg         = False
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteDiss_Flg     = False     
@@ -72,6 +73,9 @@ InputData.Kin.WriteExch_Flg     = True
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False
 InputData.HDF5.Save_Flg         = True
+
+InputData.ME.Read_Flg           = True
+InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/output_O3_T10000K_1_1_0_0/'
 
 InputData.PlotShow_Flg          = False
 
@@ -96,5 +100,17 @@ Syst = Read_Rates_CGQCT(Syst, Temp, InputData)
 if (InputData.Kin.Write_Flg):
 	Write_PartFuncsAndEnergies(Syst, Temp, InputData)
 	#Write_Kinetics_FromOverall(Syst, Temp, InputData)
+
+
+if (InputData.ME.Read_Flg):
+	ME = me_output(Syst)
+	ME.Read_Box(InputData)
+	ME.Plot_MolFracs_Evolution(InputData)
+	ME.Plot_TTran_Evolution(InputData)
+	ME.Plot_Rho_Evolution(InputData)
+	ME.Plot_P_Evolution(InputData)
+	ME.Plot_Nd_Evolution(InputData)
+	ME.Plot_Energy_Evolution(InputData)
+
 
 #Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)
