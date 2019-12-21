@@ -21,7 +21,7 @@
 #===============================================================================================================
 
 
-# Ex. of Call: bash RunKONIG.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/cvode_code/install $WORKSPACE_PATH/Mars_Database/Run_0D/database/kinetics/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 0
+# Ex. of Call: bash RunMeCvode.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/cvode_code/install $WORKSPACE_PATH/Mars_Database/Run_0D/database/kinetics/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 0
 
 echo '------------------------------------------------------------------------------------------'
 echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 								    '
@@ -34,7 +34,7 @@ echo ' '
 
 export System=${1}
 export TTran=${2}
-export PathToKONIGFldr={3}
+export PathToMECVODEFldr={3}
 export PathToDtbFldr=${4}
 export PathToRunFldr=${5}
 export DissFlg=${6}
@@ -47,10 +47,10 @@ ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/
 echo '------------------------------------------------------'
 echo '  Paths:'
 echo '------------------------------------------------------'
-echo '  ExtCode .sh   directory = '${ExtCode_SH_DIR}
-echo '  KONIG install directory = '${PathToKONIGFldr}
-echo '  KONIG Dtb     directory = '${PathToDtbFldr}
-echo '  KONIG running directory = '${PathToRunFldr}
+echo '  ExtCode .sh     directory = '${ExtCode_SH_DIR}
+echo '  MeCvode install directory = '${PathToMECVODEFldr}
+echo '  MeCvode Dtb     directory = '${PathToDtbFldr}
+echo '  MeCvode running directory = '${PathToRunFldr}
 echo '------------------------------------------------------'
 echo ' '
 
@@ -73,23 +73,23 @@ function Load_Initialize_0D{
 }
 
 
-function Call_KONIG{
+function Call_MeCvode{
   cd ${PathToRunFldr}
   export OutputFldr='output_'${System}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
-  echo "[RunKONIG]: KONIG will be executed in the Folder "${OutputFldr}
+  echo "[RunMECVODE]: MeCvode will be executed in the Folder "${OutputFldr}
   mkdir -p ./${OutputFldr}
   cd ./{OutputFldr}
-  scp ${PathToKONIGFldr}/${System}/'T'${TTran}'K/run_' ./
-  ./run_ ${OMP_PROC}
+  scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/run_' ./
+  ./run_ ${OMP_NUM_THREADS}
 }
 
 
 
-echo "[RunKONIG]: Calling Load_Initialize_0D"
+echo "[RunMECVODE]: Calling Load_Initialize_0D"
 Load_Initialize_0D
 echo " "
 
 
-echo "[RunKONIG]: Calling Call_KONIG"
-Call_KONIG
+echo "[RunMECCVODE]: Calling Call_MeCvode"
+Call_MeCvode
 echo " "
