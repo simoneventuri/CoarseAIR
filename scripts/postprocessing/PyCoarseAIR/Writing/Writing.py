@@ -22,9 +22,20 @@ import numpy as np
 import pandas
 import csv
 import shutil
+import os, errno
+
+
+def mkdirs(newdir, mode=0777):
+    try: os.makedirs(newdir, mode)
+    except OSError, err:
+        # Reraise the error unless it's about an already existing directory 
+        if err.errno != errno.EEXIST or not os.path.isdir(newdir): 
+            raise
+
 
 def Write_Rates_Thermal(Syst, Temp, InputData):
-    
+
+    mkdirs( InputData.FinalFldr )    
     PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh.csv'
     print('    [Write_Rates_Thermal]: Writing Thermal Rates in File: ' + PathToFile )
     with open(PathToFile, 'w') as csvTermo:
@@ -41,6 +52,7 @@ def Write_Rates_Thermal(Syst, Temp, InputData):
                 
 def Write_DissRates_Thermal(Syst, Temp, InputData):
 
+    mkdirs( InputData.FinalFldr )    
     PathToFile = InputData.FinalFldr + '/' + Syst.Molecule[0].Name + '_KTh_Diss.csv'
     print('    [Write_DissRates_Thermal]: Writing Dissociation Thermal Rates in File: ' + PathToFile )
     with open(PathToFile, 'w') as csvTermo:
@@ -54,6 +66,7 @@ def Write_DissRates_Thermal(Syst, Temp, InputData):
 
 def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
 
+    mkdirs( InputData.Kin.WriteFldr + '/thermo/' )    
     for iMol in range(Syst.NMolecules):
 
         for iT in Temp.iTVec:
@@ -72,6 +85,8 @@ def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
 
 
 def Write_Kinetics(Syst, Temp, InputData, iT):
+
+    mkdirs( InputData.Kin.WriteFldr + '/kinetics/' )    
 
     if (InputData.Kin.WriteDiss_Flg):
         DissKinetics = InputData.Kin.WriteFldr + '/kinetics/' + Syst.Name + 'Diss_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
@@ -129,6 +144,8 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
 
 def Write_Kinetics_FromOverall(Syst, Temp, InputData):
 
+    mkdirs( InputData.Kin.WriteFldr + '/kinetics/' )    
+    
     for iT in Temp.iTVec:
         print('\nTemperature Nb ', iT, '; T = ', Temp.TranVec[iT-1], 'K')
 
