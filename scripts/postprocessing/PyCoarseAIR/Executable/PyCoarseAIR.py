@@ -58,13 +58,13 @@ InputData.SystNameLong          = 'O3_UMN'
 InputData.TranVec               = np.array([10000])
 InputData.iTVec                 = np.arange(1) + 1
 
-InputData.QCTOutFldr            = CoarseAIRFldr + '/CG-QCT/run_O3_ALL/Test/'
-InputData.FinalFldr             = CoarseAIRFldr + '/Mars_Database/Results/'
+InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
+InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
 InputData.Kin.Read_Flg          = True
 InputData.Kin.Write_Flg         = True
-InputData.Kin.ReadFldr          = CoarseAIRFldr + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteFldr         = CoarseAIRFldr + '/Mars_Database/Run_0D/database/'
+InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
+InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteDiss_Flg     = False     
 InputData.Kin.WriteInel_Flg     = False
 InputData.Kin.WriteExch_Flg     = True
