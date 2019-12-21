@@ -21,7 +21,7 @@
 #===============================================================================================================
 
 
-# Ex. of Call: bash RunKONIG.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/ME_CVODE $WORKSPACE_PATH/Mars_Database/Run_0D/database/ WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 0
+# Ex. of Call: bash RunMECVODE.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/ME_CVODE $WORKSPACE_PATH/Mars_Database/Run_0D/database/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 -1
 
 echo '------------------------------------------------------------------------------------------'
 echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 								    '

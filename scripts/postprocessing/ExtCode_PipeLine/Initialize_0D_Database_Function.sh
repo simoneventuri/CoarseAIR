@@ -52,8 +52,8 @@ while [ ${iInel} -le ${InelFlg} ]; do
 	iInel=$((iInel+1))
 done
 
-iExch=1
-while [ ${iExch} -le ${InelFlg} ]; do 
+iExch=${ExchFlg1}
+while [ ${ExchFlg1} -le ${ExchFlg2} ]; do 
 	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP"
 	cat $PathToDtbFldr"/kinetics/"$System"Exch_Type"$iExch"_"$TTran"K.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP"
 	iExch=$((iExch+1))
