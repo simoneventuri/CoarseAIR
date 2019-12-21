@@ -68,7 +68,7 @@ echo ' '
 
 
 function Load_Initialize_0D{
-  source $ExtCode_SH_DIR/Initialize_0D_Database_Function.sh
+  source ${ExtCode_SH_DIR}/'Initialize_0D_Database_Function.sh'
   Initialize_0D_Database_Function
 }
 
