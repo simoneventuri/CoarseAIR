@@ -21,7 +21,7 @@
 #===============================================================================================================
 
 
-# Ex. of Call: bash RunKONIG.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/cvode_code/install $WORKSPACE_PATH/Mars_Database/Run_0D/database/kinetics/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 1 1
+# Ex. of Call: bash RunKONIG.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/cvode_code/install $WORKSPACE_PATH/Mars_Database/Run_0D/database/kinetics/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 0
 
 echo '------------------------------------------------------------------------------------------'
 echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 								    '
@@ -35,7 +35,7 @@ echo ' '
 export System=${1}
 export TTran=${2}
 export PathToKONIGFldr={3}
-export PathToKinFldr=${4}
+export PathToDtbFldr=${4}
 export PathToRunFldr=${5}
 export DissFlg=${6}
 export InelFlg=${7}
@@ -47,10 +47,10 @@ ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/
 echo '------------------------------------------------------'
 echo '  Paths:'
 echo '------------------------------------------------------'
-echo '  ExtCode .sh  directory   = '${ExtCode_SH_DIR}
-echo '  KONING install directory = '${PathToKONIGFldr}
-echo '  Kinetic Data directory   = '${PathToKinFldr}
-echo '  KONING running directory = '${PathToRunFldr}
+echo '  ExtCode .sh   directory = '${ExtCode_SH_DIR}
+echo '  KONIG install directory = '${PathToKONIGFldr}
+echo '  KONIG Dtb     directory = '${PathToDtbFldr}
+echo '  KONIG running directory = '${PathToRunFldr}
 echo '------------------------------------------------------'
 echo ' '
 
