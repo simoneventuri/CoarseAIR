@@ -79,8 +79,8 @@ function Call_MeCvode() {
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "${OutputFldr}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr}
-  scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/run_' ./
-  ./run_ ${OMP_NUM_THREADS}
+  scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/box_' ./
+  ./box_ ${OMP_NUM_THREADS}
 }
 
 
