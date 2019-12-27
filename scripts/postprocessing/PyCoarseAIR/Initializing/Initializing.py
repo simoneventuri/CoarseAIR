@@ -68,6 +68,7 @@ def Initialize_Data(InputData):
 
 
     ## Creating Output Folder
+    InputData.FinalFldr = InputData.FinalFldr + '/' + SystNameLong + '/'
     if not os.path.exists(InputData.FinalFldr):
         os.makedirs(InputData.FinalFldr)
 

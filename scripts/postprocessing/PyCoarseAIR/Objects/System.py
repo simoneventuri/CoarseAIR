@@ -20,18 +20,12 @@
 ##==============================================================================================================
 import numpy as np
 
-from Atom     import atom
-from Molecule import molecule
-from Pair     import pair
-from CFDComp  import cfdcomp
-
-
-
-class processes(object):
-
-    def __init__(self):
-
-        self.Rates    = 0.0
+from Atom      import atom
+from Molecule  import molecule
+from Pair      import pair
+from CFDComp   import cfdcomp
+from Processes import processes
+from QSS       import qss
 
 
 class t_properties(object):
@@ -41,6 +35,8 @@ class t_properties(object):
         self.Proc     = [processes() for iProc in range(4)]
         self.ProcExch = [processes() for iProc in range(NProcTypes-2)]
         self.ProcTot  = [processes() for iProc in range(NProcTypes)]
+        self.QSS      = qss(NProcTypes)
+
 
 
 class system(object):

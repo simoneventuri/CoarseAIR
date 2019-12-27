@@ -78,6 +78,8 @@ def Read_Levels(Syst, InputData):
                 print('  [Read_Levels]: Saving Data for Molecule Nb ' + str(iMol) + ' (' + Syst.Molecule[iMol].Name + ') in the HDF5 File')
                 Save_Levels_HDF5(Syst, iMol)
 
+        Syst.Molecule[iMol].Compute_ERot()
+
     return Syst
 
 

@@ -19,16 +19,13 @@
 #---------------------------------------------------------------------------------------------------------------
 ##==============================================================================================================
 import numpy as np
+import os.path
+from os import path
 
-from matplotlib import rc 
-import matplotlib.pyplot as plt
+class qss(object):
 
-LineWidth                        = 3
-FontSize                         = 20
-PointSize                        = 30
+    def __init__(self, NProcTypes):
 
-plt.rcParams["figure.figsize"]   = (10,10)
-plt.rcParams["font.serif"]       = 'Times New Roman'
-plt.rcParams["xtick.major.size"] = FontSize 
-plt.rcParams["xtick.labelsize"]  = FontSize 
-plt.rcParams["ytick.labelsize"]  = FontSize 
+        self.iTime = np.zeros(2, dtype=np.int32)
+        self.Time  = np.zeros(2)
+        self.Rate  = np.zeros(NProcTypes)

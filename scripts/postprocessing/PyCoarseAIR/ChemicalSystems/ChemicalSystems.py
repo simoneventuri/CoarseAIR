@@ -92,7 +92,7 @@ def CO2_NASA_Upload( Temp ):
     Syst.CFDComp[0].Name   = 'C'
     Syst.CFDComp[1].Name   = 'O'
     Syst.CFDComp[2].Name   = 'CO'
-    Syst.CFDComp[3].Name   = '$O_2$'
+    Syst.CFDComp[3].Name   = 'O2'
 
     Syst.CFDComp[0].ToMol   = -1
     Syst.CFDComp[1].ToMol   = -1
@@ -129,6 +129,8 @@ def CO2_NASA_Upload( Temp ):
 
     Syst.ExchtoMol          = np.array([0,1])
     Syst.ExchtoAtom         = np.array([2,0])
+
+    Syst.ColPartToComp      = 0
 
     return Syst
 ################################################################################################################
@@ -202,7 +204,7 @@ def O2C_NASA_Upload( Temp ):
     Syst.CFDComp[0].Name   = 'C'
     Syst.CFDComp[1].Name   = 'O'
     Syst.CFDComp[2].Name   = 'CO'
-    Syst.CFDComp[3].Name   = '$O_2$'
+    Syst.CFDComp[3].Name   = 'O2'
 
     Syst.CFDComp[0].ToMol   = -1
     Syst.CFDComp[1].ToMol   = -1
@@ -239,6 +241,8 @@ def O2C_NASA_Upload( Temp ):
 
     Syst.ExchtoMol          = np.array([1])
     Syst.ExchtoAtom         = np.array([0])
+
+    Syst.ColPartToComp      = 1
 
     return Syst
 ################################################################################################################
@@ -366,6 +370,8 @@ def CHN_UIUC_Upload( Temp ):
 
     Syst.MolToCFDComp       = 3
 
+    Syst.ColPartToComp      = 2
+
     return Syst
 ################################################################################################################
 
@@ -405,7 +411,7 @@ def O3_UMN_Upload( Temp ):
 
 
     Syst.Molecule[0].Name             = 'O2'
-    Syst.Molecule[0].DissEn           = 0.0
+    Syst.Molecule[0].DissEn           = 5.2
     Syst.Molecule[0].DegeneracyFactor = 6
     Syst.Molecule[0].Mu               = 31.9988e-3
     Syst.Molecule[0].KinMthd          = 'StS'
@@ -426,7 +432,7 @@ def O3_UMN_Upload( Temp ):
 
 
     Syst.CFDComp[0].Name   = 'O'
-    Syst.CFDComp[1].Name   = '$O_2$'
+    Syst.CFDComp[1].Name   = 'O2'
 
     Syst.CFDComp[0].ToMol   = -1
     Syst.CFDComp[1].ToMol   =  0
@@ -451,6 +457,8 @@ def O3_UMN_Upload( Temp ):
 
     Syst.ExchtoMol          = np.array([0])
     Syst.ExchtoAtom         = np.array([2])
+
+    Syst.ColPartToComp      = 0
 
     return Syst
 ################################################################################################################

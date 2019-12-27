@@ -20,15 +20,9 @@
 ##==============================================================================================================
 import numpy as np
 
-from matplotlib import rc 
-import matplotlib.pyplot as plt
 
-LineWidth                        = 3
-FontSize                         = 20
-PointSize                        = 30
+class processes(object):
 
-plt.rcParams["figure.figsize"]   = (10,10)
-plt.rcParams["font.serif"]       = 'Times New Roman'
-plt.rcParams["xtick.major.size"] = FontSize 
-plt.rcParams["xtick.labelsize"]  = FontSize 
-plt.rcParams["ytick.labelsize"]  = FontSize 
+    def __init__(self):
+
+        self.Rates    = 0.0

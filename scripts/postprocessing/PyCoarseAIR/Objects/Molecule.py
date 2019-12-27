@@ -49,6 +49,8 @@ class molecule(object):
         self.Leveljqn          = 0
         self.LevelEEh          = 0.0
         self.LevelEeV          = 0.0
+        self.LevelERot         = 0.0
+        self.LevelEVib         = 0.0
         self.LevelEGam         = 0.0
         self.LevelrMin         = 0.0
         self.LevelrMax         = 0.0
@@ -64,3 +66,17 @@ class molecule(object):
 
         self.NTTran            = NTTran
         self.T                 = [t_properties() for iTTran in range(NTTran)]
+
+
+
+    def Compute_ERot(self):
+
+        self.vEeV              = np.zeros(np.max(self.Levelvqn)+1)
+        self.LevelEVib         = np.zeros(self.NBins)
+        self.LevelERot         = np.zeros(self.NBins)
+        for iLevel in range(self.NBins):
+            if (self.Leveljqn[iLevel] == 0):
+                self.vEeV[int(self.Levelvqn[iLevel])] = self.LevelEeV[iLevel]
+            self.LevelEVib[iLevel] = self.vEeV[int(self.Levelvqn[iLevel])]
+            self.LevelERot[iLevel] = self.LevelEeV[iLevel] - self.LevelEVib[iLevel]
+

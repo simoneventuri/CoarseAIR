@@ -21,6 +21,8 @@
 import numpy as np
 import pandas
 import sys
+import os.path
+from os import path
 
 from matplotlib import rc 
 import matplotlib.pyplot as plt
@@ -54,6 +56,186 @@ class component(object):
 
 
 
+    def Read_Pop(self, InputData, NTime):
+
+        self.Pop = np.zeros((NTime,self.NBins))
+        PathToFile = InputData.ME.ReadFldr + '/pop_' + self.Name + '.dat'
+        print('\n  [Read_Pop]: Reading Level Populations from the File ' + PathToFile)
+        iTime = 0
+        for chunk in pandas.read_csv(PathToFile, header=1, chunksize=self.NBins, comment='&', delimiter=r"\s+"):
+            Data  = chunk['[eV]'].apply(pandas.to_numeric, errors='coerce')
+            self.Pop[iTime,:]  = np.array(Data.values, dtype=np.float64)
+            iTime = iTime + 1
+
+
+
+    def Compute_DistFunc(self, Syst, NTime):
+        print('\n    [Compute_DistFunc]: Computing Distribution Function')
+
+        self.DistFunc = np.zeros((NTime,self.NBins))
+        for iTime in range(NTime):
+            self.DistFunc[iTime,:] = self.Pop[iTime,:]      * Syst.Molecule[self.ToMol].Levelg[:]
+            self.DistFunc[iTime,:] = self.DistFunc[iTime,:] / np.sum( self.DistFunc[iTime,:] )
+
+
+
+    def Plot_Pop(self, InputData, Syst, ME, Temp, iT):
+
+        iT=0
+
+        plt.figure()
+        plt.title(r'Ro-Vibrational Level Populations', fontsize=FontSize)
+
+        for iTime in (ME.iTimeVec):
+            LabelStr = ('t={:.2e}s'.format(ME.Time[iTime]))
+            plt.scatter(Syst.Molecule[self.ToMol].T[iT].LevelEeV-Syst.Molecule[self.ToMol].DissEn, self.Pop[iTime,:], label=LabelStr, s=PointSize)
+            plt.yscale("log")
+        
+        plt.xlabel(r'$E_i$ [eV]',          fontsize=FontSize)
+        plt.ylabel(r'$log_{10}(N_i/g_i)$', fontsize=FontSize)
+        plt.legend(fontsize=20)
+        plt.tight_layout()
+        if (InputData.PlotShow_Flg):
+            plt.show()
+        FigSavePath = InputData.FinalFldr + '/' + Syst.Molecule[self.ToMol].Name + '_T' + str(Temp.TranVec[iT-1]) + 'K_Pops.png'
+        plt.savefig(FigSavePath)
+        print('\n    [Plot_Pop]: Saved Level Population Plot in: ' + FigSavePath)
+
+
+
+    def Compute_KAveraged(self, Syst, iT, NTime):
+        print('\n    [Compute_KAveraged]: Computing Average Rates')
+
+        for jProc in range(Syst.NProcTypes):
+            Syst.T[iT-1].ProcTot[jProc].RatesAveraged = np.zeros(NTime)
+            for iTime in range(NTime):
+                Syst.T[iT-1].ProcTot[jProc].RatesAveraged[iTime] = np.sum( Syst.T[iT-1].ProcTot[jProc].Rates[:] * self.DistFunc[iTime,:] )
+
+        return Syst
+
+
+
+    def Compute_EAveraged(self, Syst, iT, NTime):
+        print('\n    [Compute_EAveraged]: Computing Average Energies')
+
+        self.ERot = np.zeros(NTime)
+        self.EVib = np.zeros(NTime)
+        self.EInt = np.zeros(NTime)
+        for iTime in range(NTime):
+            self.ERot[iTime] = np.sum( Syst.Molecule[self.ToMol].LevelERot[:] * self.DistFunc[iTime,:] )
+            self.EVib[iTime] = np.sum( Syst.Molecule[self.ToMol].LevelEVib[:] * self.DistFunc[iTime,:] )
+            self.EInt[iTime] = np.sum( Syst.Molecule[self.ToMol].LevelEeV[:]  * self.DistFunc[iTime,:] )
+
+
+
+    def Plot_KAveraged(self, InputData, Syst, ME, Temp, iT):
+
+        plt.figure()
+        plt.title(r'$\bar{K}^{Proc}$ Evolution', fontsize=FontSize)
+
+        plt.plot(ME.Time, Syst.T[iT-1].ProcTot[0].RatesAveraged, label=r'$\bar{K}^{D}$')
+        plt.plot(Syst.T[iT-1].QSS.Time[0], Syst.T[iT-1].QSS.Rate[0], 'ko')
+        plt.plot(Syst.T[iT-1].QSS.Time[1], Syst.T[iT-1].QSS.Rate[0], 'ko')
+
+        for jProc in range(2, Syst.NProcTypes):
+            LabelStr = r'$\bar{K}_{' + Syst.Molecule[Syst.ExchtoMol[jProc-2]].Name + '}^{E}$'
+            plt.plot(ME.Time, Syst.T[iT-1].ProcTot[jProc].RatesAveraged, label=LabelStr)
+            plt.plot(Syst.T[iT-1].QSS.Time[0], Syst.T[iT-1].QSS.Rate[jProc], 'ko')
+            plt.plot(Syst.T[iT-1].QSS.Time[1], Syst.T[iT-1].QSS.Rate[jProc], 'ko')
+            
+        plt.xscale("log")
+        plt.yscale("log")
+            
+        plt.xlabel(r'time [s]', fontsize=FontSize)
+        plt.ylabel(r'$\bar{K}^{Proc}$ $[cm^3/s]$', fontsize=FontSize)
+        plt.tight_layout()
+        plt.legend(fontsize=20)
+        if (InputData.PlotShow_Flg):
+            plt.show()
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_KAveraged_Evo.png'
+        plt.savefig(FigSavePath)
+        print('\n    [Plot_TTran_Evolution]: Saved Averaged Rates Evolution Plot in: ' + FigSavePath)
+
+
+
+    def Plot_EAveraged(self, InputData, Syst, ME, Temp, iT):
+
+        plt.figure()
+        plt.title(r'$\bar{K}^{Proc}$ Evolution', fontsize=FontSize)
+
+        plt.plot(ME.Time, self.ERot, '-.r', label=r'$\bar{E}_{R}$')
+        plt.plot(ME.Time, self.EVib, '-k',  label=r'$\bar{E}_{V}$')
+        plt.plot(ME.Time, self.EInt, '--b', label=r'$\bar{E}_{I}$')
+            
+        plt.xscale("log")
+            
+        plt.xlabel(r'time [s]', fontsize=FontSize)
+        plt.ylabel(r'$\bar{E}$ $[eV]$', fontsize=FontSize)
+        plt.tight_layout()
+        plt.legend(fontsize=20)
+        if (InputData.PlotShow_Flg):
+            plt.show()
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_EAveraged_Evo.png'
+        plt.savefig(FigSavePath)
+        print('\n    [Plot_EAveraged]: Saved Averaged Energy Evolution Plot in: ' + FigSavePath)
+
+
+
+    def Compute_Taus(self, InputData, Syst, ME, iT):
+
+        iComp    = Syst.ColPartToComp
+        Pressure = ME.Component[iComp].MolFrac[-1] * ME.P[-1] / 101325.0
+        print('\n    [Compute_Taus]: Partial Pressure for iComp ' + str(iComp+1) + ' = ' + str(Pressure*100.0) + "%")
+
+        EVibLim = (self.EVib[-1] - self.EVib[0]) * 0.632 + self.EVib[0]
+        iVib=0
+        while (self.EVib[iVib] < EVibLim):
+          iVib = iVib+1;
+        DeltaT =   ME.Time[iVib] -   ME.Time[iVib-1]
+        DeltaE = self.EVib[iVib] - self.EVib[iVib-1]
+        SemiE  =         EVibLim - self.EVib[iVib-1]
+        self.TauVib = DeltaT / DeltaE * SemiE + ME.Time[iVib-1]
+        self.TauVib = Pressure * self.TauVib
+        print('    [Compute_Taus]: Vibrational Tau = ' + str(self.TauVib))
+
+        ERotLim = (self.ERot[-1] - self.ERot[0]) * 0.632 + self.ERot[0]
+        iRot=0
+        while (self.ERot[iRot] < ERotLim):
+          iRot = iRot+1;
+        DeltaT =   ME.Time[iRot] -   ME.Time[iRot-1]
+        DeltaE = self.ERot[iRot] - self.ERot[iRot-1]
+        SemiE  =         ERotLim - self.ERot[iRot-1]
+        self.TauRot = DeltaT / DeltaE * SemiE + ME.Time[iRot-1]
+        self.TauRot = Pressure * self.TauRot
+        print('    [Compute_Taus]: Rotational Tau = ' + str(self.TauRot))
+
+        EIntLim = (self.EInt[-1] - self.EInt[0]) * 0.632 + self.EInt[0]
+        iInt=0
+        while (self.EInt[iInt] < EIntLim):
+          iInt = iInt+1;
+        DeltaT =   ME.Time[iInt] -   ME.Time[iInt-1]
+        DeltaE = self.EInt[iInt] - self.EInt[iInt-1]
+        SemiE  =         EIntLim - self.EInt[iInt-1]
+        self.TauInt = DeltaT / DeltaE * SemiE + ME.Time[iInt-1]
+        self.TauInt = Pressure * self.TauInt
+        print('    [Compute_Taus]: Internal Tau = ' + str(self.TauInt))
+
+
+    def Write_Taus(self, Temp, InputData, iT):
+ 
+        PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_Taus.csv'
+        print('\n    [Write_Taus]: Writing Taus in File: ' + PathToFile )
+        with open(PathToFile, 'a') as csvTaus:
+            if (not path.exists(PathToFile) ):
+                Line       = '# T,RotTau,VibTau,IntTau\n'
+                csvTaus.write(Line)
+            TempVec = np.array([self.TauRot, self.TauVib, self.TauInt])
+            TempMat = np.transpose( np.expand_dims( np.concatenate( [np.array([Temp.TranVec[iT-1]], float), TempVec] ), axis=1 ) )
+            np.savetxt(csvTaus, TempMat, delimiter=',')
+        csvTaus.close()
+
+
+
 class me_output(object):
 
     def __init__(self, Syst):
@@ -74,6 +256,17 @@ class me_output(object):
         self.NTime = self.Time.shape[0]
         print('  [Read_Box]: Found ' + str(self.NTime+1) + ' Time Instants')
 
+        self.TimeVec  = InputData.ME.TimeVec
+        self.iTimeVec = np.zeros((self.TimeVec.size), dtype=np.int32)
+        jT = 0
+        for Time in self.TimeVec:
+            iTime = 0
+            while ( (iTime < self.NTime-1) and (self.Time[iTime] < Time) ):
+                iTime = iTime + 1
+            self.iTimeVec[jT] = iTime - 1
+            jT = jT + 1
+        print('  [Read_Box]: Vector of Times ' + str(self.TimeVec) + ' corresponds to Vector of Time Instants ' + str(self.iTimeVec) + '; (' + str(self.Time[self.iTimeVec[:]]) + ')')
+
         for iComp in range(self.NCFDComp):
             self.Component[iComp].MolFrac = np.array(Data[1+iComp].values, dtype=np.float64)
 
@@ -85,7 +278,7 @@ class me_output(object):
 
 
 
-    def Plot_MolFracs_Evolution(self, InputData):
+    def Plot_MolFracs_Evolution(self, InputData, Temp, iT):
 
         #rc.style.use('seaborn')
         plt.figure()
@@ -105,13 +298,13 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_MoleFracs_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_MoleFracs_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_MolFracs_Evolution]: Saved Mole Fraction Evolutions Plot in: ' + FigSavePath)
 
 
 
-    def Plot_TTran_Evolution(self, InputData):
+    def Plot_TTran_Evolution(self, InputData, Temp, iT):
 
         plt.figure()
         plt.title(r'$T_{Tran}$ Evolution', fontsize=FontSize)
@@ -125,13 +318,13 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_T_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_TTran_Evolution]: Saved Temperature Evolution Plot in: ' + FigSavePath)
 
 
 
-    def Plot_Rho_Evolution(self, InputData):
+    def Plot_Rho_Evolution(self, InputData, Temp, iT):
 
         plt.figure()
         plt.title(r'Density Evolution', fontsize=FontSize)
@@ -145,13 +338,13 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_Rho_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_Rho_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Rho_Evolution]: Saved Density Evolution Plot in: ' + FigSavePath)
         
 
 
-    def Plot_P_Evolution(self, InputData):
+    def Plot_P_Evolution(self, InputData, Temp, iT):
 
         plt.figure()
         plt.title(r'Pressure Evolution', fontsize=FontSize)
@@ -165,13 +358,13 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_P_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_P_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_P_Evolution]: Saved Pressure Evolution Plot in: ' + FigSavePath)
 
 
 
-    def Plot_Nd_Evolution(self, InputData):
+    def Plot_Nd_Evolution(self, InputData, Temp, iT):
 
         plt.figure()
         plt.title(r'Number Density Evolution', fontsize=FontSize)
@@ -185,13 +378,13 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_Nd_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_Nd_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Nd_Evolution]: Saved Number Density Evolution Plot in: ' + FigSavePath)
 
 
 
-    def Plot_Energy_Evolution(self, InputData):
+    def Plot_Energy_Evolution(self, InputData, Temp, iT):
 
         plt.figure()
         plt.title(r'Energy Evolution', fontsize=FontSize)
@@ -205,6 +398,6 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_EEh_Evo.png'
+        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_EEh_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Energy_Evolution]: Saved Energy Evolution Plot in: ' + FigSavePath)

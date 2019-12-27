@@ -23,7 +23,8 @@ import pandas
 import csv
 import shutil
 import os, errno
-
+import os.path
+from os import path
 
 def mkdirs(newdir, mode=0o777):
     os.makedirs(newdir, mode, exist_ok=True)
@@ -207,3 +208,19 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
                 
                 csvfile.close()
                 csvkinetics.close()
+
+
+def Write_QSS(Syst, Temp, InputData, iT):
+
+    PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KQSS.csv'
+    print('    [Write]: Writing QSS Rates in File: ' + PathToFile )
+    with open(PathToFile, 'a') as csvQSS:
+        if (not path.exists(PathToFile) ):
+            Line       = '# T,KDiss,KInel' 
+            for iExch in range(2, Syst.NProcTypes):
+                Line = Line + ',KExch' + str(iExch-1)
+            Line = Line + '\n'
+            csvQSS.write(Line)
+        TempMat = np.transpose( np.expand_dims( np.concatenate( [np.array([Temp.TranVec[iT-1]], float), Syst.T[iT-1].QSS.Rate] ), axis=1 ) )
+        np.savetxt(csvQSS, TempMat, delimiter=',')
+    csvQSS.close()

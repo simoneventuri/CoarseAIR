@@ -23,16 +23,17 @@ import sys
 import numpy as np
 
 ## Paths from where to Import Python Modules
-WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
-CoarseAIRFldr  = os.environ['COARSEAIR_SOURCE_DIR'] 
-#SrcDir    = '/home/venturi/WORKSPACE//CoarseAIR/coarseair/' 
-#SrcDir    = '/Users/sventuri/WORKSPACE//CoarseAIR/coarseair/' #os.environ['COARSEAIR_SOURCE_DIR'] 
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Objects/')
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Reading/')
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Writing/')
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Computing/')
-sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/Initializing/')
+#WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
+#WORKSPACE_PATH = '/home/venturi/WORKSPACE/'
+WORKSPACE_PATH = '/Users/sventuri/WORKSPACE/'
+#CoarseAIRFldr  = os.environ['COARSEAIR_SOURCE_DIR'] 
+CoarseAIRFldr    = WORKSPACE_PATH + '/CoarseAIR/coarseair/'
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Objects/')
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Reading/')
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Writing/')
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Computing/')
+sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Initializing/')
 
 if (len(sys.argv) > 1):
     InputFile = sys.argv[1]
@@ -43,8 +44,8 @@ else:
     sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/InputData/')
 
 from Reading           import Read_Levels, Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
-from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall
-from Computing         import Compute_Rates_Thermal_FromOverall
+from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall, Write_QSS
+from Computing         import Compute_Rates_Thermal_FromOverall, Compute_QSS
 from Initializing      import Initialize_Data
 from InputData         import inputdata
 from ME_Output         import me_output
@@ -76,6 +77,7 @@ InputData.HDF5.Save_Flg         = True
 
 InputData.ME.Read_Flg           = True
 InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/output_O3_T10000K_1_1_0_0/'
+InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
 
 InputData.PlotShow_Flg          = False
 
@@ -105,12 +107,28 @@ if (InputData.Kin.Write_Flg):
 if (InputData.ME.Read_Flg):
 	ME = me_output(Syst)
 	ME.Read_Box(InputData)
-	ME.Plot_MolFracs_Evolution(InputData)
-	ME.Plot_TTran_Evolution(InputData)
-	ME.Plot_Rho_Evolution(InputData)
-	ME.Plot_P_Evolution(InputData)
-	ME.Plot_Nd_Evolution(InputData)
-	ME.Plot_Energy_Evolution(InputData)
+	# ME.Plot_MolFracs_Evolution(InputData)
+	# ME.Plot_TTran_Evolution(InputData)
+	# ME.Plot_Rho_Evolution(InputData)
+	# ME.Plot_P_Evolution(InputData)
+	# ME.Plot_Nd_Evolution(InputData)
+	# ME.Plot_Energy_Evolution(InputData)
+
+	for iComp in range(ME.NCFDComp):
+		if ( ME.Component[iComp].ToMol > -1 ):
+			ME.Component[iComp].Read_Pop(InputData, ME.NTime)
+			ME.Component[iComp].Plot_Pop(InputData, Syst, ME, Temp, 1)
+			ME.Component[iComp].Compute_DistFunc( Syst, ME.NTime )
+			
+			ME.Component[iComp].Compute_KAveraged( Syst, 1, ME.NTime )
+			Syst = Compute_QSS( Syst, ME, 1 )
+			Write_QSS( Syst, Temp, InputData, 1 )
+			ME.Component[iComp].Plot_KAveraged( InputData, Syst, ME, Temp, 1 )
+
+			ME.Component[iComp].Compute_EAveraged( Syst, 1, ME.NTime )
+			ME.Component[iComp].Plot_EAveraged( InputData, Syst, ME, Temp, 1 )
+			ME.Component[iComp].Compute_Taus( InputData, Syst, ME, 1)
+			ME.Component[iComp].Write_Taus( Temp, InputData, 1)
 
 
 #Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)

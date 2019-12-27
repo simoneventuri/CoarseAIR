@@ -74,3 +74,28 @@ def Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData):
     Plot_DissRates_Thermal(Syst, Temp, InputData)
 
     return Syst
+
+
+
+def Compute_QSS(Syst, ME, iT):
+
+    KQSS_Eps   = 1.e-7
+
+    KDer = np.gradient(Syst.T[iT-1].ProcTot[0].RatesAveraged, ME.Time)
+    iQSS = 0
+    while (KDer[iQSS] > KQSS_Eps):
+        iQSS = iQSS + 1
+    iQSS_Start = iQSS - 1
+    while (KDer[iQSS] < KQSS_Eps):
+        iQSS = iQSS + 1
+    iQSS_End = iQSS - 1
+    Syst.T[iT-1].QSS.iTime[0] = iQSS_Start
+    Syst.T[iT-1].QSS.iTime[1] = iQSS_End
+    Syst.T[iT-1].QSS.Time[0]  = ME.Time[iQSS_Start]
+    Syst.T[iT-1].QSS.Time[1]  = ME.Time[iQSS_End]
+    
+    Syst.T[iT-1].QSS.Rate[0]  = ( Syst.T[iT-1].ProcTot[0].RatesAveraged[iQSS_Start] + Syst.T[iT-1].ProcTot[0].RatesAveraged[iQSS_End] ) / 2.0
+    for jProc in range(2, Syst.NProcTypes):
+        Syst.T[iT-1].QSS.Rate[jProc] = ( Syst.T[iT-1].ProcTot[jProc].RatesAveraged[iQSS_Start] + Syst.T[iT-1].ProcTot[jProc].RatesAveraged[iQSS_End] ) / 2.0
+
+    return Syst
