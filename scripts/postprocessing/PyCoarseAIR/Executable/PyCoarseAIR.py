@@ -24,8 +24,8 @@ import numpy as np
 
 ## Paths from where to Import Python Modules
 #WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
-#WORKSPACE_PATH = '/home/venturi/WORKSPACE/'
-WORKSPACE_PATH = '/Users/sventuri/WORKSPACE/'
+WORKSPACE_PATH = '/home/venturi/WORKSPACE/'
+#WORKSPACE_PATH = '/Users/sventuri/WORKSPACE/'
 #CoarseAIRFldr  = os.environ['COARSEAIR_SOURCE_DIR'] 
 CoarseAIRFldr    = WORKSPACE_PATH + '/CoarseAIR/coarseair/'
 sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Objects/')
@@ -64,18 +64,18 @@ InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
 InputData.Kin.Read_Flg          = False
-InputData.Kin.Write_Flg         = False
+InputData.Kin.Write_Flg         = True
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = False     
-InputData.Kin.WriteInel_Flg     = False
+InputData.Kin.WriteDiss_Flg     = True     
+InputData.Kin.WriteInel_Flg     = True
 InputData.Kin.WriteExch_Flg     = True
 
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False
 InputData.HDF5.Save_Flg         = True
 
-InputData.ME.Read_Flg           = True
+InputData.ME.Read_Flg           = False
 InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/output_O3_T10000K_1_1_0_0/'
 InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
 
