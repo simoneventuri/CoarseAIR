@@ -152,7 +152,7 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
                     for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins):
 
                         TempRate = Syst.T[iT-1].Proc[1].Rates[iLevel,jLevel] + Syst.T[iT-1].ProcExch[iExch-2].Rates[iLevel,jLevel]
-                        if ((Temp > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
+                        if ((TempRate > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
                             ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(jLevel+1) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
                             Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % Temp
                             csvkinetics.write(Line)
