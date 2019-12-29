@@ -67,8 +67,8 @@ InputData.Kin.Read_Flg          = False
 InputData.Kin.Write_Flg         = True
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = True     
-InputData.Kin.WriteInel_Flg     = True
+InputData.Kin.WriteDiss_Flg     = False     
+InputData.Kin.WriteInel_Flg     = False
 InputData.Kin.WriteExch_Flg     = True
 
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
