@@ -127,8 +127,8 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
             ExchKinetics = InputData.Kin.WriteFldr + '/kinetics/' + Syst.Name + 'Exch_Type' + str(iExch-1) + '_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
             csvkinetics  = open(ExchKinetics, 'w')
 
-            print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Molecule[Syst.ExchtoAtom[iExch-2]].Name  )
-            InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Molecule[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+            print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+            InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
             for iLevel in range(Syst.Molecule[0].NBins):
                 for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins):
@@ -145,8 +145,8 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
                 ExchKinetics = InputData.Kin.WriteFldr + '/kinetics/' + Syst.Name + 'InelExch_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
                 csvkinetics  = open(ExchKinetics, 'w')
 
-                print('      [Write_Kinetics]: Writing Inelastic + Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Molecule[Syst.ExchtoAtom[iExch-2]].Name  )
-                InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Molecule[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+                print('      [Write_Kinetics]: Writing Inelastic + Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+                InelFile     = InputData.Kin.ReadFldr                                           + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
                 for iLevel in range(Syst.Molecule[0].NBins):
                     for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins):
