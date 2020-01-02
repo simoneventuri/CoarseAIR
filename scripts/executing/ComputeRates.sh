@@ -613,8 +613,10 @@ function PostTrajectories {
       if [ ${StochPESFlg} -eq 1 ]; then 
         scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES} ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
       fi
-      if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
-        NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)
+      #if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then                                                              #TEMPORARY FOR ALESSANDRO
+      if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out ]; then                                                               #
+        #NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)                                                           #
+        NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out)                                                            #TEMPORARY FOR ALESSANDRO
         NTraj=$((NTraj-1))
       else 
         NTraj=0
@@ -705,14 +707,14 @@ function FromCrossToRates {
     cd ${COARSEAIR_BIN_OUTPUT_DIR}
     TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
   
-    if [ -e "$TrajFile" ]; then
+    if [ -e "$TrajFile" ]; then                                                                                        
   
       typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
 
       if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
         eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
-      else
+      else                                                                                                             
         if [ -e "$TrajErrorFile" ]; then
           echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
         else
@@ -725,7 +727,7 @@ function FromCrossToRates {
       
     else
     
-      if [ -e "$TrajErrorFile" ]; then
+     if [ -e "$TrajErrorFile" ]; then                                                                                   
         echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
       else
         echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
@@ -733,7 +735,7 @@ function FromCrossToRates {
       fi
       echo "        [FromCrossToRates]: No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
       
-    fi
+    fi                                                                                                                  
     
   else
   

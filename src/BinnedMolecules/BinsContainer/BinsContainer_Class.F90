@@ -107,8 +107,8 @@ Subroutine MainInitialize_BinsContainer( This, Input, iMol, DtbFldrPath, FldrPat
   end if
 
 
-  allocate( This%PathToBinMolDtbFldr, source = trim(adjustl( trim(adjustl(DtbFldrPath)) // adjustl(trim( Input%Molecules_Name(iMol) )) // '_' // This%NBins_char // '/' )) )
-  allocate( This%PathToBinMolFldr,    source = trim(adjustl( trim(adjustl(FldrPath))    // adjustl(trim( Input%Molecules_Name(iMol) )) // '_' // This%NBins_char // '/' )) )
+  allocate( This%PathToBinMolDtbFldr, source = trim(adjustl( trim(adjustl(DtbFldrPath)) // 'Bins_' // This%NBins_char // '/' )) )
+  allocate( This%PathToBinMolFldr,    source = trim(adjustl( trim(adjustl(FldrPath))    // 'Bins_' // This%NBins_char // '/' )) )
   if (i_Debug_Loc)  call Logger%Write( "Creating Folder ", This%PathToBinMolFldr )
   call system('mkdir -p ' // This%PathToBinMolFldr )
 

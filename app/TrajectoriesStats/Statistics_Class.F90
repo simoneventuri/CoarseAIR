@@ -194,7 +194,8 @@ Subroutine ReadInputs( This, i_Debug )
 !     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
-  DataFile%Name     =   'trajectories.csv'
+  !DataFile%Name     =   'trajectories.csv'
+  DataFile%Name     =   'trajectories.out'                                                                                        !!! TEMPORARY CHANGED FOR ALESSANDRO
   open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', Form='FORMATTED', iostat=DataFile%Status )
   if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
   DataFile%Format   =   "( i9,3x, 2(es15.8,3x), 2(4(i3,3x)))"

@@ -63,9 +63,9 @@ Program RunTrajectories
   character(10)                         ::    Tran_char
 !  real(rkp)                             ::    StartTime, EndTime
   
-  logical                ,parameter     ::    i_Debug_RT        = .False.
-  logical                ,parameter     ::    i_Debug_RT_Deep   = .False. 
-  logical                ,parameter     ::    i_Debug_RT_ODE    = .False. 
+  logical                ,parameter     ::    i_Debug_RT        = .True.
+  logical                ,parameter     ::    i_Debug_RT_Deep   = .True. 
+  logical                ,parameter     ::    i_Debug_RT_ODE    = .True. 
   
 !  call CPU_Time( StartTime )
   
@@ -226,18 +226,16 @@ Program RunTrajectories
   if (Input%NInitMolecules==1) Then
      iMol = 1
 
-     call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/' //                      &
-                  trim(adjustl(Input%Molecules_Name(iMol))) // '_' // trim(adjustl(Input%NBins_char(iMol))) // '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ' // &
-                  ' ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // '.inp' )
+     call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // &
+                  '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // '.inp' )
 
   else 
      do iMol = 1,Input%NInitMolecules
    
         Write(Imol_char,'(I2)')iMol
 
-        call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/' //                      &
-                  trim(adjustl(Input%Molecules_Name(iMol))) // '_' // trim(adjustl(Input%NBins_char(iMol))) // '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ' // &
-                   ' ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // trim(adjustl(iMol_char)) // '.inp' )
+        call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // &
+                     '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // trim(adjustl(iMol_char)) // '.inp' )
 
      enddo
   endif

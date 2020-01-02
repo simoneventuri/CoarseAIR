@@ -507,23 +507,33 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
 
 
   iP       = int(Arr / 16.0_rkp)
+  if (i_Debug_Loc) call Logger%Write( "iP = ", iP )
   if (iP > 0) then
     iOpp     = Collision%Pairs(iP)%Opposite
     NProcPre = Collision%Pairs(iP)%NPrevProc
     Temp     = mod(Arr , 16)
     iType    = mod(Temp, 4)
     jType    = int(Temp / 4)
+    if (i_Debug_Loc) call Logger%Write( "iType = ", iType )
+    if (i_Debug_Loc) call Logger%Write( "jType = ", jType )
+    if (i_Debug_Loc) call Logger%Write( "NProcPre = ", NProcPre )
 
     iMol     = Collision%Pairs(iP)%To_Molecule
     MolNameA = Collision%MoleculesContainer(iMol)%Molecule%Name
+    if (i_Debug_Loc) call Logger%Write( "iMol = ", iMol )
 
     iMolOpp  = Collision%Pairs(iOpp)%To_Molecule
     MolNameB = Collision%MoleculesContainer(iMolOpp)%Molecule%Name
+    if (i_Debug_Loc) call Logger%Write( "iMolOpp = ", iMolOpp )
 
     iA    = Collision%Pair_To_Atoms(1,iP)
     jA    = Collision%Pair_To_Atoms(2,iP)
     kA    = Collision%Pair_To_Atoms(1,iOpp)
     lA    = Collision%Pair_To_Atoms(2,iOpp)
+    if (i_Debug_Loc) call Logger%Write( "iA = ", iA )
+    if (i_Debug_Loc) call Logger%Write( "jA = ", jA )
+    if (i_Debug_Loc) call Logger%Write( "kA = ", kA )
+    if (i_Debug_Loc) call Logger%Write( "lA = ", lA )
 
     if (iType > 1) then
       
@@ -557,6 +567,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
       iLevel     = Collision%MoleculesContainer(iMol)%Molecule%BinsContainer%qns_to_Bin(vqn(1),jqn(1))
       NProcCurrA = iLevel + 1
       jLevel     = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%qns_to_Bin(vqn(2),jqn(2))
+      NProcCurrB = jLevel + 1
       if (iP == 1) then
         ProcType = 1
         ExcType  = 0
@@ -567,11 +578,24 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
 
     end if
 
+    if (i_Debug_Loc) call Logger%Write( "ProcType   = ", ProcType )
+    if (i_Debug_Loc) call Logger%Write( "iLevel     = ", iLevel )
+    if (i_Debug_Loc) call Logger%Write( "jLevel     = ", jLevel )
+    if (i_Debug_Loc) call Logger%Write( "ExcType    = ", ExcType )
+    if (i_Debug_Loc) call Logger%Write( "NProcCurrA = ", NProcCurrA )
+    if (i_Debug_Loc) call Logger%Write( "NProcCurrB = ", NProcCurrB )
+
     call CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelChar, jLevelChar, Name )  
+    
     iLevelFin     = [iLevel,     jLevel]
     iLevelFinChar = [iLevelChar, jLevelChar]
     Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB + 1)
     Pairs         = [iP, iOpp]
+
+    if (i_Debug_Loc) call Logger%Write( "iLevelFin  = ", iLevelFin )
+    if (i_Debug_Loc) call Logger%Write( "Idx        = ", Idx )
+    if (i_Debug_Loc) call Logger%Write( "Pairs      = ", Pairs )
+
   else
     allocate(Name, source = adjustl(trim( Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name // '+' // Collision%Atoms(4)%Name )) )
     iLevelFin     = [  0,   0]
