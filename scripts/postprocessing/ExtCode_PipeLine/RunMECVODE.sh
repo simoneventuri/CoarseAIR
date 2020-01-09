@@ -32,15 +32,17 @@ echo '   PipeLine for Running External Codes				 								    '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 
-export System=${1}
-export TTran=${2}
-export PathToMECVODEFldr=${3}
-export PathToDtbFldr=${4}
-export PathToRunFldr=${5}
-export DissFlg=${6}
-export InelFlg=${7}
-export ExchFlg1=${8}
-export ExchFlg2=${9}
+export System='O3'
+export TTran=10000
+export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
+export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
+export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
+
+export DissFlg=1
+export InelFlg=1
+export ExchFlg1=0
+export ExchFlg2=0
+
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/"
 
@@ -80,7 +82,7 @@ function Call_MeCvode() {
   cd ./${OutputFldr}
   scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/box_' ./
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
-  ./box_ ${OMP_NUM_THREADS}
+  ./box_ 8
 }
 
 
