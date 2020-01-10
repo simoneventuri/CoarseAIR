@@ -67,8 +67,11 @@ def Initialize_Data(InputData):
     Syst.PathToHDF5   = InputData.HDF5.ReadFldr
 
 
-    ## Creating Output Folder
+    ## Creating Output Folders
     InputData.FinalFldr = InputData.FinalFldr + '/' + SystNameLong + '/'
+    if not os.path.exists(InputData.FinalFldr):
+        os.makedirs(InputData.FinalFldr)
+    InputData.FinalFldr = InputData.FinalFldr + '/' + InputData.ME.ProcCode + '/'
     if not os.path.exists(InputData.FinalFldr):
         os.makedirs(InputData.FinalFldr)
 

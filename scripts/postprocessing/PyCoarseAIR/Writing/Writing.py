@@ -34,7 +34,7 @@ def mkdirs(newdir, mode=0o777):
 def Write_Rates_Thermal(Syst, Temp, InputData):
 
     mkdirs( InputData.FinalFldr )    
-    PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh.csv'
+    PathToFile = InputData.FinalFldr + '/KTh.csv'
     print('    [Write_Rates_Thermal]: Writing Thermal Rates in File: ' + PathToFile )
     with open(PathToFile, 'w') as csvTermo:
         Line       = '# T,KDiss,KInel' 
@@ -51,7 +51,7 @@ def Write_Rates_Thermal(Syst, Temp, InputData):
 def Write_DissRates_Thermal(Syst, Temp, InputData):
 
     mkdirs( InputData.FinalFldr )    
-    PathToFile = InputData.FinalFldr + '/' + Syst.Molecule[0].Name + '_KTh_Diss.csv'
+    PathToFile = InputData.FinalFldr + '/KTh_Diss.csv'
     print('    [Write_DissRates_Thermal]: Writing Dissociation Thermal Rates in File: ' + PathToFile )
     with open(PathToFile, 'w') as csvTermo:
         Line    = '# T,KDiss\n' 
@@ -122,7 +122,7 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
     if (InputData.Kin.WriteExch_Flg):
 
         for iExch in range (2, Syst.NProcTypes):
-            print('      [Write_Kinetics]: iExch =  ' + str(iExch) )
+            print('      [Write_Kinetics]: iExch =  ' + str(iExch-1) )
 
             ExchKinetics = InputData.Kin.WriteFldr + '/kinetics/' + Syst.Name + 'Exch_Type' + str(iExch-1) + '_' + str(Temp.TranVec[iT-1]) + 'K.dat' 
             csvkinetics  = open(ExchKinetics, 'w')
@@ -258,7 +258,7 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
 
 def Write_QSS(Syst, Temp, InputData, iT):
 
-    PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KQSS.csv'
+    PathToFile = InputData.FinalFldr + '/KQSS.csv'
     print('    [Write]: Writing QSS Rates in File: ' + PathToFile )
     with open(PathToFile, 'a') as csvQSS:
         if (not path.exists(PathToFile) ):

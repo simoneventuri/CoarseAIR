@@ -97,7 +97,7 @@ class component(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + Syst.Molecule[self.ToMol].Name + '_T' + str(Temp.TranVec[iT-1]) + 'K_Pops.png'
+        FigSavePath = InputData.FinalFldrT + '/Pops.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Pop]: Saved Level Population Plot in: ' + FigSavePath)
 
@@ -152,7 +152,7 @@ class component(object):
         plt.legend(fontsize=20)
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_KAveraged_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/KAveraged_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_TTran_Evolution]: Saved Averaged Rates Evolution Plot in: ' + FigSavePath)
 
@@ -175,7 +175,7 @@ class component(object):
         plt.legend(fontsize=20)
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_EAveraged_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/EAveraged_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_EAveraged]: Saved Averaged Energy Evolution Plot in: ' + FigSavePath)
 
@@ -223,7 +223,7 @@ class component(object):
 
     def Write_Taus(self, Temp, InputData, iT):
  
-        PathToFile = InputData.FinalFldr + '/' + InputData.SystNameLong + '_Taus.csv'
+        PathToFile = InputData.FinalFldr + '/Taus.csv'
         print('\n    [Write_Taus]: Writing Taus in File: ' + PathToFile )
         with open(PathToFile, 'a') as csvTaus:
             if (not path.exists(PathToFile) ):
@@ -298,7 +298,7 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_MoleFracs_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/MoleFracs_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_MolFracs_Evolution]: Saved Mole Fraction Evolutions Plot in: ' + FigSavePath)
 
@@ -318,7 +318,7 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_T_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/T_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_TTran_Evolution]: Saved Temperature Evolution Plot in: ' + FigSavePath)
 
@@ -338,7 +338,7 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_Rho_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/Rho_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Rho_Evolution]: Saved Density Evolution Plot in: ' + FigSavePath)
         
@@ -358,7 +358,7 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_P_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/P_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_P_Evolution]: Saved Pressure Evolution Plot in: ' + FigSavePath)
 
@@ -378,7 +378,7 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_Nd_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/Nd_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Nd_Evolution]: Saved Number Density Evolution Plot in: ' + FigSavePath)
 
@@ -398,6 +398,6 @@ class me_output(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_T' + str(Temp.TranVec[iT-1]) + 'K_EEh_Evo.png'
+        FigSavePath = InputData.FinalFldrT + '/EEh_Evo.png'
         plt.savefig(FigSavePath)
         print('\n    [Plot_Energy_Evolution]: Saved Energy Evolution Plot in: ' + FigSavePath)

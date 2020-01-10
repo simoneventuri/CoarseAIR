@@ -55,7 +55,7 @@ def Plot_Rates_Thermal(Syst, Temp, InputData):
     plt.tight_layout()
     if (InputData.PlotShow_Flg):
         plt.show()
-    FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh.png'
+    FigSavePath = InputData.FinalFldr + '/KTh.png'
     plt.savefig(FigSavePath)
     print('    [Plot_Rates_Thermal]: Saved Thermal Rates Plot in: ' + FigSavePath)
 
@@ -78,6 +78,6 @@ def Plot_DissRates_Thermal(Syst, Temp, InputData):
     plt.tight_layout()
     if (InputData.PlotShow_Flg):
         plt.show()
-    FigSavePath = InputData.FinalFldr + '/' + InputData.SystNameLong + '_KTh_Diss.png'
+    FigSavePath = InputData.FinalFldr + '/KTh_Diss.png'
     plt.savefig(FigSavePath)
     print('    [Plot_DissRates_Thermal]: Saved Dissociation Thermal Rates Plot in: ' + FigSavePath)

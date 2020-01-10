@@ -64,19 +64,20 @@ InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
 InputData.Kin.Read_Flg          = False
-InputData.Kin.Write_Flg         = True
+InputData.Kin.Write_Flg         = False
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = False     
-InputData.Kin.WriteInel_Flg     = False
+InputData.Kin.WriteDiss_Flg     = True     
+InputData.Kin.WriteInel_Flg     = True
 InputData.Kin.WriteExch_Flg     = True
 
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False
 InputData.HDF5.Save_Flg         = True
 
-InputData.ME.Read_Flg           = False
-InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/output_O3_T10000K_1_1_0_0/'
+InputData.ME.Read_Flg           = True
+InputData.ME.ProcCode           = '1_1_1_1'
+InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/output_O3_T10000K_' + InputData.ME.ProcCode + '/'
 InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
 
 InputData.PlotShow_Flg          = False
@@ -105,14 +106,19 @@ if (InputData.Kin.Write_Flg):
 
 
 if (InputData.ME.Read_Flg):
+
+	InputData.FinalFldrT = InputData.FinalFldr + '/T' + str(Temp.TranVec[1-1]) + '/'
+	if not os.path.exists(InputData.FinalFldrT):
+		os.makedirs(InputData.FinalFldrT)
+
 	ME = me_output(Syst)
 	ME.Read_Box(InputData)
-	# ME.Plot_MolFracs_Evolution(InputData)
-	# ME.Plot_TTran_Evolution(InputData)
-	# ME.Plot_Rho_Evolution(InputData)
-	# ME.Plot_P_Evolution(InputData)
-	# ME.Plot_Nd_Evolution(InputData)
-	# ME.Plot_Energy_Evolution(InputData)
+	ME.Plot_MolFracs_Evolution(InputData, Temp, 1)
+	# ME.Plot_TTran_Evolution(InputData, Temp, 1)
+	# ME.Plot_Rho_Evolution(InputData, Temp, 1)
+	# ME.Plot_P_Evolution(InputData, Temp, 1)
+	# ME.Plot_Nd_Evolution(InputData, Temp, 1)
+	# ME.Plot_Energy_Evolution(InputData, Temp, 1)
 
 	for iComp in range(ME.NCFDComp):
 		if ( ME.Component[iComp].ToMol > -1 ):
