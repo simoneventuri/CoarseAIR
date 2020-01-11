@@ -45,7 +45,7 @@ def Compute_BackwardRates(Syst, iT):
     for iLevel in range(Syst.Molecule[0].NBins):
         for jLevel in range(Syst.Molecule[0].NBins):
             if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[0].LevelEeV[jLevel]):
-                Syst.T[iT-1].Proc[1].BckRates[jLevel, iLevel] = Syst.T[iT-1].Proc[1].BckRates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[0].T[iT-1].LevelQExp[jLevel]
+                Syst.T[iT-1].Proc[1].BckRates[jLevel, iLevel] = Syst.T[iT-1].Proc[1].Rates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[0].T[iT-1].LevelQExp[jLevel]
 
 
     for iProc in range(2, Syst.NProcTypes):
@@ -55,7 +55,7 @@ def Compute_BackwardRates(Syst, iT):
         for iLevel in range(Syst.Molecule[0].NBins):
             for jLevel in range(Syst.Molecule[jMol].NBins):
                 if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[jMol].LevelEeV[jLevel]):
-                    Syst.T[iT-1].ProcExch[iProc-2].BckRates[jLevel, iLevel] = Syst.T[iT-1].ProcExch[iProc-2].BckRates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[jMol].T[iT-1].LevelQExp[jLevel]
+                    Syst.T[iT-1].ProcExch[iProc-2].BckRates[jLevel, iLevel] = Syst.T[iT-1].ProcExch[iProc-2].Rates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[jMol].T[iT-1].LevelQExp[jLevel]
 
     return Syst
 
@@ -139,7 +139,6 @@ def Compute_PrefJumps(InputData, Syst, iT):
     Syst.T[iT-1].Proc[1].PrefJumps = np.zeros((Syst.Molecule[0].NBins, NJumps), dtype=np.int32)
     for iLevel in range(Syst.Molecule[0].NBins):
         TempVec = Syst.T[iT-1].Proc[1].BckRates[iLevel, :]
-        print(TempVec)
         Syst.T[iT-1].Proc[1].PrefJumps[iLevel,:] = np.argsort(TempVec)[-NJumps:]
 
     for iProc in range(2, Syst.NProcTypes):
