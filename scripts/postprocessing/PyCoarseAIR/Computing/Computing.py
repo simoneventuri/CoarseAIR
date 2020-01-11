@@ -139,6 +139,7 @@ def Compute_PrefJumps(InputData, Syst, iT):
     Syst.T[iT-1].Proc[1].PrefJumps = np.zeros((Syst.Molecule[0].NBins, NJumps), dtype=np.int32)
     for iLevel in range(Syst.Molecule[0].NBins):
         TempVec = Syst.T[iT-1].Proc[1].BckRates[iLevel, :]
+        print(TempVec)
         Syst.T[iT-1].Proc[1].PrefJumps[iLevel,:] = np.argsort(TempVec)[-NJumps:]
 
     for iProc in range(2, Syst.NProcTypes):
