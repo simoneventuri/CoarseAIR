@@ -57,17 +57,20 @@ from ME_Output         import me_output
 InputData                       = inputdata()
 InputData.SystNameLong          = 'O3_UMN'
 
-InputData.TranVec               = np.array([2500])
+InputData.TranVec               = np.array([10000])
 InputData.iTVec                 = np.arange(1) + 1
 
 InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 
+InputData.Rates.PrefJumps_Flg   = True
+InputData.Rates.NPrefJumps		= 5
+
 InputData.Kin.Read_Flg          = False
 InputData.Kin.Write_Flg         = False
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = True     
+InputData.Kin.WriteDiss_Flg     = False     
 InputData.Kin.CorrFactor        = 1.0
 InputData.Kin.WriteInel_Flg     = False
 InputData.Kin.WriteExch_Flg     = False

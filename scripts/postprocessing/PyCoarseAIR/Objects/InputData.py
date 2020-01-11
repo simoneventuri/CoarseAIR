@@ -21,6 +21,15 @@
 import numpy as np
 
 
+class rates(object):
+
+    def __init__(self):
+
+        self.PrefJumps_Flg    = False
+        self.NPrefJumps       = 5
+
+
+
 class kinetics(object):
 
     def __init__(self):
@@ -33,6 +42,7 @@ class kinetics(object):
         self.WriteExch_Flg    = False
         self.WriteDiss_Flg    = False
         self.CorrFactor       = 1.0 
+
 
 
 class hdf5(object):
@@ -59,6 +69,7 @@ class ME(object):
 class inputdata(object):
 
     def __init__(self):
+        self.Rates            = rates()
         self.Kin              = kinetics()
         self.HDF5             = hdf5()
         self.ME               = ME()

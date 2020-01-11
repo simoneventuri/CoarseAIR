@@ -239,7 +239,7 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
 def Write_QSS(Syst, Temp, InputData, iT):
 
     PathToFile = InputData.FinalFldr + '/KQSS.csv'
-    print('    [Write]: Writing QSS Rates in File: ' + PathToFile )
+    print('    [Write_QSS]: Writing QSS Rates in File: ' + PathToFile )
     if (not path.exists(PathToFile) ):
         WriteFlg = True
     else:
@@ -254,3 +254,26 @@ def Write_QSS(Syst, Temp, InputData, iT):
         TempMat = np.transpose( np.expand_dims( np.concatenate( [np.array([Temp.TranVec[iT-1]], float), Syst.T[iT-1].QSS.Rate] ), axis=1 ) )
         np.savetxt(csvQSS, TempMat, delimiter=',')
     csvQSS.close()
+
+
+def Write_PrefJumps(Syst, Temp, InputData, iT):
+
+    PathToFile = InputData.FinalFldr + '/PrefJumps_Inel.csv'
+    print('    [Write_PrefJumps]: Writing Jumps in File: ' + PathToFile ) 
+    with open(PathToFile, 'w') as csvJumps:
+        Line    = '# Level1, Level2, Level3, Level4, Level5' 
+        csvJumps.write(Line)
+        TempMat = Syst.T[iT-1].Proc[1].PrefJumps
+        np.savetxt(csvJumps, TempMat, delimiter=',')
+    csvJumps.close()
+
+    for iProc in range(2, Syst.NProcTypes):
+        PathToFile = InputData.FinalFldr + '/PrefJumps_Exch_Type' + str(iProc-1) + '.csv'
+        print('    [Write_PrefJumps]: Writing Jumps in File: ' + PathToFile ) 
+        with open(PathToFile, 'w') as csvJumps:
+            Line    = '# Level1, Level2, Level3, Level4, Level5' 
+            csvJumps.write(Line)
+            TempMat = Syst.T[iT-1].ProcExch[iProc-2].PrefJumps
+            np.savetxt(csvJumps, TempMat, delimiter=',')
+        csvJumps.close()
+

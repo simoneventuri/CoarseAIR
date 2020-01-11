@@ -39,6 +39,28 @@ def Compute_Correction_To_DissRates(InputData, Syst, iT):
 
 
 
+def Compute_BackwardRates(Syst, iT):
+
+    Syst.T[iT-1].Proc[1].BckRates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[0].NBins))
+    for iLevel in range(Syst.Molecule[0].NBins):
+        for jLevel in range(Syst.Molecule[0].NBins):
+            if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[0].LevelEeV[jLevel]):
+                Syst.T[iT-1].Proc[1].BckRates[jLevel, iLevel] = Syst.T[iT-1].Proc[1].BckRates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[0].T[iT-1].LevelQExp[jLevel]
+
+
+    for iProc in range(2, Syst.NProcTypes):
+        jMol = Syst.ExchtoMol[iProc-2]
+
+        Syst.T[iT-1].ProcExch[iProc-2].BckRates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[jMol].NBins))
+        for iLevel in range(Syst.Molecule[0].NBins):
+            for jLevel in range(Syst.Molecule[jMol].NBins):
+                if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[jMol].LevelEeV[jLevel]):
+                    Syst.T[iT-1].ProcExch[iProc-2].BckRates[jLevel, iLevel] = Syst.T[iT-1].ProcExch[iProc-2].BckRates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[jMol].T[iT-1].LevelQExp[jLevel]
+
+    return Syst
+
+
+
 def Compute_Rates_Overall(Syst, iT):
 
     Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
@@ -107,3 +129,25 @@ def Compute_QSS(Syst, ME, iT):
         Syst.T[iT-1].QSS.Rate[jProc] = ( Syst.T[iT-1].ProcTot[jProc].RatesAveraged[iQSS_Start] + Syst.T[iT-1].ProcTot[jProc].RatesAveraged[iQSS_End] ) / 2.0
 
     return Syst
+
+
+
+def Compute_PrefJumps(InputData, Syst, iT):
+
+    NJumps = InputData.Rates.NPrefJumps
+
+    Syst.T[iT-1].Proc[1].PrefJumps = np.zeros((Syst.Molecule[0].NBins, NJumps), dtype=np.int32)
+    for iLevel in range(Syst.Molecule[0].NBins):
+        TempVec = Syst.T[iT-1].Proc[1].BckRates[iLevel, :]
+        Syst.T[iT-1].Proc[1].PrefJumps[iLevel,:] = np.argsort(TempVec)[-NJumps:]
+
+    for iProc in range(2, Syst.NProcTypes):
+        jMol = Syst.ExchtoMol[iProc-2]
+        
+        Syst.T[iT-1].ProcExch[iProc-2].PrefJumps = np.zeros((Syst.Molecule[0].NBins, NJumps), dtype=np.int32)
+        for iLevel in range(Syst.Molecule[0].NBins):
+            TempVec =  Syst.T[iT-1].ProcExch[iProc-2].BckRates[iLevel, :]
+            Syst.T[iT-1].ProcExch[iProc-2].PrefJumps[iLevel,:] = np.argsort(TempVec)[-NJumps:]
+
+    return Syst
+
