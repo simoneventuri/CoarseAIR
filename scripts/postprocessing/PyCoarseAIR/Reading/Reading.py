@@ -278,7 +278,7 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
 
         if (InputData.Rates.PrefJumps_Flg):
             print('  [Read_Rates_CGQCT]: Computing Backweard Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
-            Syst = Compute_BackwardRates(InputData, Syst, iT)
+            Syst = Compute_BackwardRates(Syst, iT)
             print('  [Read_Rates_CGQCT]: Computing Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
             Syst = Compute_PrefJumps(Syst, iT)
             print('  [Read_Rates_CGQCT]: Writing   Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
