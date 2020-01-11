@@ -33,9 +33,9 @@ sys.path.insert(0, '../Plotting/')
 
 from Saving        import Save_Levels_HDF5, Save_qnsEnBin_HDF5, Save_PartFuncsAndEnergiesAtT_HDF5, Save_RatesAtT_HDF5
 from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5
-from Computing     import Compute_Correction_To_DissRates, Compute_Rates_Overall, Compute_Rates_Thermal
+from Computing     import Compute_Correction_To_DissRates, Compute_Rates_Overall, Compute_Rates_Thermal, Compute_BackwardRates, Compute_PrefJumps
 from Parameters    import *
-from Writing       import Write_Rates_Thermal, Write_Kinetics
+from Writing       import Write_Rates_Thermal, Write_Kinetics, Write_PrefJumps
 from Plotting      import Plot_Rates_Thermal
 
 def Read_Levels(Syst, InputData):
