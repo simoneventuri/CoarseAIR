@@ -266,7 +266,7 @@ def Write_PrefJumps(Syst, Temp, InputData, iT):
         Line    = '# Level1, Level2, Level3, Level4, Level5' 
         csvJumps.write(Line)
         TempMat = Syst.T[iT-1].Proc[1].PrefJumps
-        np.savetxt(csvJumps, TempMat.astype(int), delimiter=',')
+        np.savetxt(csvJumps, TempMat.astype(int), delimiter=',', fmt='%d')
     csvJumps.close()
 
     for iProc in range(2, Syst.NProcTypes):
@@ -276,6 +276,6 @@ def Write_PrefJumps(Syst, Temp, InputData, iT):
             Line    = '# Level1, Level2, Level3, Level4, Level5' 
             csvJumps.write(Line)
             TempMat = Syst.T[iT-1].ProcExch[iProc-2].PrefJumps
-            np.savetxt(csvJumps, TempMat.astype(int), delimiter=',')
+            np.savetxt(csvJumps, TempMat.astype(int), delimiter=',', fmt='%d')
         csvJumps.close()
 
