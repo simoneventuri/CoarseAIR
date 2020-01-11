@@ -57,25 +57,27 @@ from ME_Output         import me_output
 InputData                       = inputdata()
 InputData.SystNameLong          = 'O3_UMN'
 
-InputData.TranVec               = np.array([8000])
-InputData.iTVec                 = np.arange(1) + 1
+InputData.TranVec               = np.array([2500, 5000, 15000, 20000])
+NTran                           = np.size(InputData.TranVec)
+InputData.iTVec                 = np.arange(NTran) + 1
 
 InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
 InputData.Kin.Read_Flg          = False
-InputData.Kin.Write_Flg         = False
+InputData.Kin.Write_Flg         = True
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteDiss_Flg     = True     
-InputData.Kin.WriteInel_Flg     = True
-InputData.Kin.WriteExch_Flg     = True
+InputData.Kin.CorrFactor        = 5.33333333333
+InputData.Kin.WriteInel_Flg     = False
+InputData.Kin.WriteExch_Flg     = False
 
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False
 InputData.HDF5.Save_Flg         = True
 
-InputData.ME.Read_Flg           = True
+InputData.ME.Read_Flg           = False
 InputData.ME.ProcCode           = '0_1_0_0'
 InputData.ME.ReadFldr 	        = WORKSPACE_PATH + '/Mars_Database/Run_0D/'
 InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])

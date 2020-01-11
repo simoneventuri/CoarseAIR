@@ -36,26 +36,31 @@ function Initialize_0D_Database {
 #echo "  [Initialize_0D_Database]: How Many Exchanges?   = "$ExchFlg
 
 
-echo "Units=cm^3/s" > $PathToDtbFldr"/kinetics/KineticsTEMP"
+echo "Units=cm^3/s" > $PathToDtbFldr"/kinetics/KineticsTEMP_T"$TTran"K"
 
 iDiss=1
 while [ ${iDiss} -le ${DissFlg} ]; do 
-	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP"
-	cat $PathToDtbFldr"/kinetics/"$System"Diss_"$TTran"K.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP"
+	if [ $CorrFlg -eq 0 ]; then
+		echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+		cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+	else	
+		echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+		cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+	fi
 	iDiss=$((iDiss+1))
 done
 
 iInel=1
 while [ ${iInel} -le ${InelFlg} ]; do 
-	echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP"
-	cat $PathToDtbFldr"/kinetics/"$System"Inel_"$TTran"K.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP"
+	echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
 	iInel=$((iInel+1))
 done
 
 iExch=${ExchFlg1}
 while [ ${iExch} -gt 0 ] && [ ${iExch} -le ${ExchFlg2} ]; do 
-	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP"
-	cat $PathToDtbFldr"/kinetics/"$System"Exch_Type"$iExch"_"$TTran"K.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP"
+	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Exch_Type"$iExch".dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
 	iExch=$((iExch+1))
 done
 

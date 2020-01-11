@@ -31,7 +31,8 @@ class kinetics(object):
         self.WriteFldr        = ''
         self.WriteInel_Flg    = False
         self.WriteExch_Flg    = False
-        self.WriteDiss_Flg    = False 
+        self.WriteDiss_Flg    = False
+        self.CorrFactor       = 1.0 
 
 
 class hdf5(object):

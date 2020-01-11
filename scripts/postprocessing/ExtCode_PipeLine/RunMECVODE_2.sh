@@ -33,7 +33,7 @@ echo '--------------------------------------------------------------------------
 echo ' '
 
 export System='O3_UMN'
-export TTran=10000
+export Tran_vec=(2500 5000) 
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
@@ -41,8 +41,8 @@ export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 export DissFlg=1
 export CorrFlg=1
 export InelFlg=1
-export ExchFlg1=0
-export ExchFlg2=0
+export ExchFlg1=1
+export ExchFlg2=1
 
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/"
@@ -61,7 +61,7 @@ echo '------------------------------------------------------'
 echo '  Inputs:'
 echo '------------------------------------------------------'
 echo '  System                         = '${System}
-echo '  Translational Temp.            = '${TTran}
+echo '  Vector of Translational Temp.s = '${Tran_vec}
 echo '  Writing Dissociation?          = '${DissFlg}
 echo '  Writing Inelastic?             = '${InelFlg}
 echo '  Firts Exchanges to be Written? = '${ExchFlg1}
@@ -80,19 +80,24 @@ function Call_MeCvode() {
   cd ${PathToRunFldr}
   export OutputFldr='output_'${System}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   mkdir -p ./${OutputFldr}
-  cd ./${OutputFldr}
-  scp ${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K/exec/box_' ./
+  cd ./${OutputFldr} 
+  export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_wDiss' 
+  echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
+  scp ${ExFldr}'/exec/box_' ./
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
   ./box_ 8
 }
 
 
+for TTran in "${Tran_vec[@]}"; do :
+	echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
 
-echo "[RunMECVODE]: Calling Load_Initialize_0D"
-Load_Initialize_0D
-echo " "
+	echo "[RunMECVODE]: Calling Load_Initialize_0D"
+	Load_Initialize_0D
+  echo " "
 
+	echo "[RunMECCVODE]: Calling Call_MeCvode"
+	Call_MeCvode
+	echo " "
 
-echo "[RunMECCVODE]: Calling Call_MeCvode"
-Call_MeCvode
-echo " "
+done

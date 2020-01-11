@@ -33,7 +33,7 @@ sys.path.insert(0, '../Plotting/')
 
 from Saving        import Save_Levels_HDF5, Save_qnsEnBin_HDF5, Save_PartFuncsAndEnergiesAtT_HDF5, Save_RatesAtT_HDF5
 from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5
-from Computing     import Compute_Rates_Overall, Compute_Rates_Thermal
+from Computing     import Compute_Correction_To_DissRates, Compute_Rates_Overall, Compute_Rates_Thermal
 from Parameters    import *
 from Writing       import Write_Rates_Thermal, Write_Kinetics
 from Plotting      import Plot_Rates_Thermal
@@ -265,6 +265,10 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
             if (InputData.HDF5.Save_Flg):
                 print('  [Read_Rates_CGQCT]: Saving Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File\n')
                 Save_RatesAtT_HDF5(Syst, iT, TTra, TInt)
+        
+        if (InputData.Kin.CorrFactor != 1.0):	
+                print('  [Read_Rates_CGQCT]: Correcting Dissociation Rates (Corr Factor = ' + str(InputData.Kin.CorrFactor) + ') for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
+                Syst = Compute_Correction_To_DissRates(InputData, Syst, iT)
 
         print('  [Read_Rates_CGQCT]: Computing Overall Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
         Syst = Compute_Rates_Overall(Syst, iT)

@@ -225,8 +225,12 @@ class component(object):
  
         PathToFile = InputData.FinalFldr + '/Taus.csv'
         print('\n    [Write_Taus]: Writing Taus in File: ' + PathToFile )
+        if (not path.exists(PathToFile) ):
+            WriteFlg = True
+        else:
+            WriteFlg = False        
         with open(PathToFile, 'a') as csvTaus:
-            if (not path.exists(PathToFile) ):
+            if (WriteFlg):
                 Line       = '# T,RotTau,VibTau,IntTau\n'
                 csvTaus.write(Line)
             TempVec = np.array([self.TauRot, self.TauVib, self.TauInt])

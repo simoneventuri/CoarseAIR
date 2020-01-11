@@ -31,6 +31,14 @@ sys.path.insert(0, '../Plotting/')
 from Plotting      import Plot_DissRates_Thermal
 
 
+def Compute_Correction_To_DissRates(InputData, Syst, iT):
+
+    Syst.T[iT-1].Proc[0].Rates[:,0] = Syst.T[iT-1].Proc[0].Rates[:,0] * InputData.Kin.CorrFactor
+
+    return Syst
+
+
+
 def Compute_Rates_Overall(Syst, iT):
 
     Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
