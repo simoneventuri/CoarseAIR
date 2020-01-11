@@ -258,7 +258,11 @@ def Write_QSS(Syst, Temp, InputData, iT):
 
 def Write_PrefJumps(Syst, Temp, InputData, iT):
 
-    PathToFile = InputData.FinalFldr + '/PrefJumps_Inel.csv'
+    print(Syst.T[iT-1].Proc[1].PrefJumps)
+
+    TempFldr   = PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(TTra)) + '_' + str(int(TInt))
+
+    PathToFile = TempFldr + '/PrefJumps_Inel.csv'
     print('    [Write_PrefJumps]: Writing Jumps in File: ' + PathToFile ) 
     with open(PathToFile, 'w') as csvJumps:
         Line    = '# Level1, Level2, Level3, Level4, Level5' 
@@ -268,7 +272,7 @@ def Write_PrefJumps(Syst, Temp, InputData, iT):
     csvJumps.close()
 
     for iProc in range(2, Syst.NProcTypes):
-        PathToFile = InputData.FinalFldr + '/PrefJumps_Exch_Type' + str(iProc-1) + '.csv'
+        PathToFile = TempFldr + '/PrefJumps_Exch_Type' + str(iProc-1) + '.csv'
         print('    [Write_PrefJumps]: Writing Jumps in File: ' + PathToFile ) 
         with open(PathToFile, 'w') as csvJumps:
             Line    = '# Level1, Level2, Level3, Level4, Level5' 
