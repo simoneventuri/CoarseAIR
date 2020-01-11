@@ -44,7 +44,7 @@ def Compute_BackwardRates(Syst, iT):
     Syst.T[iT-1].Proc[1].BckRates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[0].NBins))
     for iLevel in range(Syst.Molecule[0].NBins):
         for jLevel in range(Syst.Molecule[0].NBins):
-            if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[0].LevelEeV[jLevel]):
+            if ( (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[0].LevelEeV[jLevel]) and (Syst.T[iT-1].Proc[1].Rates[iLevel, jLevel] > 0.0) ):
                 Syst.T[iT-1].Proc[1].BckRates[jLevel, iLevel] = Syst.T[iT-1].Proc[1].Rates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[0].T[iT-1].LevelQExp[jLevel]
 
 
@@ -54,7 +54,7 @@ def Compute_BackwardRates(Syst, iT):
         Syst.T[iT-1].ProcExch[iProc-2].BckRates = np.zeros((Syst.Molecule[0].NBins, Syst.Molecule[jMol].NBins))
         for iLevel in range(Syst.Molecule[0].NBins):
             for jLevel in range(Syst.Molecule[jMol].NBins):
-                if (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[jMol].LevelEeV[jLevel]):
+                if ( (Syst.Molecule[0].LevelEeV[iLevel] > Syst.Molecule[jMol].LevelEeV[jLevel]) and (Syst.T[iT-1].ProcExch[iProc-2].Rates[iLevel, jLevel] > 0.0) ):
                     Syst.T[iT-1].ProcExch[iProc-2].BckRates[jLevel, iLevel] = Syst.T[iT-1].ProcExch[iProc-2].Rates[iLevel, jLevel] * Syst.Molecule[0].T[iT-1].LevelQExp[iLevel] / Syst.Molecule[jMol].T[iT-1].LevelQExp[jLevel]
 
     return Syst
