@@ -57,37 +57,53 @@ from ME_Output         import me_output
 InputData                       = inputdata()
 InputData.SystNameLong          = 'O3_UMN'
 
-InputData.TranVec               = np.array([20000])
+InputData.TranVec               = np.array([1500.0, 2500.0, 3000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 15000.0, 20000.0])
+InputData.T0                    = 300.0
 NTran                           = np.size(InputData.TranVec)
 InputData.iTVec                 = np.arange(NTran) + 1
 
 InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
 InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
 
-InputData.Kin.Read_Flg          = False
-InputData.Kin.Write_Flg         = False
-InputData.Kin.ReadArr_Flg       = False
-InputData.Kin.WriteArr_Flg      = False
-InputData.Kin.SaveArr_Flg       = False
-InputData.Kin.MinRate           = 1.e-15
-InputData.Kin.MinNbTs           = 4
+
+## Reading / Writing Kinetics Data
+InputData.Kin.Read_Flg          = True
+InputData.Kin.Write_Flg         = True
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.Diss_Flg          = False    
+InputData.Kin.WriteDiss_Flg     = True     
 InputData.Kin.CorrFactor        = 5.33333333333
-InputData.Kin.Inel_Flg          = False
-InputData.Kin.Exch_Flg          = False
-InputData.Kin.MaxEntOrPlato     = 1
-InputData.Kin.MaxErrArr         = 1.e-7
+InputData.Kin.WriteInel_Flg     = False
+InputData.Kin.WriteExch_Flg     = False
+
+## Correcting Kinetics Based on Window-Averaging
 InputData.Kin.WindAvrgFlg           = False
 InputData.Kin.WindAvrgJs            = 3
 InputData.Kin.WindAvrgVs            = 2
 
+## Writing Arrhenius Files
+InputData.Kin.MaxEntOrPlato         = 1
+InputData.Kin.MinRate               = 1.e-15
+InputData.Kin.MinNbTs               = 4
+InputData.Kin.MaxErrArr             = 1.e-7
+
+## Grouping Rates
+InputData.Kin.Groups.Flg            = True
+InputData.Kin.Groups.Types          = ['Adaptive']  # '' / 'VibSpecific' / 'Adaptive'
+InputData.Kin.Groups.FldrName       = '_ADD100'
+InputData.Kin.Groups.PathsToMapping = ['/home/venturi/WORKSPACE/SpectralCluster/output/T10000K/Amals100_InelDiss.dat']
+#InputData.Kin.Groups.T0             = 300
+InputData.Kin.Groups.Write_Flg      = True
+InputData.Kin.Groups.WriteDiss_Flg  = True
+InputData.Kin.Groups.WriteInel_Flg  = True
+InputData.Kin.Groups.WriteExch_Flg  = True
+
+
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False
-InputData.HDF5.Save_Flg         = True
+InputData.HDF5.Save_Flg         = False
 
-InputData.ME.Read_Flg           = True
+InputData.ME.Read_Flg           = False
 InputData.ME.ProcCode           = '0_1_1_1'
 InputData.ME.ReadFldr           = WORKSPACE_PATH + '/Mars_Database/Run_0D/'
 InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
@@ -103,11 +119,23 @@ print("\n[PyCoarseAIR]: Initializing Data")
 
 [Syst, Temp] = Initialize_Data(InputData)
 
-print("\n[PyCoarseAIR]: Uploading Data")
+
+
+print("\n[PyCoarseAIR]: Uploading Molecules Data")
 
 Syst = Read_Levels(Syst, InputData)
 Syst = Read_qnsEnBin(Syst, InputData)
 Syst = Read_PartFuncsAndEnergies(Syst, Temp, InputData)
+for iMol in range(Syst.NMolecules):    
+    if hasattr(InputData.Kin.Groups, 'Types'):
+        Syst.Molecule[iMol].Grouped.Get_Mapping(Syst.Molecule[iMol].Levelvqn)
+        Syst.Molecule[iMol].Grouped.Compute_GroupProps(Syst.Molecule[iMol].NBins, Syst.Molecule[iMol].Levelg, Syst.Molecule[iMol].LevelEeV)
+        Syst.Molecule[iMol].Grouped.Write_Groups_PartFuncsAndEnergies(Syst, InputData, Temp)
+
+
+
+print("\n[PyCoarseAIR]: Uploading and Processing Rates Data")
+
 Syst = Read_Rates_CGQCT(Syst, Temp, InputData)
 
 
@@ -117,36 +145,37 @@ if (InputData.Kin.Write_Flg):
 
 
 if (InputData.ME.Read_Flg):
+
     InputData.FinalFldrT = InputData.FinalFldr + '/T' + str(Temp.TranVec[1-1]) + 'K/'
+    if not os.path.exists(InputData.FinalFldrT):
+        os.makedirs(InputData.FinalFldrT)
+    
+    InputData.ME.ReadFldr = InputData.ME.ReadFldr + 'output_' + InputData.SystNameLong + '_T' + str(InputData.TranVec[1-1]) + 'K_' + InputData.ME.ProcCode + '/'
 
-if not os.path.exists(InputData.FinalFldrT):
-    os.makedirs(InputData.FinalFldrT)
+    ME = me_output(Syst)
+    ME.Read_Box(InputData)
+    ME.Plot_MolFracs_Evolution(InputData, Temp, 1)
+    # ME.Plot_TTran_Evolution(InputData, Temp, 1)
+    # ME.Plot_Rho_Evolution(InputData, Temp, 1)
+    # ME.Plot_P_Evolution(InputData, Temp, 1)
+    # ME.Plot_Nd_Evolution(InputData, Temp, 1)
+    # ME.Plot_Energy_Evolution(InputData, Temp, 1)
 
-InputData.ME.ReadFldr = InputData.ME.ReadFldr + 'output_' + InputData.SystNameLong + '_T' + str(InputData.TranVec[1-1]) + 'K_' + InputData.ME.ProcCode + '/'
-ME = me_output(Syst)
-ME.Read_Box(InputData)
-ME.Plot_MolFracs_Evolution(InputData, Temp, 1)
-# ME.Plot_TTran_Evolution(InputData, Temp, 1)
-# ME.Plot_Rho_Evolution(InputData, Temp, 1)
-# ME.Plot_P_Evolution(InputData, Temp, 1)
-# ME.Plot_Nd_Evolution(InputData, Temp, 1)
-# ME.Plot_Energy_Evolution(InputData, Temp, 1)
+    for iComp in range(ME.NCFDComp):
+        if ( ME.Component[iComp].ToMol > -1 ):
+            ME.Component[iComp].Read_Pop(InputData, ME.NTime)
+            ME.Component[iComp].Plot_Pop(InputData, Syst, ME, Temp, 1)
+            ME.Component[iComp].Compute_DistFunc( Syst, ME.NTime )
+            
+            #ME.Component[iComp].Compute_KAveraged( Syst, 1, ME.NTime )
+            #Syst = Compute_QSS( Syst, ME, 1 )
+            #Write_QSS( Syst, Temp, InputData, 1 )
+            #ME.Component[iComp].Plot_KAveraged( InputData, Syst, ME, Temp, 1 )
 
-for iComp in range(ME.NCFDComp):
-    if ( ME.Component[iComp].ToMol > -1 ):
-        ME.Component[iComp].Read_Pop(InputData, ME.NTime)
-        ME.Component[iComp].Plot_Pop(InputData, Syst, ME, Temp, 1)
-        ME.Component[iComp].Compute_DistFunc( Syst, ME.NTime )
-
-        # ME.Component[iComp].Compute_KAveraged( Syst, 1, ME.NTime )
-        # Syst = Compute_QSS( Syst, ME, 1 )
-        # Write_QSS( Syst, Temp, InputData, 1 )
-        # ME.Component[iComp].Plot_KAveraged( InputData, Syst, ME, Temp, 1 )
-
-        ME.Component[iComp].Compute_EAveraged( Syst, 1, ME.NTime )
-        ME.Component[iComp].Plot_EAveraged( InputData, Syst, ME, Temp, 1 )
-        ME.Component[iComp].Compute_Taus( InputData, Syst, ME, 1)
-        ME.Component[iComp].Write_Taus( Temp, InputData, 1)
+            ME.Component[iComp].Compute_EAveraged( Syst, 1, ME.NTime )
+            ME.Component[iComp].Plot_EAveraged( InputData, Syst, ME, Temp, 1 )
+            ME.Component[iComp].Compute_Taus( InputData, Syst, ME, 1)
+            ME.Component[iComp].Write_Taus( Temp, InputData, 1)
 
 
 #Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)

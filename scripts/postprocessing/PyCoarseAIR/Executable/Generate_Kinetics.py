@@ -57,7 +57,7 @@ from ME_Output         import me_output
 InputData                       = inputdata()
 InputData.SystNameLong          = 'O3_UMN'
 
-InputData.TranVec               = np.array([2500, 5000, 15000, 20000])
+InputData.TranVec               = np.array([12000, 14000, 15000, 20000])
 NTran                           = np.size(InputData.TranVec)
 InputData.iTVec                 = np.arange(NTran) + 1
 
@@ -68,10 +68,19 @@ InputData.Kin.Read_Flg          = False
 InputData.Kin.Write_Flg         = True
 InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = True     
+InputData.Kin.WriteDiss_Flg     = False     
 InputData.Kin.CorrFactor        = 5.33333333333
-InputData.Kin.WriteInel_Flg     = False
-InputData.Kin.WriteExch_Flg     = False
+InputData.Kin.WriteInel_Flg     = True
+InputData.Kin.WriteExch_Flg     = True
+## Correcting Kinetics Based on Window-Averaging
+InputData.Kin.WindAvrgFlg 			= True
+InputData.Kin.WindAvrgJs  			= 3
+InputData.Kin.WindAvrgVs  			= 2
+## Writing Arrhenius Files
+InputData.Kin.MaxEntOrPlato         = 1
+InputData.Kin.MinRate 			    = 1.e-15
+InputData.Kin.MinNbTs 			    = 4
+InputData.Kin.MaxErrArr             = 1.e-7
 
 InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
 InputData.HDF5.ForceReadDat_Flg = False

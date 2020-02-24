@@ -26,6 +26,7 @@ import os
 
 from System            import system
 from Temperatures      import temperatures
+from Molecule          import groupedmolecule
 
 import ChemicalSystems
 
@@ -37,7 +38,7 @@ def Initialize_Data(InputData):
     Temp.NTran               = Temp.TranVec.size
     Temp.IntVec              = Temp.TranVec
     Temp.NInt                = Temp.IntVec.size
-
+    Temp.T0                  = InputData.T0
     Temp.iTVec               = InputData.iTVec
 
 
@@ -50,12 +51,18 @@ def Initialize_Data(InputData):
 
     
     for iMol in range(Syst.NMolecules):
+
         if hasattr(InputData, 'KinMthd'):
             ## Kinetic Method for Each of the Molecules (STS/CGM)
             Syst.Molecule[iMol].KinMthd = InputData.KinMthd[iMol]
+        
         if hasattr(InputData, 'NBins'):
             ## Nb of Levels/Bins per Molecule
             Syst.Molecule[iMol].NBins   = InputData.NBins[iMol]
+
+        if hasattr(InputData.Kin.Groups, 'Types'):
+            ## Nb of Levels/Bins per Molecule
+            Syst.Molecule[iMol].Grouped = groupedmolecule(InputData.Kin.Groups.Types[iMol], InputData.Kin.Groups.PathsToMapping[iMol], InputData.Kin.Groups.T0, Syst.NProcTypes, Temp, Syst.Molecule[iMol].Name)
             
 
     NProcTot = 1
@@ -67,6 +74,11 @@ def Initialize_Data(InputData):
     Syst.PathToHDF5   = InputData.HDF5.ReadFldr
 
 
+
+    Syst.Arr.MinRate           = InputData.Kin.MinRate
+    Syst.Arr.MinNbTs           = InputData.Kin.MinNbTs
+
+
     ## Creating Output Folders
     InputData.FinalFldr = InputData.FinalFldr + '/' + SystNameLong + '/'
     if not os.path.exists(InputData.FinalFldr):
@@ -74,5 +86,6 @@ def Initialize_Data(InputData):
     InputData.FinalFldr = InputData.FinalFldr + '/' + InputData.ME.ProcCode + '/'
     if not os.path.exists(InputData.FinalFldr):
         os.makedirs(InputData.FinalFldr)
+
 
     return Syst, Temp

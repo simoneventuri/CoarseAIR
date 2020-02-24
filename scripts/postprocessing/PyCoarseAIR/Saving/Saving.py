@@ -194,3 +194,89 @@ def Save_RatesAtT_HDF5(Syst, iT, TTra, TInt):
         #     ProcToti  = grp.create_dataset(ExchStr, data=Syst.T[iT-1].ProcTot[iProc].Rates, compression="gzip", compression_opts=9)
 
     f.close()
+
+
+
+def Save_Arr_Diss_HDF5(Syst, iMol):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, 'a')
+
+    TempStr1   = Syst.Molecule[iMol].Name
+    
+    TempStr2   = TempStr1 + '/Arr/Diss/'
+
+    if TempStr2 in f.keys():
+
+        #del f[TempStr2]
+        grp       = f[TempStr2]
+        Data      = grp["Idxs"]
+        Data[...] = Syst.Arr.Proc[0].Idxs
+        Data      = grp["Coeffs"]
+        Data[...] = Syst.Arr.Proc[0].Coeffs
+
+    else:
+        if (not (TempStr2 in f.keys())):
+            grp       = f.create_group(TempStr2)
+        else:
+            grp       = f[TempStr2]
+        Idxs   = grp.create_dataset("Idxs",   data=Syst.Arr.Proc[0].Idxs,   compression="gzip", compression_opts=9)
+        Coeffs = grp.create_dataset("Coeffs", data=Syst.Arr.Proc[0].Coeffs, compression="gzip", compression_opts=9)
+
+    f.close()
+
+
+
+def Save_Arr_Inel_HDF5(Syst, iMol):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, 'a')
+
+    TempStr1   = Syst.Molecule[iMol].Name
+    
+    TempStr2   = TempStr1 + '/Arr/Inel/'
+
+    if TempStr2 in f.keys():
+
+        del f[TempStr2]
+        grp       = f.create_group(TempStr2)
+        Idxs   = grp.create_dataset("Idxs",   data=Syst.Arr.Proc[1].Idxs,   compression="gzip", compression_opts=9)
+        Coeffs = grp.create_dataset("Coeffs", data=Syst.Arr.Proc[1].Coeffs, compression="gzip", compression_opts=9)
+
+    else:
+        if (not (TempStr2 in f.keys())):
+            grp       = f.create_group(TempStr2)
+        else:
+            grp       = f[TempStr2]
+        Idxs   = grp.create_dataset("Idxs",   data=Syst.Arr.Proc[1].Idxs,   compression="gzip", compression_opts=9)
+        Coeffs = grp.create_dataset("Coeffs", data=Syst.Arr.Proc[1].Coeffs, compression="gzip", compression_opts=9)
+
+    f.close()
+
+
+
+def Save_Arr_Exch_HDF5(Syst, iMol):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, 'a')
+
+    TempStr1   = Syst.Molecule[iMol].Name
+    
+    TempStr2   = TempStr1 + '/Arr/Exch/'
+
+    if TempStr2 in f.keys():
+
+        del f[TempStr2]
+        grp       = f.create_group(TempStr2)
+        Idxs   = grp.create_dataset("Idxs",   data=Syst.Arr.Proc[2].Idxs,   compression="gzip", compression_opts=9)
+        Coeffs = grp.create_dataset("Coeffs", data=Syst.Arr.Proc[2].Coeffs, compression="gzip", compression_opts=9)
+
+    else:
+        if (not (TempStr2 in f.keys())):
+            grp       = f.create_group(TempStr2)
+        else:
+            grp       = f[TempStr2]
+        Idxs   = grp.create_dataset("Idxs",   data=Syst.Arr.Proc[2].Idxs,   compression="gzip", compression_opts=9)
+        Coeffs = grp.create_dataset("Coeffs", data=Syst.Arr.Proc[2].Coeffs, compression="gzip", compression_opts=9)
+
+    f.close()

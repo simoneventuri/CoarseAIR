@@ -32,10 +32,10 @@ sys.path.insert(0, '../Writing/')
 sys.path.insert(0, '../Plotting/')
 
 from Saving        import Save_Levels_HDF5, Save_qnsEnBin_HDF5, Save_PartFuncsAndEnergiesAtT_HDF5, Save_RatesAtT_HDF5
-from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5
-from Computing     import Compute_Correction_To_DissRates, Compute_Rates_Overall, Compute_Rates_Thermal, Compute_BackwardRates, Compute_PrefJumps
+from Loading       import Load_Levels_HDF5, Load_qnsEnBin_HDF5, Load_PartFuncsAndEnergiesAtT_HDF5, Load_RatesAtT_HDF5, Load_DissRatesAtT_HDF5
+from Computing     import Compute_Correction_To_DissRates, Compute_Rates_Overall, Compute_Rates_Thermal, Compute_BackwardRates, Compute_PrefJumps, Compute_WindAvrg_Matrix, Compute_Correction_To_GroupedDissRates
 from Parameters    import *
-from Writing       import Write_Rates_Thermal, Write_Kinetics, Write_PrefJumps
+from Writing       import Write_Rates_Thermal, Write_Kinetics, Write_GroupedKinetics, Write_PrefJumps
 from Plotting      import Plot_Rates_Thermal
 
 def Read_Levels(Syst, InputData):
@@ -136,10 +136,10 @@ def Read_PartFuncsAndEnergies(Syst, Temp, InputData):
             TempStr     = TStr + '/' + Syst.Molecule[iMol].Name + '/LevelQ'
             TPresentFlg = TempStr in f.keys()
             f.close()
-            if (TPresentFlg): print('  [Read_PartFuncsAndEnergies]: Found Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
+            if (TPresentFlg): print('  [Read_PartFuncsAndEnergies]: Found Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File')
 
             if ( (TPresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
-                print('  [Read_PartFuncsAndEnergies]: Loading Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) from HDF5 File')
+                print('  [Read_PartFuncsAndEnergies]: Loading Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) from HDF5 File')
                 Load_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt)
 
             else:
@@ -155,7 +155,7 @@ def Read_PartFuncsAndEnergies(Syst, Temp, InputData):
 
 
                 if (InputData.HDF5.Save_Flg):
-                    print('  [Read_Rates_CGQCT]: Saving Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
+                    print('  [Read_Rates_CGQCT]: Saving Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File')
                     Save_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt)
 
             Syst.Molecule[iMol].T[iT-1].LevelQExp = Syst.Molecule[iMol].Levelg * np.exp( - Syst.Molecule[iMol].T[iT-1].LevelEeV * Ue / (TTra * UKb) )
@@ -240,6 +240,10 @@ def Read_RatesAtT_CGQCT(Syst, TTra, TInt, iT):
 def Read_Rates_CGQCT(Syst, Temp, InputData):
 
     print('\n  [Read_Rates_CGQCT]: Uploading Rates')
+
+    if (InputData.Kin.WindAvrgFlg) and (InputData.Kin.Write_Flg):
+        print('\n  [Read_Rates_CGQCT]: Computing Data for Window-Averaging the Kinetics')
+        Syst = Compute_WindAvrg_Matrix(Syst, InputData)
     
     for iT in Temp.iTVec:
         TTra = Temp.TranVec[iT-1]
@@ -250,45 +254,68 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
         TStr        = 'T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Rates/'
         TPresentFlg = TStr in f.keys()
         f.close()
-        if (TPresentFlg): print('  [Read_Rates_CGQCT]: Found Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File')
+        if (TPresentFlg): print('  [Read_Rates_CGQCT]: Found Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File')
 
         if ( (TPresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
-            print('  [Read_Rates_CGQCT]: Loading Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) from HDF5 File')
+            print('  [Read_Rates_CGQCT]: Loading Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) from HDF5 File')
         
             Load_RatesAtT_HDF5(Syst, TTra, TInt, iT)
 
         else:
-            print('  [Read_Rates_CGQCT]: Reading Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) from set of .dat Files')
+            print('  [Read_Rates_CGQCT]: Reading Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) from set of .dat Files')
 
             Syst = Read_RatesAtT_CGQCT(Syst, TTra, TInt, iT)
 
             if (InputData.HDF5.Save_Flg):
-                print('  [Read_Rates_CGQCT]: Saving Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K) in the HDF5 File\n')
+                print('  [Read_Rates_CGQCT]: Saving Rates Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File\n')
                 Save_RatesAtT_HDF5(Syst, iT, TTra, TInt)
         
-        if (InputData.Kin.CorrFactor != 1.0):	
-                print('  [Read_Rates_CGQCT]: Correcting Dissociation Rates (Corr Factor = ' + str(InputData.Kin.CorrFactor) + ') for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
-                Syst = Compute_Correction_To_DissRates(InputData, Syst, iT)
 
-        print('  [Read_Rates_CGQCT]: Computing Overall Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
+        if ((InputData.Rates.PrefJumps_Flg) or (InputData.Kin.Groups.Flg)):
+            print('  [Read_Rates_CGQCT]: Computing Backweard Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)')
+            Syst = Compute_BackwardRates(Syst, iT)
+
+
+        if (InputData.Kin.Groups.Flg):
+            print('  [Read_Rates_CGQCT]: Computing Grouped Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)')
+            NbLevels = np.array( [Syst.Molecule[0].NBins]            + [Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins            for iExch in range(2, Syst.NProcTypes)] ) 
+            NbGroups = np.array( [Syst.Molecule[0].Grouped.NbGroups] + [Syst.Molecule[Syst.ExchtoMol[iExch-2]].Grouped.NbGroups for iExch in range(2, Syst.NProcTypes)] )
+            Syst.Molecule[0].Grouped.Compute_GroupRates(Syst, iT-1, NbLevels, NbGroups)
+
+
+        if (InputData.Kin.CorrFactor != 1.0):	
+                print('  [Read_Rates_CGQCT]: Correcting Dissociation Rates (Corr Factor = ' + str(InputData.Kin.CorrFactor) + ') for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
+                Syst = Compute_Correction_To_DissRates(InputData, Syst, iT)
+                if (InputData.Kin.Groups.Flg):
+                    print('  [Read_Rates_CGQCT]: Correcting Grouped Dissociation Rates (Corr Factor = ' + str(InputData.Kin.CorrFactor) + ') for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
+                    Syst = Compute_Correction_To_GroupedDissRates(InputData, Syst, iT)
+
+
+        print('  [Read_Rates_CGQCT]: Computing Overall Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
         Syst = Compute_Rates_Overall(Syst, iT)
 
-        print('  [Read_Rates_CGQCT]: Computing Thermal Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
+
+        print('  [Read_Rates_CGQCT]: Computing Thermal Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
         Syst = Compute_Rates_Thermal(Syst, iT)
 
+
         if (InputData.Rates.PrefJumps_Flg):
-            print('  [Read_Rates_CGQCT]: Computing Backweard Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
-            Syst = Compute_BackwardRates(Syst, iT)
-            print('  [Read_Rates_CGQCT]: Computing Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
+            print('  [Read_Rates_CGQCT]: Computing Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)')
             Syst = Compute_PrefJumps(InputData, Syst, iT)
-            print('  [Read_Rates_CGQCT]: Writing   Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)')
+            print('  [Read_Rates_CGQCT]: Writing   Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)')
             Write_PrefJumps(Syst, Temp, InputData, iT)
             print('\n')
 
 
         if (InputData.Kin.Write_Flg):
-            print('  [Read_Rates_CGQCT]: Writing Kinetics File for Temperature Nb ' + str(iT) + ' (T = ' + str(TTra) + 'K)\n')
+            print('  [Read_Rates_CGQCT]: Writing Kinetics File for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
             Write_Kinetics(Syst, Temp, InputData, iT)
+
+
+        if  (InputData.Kin.Groups.Flg) and (InputData.Kin.Groups.Write_Flg):
+            print('  [Read_Rates_CGQCT]: Writing Grouped Kinetics File for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K)\n')
+            NbGroups = np.array( [Syst.Molecule[0].Grouped.NbGroups] + [Syst.Molecule[Syst.ExchtoMol[iExch-2]].Grouped.NbGroups for iExch in range(2, Syst.NProcTypes)] )
+            Write_GroupedKinetics(Syst, Temp, InputData, iT, NbGroups)
 
 
         if (InputData.DelRateMat_Flg):
@@ -304,4 +331,3 @@ def Read_Rates_CGQCT(Syst, Temp, InputData):
     Plot_Rates_Thermal(Syst, Temp, InputData)
 
     return Syst
-

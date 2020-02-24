@@ -26,3 +26,5 @@ class processes(object):
     def __init__(self):
 
         self.Rates    = 0.0
+        self.Inxs     = 0
+        self.Coeffs   = 0.0

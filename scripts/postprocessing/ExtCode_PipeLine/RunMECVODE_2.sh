@@ -24,25 +24,34 @@
 # Ex. of Call: bash RunMECVODE.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/ME_CVODE $WORKSPACE_PATH/Mars_Database/Run_0D/database/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 -1
 
 echo '------------------------------------------------------------------------------------------'
-echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 								    '
+echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories                     '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 echo '------------------------------------------------------------------------------------------'
-echo '   PipeLine for Running External Codes				 								    '
+echo '   PipeLine for Running External Codes                            '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 
+source ~/.bashrc
+module purge
+COARSEAIR_UPDATE
+COARSEAIR_release
+#PLATONORECOMB_gnu_release
+PLATO_gnu_release
+
 export System='O3_UMN'
-export Tran_vec=(2500 5000) 
+export Molecule='O2'
+export FldrName=''
+export Tran_vec=(6000 8000 10000) 
+export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=1
-export CorrFlg=1
-export InelFlg=1
-export ExchFlg1=1
-export ExchFlg2=1
+export DissFlg=2
+export InelFlg=2
+export ExchFlg1=2
+export ExchFlg2=2
 
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/"
@@ -50,6 +59,7 @@ ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/
 echo '------------------------------------------------------'
 echo '  Paths:'
 echo '------------------------------------------------------'
+echo '  $PLATO_LIB      directory = '${PLATO_LIB}
 echo '  ExtCode .sh     directory = '${ExtCode_SH_DIR}
 echo '  MeCvode install directory = '${PathToMECVODEFldr}
 echo '  MeCvode Dtb     directory = '${PathToDtbFldr}
@@ -78,10 +88,14 @@ function Load_Initialize_0D() {
 
 function Call_MeCvode() {
   cd ${PathToRunFldr}
-  export OutputFldr='output_'${System}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
-  export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_wDiss' 
+  if [ $DissFlg -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
+  else
+    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'
+  fi  
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
@@ -90,14 +104,14 @@ function Call_MeCvode() {
 
 
 for TTran in "${Tran_vec[@]}"; do :
-	echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
+  echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
 
-	echo "[RunMECVODE]: Calling Load_Initialize_0D"
-	Load_Initialize_0D
+  echo "[RunMECVODE]: Calling Load_Initialize_0D"
+  Load_Initialize_0D
   echo " "
 
-	echo "[RunMECCVODE]: Calling Call_MeCvode"
-	Call_MeCvode
-	echo " "
+  echo "[RunMECCVODE]: Calling Call_MeCvode"
+  Call_MeCvode
+  echo " "
 
 done

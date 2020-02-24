@@ -135,3 +135,20 @@ def Load_RatesAtT_HDF5(Syst, TTra, TInt, iT):
     f.close()
 
     return Syst
+
+
+
+def Load_DissRatesAtT_HDF5(Syst, TTra, TInt, iT):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, "r")
+
+    TStr = 'T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Rates/'
+    grp  = f[TStr]
+
+    Data                       = grp["Diss"]
+    Syst.T[iT-1].Proc[0].Rates = Data[...]
+
+    f.close()
+
+    return Syst

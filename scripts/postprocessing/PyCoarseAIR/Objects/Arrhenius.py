@@ -21,66 +21,8 @@
 import numpy as np
 
 
-class rates(object):
+class Arrhenius(object):
 
-    def __init__(self):
+    def __init__(self, NProcTypes):
 
-        self.PrefJumps_Flg    = False
-        self.NPrefJumps       = 5
-
-
-
-class grouping(object):
-
-    def __init__(self):
-
-        #self.Types             = ['']
-        self.PathsToMapping    = ['']
-        self.T0                = 300.0
-
-
-
-class kinetics(object):
-
-    def __init__(self):
-
-        self.Read_Flg         = False
-        self.Write_Flg        = False
-        self.ReadFldr         = ''
-        self.WriteFldr        = ''
-        self.WriteInel_Flg    = False
-        self.WriteExch_Flg    = False
-        self.WriteDiss_Flg    = False
-        self.CorrFactor       = 1.0 
-        self.Groups           = grouping()
-
-
-
-class hdf5(object):
-
-    def __init__(self):
-
-        self.ReadFolder       = ''
-        self.WriteFolder      = ''
-        self.ForceReadDat_Flg = False
-        self.Save_Flg         = False
-
-
-
-class ME(object):
-
-    def __init__(self):
-
-        self.Read_Flg         = False
-        self.ReadFolder       = ''
-        self.WriteFolder      = ''
-
-
-
-class inputdata(object):
-
-    def __init__(self):
-        self.Rates            = rates()
-        self.Kin              = kinetics()
-        self.HDF5             = hdf5()
-        self.ME               = ME()
+        self.Proc = [processes() for iProc in range(NProcTypes)]

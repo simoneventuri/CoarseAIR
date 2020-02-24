@@ -24,11 +24,11 @@
 # Ex. of Call: bash RunMECVODE.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/ME_CVODE $WORKSPACE_PATH/Mars_Database/Run_0D/database/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 -1
 
 echo '------------------------------------------------------------------------------------------'
-echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 								    '
+echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories                     '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 echo '------------------------------------------------------------------------------------------'
-echo '   PipeLine for Running External Codes				 								    '
+echo '   PipeLine for Running External Codes                            '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 
@@ -42,7 +42,7 @@ PLATO_gnu_release
 export System='O3_UMN'
 export Molecule='O2'
 export FldrName=''
-export Tran_vec=(1500 2500 5000) 
+export Tran_vec=(12000 14000 15000 20000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
@@ -104,14 +104,14 @@ function Call_MeCvode() {
 
 
 for TTran in "${Tran_vec[@]}"; do :
-	echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
+  echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
 
-	echo "[RunMECVODE]: Calling Load_Initialize_0D"
-	Load_Initialize_0D
+  echo "[RunMECVODE]: Calling Load_Initialize_0D"
+  Load_Initialize_0D
   echo " "
 
-	echo "[RunMECCVODE]: Calling Call_MeCvode"
-	Call_MeCvode
-	echo " "
+  echo "[RunMECCVODE]: Calling Call_MeCvode"
+  Call_MeCvode
+  echo " "
 
 done

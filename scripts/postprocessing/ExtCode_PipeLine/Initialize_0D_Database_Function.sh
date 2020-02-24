@@ -38,30 +38,62 @@ function Initialize_0D_Database {
 
 echo "Units=cm^3/s" > $PathToDtbFldr"/kinetics/KineticsTEMP_T"$TTran"K"
 
-iDiss=1
-while [ ${iDiss} -le ${DissFlg} ]; do 
-	if [ $CorrFlg -eq 0 ]; then
-		echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-		cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-	else	
-		echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-		cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-	fi
-	iDiss=$((iDiss+1))
-done
+if [ $DissFlg -eq 1 ]; then
+	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+elif [ $DissFlg -eq 2 ]; then
+	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+elif [ $DissFlg -eq 3 ]; then
+	echo "  [Initialize_0D_Database]: Adding VS Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_VS.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"		
+elif [ $DissFlg -eq 4 ]; then
+	echo "  [Initialize_0D_Database]: Adding Phys-Based Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_10Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+elif [ $DissFlg -eq 5 ]; then
+	echo "  [Initialize_0D_Database]: Adding Fitted Phys-Based Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_Fitted_10Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+elif [ $DissFlg -eq 6 ]; then
+	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	echo "  [Initialize_0D_Database]: MANINDER'S CASE: NO CORRECTION and NO RECOMBINATION"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+elif [ $DissFlg -eq 7 ]; then
+	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	echo "  [Initialize_0D_Database]: MANINDER'S CASE: NO CORRECTION but RECOMBINATION"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+elif [ $DissFlg -eq 11 ]; then
+	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	echo "  [Initialize_0D_Database]: NO CORRECTION and NO RECOMBINATION"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+elif [ $DissFlg -eq 12 ]; then
+	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	echo "  [Initialize_0D_Database]: NO RECOMBINATION"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+fi
 
-iInel=1
-while [ ${iInel} -le ${InelFlg} ]; do 
-	echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-	cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-	iInel=$((iInel+1))
-done
+iInel=${InelFlg}
+if [ ${iInel} -eq 1 ]; then
+	echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+elif [ ${iInel} -eq 2 ]; then
+	echo "  [Initialize_0D_Database]: Adding Window-Averaged Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+fi
 
 iExch=${ExchFlg1}
-while [ ${iExch} -gt 0 ] && [ ${iExch} -le ${ExchFlg2} ]; do 
-	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-	cat $PathToDtbFldr"/kinetics/"$System"/T"$TTran"K/Exch_Type"$iExch".dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-	iExch=$((iExch+1))
-done
+if [ ${iExch} -eq 1 ]; then
+	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+elif [ ${iExch} -eq 2 ]; then
+	echo "  [Initialize_0D_Database]: Adding Window-Averaged Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Exch_Type1_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+fi
+
+
+echo "  [Initialize_0D_Database]: Copying Thermo File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+cat $PathToDtbFldr/"/thermo/"${System}${FldrName}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+
+echo "  [Initialize_0D_Database]: Copying Initial Mole Fraction File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${T0}"K"
+cat $PathToDtbFldr/"/thermo/"${System}${FldrName}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
 
 }

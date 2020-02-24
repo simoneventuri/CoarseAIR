@@ -71,16 +71,36 @@ def Write_DissRates_Thermal(Syst, Temp, InputData):
     csvTermo.close()
 
 
-
 def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
 
-    mkdirs( InputData.Kin.WriteFldr + '/thermo/' )    
+    mkdirs(    InputData.Kin.WriteFldr + '/thermo/' ) 
+    mkdirs(    InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong )
+    TempFldr = InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong
+
     for iMol in range(Syst.NMolecules):
 
-        for iT in Temp.iTVec:
 
-            PathToFileOrig = InputData.Kin.WriteFldr + '/thermo/' + Syst.Molecule[iMol].Name + '_Format'
-            PathToFile     = InputData.Kin.WriteFldr + '/thermo/' + Syst.Molecule[iMol].Name + '_' + Syst.NameLong + '_' + str(Temp.TranVec[iT-1])
+        print('      [Write_PartFuncsAndEnergies]: Computing Ratios of Initial Mole Fractions for Molecule: ' + Syst.Molecule[iMol].Name )
+        Syst.Molecule[iMol].Comput_QRatio0(Temp.T0)
+
+        MoleFracsFile = TempFldr + '/' + Syst.Molecule[iMol].Name + '_InitialMoleFracs_T' + str(int(Temp.T0)) + 'K.dat' 
+        print('      [Write_PartFuncsAndEnergies]: Writing Initial Mole Fractions for Molecule: ' + Syst.Molecule[iMol].Name )
+        csvmole       = open(MoleFracsFile, 'w')
+        Line          = '# Percentage of ' + Syst.Molecule[iMol].Name + ' Contained in Each Level\n'
+        csvmole.write(Line)
+
+        for iLevel in range(Syst.Molecule[iMol].NBins):
+            Line     = '%.10e\n' % float(np.maximum( Syst.Molecule[iMol].QRatio0[iLevel], 1.e-99+Syst.Molecule[iMol].QRatio0[iLevel]*0.0 ))
+            csvmole.write(Line)
+
+        csvmole.close()
+
+
+        for iT in Temp.iTVec:
+            print('      [Write_PartFuncsAndEnergies]: Writing Thermo File for Molecule: ' + Syst.Molecule[iMol].Name + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
+
+            PathToFileOrig = TempFldr + '/../' + Syst.Molecule[iMol].Name + '_Format'
+            PathToFile     = TempFldr + '/'    + Syst.Molecule[iMol].Name + '_T' + str(int(Temp.TranVec[iT-1])) + 'K'
             DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
             print('Copied File to: ', DestTemp)
 
@@ -92,12 +112,22 @@ def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
 
 
 
+def Compute_WindAvrg_Rates(Syst, TempTempRates):
+    
+    TempRates = np.zeros( (Syst.Molecule[0].NBins) )
+    for jLevel in range(Syst.Molecule[0].NBins):
+        TempRates[jLevel] = np.sum(TempTempRates[Syst.Molecule[0].WindAvrgMat[jLevel,0:Syst.Molecule[0].WindAvrgFound[jLevel,0]+1]]) / (Syst.Molecule[0].WindAvrgFound[jLevel,0]+1)
+
+    return TempRates 
+
+
+
 def Write_Kinetics(Syst, Temp, InputData, iT):
 
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(Temp.TranVec[iT-1]) + 'K/' )    
-    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(Temp.TranVec[iT-1]) + 'K/'
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
 
     if (InputData.Kin.WriteDiss_Flg):
         if (InputData.Kin.CorrFactor != 1.0):
@@ -114,23 +144,33 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
                 ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
                 Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(Syst.T[iT-1].Proc[0].Rates[iLevel,0])
                 csvkinetics.write(Line)
+            # else:
+            #     ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
+            #     Line     = ProcName + ':+1.0000E-20,+0.0000E+00,+0.0000E+00,2\n'
+            #     csvkinetics.write(Line)
         
         csvkinetics.close()
 
 
     if (InputData.Kin.WriteInel_Flg):
-        InelKinetics = TempFldr + '/Inel.dat' 
+        if (InputData.Kin.WindAvrgFlg):
+            InelKinetics = TempFldr + '/Inel_WindAvrg.dat' 
+            print('      [Write_Kinetics]: Writing Window-Averaged Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+        else:
+            InelKinetics = TempFldr + '/Inel.dat' 
+            print('      [Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
         csvkinetics  = open(InelKinetics, 'w')
-
-        print('      [Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
         InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
 
         for iLevel in range(Syst.Molecule[0].NBins):
-            for jLevel in range(Syst.Molecule[0].NBins):
+            TempRates = Syst.T[iT-1].Proc[1].Rates[iLevel,:]
+            if (InputData.Kin.WindAvrgFlg):
+                TempRates = Compute_WindAvrg_Rates(Syst, TempRates)                
 
-                if ((Syst.T[iT-1].Proc[1].Rates[iLevel,jLevel] > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[0].LevelEEh[jLevel]) ):
+            for jLevel in range(Syst.Molecule[0].NBins):
+                if ((TempRates[jLevel] > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[0].LevelEEh[jLevel]) ):
                     ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(jLevel+1) + ')+' + Syst.Atom[2].Name
-                    Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % Syst.T[iT-1].Proc[1].Rates[iLevel,jLevel]
+                    Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % TempRates[jLevel]
                     csvkinetics.write(Line)
                     
         csvkinetics.close()
@@ -141,29 +181,126 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
         for iExch in range (2, Syst.NProcTypes):
             print('      [Write_Kinetics]: iExch =  ' + str(iExch-1) )
 
-            ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
+            if (InputData.Kin.WindAvrgFlg):
+                ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '_WindAvrg.dat' 
+                print('      [Write_Kinetics]: Writing Window-Averaged Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+            else:
+                ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
+                print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
             csvkinetics  = open(ExchKinetics, 'w')
-
-            print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
             InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
             for iLevel in range(Syst.Molecule[0].NBins):
-                for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins):
+                TempRates = Syst.T[iT-1].ProcExch[iExch-2].Rates[iLevel,:]
+                if (InputData.Kin.WindAvrgFlg):
+                    TempRates = Compute_WindAvrg_Rates(Syst, TempRates)                    
 
-                    if ((Syst.T[iT-1].ProcExch[iExch-2].Rates[iLevel,jLevel] > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
+                for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NBins):
+                    if ((TempRates[jLevel] > 0.0) and (Syst.Molecule[0].LevelEEh[iLevel] > Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
                         ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(jLevel+1) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
-                        Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % Syst.T[iT-1].ProcExch[iExch-2].Rates[iLevel,jLevel]
+                        Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % TempRates[jLevel]
                         csvkinetics.write(Line)
 
             csvkinetics.close()
+
+
+
+def Write_GroupedKinetics(Syst, Temp, InputData, iT, NbGroups):
+
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
+
+    if (InputData.Kin.Groups.WriteDiss_Flg):
+        if (InputData.Kin.CorrFactor != 1.0):
+            DissKinetics = TempFldr + '/Diss_Corrected.dat' 
+            print('      [Write_Kinetics]: Writing Corrected Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
+        else:
+            DissKinetics = TempFldr + '/Diss.dat' 
+            print('      [Write_Kinetics]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
+        csvkinetics  = open(DissKinetics, 'w')
+
+        for iGroup in range(NbGroups[0]):
+
+            if (Syst.Molecule[0].Grouped.T[iT].Proc[0].Rates[iGroup,0] > 0.0):
+                ProcName = Syst.Molecule[0].Name + '(' + str(iGroup+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
+                Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(Syst.Molecule[0].Grouped.T[iT].Proc[0].Rates[iGroup,0])
+                csvkinetics.write(Line)
+            # else:
+            #     ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
+            #     Line     = ProcName + ':+1.0000E-20,+0.0000E+00,+0.0000E+00,2\n'
+            #     csvkinetics.write(Line)
+        
+        csvkinetics.close()
+
+
+    if (InputData.Kin.Groups.WriteInel_Flg):
+    #     if (InputData.Kin.Grouped.WindAvrgFlg):
+    #         InelKinetics = TempFldr + '/Inel_WindAvrg.dat' 
+    #         print('      [Write_Kinetics]: Writing Window-Averaged Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+    #     else:
+    #         InelKinetics = TempFldr + '/Inel.dat' 
+    #         print('      [Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+    #     csvkinetics  = open(InelKinetics, 'w')
+    #     InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'    
+        InelKinetics = TempFldr + '/Inel.dat' 
+        print('      [Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+        csvkinetics  = open(InelKinetics, 'w')
+        InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
+
+
+        for iGroup in range(NbGroups[0]):
+            TempRates = Syst.Molecule[0].Grouped.T[iT].Proc[1].Rates[iGroup,:]
+            # if (InputData.Kin.WindAvrgFlg):
+            #     TempRates = Compute_WindAvrg_Rates(Syst, TempRates)                
+
+            for jGroup in range(NbGroups[0]):
+                if ((TempRates[jGroup] > 0.0) and (Syst.Molecule[0].Grouped.T[iT].EeV[iGroup] > Syst.Molecule[0].Grouped.T[iT].EeV[jGroup]) ):
+                    ProcName = Syst.Molecule[0].Name + '(' + str(iGroup+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(jGroup+1) + ')+' + Syst.Atom[2].Name
+                    Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % TempRates[jGroup]
+                    csvkinetics.write(Line)
+                    
+        csvkinetics.close()
+
+
+    if (InputData.Kin.Groups.WriteExch_Flg):
+
+        for iExch in range (2, Syst.NProcTypes):
+            print('      [Write_Kinetics]: iExch =  ' + str(iExch-1) )
+
+            # if (InputData.Kin.WindAvrgFlg):
+            #     ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '_WindAvrg.dat' 
+            #     print('      [Write_Kinetics]: Writing Window-Averaged Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+            # else:
+            #     ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
+            #     print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+            ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
+            print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+            csvkinetics  = open(ExchKinetics, 'w')
+            InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+
+            for iGroup in range(NbGroups[0]):
+                TempRates = Syst.Molecule[0].Grouped.T[iT].ProcExch[iExch-2].Rates[iGroup,:]
+                # if (InputData.Kin.WindAvrgFlg):
+                #     TempRates = Compute_WindAvrg_Rates(Syst, TempRates)                    
+
+                for jGroup in range(NbGroups[iExch-1]):
+                    if ((TempRates[jGroup] > 0.0) and (Syst.Molecule[0].Grouped.T[iT].EeV[iGroup] > Syst.Molecule[Syst.ExchtoMol[iExch-2]].Grouped.T[iT].EeV[jGroup]) ):
+                        ProcName = Syst.Molecule[0].Name + '(' + str(iGroup+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(jGroup+1) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
+                        Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % TempRates[jGroup]
+                        csvkinetics.write(Line)
+
+            csvkinetics.close()
+
 
 
 def Write_Kinetics_FromOverall(Syst, Temp, InputData):
     
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(Temp.TranVec[iT-1]) + 'K/' )    
-    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(Temp.TranVec[iT-1]) + 'K/'
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
 
     for iT in Temp.iTVec:
         print('\nTemperature Nb ', iT, '; T = ', Temp.TranVec[iT-1], 'K')
@@ -231,6 +368,11 @@ def Write_Kinetics_FromOverall(Syst, Temp, InputData):
                         TempRate = float(row[iT])
                         Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % (TempRate * InputData.Kin.CorrFactor)
                         csvkinetics.write(Line)
+                    else:
+                        ProcName = Syst.Molecule[0].Name + '(' + str(row[0]) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
+                        TempRate = float(row[iT])
+                        Line     = ProcName + ':+1.0000E-20,+0.0000E+00,+0.0000E+00,2\n'
+                        csvkinetics.write(Line)
                 
                 csvfile.close()
                 csvkinetics.close()
@@ -249,9 +391,13 @@ def Write_QSS(Syst, Temp, InputData, iT):
             Line       = '# T,KDiss,KInel' 
             for iExch in range(2, Syst.NProcTypes):
                 Line = Line + ',KExch' + str(iExch-1)
-            Line = Line + '\n'
+            Line = Line + ',tIni,tFin,ActualQSS?\n'
             csvQSS.write(Line)
-        TempMat = np.transpose( np.expand_dims( np.concatenate( [np.array([Temp.TranVec[iT-1]], float), Syst.T[iT-1].QSS.Rate] ), axis=1 ) )
+        RealFlg = 1.0
+        if (Syst.T[iT-1].QSS.Rate[0] >= Syst.RatesTh[0,iT-1]):
+            RealFlg = 0.0
+        TempVec = np.array([Syst.T[iT-1].QSS.Time[0], Syst.T[iT-1].QSS.Time[1], RealFlg], float)
+        TempMat = np.transpose( np.expand_dims( np.concatenate( [np.array([Temp.TranVec[iT-1]], float), Syst.T[iT-1].QSS.Rate, TempVec] ), axis=1 ) )
         np.savetxt(csvQSS, TempMat, delimiter=',')
     csvQSS.close()
 
@@ -279,3 +425,88 @@ def Write_PrefJumps(Syst, Temp, InputData, iT):
             np.savetxt(csvJumps, TempMat.astype(int), delimiter=',', fmt='%d')
         csvJumps.close()
 
+
+def Write_Arrhenius_Diss(Syst, InputData, Ixd, Coeffs, MaxEntOrPlato, csvkinetics):
+    
+    if (csvkinetics == 0):
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        if (MaxEntOrPlato == 1):
+            DissKinetics = TempFldr + '/Dh.dat' 
+            print('      [Write_Arrhenius_Diss]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
+            csvkinetics  = open(DissKinetics, 'w')
+            Line     = '#LevelId,A1,A2,A3\n'
+            csvkinetics.write(Line)    
+        elif (MaxEntOrPlato == 2):
+            if (InputData.Kin.CorrFactor != 1.0):
+                DissKinetics = TempFldr + '/Diss_Corrected.dat' 
+                print('      [Write_Arrhenius_Diss]: Writing Corrected Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
+            else:
+                DissKinetics = TempFldr + '/Diss.dat' 
+                print('      [Write_Arrhenius_Diss]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
+            csvkinetics  = open(DissKinetics, 'w')
+    else:
+        if (MaxEntOrPlato == 1):
+            Line     = '%i,%.10e,%.10e,%.10e\n' % ((Ixd+1), float(Coeffs[0]), float(Coeffs[1]), float(Coeffs[2])) 
+            csvkinetics.write(Line)       
+        else:
+            ProcName = Syst.Molecule[0].Name + '(' + str(Ixd+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
+            Line     = ProcName + ':%.4e,%.4e,%.4e,2\n' % (float(Coeffs[0]), float(Coeffs[1]), float(Coeffs[2]))
+            csvkinetics.write(Line)
+
+    return csvkinetics
+
+
+
+def Write_Arrhenius_Inel(Syst, InputData, Ixd, Coeffs, MaxEntOrPlato, iExch, csvkinetics):
+    
+    if (csvkinetics == 0):
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        if (MaxEntOrPlato == 1):
+            if (iExch == 0):
+                InelKinetics = TempFldr + '/EXh_WOExch.dat' 
+                print('      [Write_Arrhenius_Inel]: Writing Inelastic Processes, WITHOUT Exchange: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+            elif (iExch == 1):
+                InelKinetics = TempFldr + '/EXh.dat' 
+                print('      [Write_Arrhenius_Inel]: Writing Inelastic Processes, WITH Exchange: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+            csvkinetics  = open(InelKinetics, 'w')
+            Line     = '#InLevelId,FinLevelId,A1,A2,A3\n'
+            csvkinetics.write(Line)    
+        elif (MaxEntOrPlato == 2):
+            InelKinetics = TempFldr + '/Inel.dat' 
+            print('      [Write_Arrhenius_Inel]: Writing Inelastic Processes: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
+            csvkinetics  = open(InelKinetics, 'w')
+    else:
+        if (MaxEntOrPlato == 1):
+            Line     = '%i,%i,%.10e,%.10e,%.10e\n' % ((Ixd[0]+1), (Ixd[1]+1), float(Coeffs[0]), float(Coeffs[1]), float(Coeffs[2])) 
+            csvkinetics.write(Line)       
+        else:
+            ProcName = Syst.Molecule[0].Name + '(' + str(Ixd[0]+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(rIxd[1]+1) + ')+' + Syst.Atom[2].Name
+            Line     = ProcName + ':%.4e,%.4e,%.4e,5\n' % (float(Coeffs[0]), float(Coeffs[1]), float(Coeffs[2]))
+            csvkinetics.write(Line)
+
+    return csvkinetics
+
+
+
+def Write_Arrhenius_Exch(Syst, InputData, Ixd, Coeffs, iExch, csvkinetics):
+    
+    if (csvkinetics == 0):
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat'  
+        print('      [Write_Arrhenius_Inel]: Writing Exchange Processes Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+        csvkinetics  = open(ExchKinetics, 'w')
+    else:    
+        ProcName = Syst.Molecule[0].Name + '(' + str(iLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(jLevel+1) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
+        Line     = ProcName + ':%.4e,%.4e,%.4e,6\n' % (float(Coeffs[0]), float(Coeffs[1]), float(Coeffs[2]))
+        csvkinetics.write(Line)
+
+    return csvkinetics

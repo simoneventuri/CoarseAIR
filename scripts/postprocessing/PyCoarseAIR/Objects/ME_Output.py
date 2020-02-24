@@ -288,11 +288,17 @@ class me_output(object):
         plt.figure()
         plt.title(r'Mole Fraction Evolutions', fontsize=FontSize)
 
-        for iComp in range(self.NCFDComp):
-            LabelStr = self.Component[iComp].Name
-            TempStr  = 'C' + str(iComp+1)
-            plt.plot(self.Time, self.Component[iComp].MolFrac, linestyle=self.Component[iComp].LineStyle, color=self.Component[iComp].Color, label=LabelStr, linewidth=LineWidth)
-            #plt.plot(self.Time, self.Component[iComp].MolFrac, TempStr, linestyle=self.Component[iComp].LineStyle, label=LabelStr)
+        # for iComp in range(self.NCFDComp):
+        #     LabelStr = self.Component[iComp].Name
+        #     TempStr  = 'C' + str(iComp+1)
+        #     plt.plot(self.Time, self.Component[iComp].MolFrac, linestyle=self.Component[iComp].LineStyle, color=self.Component[iComp].Color, label=LabelStr, linewidth=LineWidth)
+        #     #plt.plot(self.Time, self.Component[iComp].MolFrac, TempStr, linestyle=self.Component[iComp].LineStyle, label=LabelStr)
+
+        iComp    = 1        
+        LabelStr = self.Component[iComp].Name
+        TempStr  = 'C' + str(iComp+1)
+        plt.plot(self.Time, self.Component[iComp].MolFrac, linestyle=self.Component[iComp].LineStyle, color=self.Component[iComp].Color, label=LabelStr, linewidth=LineWidth)
+        #plt.plot(self.Time, self.Component[iComp].MolFrac, TempStr, linestyle=self.Component[iComp].LineStyle, label=LabelStr)
         
         plt.xscale("log")
         

@@ -38,6 +38,14 @@ class t_properties(object):
         self.QSS      = qss(NProcTypes)
 
 
+class arrhenius(object):
+
+    def __init__(self, NProcTypes):
+
+        self.Proc    = [processes() for iProc in range(NProcTypes)]
+        self.MinRate = 0.0
+        self.MinNbTs = 3
+
 
 class system(object):
 
@@ -65,6 +73,8 @@ class system(object):
         self.NProcTypes   = NProcTypes
 
         self.T            = [t_properties(NProcTypes) for iT in range(NTTran)]
+
+        self.Arr          = arrhenius(NProcTypes)
 
         self.Proc         = [processes() for iProc in range(NProcTypes)]
 
