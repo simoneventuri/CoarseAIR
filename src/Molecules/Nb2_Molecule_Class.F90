@@ -66,7 +66,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   integer                                   ,intent(in)     ::    iMol
   logical                         ,optional ,intent(in)     ::    i_Debug
   
-  integer                                                   ::    i, iP
+  integer                                                   ::    i, iP, i1, i2
   integer                                                   ::    Status
   integer                                                   ::    iA1, iA2
   integer                                                   ::    pos_m, pos_e
@@ -166,7 +166,9 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   if (i_Debug_Loc) call Logger%Write( "First  Atom of the Molecule ", This%Name, " is the Atom Nb ", This%To_Atoms(1) )
   if (i_Debug_Loc) call Logger%Write( "Second Atom of the Molecule ", This%Name, " is the Atom Nb ", This%To_Atoms(2) )
 
-  This%Atom(:) = Atoms(Pairs(This%To_Pairs(1))%To_Atoms(:))
+  i1 = Pairs(This%To_Pairs(1))%To_Atoms(1)
+  i2 = Pairs(This%To_Pairs(1))%To_Atoms(2)
+  This%Atom = Atoms
   if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom(1): This%Atom(1)%Name = ", This%Atom(1)%Name )
   if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom(2): This%Atom(2)%Name = ", This%Atom(2)%Name )
 
