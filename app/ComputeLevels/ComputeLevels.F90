@@ -51,8 +51,8 @@ Program ComputeLevels
   integer                                           ::    Status
   real(rkp)                                         ::    StartTime, EndTime
   
-  logical   ,parameter                              ::    i_Debug_CL        = .True.
-  logical   ,parameter                              ::    i_Debug_CL_Deep   = .True.
+  logical   ,parameter                              ::    i_Debug_CL        = .False.
+  logical   ,parameter                              ::    i_Debug_CL_Deep   = .False.
 
   
   call CPU_Time( StartTime )
