@@ -61,9 +61,9 @@ Program PostTrajectories
   integer                                               :: Status
   real(rkp)                                             :: StartTime, EndTime
 
-  logical                                  ,parameter   :: i_Debug_PT        = .False.
-  logical                                  ,parameter   :: i_Debug_PT_Medium = .False.
-  logical                                  ,parameter   :: i_Debug_PT_Deep   = .False.
+  logical                                  ,parameter   :: i_Debug_PT        = .True.
+  logical                                  ,parameter   :: i_Debug_PT_Medium = .True.
+  logical                                  ,parameter   :: i_Debug_PT_Deep   = .True.
 
   
   call CPU_Time( StartTime )

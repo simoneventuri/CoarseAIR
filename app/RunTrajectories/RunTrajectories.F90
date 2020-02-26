@@ -55,6 +55,8 @@ Program RunTrajectories
   character(200)                        ::    LevelOutputDir
   integer                               ::    iMol  
   integer                               ::    iBin
+  integer                               ::    iPES
+  integer                               ::    TotDeg, NTrajDeg, NTrajPES
   integer                               ::    Status, Unit
   integer                               ::    temp1, temp2
   integer ,dimension(:) ,allocatable    ::    Levels_per_Bin
@@ -204,6 +206,10 @@ Program RunTrajectories
   
   if (i_Debug_RT) call Logger%Write( "Nb of Processors,  Input%NProc = ", Input%NProc )
   Input%NTraj =  max(ceiling(real(Input%NTraj) / real(Input%NProc,rkp)), 1)
+
+  
+
+
   if (i_Debug_RT) call Logger%Write( "Nb of Trajectories to run for Input Processor,  Input%NTraj = ", Input%NTraj )
   
   if ((Input%NTrajBatch > 0) .and. (Input%NTrajBatch < Input%NTraj)) then
@@ -216,6 +222,18 @@ Program RunTrajectories
     Input%NBatch     = 1
     Input%NTrajBatch = Input%NTraj
     if (i_Debug_RT) call Logger%Write( "Nb of Trajectories per Mini-Batch set to:   Input%NTrajBatch = ", Input%NTrajBatch )
+  end if
+
+
+  TotDeg   = sum(Input%PES_DegeneracyINT)
+  NTrajDeg = ceiling ( real(Input%NTrajBatch, rkp) / real(TotDeg, rkp) )
+  NTrajPES = 0
+  do iPES=1,Input%NPESs
+    NTrajPES = NTrajPES + ceiling ( Input%PES_DegeneracyINT(iPES) * real(NTrajDeg, rkp) )
+  end do
+  if (NTrajPES /= Input%NTrajBatch) then
+    if (i_Debug_RT) call Logger%Write( "Adding ", (NTrajPES - Input%NTrajBatch), " Trajectories to Input%NTrajBatch in order to respect the Statistics on the PES Degeneracies" )
+    Input%NTrajBatch = NTrajPES
   end if
 ! ==============================================================================================================  
   

@@ -194,8 +194,8 @@ Subroutine ReadInputs( This, i_Debug )
 !     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
-  !DataFile%Name     =   'trajectories.csv'
-  DataFile%Name     =   'trajectories.out'                                                                                        !!! TEMPORARY CHANGED FOR ALESSANDRO
+  DataFile%Name     =   'trajectories.csv'                                                                                         !#
+  !DataFile%Name     =   'trajectories.out'                                                                                        !# FOR COMPATIBILITY WITH CG-QCT CODE
   open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', Form='FORMATTED', iostat=DataFile%Status )
   if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
   DataFile%Format   =   "( i9,3x, 2(es15.8,3x), 2(4(i3,3x)))"
@@ -959,6 +959,7 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
         
         ArrDiv    =  FinCond(iu,iCond)/16
         ArrDiff   =  FinCond(iu,iCond) - ArrDiv*16
+
         ipart1    =  0
         ipart2    =  0
         if ( NCond == 5 ) then
@@ -968,31 +969,37 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
           ipartMax =  max(ipart1,ipart2)
           ipart    =  ipartMin + ipartMax*4
         end if
-        
+        if (i_Debug_Loc) call Logger%Write( "ArrDiv  = ", ArrDiv )
+        if (i_Debug_Loc) call Logger%Write( "ArrDiff = ", ArrDiff )
+        if (i_Debug_Loc) call Logger%Write( "ipart1  = ", ipart1 )
+        if (i_Debug_Loc) call Logger%Write( "ipart2  = ", ipart2 )
+
         if (NCond == 3) then
         
-          if (ArrDiff == 2) then
-            if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )
-            iquse = 2
-          else
-            iquse = iquse * This%iskip(iCond)
-          end if
-          
+          !if (ArrDiff == 2) then                                                                                           ! # UnComment for Matching CG-QCT Rates
+          !  if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )
+          !  iquse = 2
+          !else
+          !  iquse = iquse * This%iskip(iCond)
+          !end if                                                                                                           ! # UnComment for Matching CG-QCT Rates
+          iquse = iquse * This%iskip(iCond)                                                                                 ! # Comment for Matching CG-QCT Rates
+
         elseif (NCond == 5) then
         
-          if (ArrDiff == 10) then
-            if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-            iquse = 10
-          else if (ipart1 == 2) then
-            if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-            iquse = ipart2
-          else if (ipart2 == 2) then
-            if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-            iquse = ipart1
-          else
-            iquse = iquse * This%iskip(iCond)
-          end if
-          
+          ! if (ArrDiff == 10) then                                                                                         ! # UnComment for Matching CG-QCT Rates
+          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Both the Fin States are Unbound" )
+          !   iquse = 10
+          ! else if (ipart1 == 2) then
+          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 1st Fin States is Unbound" )
+          !   iquse = ipart2
+          ! else if (ipart2 == 2) then
+          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 2nd Fin States is Unbound" )
+          !   iquse = ipart1
+          ! else
+          !   iquse = iquse * This%iskip(iCond)
+          ! end if                                                                                                          ! # UnComment for Matching CG-QCT Rates
+          iquse = iquse * This%iskip(iCond)                                                                                 ! # Comment for Matching CG-QCT Rates
+
         end if
 
       else
@@ -1003,7 +1010,7 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
       if ( (This%iskip(iCond) /= 0) .or. (iCond == NCond) ) isum = isum + (iquse+2) * ifact
       if (i_Debug_Loc) call Logger%Write( "iCond = ", iCond, "; iquse = ", iquse, "; isum = ", isum )
       Weight = Weight * WeightTemp(iu,iCond)
-      ifact = ifact * This%QuantumNumberMax
+      ifact  = ifact  * This%QuantumNumberMax
 
     end do
 
@@ -1045,27 +1052,29 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
             
           if (NCond == 3) then
         
-            if (ArrDiff == 2) then
-              if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )
-              iquse = 2
-            else
-              iquse = iquse * This%iskip(iCond)
-            end if
+            ! if (ArrDiff == 2) then                                                                                        ! # UnComment for Matching CG-QCT Rates
+            !   if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )       ! #
+            !   iquse = 2                                                                                                   ! #
+            ! else                                                                                                          ! #
+            !   iquse = iquse * This%iskip(iCond)                                                                           ! #
+            ! end if                                                                                                        ! # UnComment for Matching CG-QCT Rates
+            iquse = iquse * This%iskip(iCond)                                                                               ! # Comment for Matching CG-QCT Rates
             
           elseif (NCond == 5) then
           
-            if (ArrDiff == 10) then
-              if (i_Debug_Loc) call Logger%Write( "1 Molecule in the Collision; Found an Unbound Fin State" )
-              iquse = 10
-            else if (ipart1 == 2) then
-              if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-              iquse = ipart2
-            else if (ipart2 == 2) then
-              if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-              iquse = ipart1
-            else
-              iquse = iquse * This%iskip(iCond)
-            end if
+            ! if (ArrDiff == 10) then                                                                                       ! # UnComment for Matching CG-QCT Rates
+            !   if (i_Debug_Loc) call Logger%Write( "1 Molecule in the Collision; Found an Unbound Fin State" )
+            !   iquse = 10
+            ! else if (ipart1 == 2) then
+            !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
+            !   iquse = ipart2
+            ! else if (ipart2 == 2) then
+            !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
+            !   iquse = ipart1
+            ! else
+            !   iquse = iquse * This%iskip(iCond)
+            ! end if                                                                                                       ! # UnComment for Matching CG-QCT Rates
+            iquse = iquse * This%iskip(iCond)                                                                              ! # Comment for Matching CG-QCT Rates
             
           end if
           

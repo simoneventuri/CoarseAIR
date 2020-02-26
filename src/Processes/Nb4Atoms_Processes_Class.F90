@@ -336,7 +336,7 @@ Subroutine Mask4Excahge_Nb4Atoms( This, Input, Collision, i_Debug )
   !!!   - Collision%Pairs(...)%NPrevProc
   !!!
   iP=1
-  Collision%Pairs(iP)%NPrevProc     = 0 
+  Collision%Pairs(iP)%NPrevProc     = 1 
   NTotTemp                          = Collision%Pairs(1)%NProc * Collision%Pairs(6)%NProc + 1
   do iP=2,3
     iPOpp = Collision%Pairs(iP)%Opposite
@@ -345,7 +345,7 @@ Subroutine Mask4Excahge_Nb4Atoms( This, Input, Collision, i_Debug )
       Collision%Pairs(iP)%NPrevProc = Collision%Pairs(jP)%NPrevProc
     else
       Collision%Pairs(iP)%NPrevProc = NTotTemp
-      NTotTemp                      = NTotTemp + Collision%Pairs(iP)%NProc * Collision%Pairs(iPOpp)%NProc + 1
+      NTotTemp                      = NTotTemp + Collision%Pairs(iP)%NProc * Collision%Pairs(iPOpp)%NProc
     end if
   end do
   if (i_Debug_Loc) call Logger%Write( "Constructed Collision%Pairs(...)%To_Pair_Exch and Collision%Pairs(...)%NProc!" )   
@@ -511,6 +511,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   if (iP > 0) then
     iOpp     = Collision%Pairs(iP)%Opposite
     NProcPre = Collision%Pairs(iP)%NPrevProc
+    if (i_Debug_Loc) call Logger%Write( "Collision%Pairs(iP)%NPrevProc = ", Collision%Pairs(iP)%NPrevProc )
     Temp     = mod(Arr , 16)
     iType    = mod(Temp, 4)
     jType    = int(Temp / 4)
@@ -584,12 +585,14 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     if (i_Debug_Loc) call Logger%Write( "ExcType    = ", ExcType )
     if (i_Debug_Loc) call Logger%Write( "NProcCurrA = ", NProcCurrA )
     if (i_Debug_Loc) call Logger%Write( "NProcCurrB = ", NProcCurrB )
+    if (i_Debug_Loc) call Logger%Write( "NProcPre   = ", NProcPre )
+    if (i_Debug_Loc) call Logger%Write( "This%NProc_iPOpp(iP,2) = ", This%NProc_iPOpp(iP,2) )
 
     call CreateName_Nb4Atoms( MolNameA, MolNameB, iLevel, jLevel, iLevelChar, jLevelChar, Name )  
     
     iLevelFin     = [iLevel,     jLevel]
     iLevelFinChar = [iLevelChar, jLevelChar]
-    Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB + 1)
+    Idx           = NProcPre + ( (NProcCurrA-1)*This%NProc_iPOpp(iP,2) + NProcCurrB )
     Pairs         = [iP, iOpp]
 
     if (i_Debug_Loc) call Logger%Write( "iLevelFin  = ", iLevelFin )

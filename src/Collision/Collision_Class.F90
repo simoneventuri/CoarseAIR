@@ -209,7 +209,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   character(:)              ,allocatable                    ::    FileName
   integer   ,dimension(64)                                  ::    seed
   integer                                                   ::    iSeed
-  real(rkp)                                                 ::    Temp
+  integer                                                   ::    NTrajTemp
   integer                                                   ::    NTrajPES
   real(rkp) ,dimension(2)                                   ::    array
   integer                                                   ::    TaskType_Loc
@@ -505,9 +505,15 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     if (i_Debug_Loc) call Logger%Write( "Allocated ImpactPara" )
 
     if (i_Debug_Loc) call Logger%Write( "Calling InitializeImpactParameter" )
-    Temp = 0
+    NTrajTemp = 0
     do iPES = 1,Input%NPESs
-      NTrajPES = int ( Input%PES_Degeneracy(iPES) * Input%NTrajBatch )
+      !if (iPES < Input%NPESs) then
+        NTrajPES  = int ( Input%PES_Degeneracy(iPES) * Input%NTrajBatch )
+        NTrajTemp = NTrajTemp + NTrajPES
+      !else
+      !  NTrajPES = Input%NTrajBatch - NTrajTemp
+      !  if (i_Debug_Loc) call Logger%Write( "-> For the Last PES, allocated ", NTrajPES,  " trajectories" )
+      !end if
       call This%InitializeImpactParameter( Input, iPES, NTrajPES, i_Debug=i_Debug_Loc )
     end do
     if (i_Debug_Loc) call Logger%Write( "-> Done with InitializeImpactParameter" )
@@ -759,7 +765,6 @@ Subroutine InitializeAtomsPairsSpecies( This, Input, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "-> Maximum number of atoms per species: This%NAtoMaxSpe = ", This%NAtoMaxSpe )
     if (i_Debug_Loc) call Logger%Write( "-> Done setting Species objects" )
   ! ==============================================================================================================
-
 
   if (i_Debug_Loc) call Logger%Exiting
   

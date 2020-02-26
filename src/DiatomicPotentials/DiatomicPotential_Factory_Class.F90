@@ -152,7 +152,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
-          case ('O2', 'OOa', 'OOb', 'OOc', 'OOd', 'OaOb','OcOd','ObOc','OaOd','OaOc','ObOd')
+          case ('O2', 'OOa', 'OOb', 'OOc', 'OOd', 'OaOb','OaOc','OaOd','ObOc','ObOd','OcOd')
             if (Input%Diatomic_Model(iMol) == 'NASA') then
               allocate( O2_NASA_DiatomicPotential_Type :: DiaPot )
             elseif (Input%Diatomic_Model(iMol) == 'UMN') then

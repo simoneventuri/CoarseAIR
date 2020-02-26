@@ -200,7 +200,13 @@ function ReadBashInput {
     MaxLevel2=0
     NLevels2=0
   fi
+  SymmFlg=0
+  if [ ${MinLevel2} -eq 0 ] && [ ${NMolecules} -gt 1 ]; then
+    SymmFlg=1
+    echo "  [ReadBashInput]:    Found 2 Molecules and decided to consider Symmetries between them. I am going to run AB(i)+CD(j) => ... only if j>=i. (SymmFlg = "${SymmFlg}")"
+  fi
   echo "  [ReadBashInput]:  "
+
 
   iLine=$((iLine+1))
   GenLevFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')

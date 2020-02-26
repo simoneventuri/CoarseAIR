@@ -255,8 +255,8 @@ Subroutine Mask4Excahge_Nb3Atoms( This, Input, Collision, i_Debug )
   !!!
   iP=1
   Collision%Pairs(iP)%NProc       = Collision%MoleculesContainer(iMol1)%Molecule%BinsContainer%NBins + 1
-  Collision%Pairs(iP)%NPrevProc   = 0 
-  NTotTemp                        = Collision%Pairs(iP)%NProc
+  Collision%Pairs(iP)%NPrevProc   = 1 
+  NTotTemp                        = Collision%Pairs(iP)%NProc + 1
   do iP=2,3
     iMol                            = Collision%Pairs(iP)%To_Molecule
     jMol                            = iMol

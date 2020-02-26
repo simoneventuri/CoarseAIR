@@ -28,7 +28,8 @@
     Max Vibrational Quantum Nb = 200
     
     ##  Print Levels at Screen
-    Print Levels = yes
+    Print Levels? = yes
+    Write Wave Function? = yes
     
     ## Spatial Delta in the Integration Grid (1.d-4 / 1.d-3)
     Spatial Delta in the Integration Grid = 5.d-3 

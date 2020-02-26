@@ -183,7 +183,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Construction the diatomic potential object" )
   call DiaPot_Factory%Construct( This%Atom, [1,2], Input, This%DiaPot, i_Debug=i_Debug_Loc ) 
-  call Logger%Write( "Diatomic pot. name: This%DiaPot%Name = ", This%DiaPot%Name )
+  if (i_Debug_Loc) call Logger%Write( "Diatomic pot. name: This%DiaPot%Name = ", This%DiaPot%Name )
   if (i_Debug_Loc) call Logger%Write( "-> Done" )
   ! ==============================================================================================================
 

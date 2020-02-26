@@ -147,6 +147,7 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   This%Initialized  =   .True.
   This%CartCoordFlg =   .False.
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
+  allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
   iA(1,:) = [1, 2]
   iA(2,:) = [1, 3]
@@ -171,7 +172,7 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   ! ==============================================================================================================
   !   READ PARAMETERS
   ! ============================================================================================================== 
-  Weights_File = trim(adjustl(Input%DtbPath))  // '/Systems/O4/PESs/UMN/' // trim(adjustl(This%Model)) // '.dat'
+  Weights_File = trim(adjustl(Input%DtbPath))  // '/Systems/O4/PESs/UMN/' // trim(adjustl(Input%PES_Model(iPES))) // '.dat'
   if (i_Debug_Loc) call Logger%Write( "Reading O4 UMN PES Parameters" )
   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", Weights_File)
   open( File=Weights_File, NewUnit=Unit, status='OLD', iostat=Status )

@@ -311,6 +311,50 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
           end if
           ! ! ============================================================================================================== 
           !pause
+
+
+          ! ! ==============================================================================================================
+          ! !   WRITING ENERGY LEVEL
+          ! ! ============================================================================================================== 
+          if (Input%WriteWF) then
+
+            ! open( NewUnit=UnitWrite, File='./trajectories.bin', Action='WRITE', access="Stream", form="Unformatted", iostat=StatusWrite )
+            ! if (StatusWrite/=0) call Error( "Error writing the binary data file for wave function: " // './trajectories.bin'  ) 
+            ! write(UnitWrite) int(This%NTraj, rkp)
+
+            ! if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
+            ! rewind(DataFile%Unit)                                                                                           
+            ! read(DataFile%Unit,*)                                                                                         
+            ! do iTraj = 1,This%NTraj                                                                                       
+            !   read(DataFile%Unit,*,iostat=DataFile%Status) Idx, iPES, This%bMax(iTraj), This%bSampled(iTraj), This%Qini(:,iTraj), This%Qfin(:,iTraj)
+            !   if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
+
+            !   if (This%StatWritesBinaryFlg) then
+            !     write(UnitWrite) int(Idx,  rkp)
+            !     write(UnitWrite) int(iPES, rkp)
+            !     write(UnitWrite) This%bMax(iTraj)
+            !     write(UnitWrite) This%bSampled(iTraj)
+            !     do iCond=1,This%NCond
+            !       write(UnitWrite) This%Qini(iCond,iTraj)
+            !     end do
+            !     do iCond=1,This%NCond
+            !       write(UnitWrite) This%Qfin(iCond,iTraj)
+            !     end do
+            !   end if
+
+            ! end do                                                                                                        
+            ! if (i_Debug_Loc) then
+            !   call Logger%Write( "-> Done reading the trajectory data" )
+            !   call Logger%Write( "-> Last line: iTraj = ", "This%bMax(iTraj) = ", This%bMax(This%NTraj), "This%bSampled(iTraj) = ", This%bSampled(This%NTraj), Fi="i9", Fr="es15.8")
+            ! end if
+            ! call DataFile%Close()
+
+            !if (This%StatWritesBinaryFlg) close(UnitWrite)
+
+
+          end if
+          ! ! ============================================================================================================== 
+          !pause
           
           ivqn = ivqn + 1
         elseif (EintOld + State%Vmin > State%Vmax) then

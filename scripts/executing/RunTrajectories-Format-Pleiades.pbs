@@ -146,12 +146,16 @@ echo " "
 ###################################################################################################  <<<--- WRITE HERE !!!! 
 MinLevel1=
 MaxLevel1=
+MinLevel2=
+MaxLevel2=
 Tran=
 Tint=
 iNode=
 ###################################################################################################  <<<--- WRITE HERE !!!! 
 echo "[CoarseAIR]: MinLevel1 = "${MinLevel1} 
 echo "[CoarseAIR]: MaxLevel1 = "${MaxLevel1} 
+echo "[CoarseAIR]: MinLevel2 = "${MinLevel2} 
+echo "[CoarseAIR]: MaxLevel2 = "${MaxLevel2} 
 echo "[CoarseAIR]: Tran      = "${Tran} 
 echo "[CoarseAIR]: Tint      = "${Tint} 
 echo "[CoarseAIR]: iNode     = "${iNode} 

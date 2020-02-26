@@ -103,6 +103,7 @@ Module Input_Class
     character(150) ,dimension(:) ,allocatable ::    GeneratedLevelsFile
     logical                                   ::    PrintLevelsFlg = .false.
     logical                                   ::    SortLevelsFlg  = .true.
+    logical                                   ::    WriteWF        = .false.
 
 ! CUT INPUTS
 ! =================
@@ -191,6 +192,7 @@ Module Input_Class
     character(150),dimension(:),allocatable   ::    PES_ParamsFldr
     character(150)                            ::    PES_ParamsFile = 'NONE'
     real(rkp)     ,dimension(:),allocatable   ::    PES_Degeneracy                      !< Potential Energy Surface's Degeneracy
+    integer       ,dimension(:),allocatable   ::    PES_DegeneracyINT                   !< Potential Energy Surface's Degeneracy (integer version)
     real(rkp)     ,dimension(:),allocatable   ::    PES_Degeneracy_Vec                  !< Potential Energy Surface's Degeneracy Vector
     character(150),dimension(:),allocatable   ::    Diatomic_Model                      !< Model for Diatomic Potential
     character(150),dimension(:),allocatable   ::    DiatPot_ParamsFile
@@ -580,7 +582,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   if (Status/=0) call Error( "Error allocating This%PES_Model" )
   allocate( This%PES_Degeneracy(This%NPESs), stat=Status )
   if (Status/=0) call Error( "Error allocating This%PES_Degeneracy" )
-  This%PES_Degeneracy = One
+  This%PES_Degeneracy    = One
+  allocate( This%PES_DegeneracyINT(This%NPESs), stat=Status )
+  if (Status/=0) call Error( "Error allocating This%PES_DegeneracyINT" )
+  This%PES_DegeneracyINT = 1
   allocate( This%PES_Degeneracy_Vec(This%NPESs), stat=Status )
   if (Status/=0) call Error( "Error allocating This%PES_Degeneracy_Vec" )
   allocate( This%PES_ParamsFldr(This%NPESs), stat=Status )
@@ -867,6 +872,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             allocate( This%PES_Degeneracy(This%NPESs), stat=Status )
             if (Status/=0) call Error( "Error allocating This%PES_Degeneracy" )
             This%PES_Degeneracy = One
+            deallocate( This%PES_DegeneracyINT )
+            allocate( This%PES_DegeneracyINT(This%NPESs), stat=Status )
+            if (Status/=0) call Error( "Error allocating This%PES_DegeneracyINT" )
+            This%PES_DegeneracyINT = 1
             deallocate( This%PES_Degeneracy_Vec )
             allocate( This%PES_Degeneracy_Vec(This%NPESs), stat=Status )
             if (Status/=0) call Error( "Error allocating This%PES_Degeneracy_Vec" )
@@ -1564,7 +1573,9 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
           if (adjustl(trim(i_case)) == TRIM(PESDegeneracy_case)) then
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)')  This%PES_Degeneracy(iiPES)
-            if (i_Debug_Loc) call Logger%Write( "Degeneracy, PES ", iiPES, ":      This%PES_Degeneracy(iiPES)  = ", This%PES_Degeneracy(iiPES) )
+            if (i_Debug_Loc) call Logger%Write( "Degeneracy, PES ", iiPES, ":      This%PES_Degeneracy(iiPES)     = ", This%PES_Degeneracy(iiPES) )
+            This%PES_DegeneracyINT(iiPES) = int( This%PES_Degeneracy(iiPES) )
+            if (i_Debug_Loc) call Logger%Write( "Integer Degeneracy, PES ", iiPES, ":      This%PES_DegeneracyINT(iiPES)  = ", This%PES_DegeneracyINT(iiPES) )
             This%PES_Degeneracy_Vec(iiPES) = This%PES_Degeneracy_Vec(max(1,iiPES-1)) + This%PES_Degeneracy(iiPES)
           end if
 
@@ -1614,7 +1625,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
     This%PES_Degeneracy_Vec = This%PES_Degeneracy_Vec / sum(This%PES_Degeneracy,1)
   end if
   if (i_Debug_Loc) call Logger%Write( "Degeneracy Vector:   This%PES_Degeneracy_Vec = ", This%PES_Degeneracy_Vec )
-  This%PES_Degeneracy = This%PES_Degeneracy / sum(This%PES_Degeneracy,1)
+  This%PES_Degeneracy    = This%PES_Degeneracy / sum(This%PES_Degeneracy,1)
 
 
   if ( trim(This%TtraModel) .eq. "Uniform" ) then
@@ -1915,6 +1926,12 @@ Subroutine GenerateLevels( This, i_Debug)
             end if
             if (i_Debug_Loc) call Logger%Write( "New Levels' File Name:      This%SortLevelsFlg  = ",  This%SortLevelsFlg )
 
+          case("Write Wave Function?")
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'YES') .or. (adjustl(trim(line_input)) == 'yes')) then
+              This%WriteWF = .True.
+            end if
+            if (i_Debug_Loc) call Logger%Write( "Write Wave Function?:      This%WriteWF  = ",  This%WriteWF )
 
         end select
         
