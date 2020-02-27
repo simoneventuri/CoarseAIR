@@ -33,7 +33,7 @@ Module N2_UMN_ForN2O2_DiatomicPotential_Class
 
   Type  ,extends(DiatomicPotential_Type)  ::    N2_UMN_ForN2O2_DiatomicPotential_Type
   contains
-    procedure         ::    Initialize        =>    Initialize_N2_UMN_ForN2O2_DiatomicPotential
+    procedure         ::    Initialize        =>    Initialize_N2_DiatomicPotential
     procedure         ::    Compute_Vd_dVd    =>    Compute_Vd_dVd_N2
     procedure         ::    DiatomicPotential =>    DiatomicPotential_N2
   End Type
@@ -51,7 +51,7 @@ Module N2_UMN_ForN2O2_DiatomicPotential_Class
   contains
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Initialize_N2_UMN_ForN2O2_DiatomicPotential( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
+Subroutine Initialize_N2_DiatomicPotential( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
 
   use Input_Class               ,only:  Input_Type
 
@@ -66,7 +66,7 @@ Subroutine Initialize_N2_UMN_ForN2O2_DiatomicPotential( This, Input, SpeciesName
   logical                                             ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Initialize_N2_UMN_ForN2O2_DiatomicPotential" )
+  if (i_Debug_Loc) call Logger%Entering( "Initialize_N2_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
   allocate( This%Name        ,source = trim(Name_DiaPot) )

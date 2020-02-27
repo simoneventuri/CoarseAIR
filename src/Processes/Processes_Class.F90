@@ -213,6 +213,13 @@ Subroutine FindingFinalLevel_Processes( This, Input, Collision, vqn, jqn, Arr, N
   if (i_Debug_Loc) call Logger%Entering( "FindingFinalLevel_Processes" )
   !i_Debug_Loc   =     Logger%On()
 
+  Name          = ''
+  ProcType      = 0
+  ExcType       = 0
+  Pairs         = 0
+  iLevelFin     = 0
+  iLevelFinChar = '      '
+  Idx           = 0
   
   if (i_Debug_Loc) call Logger%Exiting
   
