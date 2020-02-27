@@ -31,7 +31,7 @@
      Atom 3 = O
        Mass [a.u.] of Atom 3  = 29148.94559d0
 
-   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/
+   Database Path = /home/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb/
 
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 =

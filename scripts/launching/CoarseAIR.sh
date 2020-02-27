@@ -27,7 +27,7 @@ ProcType='ivy'                                                                  
 NProc=1                                                                                           # Nb of Processors
 SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
 MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
-RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
+RmTrajFlg=0                                                                                       # =1 -> Removing Traj Files from Single Processors
 BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 

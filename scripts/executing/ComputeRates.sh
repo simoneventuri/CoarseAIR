@@ -40,6 +40,8 @@ function ComputeTrajsPBS {
   cd ${COARSEAIR_OUTPUT_DIR}/..
   if [ "${ProcType}" = "none" ]; then
     scp ${COARSEAIR_SH_DIR}/RunTrajectories-Format-UIUC.pbs     ./
+  elif [ "${ProcType}" = "test" ]; then
+    scp ${COARSEAIR_SH_DIR}/RunTrajectories-Format-Test.pbs     ./
   else
     scp ${COARSEAIR_SH_DIR}/RunTrajectories-Format-Pleiades.pbs ./
   fi
@@ -68,6 +70,8 @@ function ComputeTrajsPBS {
                 
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
+        if [ "${ProcType}" = "test" ]; then
+          sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Test.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
         fi
@@ -664,6 +668,8 @@ function PostTrajectoriesPBS {
           
               if [ "${ProcType}" = "none" ]; then
                 sed -e '3s/$/1:ppn='${NProc}'/'                        'PostTrajectories-Format-UIUC.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
+              elif [ "${ProcType}" = "test" ]; then
+                sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'  'PostTrajectories-Format-Test.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
               else
                 sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'  'PostTrajectories-Format-Pleiades.pbs' > 'PostTrajectoriesTEMP-1.pbs'
               fi

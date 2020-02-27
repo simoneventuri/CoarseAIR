@@ -39,7 +39,7 @@
    Relative Translational Energy Model = Boltzmann
    
    Nb of Translational Temperatures = 1
-     Translational Temperature [K] 1 = 10000.d0
+     Translational Temperature [K] 1 = 20000.d0
    #Nb of Internal Temperatures = 1
    # Internal Temperature 1 = 10000.d0
    
@@ -52,8 +52,8 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = N2_UMN_N2O2_Sorted.inp
-   Levels File Name, Molecule 2 = NO_UMN_Sorted.inp
+   Levels File Name, Molecule 1 = Recomputed.inp
+   Levels File Name, Molecule 2 = Recomputed.inp
    
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
@@ -76,7 +76,7 @@
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
      Starting Level, Molecule 1 = 1                               
-     Final    Level, Molecule 1 = 0
+     Final    Level, Molecule 1 = 2
    Sorting Method, Molecule 2 = State-Specific
    #*##
    
@@ -110,7 +110,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 25000
+   Nb of Trajectories per Level / Bin = 30000
    #  Nb of Trajectories per Mini-Batch = 10000
    
    Generate a CPU-Clock Dependent Seed? = no
@@ -236,7 +236,7 @@
    Final States Assigment Mthd = Histogram
 
    ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
-   Writing Trajectory Files in Binary Format? = yes
+   Writing Trajectory Files in Binary Format? = no
    
 ###########################################################################################
 
