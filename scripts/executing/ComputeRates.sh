@@ -157,6 +157,8 @@ function ComputeTrajsPBS {
               
               if [ "${ProcType}" = "none" ]; then
                 sed -e '3s/$/1:ppn='${NProc}'/'                        'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
+              elif [ "${ProcType}" = "test" ]; then
+                sed -e '3s/$/1:ncpus='${NProc}':model=ivy/'            'RunTrajectories-Format-Test.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
               else
                 sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'  'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
               fi
