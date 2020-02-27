@@ -152,7 +152,7 @@ elseif (Fortran_COMPILER_NAME MATCHES "ifort.*")
     if ( CMAKE_BUILD_TYPE STREQUAL "release" )
       set( DEBUG_FLAG "")
 #      set( OPTIM_FLAG "-fast -fPIC -r8")
-      set( OPTIM_FLAG "-ipo -O3 -no-prec-div -xHost -xAVX -fPIC -r8")
+      set( OPTIM_FLAG "-ipo -O3 -no-prec-div -xHost -xAVX -fPIC -r8 -diag-disable8291")
       set( FFLAGS "${COMMON_FLAG} ${OPTIM_FLAG} ${DEBUG_FLAG}" )
 endif()
 
