@@ -142,6 +142,8 @@ Elemental Subroutine Compute_Vd_dVd_DiaPot( This, R, V, dV )
   real(rkp)                     ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                     ,intent(out)    ::    V             !< Diatomic potential energy [hartree]
   real(rkp)                     ,intent(out)    ::    dV            !< First derivative of the diatomic potential energy [hartree/bohr]
+  V  = Zero
+  dV = Zero
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 
