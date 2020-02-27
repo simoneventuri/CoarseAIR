@@ -70,7 +70,7 @@ function ComputeTrajsPBS {
                 
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
-        if [ "${ProcType}" = "test" ]; then
+        elif [ "${ProcType}" = "test" ]; then
           sed -e '3s/$/1:ncpus='${NProc}':model=ivy/'               'RunTrajectories-Format-Test.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
@@ -234,6 +234,7 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: StochPESFlg           = "${StochPESFlg}
   echo "  [ComputeTrajs]: NPESs                 = "${NPESs}
   echo "  [ComputeTrajs]: iPESStart             = "${iPESStart}
+  echo "  [ComputeTrajs]: RmTrajFlg             = "${RmTrajFlg}
 
   if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
     echo "  [ComputeTrajs]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
@@ -461,6 +462,11 @@ function MergeTrajectories {
       
     iProc=$((iProc+1))
     done
+
+    if [ ${RmTrajFlg} -eq 1 ]; then
+      rm -rf ./Node_$iNode
+      echo "    [MergeTrajectories]: -> Done with merging Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel1}". Now I will remove the Node Folder"
+    fi
     
   #iNode=$((iNode+1))
   #done
