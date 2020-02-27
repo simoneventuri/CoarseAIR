@@ -52,7 +52,7 @@ function RmAll {
       if [ ${MinLevel2} -eq 0 ] && [ ${NMolecules} -gt 1 ]; then
         MinLevel2Temp=${iLevel1}
       fi
-      for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
           echo "  [RmAll]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
           echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
@@ -116,7 +116,7 @@ function Clean {
       if [ ${MinLevel2} -eq 0 ] && [ ${NMolecules} -gt 1 ]; then
         MinLevel2Temp=${iLevel1}
       fi
-      for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
           echo "  [Clean]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
           echo "  [Clean]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "

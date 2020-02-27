@@ -29,6 +29,7 @@ function ComputeTrajsPBS {
   echo "  [ComputeTrajsPBS]: ProcType             = "${ProcType}
   echo "  [ComputeTrajsPBS]: NProc                = "${NProc}
   echo "  [ComputeTrajsPBS]: NMolecules           = "${NMolecules}
+  echo "  [ComputeTrajsPBS]: SymmFlg              = "${SymmFlg}
   echo "  [ComputeTrajsPBS]: NLevels1             = "${NLevels1}
   echo "  [ComputeTrajsPBS]: MinLevel1            = "${MinLevel1}
   echo "  [ComputeTrajsPBS]: MaxLevel1            = "${MaxLevel1}
@@ -109,7 +110,7 @@ function ComputeTrajsPBS {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
@@ -142,7 +143,7 @@ function ComputeTrajsPBS {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             iProcessesTot=$((iProcessesTot+1))
             iProcessesPerNode=$((iProcessesPerNode+1))
@@ -311,7 +312,7 @@ function ComputeTrajs {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
         
             echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
@@ -515,7 +516,7 @@ function SplitTrajsPESs {
       if [ ${SymmFlg} -eq 1 ]; then
         MinLevel2Temp=${iLevel1}
       fi
-      for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
 
           echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
@@ -629,7 +630,7 @@ function PostTrajectoriesPBS {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
@@ -662,7 +663,7 @@ function PostTrajectoriesPBS {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             iProcessesTot=$((iProcessesTot+1))
             iProcessesPerNode=$((iProcessesPerNode+1))
@@ -818,7 +819,7 @@ function PostTrajectoriesAtNode {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
@@ -848,7 +849,7 @@ function PostTrajectoriesAtNode {
         if [ ${SymmFlg} -eq 1 ]; then
           MinLevel2Temp=${iLevel1}
         fi
-        for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
             iProcessesTot=$((iProcessesTot+1))
             iProcessesPerProc=$((iProcessesPerProc+1))
@@ -1106,7 +1107,7 @@ function MergeAllRates {
           if [ ${SymmFlg} -eq 1 ]; then
             MinLevel2Temp=${iLevel1}
           fi
-          for (( iLevel2=1; iLevel2<=${NLevels2}; iLevel2++ )); do
+          for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
             if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
           
 
