@@ -68,7 +68,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   
   integer                                                   ::    i, iP, i1, i2
   integer                                                   ::    Status
-  integer                                                   ::    iA1, iA2
+  integer                                                   ::    iA, iA1, iA2
   integer                                                   ::    pos_m, pos_e
   character(:)                    ,allocatable              ::    AtA_Name, AtB_Name
   character(:)                    ,allocatable              ::    MolA_Name, MolB_Name
@@ -157,18 +157,28 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   if (Status/=0) call Error( "Error allocating This%To_Atoms" )
   if (i_Debug_Loc) call Logger%Write( "Allocated This%To_Atoms with dimension 2" )
 
-  allocate( This%Atom(2), stat=Status )
-  if (Status/=0) call Error( "Error allocating This%Atom" )
-  if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom with dimension 2" )
-
   This%To_Atoms(1) = Pairs(This%To_Pairs(1))%To_Atoms(1)
   This%To_Atoms(2) = Pairs(This%To_Pairs(1))%To_Atoms(2)
   if (i_Debug_Loc) call Logger%Write( "First  Atom of the Molecule ", This%Name, " is the Atom Nb ", This%To_Atoms(1) )
   if (i_Debug_Loc) call Logger%Write( "Second Atom of the Molecule ", This%Name, " is the Atom Nb ", This%To_Atoms(2) )
 
-  i1 = Pairs(This%To_Pairs(1))%To_Atoms(1)
-  i2 = Pairs(This%To_Pairs(1))%To_Atoms(2)
-  This%Atom = Atoms
+  allocate( This%Atom(2), stat=Status )
+  if (Status/=0) call Error( "Error allocating This%Atom" )
+  if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom with dimension 2" )
+
+  do iA=1,2
+    !associate( Atom => This%Atom(iA) )
+      iP              = Pairs(This%To_Pairs(1))%To_Atoms(iA)
+      This%Atom(iA)%Idx        = Atoms(iP)%Idx
+      This%Atom(iA)%Name       = Atoms(iP)%Name
+      This%Atom(iA)%Mass       = Atoms(iP)%Mass
+      This%Atom(iA)%To_Species = Atoms(iP)%To_Species
+    !end associate
+  end do
+  ! i1 = Pairs(This%To_Pairs(1))%To_Atoms(1)
+  ! i2 = Pairs(This%To_Pairs(1))%To_Atoms(2)
+  ! This%Atom(1) = Atoms(i1)
+  ! This%Atom(2) = Atoms(i2)
   if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom(1): This%Atom(1)%Name = ", This%Atom(1)%Name )
   if (i_Debug_Loc) call Logger%Write( "Allocated This%Atom(2): This%Atom(2)%Name = ", This%Atom(2)%Name )
 
