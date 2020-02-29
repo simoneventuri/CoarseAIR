@@ -146,7 +146,7 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   This%Name         =   Name_PES
   This%Initialized  =   .True.
   This%CartCoordFlg =   .False.
-  This%NPairs       =   3               ! Setting the number of atom-atom pairs
+  This%NPairs       =   6               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
   iA(1,:) = [1, 2]

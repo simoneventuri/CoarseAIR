@@ -1,3 +1,4 @@
+
 !**********************************************************************
 !   System:                     O4
 !   Functional form:            permutation-invariant polynomials
@@ -61,22 +62,22 @@
 
 ! Common variables
 ! R(6):         Interatomic bond distance
-! rMs(6)		Array to store base terms
-! rM(0:111) 	Array to store monomials
-! P(0:465) 		Array to store polynomials
-! B(1:430)     	Array to store basis functions
+! rMs(6)          Array to store base terms
+! rM(0:111)       Array to store monomials
+! P(0:465)        Array to store polynomials
+! B(1:430)        Array to store basis functions
 ! dMsdR(6,6):   The derivative of base terms w.r.t. R
 ! dMdR(6,112):  The derivative of monomials w.r.t. R
 ! dPdR(6,466):  The derivative of basis functions w.r.t. R
 ! dVdR(6):      The derivative of V w.r.t. R
 ! dRdX(6,12):   The derivative of R w.r.t. X
-! dBdR(6,430)	The derivative of B w.r.t. R 
-	  
+! dBdR(6,430)     The derivative of B w.r.t. R 
+        
       double precision :: R(6)
       double precision :: rMs(6),rM(0:111),P(0:465),B(430)
       double precision :: dMsdR(6,6),dMdR(6,0:111),dPdR(6,0:465)
       double precision :: dVdR(6),dRdX(6,12),dBdR(6,430)
-	  
+        
 ! Nonlinear parameters:
 ! a(in Ang)
 ! ab (in Ang^2)
@@ -264,7 +265,7 @@
       double precision,intent(in) :: X(4),Y(4),Z(4)
       double precision,intent(out) :: dEdX(4),dEdY(4),dEdZ(4)
       double precision Xcart(12)
-	  double precision dVdX(12)
+        double precision dVdX(12)
       integer i
 
 ! Convert to local variables
@@ -1229,7 +1230,7 @@
       integer :: k 
 ! Dispersion variables
       double precision :: dist(1),disp,dispdr(1)
-	  
+        
 ! Original parameters
 !      alpha = 0.785d0
 !      beta = 1.307d0
@@ -1265,7 +1266,7 @@
         dist(1)=r
         call d3disp(dist,disp,dispdr,0,imol)
         v=v+disp
-	  
+        
 ! Compute the gradient if needed
       if (igrad.eq.1) then
        grad=0.d0

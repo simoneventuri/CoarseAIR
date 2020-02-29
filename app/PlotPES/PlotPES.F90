@@ -26,7 +26,7 @@
 ! 
 !
 ! ==============================================================================================================
-Program PlotPES
+Program PlotPES_Program
 
   use Parameters_Module     ,only:  rkp, Zero
   use Logger_Class          ,only:  Logger
@@ -35,12 +35,16 @@ Program PlotPES
   
   use Input_Class           ,only:  Input_Type
   use Collision_Class       ,only:  Collision_Type
-  use PlotPES_Module
+  use PlotPES_Factory_Class ,only:  PlotPES_Factory_Type
+  use PlotPES_Class         ,only:  PlotPES_Type
   
   implicit none
 
   type(Input_Type)                      ::    Input
   type(Collision_Type)                  ::    Collision
+
+  type(PlotPES_Factory_Type)            ::    PlotPES_Factory
+  class(PlotPES_Type)    ,allocatable   ::    PlotPES
 
   integer                               ::    Status, Unit
   character(150)                        ::    LevelOutputDir
@@ -50,7 +54,16 @@ Program PlotPES
   
   Input%iProc =  1
   Input%iNode =  1
-  
+
+  ! trim(adjustl(Input%OutputDir))
+  if (i_Debug_PP) call Logger%Initialize( "PlotPES.log",           &                                      ! Opening the Log File using
+                              Status          =       'REPLACE',   &                                      ! replacing any previous log file
+                              Position        =       'REWIND',    &                                      ! rewinding to the top of the file
+                              Procedure       =       'PlotPES',   &                                      ! loading the calling procedure name
+                              Indentation     =       2   )                                               ! and setting the initial indentation level
+
+
+
 !  call CPU_Time( StartTime )
   
 ! ==============================================================================================================
@@ -72,12 +85,6 @@ Program PlotPES
 
   call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/')
 
-  if (i_Debug_PP) call Logger%Initialize( trim(adjustl(Input%OutputDir)) // "/PlotPES/PlotPES.log", &     ! Opening the Log File using
-                              Status          =       'REPLACE',   &                                      ! replacing any previous log file
-                              Position        =       'REWIND',    &                                      ! rewinding to the top of the file
-                              Procedure       =       'PlotPES',   &                                      ! loading the calling procedure name
-                              Indentation     =       2   )                                               ! and setting the initial indentation level
-
 
 ! ==============================================================================================================
 !   INITIALIZING COLLISION
@@ -90,11 +97,22 @@ Program PlotPES
 
 
 ! ==============================================================================================================
+!   INITIALIZING PlotPES OBJECT
+! =============================================================================================================
+  if (i_Debug_PP) call Logger%Write( "Setting the Collision object; Calling Collision%Initialize", NewLine=.True. )
+  call PlotPES_Factory%Define_PlotPEs( Input, PlotPES, i_Debug=i_Debug_PP )
+  call PlotPES%Initialize( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+  if (i_Debug_PP) call Logger%Write( "Done Initializing Collision" )
+! ==============================================================================================================
+
+
+
+! ==============================================================================================================
 !   COMPUTING AND PLOTTING PES
 ! =============================================================================================================
   if (Input%PlotPES_ReadPntsFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling ReadPoints", NewLine=.True. )
-    call ReadPoints( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%ReadPoints( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with ReadPoints", NewLine=.True. )
     
 !    if (i_Debug_PP) call Logger%Write( "Calling EvaluatePoints", NewLine=.True. )
@@ -109,54 +127,54 @@ Program PlotPES
   if (Input%PlotPES_GridFlg) then
     if (Input%StochPESFlg) then
       if (i_Debug_PP) call Logger%Write( "Calling GridForStochPES", NewLine=.True. )
-      call GridForStochPES( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      call PlotPES%GridForStochPES( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
       if (i_Debug_PP) call Logger%Write( "Done with GridForStochPES", NewLine=.True. )
     else
       if (i_Debug_PP) call Logger%Write( "Calling Grid", NewLine=.True. )
-      call Grid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      call PlotPES%Grid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
       if (i_Debug_PP) call Logger%Write( "Done with Grid", NewLine=.True. )
     end if
   end if
   
   if (Input%PlotPES_DoubleGridFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling DoubleGrid", NewLine=.True. )
-    call DoubleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%DoubleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with DoubleGrid", NewLine=.True. )
   end if
   
   if (Input%PlotPES_TripleGridFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling TripleGrid", NewLine=.True. )
-    call TripleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%TripleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with TripleGrid", NewLine=.True. )
   end if
   
   if (Input%PlotPES_GridForScatterFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling GridForScatter", NewLine=.True. )
-    call GridForScatter( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%GridForScatter( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with GridForScatter", NewLine=.True. )
   end if
   
   if (Input%PlotPES_StatsFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling StochPESStats", NewLine=.True. )
-    call StochPESStats( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%StochPESStats( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with StochPESStats", NewLine=.True. )
   end if
   
   if (Input%PlotPES_VargasPaperFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling PlotsVargasPaper", NewLine=.True. )
-    call PlotsVargasPaper( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%PlotsVargasPaper( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with PlotsVargasPaper", NewLine=.True. )
   end if
 
   if (Input%PlotPES_Rot3rdFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling PlotPES_Rot3rd", NewLine=.True. )
-    call PlotPES_Rot3rd( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%Rot3rd( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with PlotPES_Rot3rd", NewLine=.True. )
   end if
 
   if (Input%PlotPES_IsoTriFlg) then
     if (i_Debug_PP) call Logger%Write( "Calling PlotPES_IsoTri", NewLine=.True. )
-    call PlotPES_IsoTri( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    call PlotPES%IsoTri( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
     if (i_Debug_PP) call Logger%Write( "Done with PlotPES_IsoTri", NewLine=.True. )
   end if
 

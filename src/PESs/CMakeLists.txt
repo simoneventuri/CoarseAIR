@@ -1,3 +1,5 @@
+add_subdirectory ( PlotPES )
+
 # Adding source files of current directory to be compiled
 add_sources (
   PESsContainer_Class.F90

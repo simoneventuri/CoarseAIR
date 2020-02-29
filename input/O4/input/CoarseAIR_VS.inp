@@ -38,7 +38,7 @@
      Atom 4 = Od
        Mass [a.u.] of Atom 4 = 29148.94559d0
    
-   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
@@ -93,7 +93,6 @@
 ###########################################################################################
 
    ### Sorting Method ( State-Specific / Vib-Specific / RoVib-CG / From-File )
-   
    #*                                                                      <- Uncomment from #: to #* for Running State Specific QCT
    #                                                                         <- If Starting Level==0 for all the initial molecules, CoarseAIR reads the levels/bins to run from the "ProcessesToRunList.inp" in the input folder
    #                                                                         <- If Final    Level==0, CoarseAIR runs until the molecule's last level/bin
@@ -122,7 +121,7 @@
       Starting vqn, Molecule 2 = 1
       Final    vqn, Molecule 2 = 0
 
-   # Molecule 3, 4, 5 and 6: RoVib-CG
+   # Molecule 3, 4, 5 and 6: Vib-Specific          
    #Sorting Method, Molecule 3 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 3 = E_low.dat
    #  Nb of Bins, Molecule 3 = 10
@@ -151,7 +150,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 50000
+   Nb of Trajectories per Level / Bin = 200000
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
