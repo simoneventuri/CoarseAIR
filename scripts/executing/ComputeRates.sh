@@ -360,6 +360,9 @@ function RunTrajectoriesAtNode {
   echo "    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories"
   echo "    [RunTrajectoriesAtNode]: Node "${iNode}
   
+  mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}
+  python3 ${COARSEAIR_SH_DIR}'/SplitLevelsList.py' ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode} ${COARSEAIR_OUTPUT_DIR} ${System} ${NMolecules} ${Molecule1} ${NLevels1} ${iLevel1} ${Molecule2} ${NLevels2} ${iLevel2}
+
   if [[ ${NProc} -eq 1 ]]; then
     RunTrajectoriesAtProc 1
   elif [[ ${NProc} -eq 2 ]]; then
@@ -416,7 +419,8 @@ function RunTrajectoriesAtProc() {
   mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}
   mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}
   cd ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}
-  
+  scp ../levels* ./
+
   echo "      [RunTrajectoriesAtProc]: Running Trajectories for Node "${iNode}" of "${NNode}", Processor "${iProc}
   eval ${RunTrajectoriesCommand} '${COARSEAIR_BIN_OUTPUT_DIR}' ${Tran} ${Tint} ${NProcTot} ${iProc} ${NNode} ${iNode} ${iLevel1} ${iLevel2}
   echo "      [RunTrajectoriesAtProc]: Done Running Trajectories for Node "${iNode}", Processor "${iProc}

@@ -524,7 +524,7 @@ Subroutine WriteBinsData_BinsContainer( This, Input, LevelsContainer, iMol, i_De
 
 
   ! Write the Levels Contained in Each Bin
-  call This%WriteLevelsInBin( LevelsContainer, i_Debug=i_Debug_Loc )
+  !call This%WriteLevelsInBin( LevelsContainer, i_Debug=i_Debug_Loc )
 
 
   ! ! Write the Mapping QNs Contained in Each Bin

@@ -67,9 +67,9 @@ else
   COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tran%.*}/"Bins_"${iLevels1}"_"${iLevels2}
 fi
 
-mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}
 mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}
 cd ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}
+scp ../levels* ./
 
 echo "      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node "${iNode}" of "${NNode}", Processor "${iProc}
 eval ${RunTrajectoriesCommand} '${COARSEAIR_BIN_OUTPUT_DIR}' ${Tran} ${Tint} ${NProcTot} ${iProc} ${NNode} ${iNode} ${iLevels1} ${iLevels2}

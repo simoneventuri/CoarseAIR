@@ -42,6 +42,7 @@ Program RunTrajectories
   use Input_Class           ,only:  Input_Type
   use Collision_Class       ,only:  Collision_Type
   use Integrator_Class      ,only:  Integrator_Type
+  ! use LevelsContainer_Class ,only:  WriteTempList
   use Error_Class           ,only:  Error
   use Timing_Module
 
@@ -51,7 +52,6 @@ Program RunTrajectories
   type(Collision_Type)                  ::    Collision
   type(Integrator_Type)                 ::    Integrator
 
-  character(2)                          ::    iMol_char
   character(200)                        ::    LevelOutputDir
   integer                               ::    iMol  
   integer                               ::    iBin
@@ -238,26 +238,13 @@ Program RunTrajectories
 ! ==============================================================================================================  
   
 
-! ==============================================================================================================
-!   COPING ENERGY LEVELS LIST
-! ==============================================================================================================
-  if (Input%NInitMolecules==1) Then
-     iMol = 1
-
-     call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // &
-                  '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // '.inp' )
-
-  else 
-     do iMol = 1,Input%NInitMolecules
-   
-        Write(Imol_char,'(I2)')iMol
-
-        call system( 'scp '  // adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // &
-                     '/levels_Bin' // trim(adjustl(Input%BinOI_char(iMol))) // '.inp ./levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // trim(adjustl(iMol_char)) // '.inp' )
-
-     enddo
-  endif
-! ==============================================================================================================
+! ! ==============================================================================================================
+! !   COPING ENERGY LEVELS LIST
+! ! ==============================================================================================================
+!   if (i_Debug_RT) call Logger%Write( "-> Scanning Levels File" )
+!   call WriteTempList( Input, i_Debug=i_Debug_RT ) 
+!   if (i_Debug_RT) call Logger%Write( "-> Done Scanning Levels File" )
+! ! ==============================================================================================================
   
   
 ! ==============================================================================================================
