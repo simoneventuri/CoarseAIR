@@ -158,11 +158,14 @@ else
 
   iProcessesTot=0
   ExitCond=0
-  iLevel2Start=${MinLevel2}
-  if [ ${SymmFlg} -eq 1 ]; then
-    iLevel2Start=${iLevel1}
-  fi
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+    fi
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+    fi
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
