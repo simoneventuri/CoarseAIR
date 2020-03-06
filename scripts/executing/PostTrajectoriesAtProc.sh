@@ -174,6 +174,9 @@ else
 
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((${iProcessesTot}+1))
+        echo ${iProcessesTot}
+        echo ${MinProcessInNode}
+        echo ${MaxProcessInNode}
         if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
           echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
           echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
