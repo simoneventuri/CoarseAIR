@@ -292,7 +292,7 @@ function ComputeTrajs {
           fi
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
             ExitCond=2
-            MinProcessInNode=${NProcessesTot}
+            MaxProcessInNode=${NProcessesTot}
           fi
           echo "  [ComputeTrajs]: -> iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}"; ExitCond = "${ExitCond}
         done
@@ -830,7 +830,7 @@ function PostTrajectoriesAtNode {
           fi
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
             ExitCond=2
-            MinProcessInNode=${NProcessesTot}
+            MaxProcessInNode=${NProcessesTot}
           fi
         done
       done
