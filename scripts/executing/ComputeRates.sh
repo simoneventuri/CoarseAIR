@@ -111,8 +111,7 @@ function ComputeTrajsPBS {
             TempFlg=0
           fi
           if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-              NProcessesTot=$((NProcessesTot+1))
-            fi
+            NProcessesTot=$((NProcessesTot+1))
           fi
         done
       fi
@@ -275,8 +274,7 @@ function ComputeTrajs {
               TempFlg=0
             fi
             if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-                NProcessesTot=$((NProcessesTot+1))
-              fi
+              NProcessesTot=$((NProcessesTot+1))
             fi
           done
         fi
@@ -626,8 +624,7 @@ function PostTrajectoriesPBS {
             TempFlg=0
           fi
           if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-              NProcessesTot=$((NProcessesTot+1))
-            fi
+            NProcessesTot=$((NProcessesTot+1))
           fi
         done
       fi
@@ -780,8 +777,7 @@ function PostTrajectoriesAtNode {
               TempFlg=0
             fi
             if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-                NProcessesTot=$((NProcessesTot+1))
-              fi
+              NProcessesTot=$((NProcessesTot+1))
             fi
           done
         fi
