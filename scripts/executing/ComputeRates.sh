@@ -111,11 +111,12 @@ function ComputeTrajsPBS {
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           ExitCond=1
-        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
         fi
         if [ ${ExitCond} -eq 1 ]; then
           NProcessesTot=$((NProcessesTot+1))
+        fi
+        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
         fi
       done
     done
@@ -268,7 +269,6 @@ function ComputeTrajs {
 
     if [ ${NNode} -eq 1 ]; then
       iNode=1
-      MinProcessInNode=1
       NProcessesTot=0
       ExitCond=0
       iLevel2Start=${MinLevel2}
@@ -279,16 +279,18 @@ function ComputeTrajs {
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
-          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
+            MinProcessInNode=${NProcessesTot}
           fi
           if [ ${ExitCond} -eq 1 ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
+          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
+            MinProcessInNode=${NProcessesTot}
+          fi
         done
       done
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesTot}
-      MaxProcessInNode=${NProcessesTot}
     fi
     echo "  [ComputeTrajs]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
     echo "  [ComputeTrajs]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
@@ -304,8 +306,6 @@ function ComputeTrajs {
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           ExitCond=1
-        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
         fi
         if [ ${ExitCond} -eq 1 ]; then
           iProcessesTot=$((iProcessesTot+1))
@@ -333,6 +333,9 @@ function ComputeTrajs {
             echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
             echo " "
           fi
+        fi
+        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
         fi
       done
     done
@@ -523,8 +526,6 @@ function SplitTrajsPESs {
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
-      elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-        ExitCond=2
       fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
@@ -541,6 +542,9 @@ function SplitTrajsPESs {
           python3 ${COARSEAIR_SH_DIR}/SplitTrajsPESs.py ${COARSEAIR_BIN_OUTPUT_DIR} ${iPESStart}
 
         fi
+      fi
+      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        ExitCond=2
       fi
     done
   done
@@ -641,14 +645,16 @@ function PostTrajectoriesPBS {
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           ExitCond=1
-        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
         fi
         if [ ${ExitCond} -eq 1 ]; then
           NProcessesTot=$((NProcessesTot+1))
         fi
+        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
+        fi
       done
     done
+
     echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesTot} / ${NNode}")"
@@ -771,7 +777,7 @@ function PostTrajectoriesAtNode {
       MaxProcessInProc=$((iProc*NProcessesPerProc))
       if [ ${MaxProcessInProc} -gt ${NProcessesPerNode} ]; then
         MaxProcessInProc=${NProcessesPerNode}
-      done
+      fi
 
       echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the first Process to be read from file is the "${MinProcessInProc}"-th in the List"
       echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the last  Process to be read from file is the "${MaxProcessInProc}"-th in the List"
@@ -787,7 +793,6 @@ function PostTrajectoriesAtNode {
 
     if [ ${NNode} -eq 1 ]; then
       iNode=1
-      MinProcessInNode=1
       NProcessesTot=0
       ExitCond=0
       iLevel2Start=${MinLevel2}
@@ -798,15 +803,17 @@ function PostTrajectoriesAtNode {
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
-          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
+            MinProcessInNode=${NProcessesTot}
           fi
           if [ ${ExitCond} -eq 1 ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
+          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
+            MinProcessInNode=${NProcessesTot}
+          fi
         done
       done
-      MaxProcessInNode=${NProcessesTot}
     fi
     NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))
     echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
@@ -821,7 +828,7 @@ function PostTrajectoriesAtNode {
       MaxProcessInProc=$((${iProc}*${NProcessesPerProc}))
       if [ ${MaxProcessInProc} -gt ${NProcessesPerNode} ]; then
         MaxProcessInProc=${NProcessesPerNode}
-      done
+      fi
 
       echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the first Process to be computed is the "${MinProcessInProc}"-th in the List"
       echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the last  Process to be computed is the "${MaxProcessInProc}"-th in the List"
@@ -1057,8 +1064,6 @@ function MergeAllRates {
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
           if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
-          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
           fi
           if [ ${ExitCond} -eq 1 ]; then
             iProcessesTot=$((iProcessesTot+1))
@@ -1089,6 +1094,9 @@ function MergeAllRates {
             
             rm -rf ./trajectories.csv
 
+          fi
+          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
           fi
         done
       done

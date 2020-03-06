@@ -166,9 +166,7 @@ else
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
-      elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-        ExitCond=2
-      fi
+      if
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
         if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
@@ -210,6 +208,9 @@ else
           echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
           echo " "
         fi
+      fi
+      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        ExitCond=2
       fi
     done
   done
