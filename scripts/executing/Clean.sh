@@ -47,38 +47,43 @@ function RmAll {
 
 
   iProcessesTot=0
+  ExitCond=0
+  iLevel2Start=${MinLevel2}
+  if [ ${SymmFlg} -eq 1 ]; then
+    iLevel2Start=${iLevel1}
+  fi
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-      echo "  [RmAll]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
-      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-        TempFlg=1
-        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-          TempFlg=0
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+        ExitCond=1
+      elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        ExitCond=2
+      fi
+      if [ ${ExitCond} -eq 1 ]; then
+        iProcessesTot=$((iProcessesTot+1))
+
+        echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
+        echo "  [RmAll]"
+
+     
+        if [ ${TranFlg} -eq 0 ]; then 
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+        else
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
         fi
-        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-          echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
-          echo "  [RmAll]"
-
-       
-          if [ ${TranFlg} -eq 0 ]; then 
-            export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
-          else
-            export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
-          fi
 
 
-          #if [ -f ${COARSEAIR_BIN_OUTPUT_DIR} ]; then
-          #  echo ${COARSEAIR_BIN_OUTPUT_DIR}
-          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}
-          #fi
+        #if [ -f ${COARSEAIR_BIN_OUTPUT_DIR} ]; then
+        #  echo ${COARSEAIR_BIN_OUTPUT_DIR}
+        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}
+        #fi
 
-          echo "  [RmAll]: ---------------------------------------------------------- "
-        fi
-      done
-      echo "  [RmAll]: ------------------------------------------------------------ "
-      echo " "
-    fi
-  done     
+        echo "  [RmAll]: ---------------------------------------------------------- "
+        echo "  [RmAll]: ------------------------------------------------------------ "
+        echo " "
+      fi
+    done
+  done
    
 }
 #================================================================================================================================#
@@ -112,38 +117,43 @@ function Clean {
 
 
   iProcessesTot=0
+  ExitCond=0
+  iLevel2Start=${MinLevel2}
+  if [ ${SymmFlg} -eq 1 ]; then
+    iLevel2Start=${iLevel1}
+  fi
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-      echo "  [Clean]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
-      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-        TempFlg=1
-        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-          TempFlg=0
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+        ExitCond=1
+      elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        ExitCond=2
+      fi
+      if [ ${ExitCond} -eq 1 ]; then
+        iProcessesTot=$((iProcessesTot+1))
+        
+        echo "  [Clean]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
+        echo "  [Clean]"
+
+    
+        if [ ${TranFlg} -eq 0 ]; then 
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+        else
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
         fi
-        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-          echo "  [Clean]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
-          echo "  [Clean]"
-
-      
-          if [ ${TranFlg} -eq 0 ]; then 
-            export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
-          else
-            export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
-          fi
 
 
-          if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics-*
-          fi
-
-          echo "  [Clean]: ---------------------------------------------------------- "
+        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
+          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
+          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics-*
         fi
-      done
-      echo "  [Clean]: ------------------------------------------------------------ "
-      echo " "
-    fi
-  done     
+
+        echo "  [Clean]: ---------------------------------------------------------- "
+        echo "  [Clean]: ------------------------------------------------------------ "
+        echo " "
+      fi
+    done
+  done
       
 }
 #================================================================================================================================#

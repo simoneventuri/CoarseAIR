@@ -53,7 +53,7 @@ function ComputeTrajsPBS {
 
     echo "  [ComputeTrajsPBS]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
     NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
-    echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
+    echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesFromFile}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesFromFile} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
@@ -101,22 +101,26 @@ function ComputeTrajsPBS {
 
   else
 
-
     NProcessesTot=0
+    ExitCond=0
+    iLevel2Start=${MinLevel2}
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+    fi
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-          TempFlg=1
-          if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-            TempFlg=0
-          fi
-          if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-            NProcessesTot=$((NProcessesTot+1))
-          fi
-        done
-      fi
-    done  
+      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+          ExitCond=1
+        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
+        fi
+        if [ ${ExitCond} -eq 1 ]; then
+          NProcessesTot=$((NProcessesTot+1))
+        fi
+      done
+    done
     echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
+
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesTot} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
@@ -266,19 +270,23 @@ function ComputeTrajs {
       iNode=1
       MinProcessInNode=1
       NProcessesTot=0
+      ExitCond=0
+      iLevel2Start=${MinLevel2}
+      if [ ${SymmFlg} -eq 1 ]; then
+        iLevel2Start=${iLevel1}
+      fi
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-          for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-            TempFlg=1
-            if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-              TempFlg=0
-            fi
-            if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-              NProcessesTot=$((NProcessesTot+1))
-            fi
-          done
-        fi
-      done  
+        for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+            ExitCond=1
+          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
+          fi
+          if [ ${ExitCond} -eq 1 ]; then
+            NProcessesTot=$((NProcessesTot+1))
+          fi
+        done
+      done
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesTot}
       MaxProcessInNode=${NProcessesTot}
     fi
@@ -287,43 +295,47 @@ function ComputeTrajs {
 
 
     iProcessesTot=0
+    ExitCond=0
+    iLevel2Start=${MinLevel2}
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+    fi
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-        echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
-        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-          TempFlg=1
-          if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-            TempFlg=0
-          fi
-          if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-            iProcessesTot=$((iProcessesTot+1))
-            if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
-              echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------------ "
-              echo "  [ComputeTrajs]"
-            
-              if [ ${TranFlg} -eq 0 ]; then 
-                COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-              else
-                COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-              fi
-            
-            
-              echo "  [ComputeTrajs]: Calling RunTrajectoriesAtNode"
-              RunTrajectoriesAtNode
-              wait
-
-              echo "  [ComputeTrajs]: Calling MergeTrajectories"
-              MergeTrajectories
-              wait
-
-              echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ---------------- DONE -- "
+      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+          ExitCond=1
+        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
+        fi
+        if [ ${ExitCond} -eq 1 ]; then
+          iProcessesTot=$((iProcessesTot+1))
+          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
+            echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
+            echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------------ "
+            echo "  [ComputeTrajs]"
+          
+            if [ ${TranFlg} -eq 0 ]; then 
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+            else
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
             fi
+          
+          
+            echo "  [ComputeTrajs]: Calling RunTrajectoriesAtNode"
+            RunTrajectoriesAtNode
+            wait
+
+            echo "  [ComputeTrajs]: Calling MergeTrajectories"
+            MergeTrajectories
+            wait
+
+            echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ---------------- DONE -- "
+            echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
+            echo " "
           fi
-        done
-        echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
-        echo " "
-      fi
-    done  
+        fi
+      done
+    done
 
   
   fi
@@ -502,31 +514,35 @@ function SplitTrajsPESs {
   MaxProcessInNode=${MaxProcess}
 
   iProcessesTot=0
+  ExitCond=0
+  iLevel2Start=${MinLevel2}
+  if [ ${SymmFlg} -eq 1 ]; then
+    iLevel2Start=${iLevel1}
+  fi
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-        TempFlg=1
-        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-          TempFlg=0
-        fi
-        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-          iProcessesTot=$((iProcessesTot+1))
-          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+        ExitCond=1
+      elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        ExitCond=2
+      fi
+      if [ ${ExitCond} -eq 1 ]; then
+        iProcessesTot=$((iProcessesTot+1))
+        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
 
-            echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
+          echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
 
-            if [ ${TranFlg} -eq 0 ]; then 
-              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-            else
-              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-            fi
-
-            python3 ${COARSEAIR_SH_DIR}/SplitTrajsPESs.py ${COARSEAIR_BIN_OUTPUT_DIR} ${iPESStart}
-
+          if [ ${TranFlg} -eq 0 ]; then 
+            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+          else
+            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
           fi
+
+          python3 ${COARSEAIR_SH_DIR}/SplitTrajsPESs.py ${COARSEAIR_BIN_OUTPUT_DIR} ${iPESStart}
+
         fi
-      done
-    fi
+      fi
+    done
   done
 
   echo "  [SplitTrajsPESs]: -> Done Splitting PESs in the Trajectory Files"
@@ -616,19 +632,23 @@ function PostTrajectoriesPBS {
 
 
     NProcessesTot=0
+    ExitCond=0
+    iLevel2Start=${MinLevel2}
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+    fi
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-        for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-          TempFlg=1
-          if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-            TempFlg=0
-          fi
-          if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-            NProcessesTot=$((NProcessesTot+1))
-          fi
-        done
-      fi
-    done  
+      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+          ExitCond=1
+        elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
+        fi
+        if [ ${ExitCond} -eq 1 ]; then
+          NProcessesTot=$((NProcessesTot+1))
+        fi
+      done
+    done
     echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesTot} / ${NNode}")"
@@ -769,19 +789,23 @@ function PostTrajectoriesAtNode {
       iNode=1
       MinProcessInNode=1
       NProcessesTot=0
+      ExitCond=0
+      iLevel2Start=${MinLevel2}
+      if [ ${SymmFlg} -eq 1 ]; then
+        iLevel2Start=${iLevel1}
+      fi
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-          for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-            TempFlg=1
-            if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-              TempFlg=0
-            fi
-            if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-              NProcessesTot=$((NProcessesTot+1))
-            fi
-          done
-        fi
-      done  
+        for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+            ExitCond=1
+          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
+          fi
+          if [ ${ExitCond} -eq 1 ]; then
+            NProcessesTot=$((NProcessesTot+1))
+          fi
+        done
+      done
       MaxProcessInNode=${NProcessesTot}
     fi
     NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))
@@ -1024,47 +1048,49 @@ function MergeAllRates {
       echo '  [MergeAllRates]'     
 
       iProcessesTot=0
+      ExitCond=0
+      iLevel2Start=${MinLevel2}
+      if [ ${SymmFlg} -eq 1 ]; then
+        iLevel2Start=${iLevel1}
+      fi
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
-          for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-            TempFlg=1
-            if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
-              TempFlg=0
+        for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+            ExitCond=1
+          elif [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+            ExitCond=2
+          fi
+          if [ ${ExitCond} -eq 1 ]; then
+            iProcessesTot=$((iProcessesTot+1))
+
+            if [ ${TranFlg} -eq 0 ]; then 
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+            else
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
             fi
-            if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
-              #iProcessesTot=$((iProcessesTot+1))
-              #if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
-
-                if [ ${TranFlg} -eq 0 ]; then 
-                  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-                else
-                  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-                fi
-                cd ${COARSEAIR_BIN_OUTPUT_DIR}
+            cd ${COARSEAIR_BIN_OUTPUT_DIR}
 
 
-                if [ -f ../trajectories-Tot.csv ]; then  
-                  tail -n+2 ./trajectories.csv >> ../trajectories-Tot.csv
-                  if [ -f ./PaQSOl.out ]; then
-                    echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
-                    tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
-                    rm -rf ./PaQSOl.out
-                  fi
-                else
-                  cat ./trajectories.csv > ../trajectories-Tot.csv
-                  if [ -f ./PaQSOl.out ]; then
-                    echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
-                    tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
-                    rm -rf ./PaQSOl.out
-                  fi
-                fi
-                
-                rm -rf ./trajectories.csv
-
-              #fi
+            if [ -f ../trajectories-Tot.csv ]; then  
+              tail -n+2 ./trajectories.csv >> ../trajectories-Tot.csv
+              if [ -f ./PaQSOl.out ]; then
+                echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
+                tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
+                rm -rf ./PaQSOl.out
+              fi
+            else
+              cat ./trajectories.csv > ../trajectories-Tot.csv
+              if [ -f ./PaQSOl.out ]; then
+                echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
+                tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
+                rm -rf ./PaQSOl.out
+              fi
             fi
-          done
-        fi
+            
+            rm -rf ./trajectories.csv
+
+          fi
+        done
       done
 
     #done
