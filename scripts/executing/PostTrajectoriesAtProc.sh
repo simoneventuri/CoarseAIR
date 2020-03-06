@@ -169,56 +169,56 @@ else
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       echo "iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}
 
-      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-        ExitCond=1
-      if
+      # if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+      #   ExitCond=1
+      # if
 
-      if [ ${ExitCond} -eq 1 ]; then
-        iProcessesTot=$((iProcessesTot+1))
-        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
-          echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
-          echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
+      # if [ ${ExitCond} -eq 1 ]; then
+      #   iProcessesTot=$((iProcessesTot+1))
+      #   if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+      #     echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
+      #     echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
 
               
-          if [ ${TranFlg} -eq 0 ]; then 
-            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-          else
-            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-          fi
+      #     if [ ${TranFlg} -eq 0 ]; then 
+      #       COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+      #     else
+      #       COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+      #     fi
           
 
-          VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
-          if [ -f $exist ]; then
-            Velocity=$(sed '2q;d' ${VelocityFile})
-            echo "    [PostTrajectoriesAtProc.sh]: Velocity = "${Velocity}
-          else
-            echo "    [PostTrajectoriesAtProc.sh]: ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
-            exit1
-          fi
+      #     VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
+      #     if [ -f $exist ]; then
+      #       Velocity=$(sed '2q;d' ${VelocityFile})
+      #       echo "    [PostTrajectoriesAtProc.sh]: Velocity = "${Velocity}
+      #     else
+      #       echo "    [PostTrajectoriesAtProc.sh]: ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
+      #       exit1
+      #     fi
           
-          echo "    [PostTrajectoriesAtProc.sh]: Calling PostTrajectories"
-          PostTrajectories
+      #     echo "    [PostTrajectoriesAtProc.sh]: Calling PostTrajectories"
+      #     PostTrajectories
           
-          if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-            rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
-            if [ ${BinaryTrajFlg} -eq 1 ]; then
-              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
-            fi
-          fi
+      #     if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
+      #       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
+      #       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
+      #       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
+      #       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
+      #       if [ ${BinaryTrajFlg} -eq 1 ]; then
+      #         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
+      #       fi
+      #     fi
 
 
-          echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
-          echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
-          echo " "
-        fi
-      fi
+      #     echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
+      #     echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
+      #     echo " "
+      #   fi
+      # fi
 
-      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-        ExitCond=2
-      fi
+      # if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+      #   ExitCond=2
+      # fi
 
     done
   done
