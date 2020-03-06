@@ -294,7 +294,7 @@ function ComputeTrajs {
             ExitCond=2
             MaxProcessInNode=${NProcessesTot}
           fi
-          echo "  [ComputeTrajs]: -> iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}"; ExitCond = "${ExitCond}
+          #echo "  [ComputeTrajs]: -> iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}"; ExitCond = "${ExitCond}
         done
       done
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesTot}
