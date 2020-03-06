@@ -144,23 +144,19 @@ echo " "
  
  
 ###################################################################################################  <<<--- WRITE HERE !!!! 
-MinLevel1=
-MaxLevel1=
-MinLevel2=
-MaxLevel2=
+MinProcessInNode=
+MaxProcessInNode=
 Tran=
 Tint=
 iNode=
 ###################################################################################################  <<<--- WRITE HERE !!!! 
-echo "[CoarseAIR]: MinLevel1 = "${MinLevel1} 
-echo "[CoarseAIR]: MaxLevel1 = "${MaxLevel1} 
-echo "[CoarseAIR]: MinLevel2 = "${MinLevel2} 
-echo "[CoarseAIR]: MaxLevel2 = "${MaxLevel2} 
-echo "[CoarseAIR]: Tran      = "${Tran} 
-echo "[CoarseAIR]: Tint      = "${Tint} 
-echo "[CoarseAIR]: iNode     = "${iNode} 
+echo "[CoarseAIR]: MinProcessInNode = "${MinProcessInNode} 
+echo "[CoarseAIR]: MaxProcessInNode = "${MaxProcessInNode} 
+echo "[CoarseAIR]: Tran             = "${Tran} 
+echo "[CoarseAIR]: Tint             = "${Tint} 
+echo "[CoarseAIR]: iNode            = "${iNode} 
 echo " " 
- 
+
  
 # --- Computing Rates ----------------------------------------------------------------------- # 
 if [ ${RunTrajFlg} -eq 1 ] || [ ${PostFlg} -eq 1 ]; then 

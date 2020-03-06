@@ -52,9 +52,10 @@ Molecule2=${22}
 NLevels2=${23}
 MinLevel2=${24}
 MaxLevel2=${25}
-RmTrajFlg=${26}
-BinaryTrajFlg=${27}                                                            
-
+MinProcessInProc=${26}
+MaxProcessInProc=${27}
+RmTrajFlg=${28}
+BinaryTrajFlg=${29}                                                            
 
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
@@ -81,6 +82,8 @@ echo "    [PostTrajectoriesAtProc.sh]: Molecule2             = "${Molecule2}
 echo "    [PostTrajectoriesAtProc.sh]: NLevels2              = "${NLevels2}
 echo "    [PostTrajectoriesAtProc.sh]: MinLevel2             = "${MinLevel2}
 echo "    [PostTrajectoriesAtProc.sh]: MaxLevel2             = "${MaxLevel2}
+echo "    [PostTrajectoriesAtProc.sh]: MinProcessInProc      = "${MinProcessInProc}
+echo "    [PostTrajectoriesAtProc.sh]: MaxProcessInProc      = "${MaxProcessInProc}
 echo "    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = "${RmTrajFlg}
 echo "    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = "${BinaryTrajFlg}
 
@@ -89,15 +92,10 @@ source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
 if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
   echo "  [PostTrajectoriesAtProc]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-  
-
-  MinProcessInProc=${MaxLevel1}
-  MaxProcessInProc=${MaxLevel2}
   echo "  [PostTrajectoriesAtProc]: For Node "${iNode}", Processor "${iProc}", the first Process to be read from file is the "${MinProcessInProc}"-th in the List"
   echo "  [PostTrajectoriesAtProc]: For Node "${iNode}", Processor "${iProc}", the last  Process to be read from file is the "${MaxProcessInProc}"-th in the List"
   
   
-
   iProcess=0
   while IFS= read -r ProcessLine
     do
@@ -112,11 +110,6 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
       if [ -z "$iLevel2" ]; then 
         iLevel2=0
       fi
-      MinLevel1=${iLevel1}
-      MaxLevel1=${iLevel1}
-      MinLevel2=${iLevel2}
-      MaxLevel2=${iLevel2}
-
     
       echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin " ${iLevel1} " ----------------------------- "
       echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "        
@@ -160,58 +153,63 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
   done < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp"
 
 else
+  echo "  [PostTrajectoriesAtProc]: For Node "${iNode}", Processor "${iProc}", the first Process to be computed is the "${MinProcessInProc}"-th"
+  echo "  [PostTrajectoriesAtProc]: For Node "${iNode}", Processor "${iProc}", the last  Process to be computed is the "${MaxProcessInProc}"-th"
 
-  
-  MinLevel1Temp=${MinLevel1}
-  MaxLevel1Temp=${MaxLevel1}
-  MinLevel2Temp=${MinLevel2}
-  MaxLevel2Temp=${MaxLevel2}
-  for (( iLevel1=${MinLevel1Temp}; iLevel1<=${MaxLevel1Temp}; iLevel1++ )); do
-    echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
-    if [ ${SymmFlg} -eq 1 ]; then
-      MinLevel2Temp=${iLevel1}
-      echo "    [---]: MinLevel2Temp = " ${MinLevel2Temp} " --------------------- "
-    fi
-    for (( iLevel2=${MinLevel2Temp}; iLevel2<=${MaxLevel2Temp}; iLevel2++ )); do
-      echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
-      
-      
-      if [ ${TranFlg} -eq 0 ]; then 
-        COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-      else
-        COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-      fi
-      
-
-      VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
-      if [ -f $exist ]; then
-        Velocity=$(sed '2q;d' ${VelocityFile})
-        echo "    [PostTrajectoriesAtProc.sh]: Velocity = "${Velocity}
-      else
-        echo "    [PostTrajectoriesAtProc.sh]: ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
-        exit1
-      fi
-      
-      echo "    [PostTrajectoriesAtProc.sh]: Calling PostTrajectories"
-      PostTrajectories
-      
-      if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
-        if [ ${BinaryTrajFlg} -eq 1 ]; then
-          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
+  iProcessesTot=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
+      echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
+      for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
+        TempFlg=1
+        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
+          TempFlg=0
         fi
-      fi
+        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
+          iProcessesTot=$((iProcessesTot+1))
+          if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]
+            echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
+            
+                
+            if [ ${TranFlg} -eq 0 ]; then 
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+            else
+              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+            fi
+            
+
+            VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
+            if [ -f $exist ]; then
+              Velocity=$(sed '2q;d' ${VelocityFile})
+              echo "    [PostTrajectoriesAtProc.sh]: Velocity = "${Velocity}
+            else
+              echo "    [PostTrajectoriesAtProc.sh]: ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
+              exit1
+            fi
+            
+            echo "    [PostTrajectoriesAtProc.sh]: Calling PostTrajectories"
+            PostTrajectories
+            
+            if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
+              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
+              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
+              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
+              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
+              if [ ${BinaryTrajFlg} -eq 1 ]; then
+                rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
+              fi
+            fi
 
 
-      echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
-    done
-    echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
-    echo " "
+            echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
+          fi
+        fi
+      done
+      echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
+      echo " "
+    fi
   done
-
+  
 
 fi
 

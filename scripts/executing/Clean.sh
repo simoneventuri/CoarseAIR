@@ -21,44 +21,45 @@
 
 # ----------------------------------------------------------------------------------------------------------------- Clean #
 function RmAll {
-  
+  # Ex: RmAll 1 10000.0 10000.0 1 0 1 9390 0 0
+
   export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
   export TranFlg=${1}
   export Tran=${2}
   export Tint=${3}
   export NMolecules=${4}
-  export MinLevel1=${5}
-  export MaxLevel1=${6}
-  export MinLevel1=${7}
-  export MaxLevel1=${8}
+  export SymmFlg=${5}
+  export MinLevel1=${6}
+  export MaxLevel1=${7}
+  export MinLevel1=${8}
+  export MaxLevel1=${9}
 
   echo "  [RmAll]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [RmAll]: TranFlg               = "${TranFlg}
   echo "  [RmAll]: Tran                  = "${Tran}
   echo "  [RmAll]: Tint                  = "${Tint}
   echo "  [RmAll]: NMolecules            = "${NMolecules}
+  echo "  [RmAll]: SymmFlg               = "${SymmFlg}
   echo "  [RmAll]: MinLevel1             = "${MinLevel1}
   echo "  [RmAll]: MaxLevel1             = "${MaxLevel1}
   echo "  [RmAll]: MinLevel2             = "${MinLevel2}
   echo "  [RmAll]: MaxLevel2             = "${MaxLevel2}
-   
 
-  MinLevel1Temp=${MinLevel1}
-  MaxLevel1Temp=${MaxLevel1}
-  MinLevel2Temp=${MinLevel2}
-  MaxLevel2Temp=${MaxLevel2}
+
+  iProcessesTot=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    if [ ${iLevel1} -ge ${MinLevel1Temp} ] && [ ${iLevel1} -le ${MaxLevel1Temp} ]; then
-      if [ ${MinLevel2} -eq 0 ] && [ ${NMolecules} -gt 1 ]; then
-        MinLevel2Temp=${iLevel1}
-      fi
+    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
+      echo "  [RmAll]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
       for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-        if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
-          echo "  [RmAll]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
+        TempFlg=1
+        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
+          TempFlg=0
+        fi
+        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
           echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
           echo "  [RmAll]"
 
-      
+       
           if [ ${TranFlg} -eq 0 ]; then 
             export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
           else
@@ -70,55 +71,56 @@ function RmAll {
           #  echo ${COARSEAIR_BIN_OUTPUT_DIR}
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}
           #fi
+
+          echo "  [RmAll]: ---------------------------------------------------------- "
         fi
-        echo "  [RmAll]: ---------------------------------------------------------- "
       done
+      echo "  [RmAll]: ------------------------------------------------------------ "
+      echo " "
     fi
-    echo "  [RmAll]: ------------------------------------------------------------ "
-    echo " "
-  done         
-      
+  done     
+   
 }
 #================================================================================================================================#
 
 
 # ------------------------------------------------------------------------------------------------------------------------ Clean #
 function Clean {
-  # Ex: Clean 1 10000.0 10000.0 1 9390 0 0
+  # Ex: Clean 1 10000.0 10000.0 1 0 1 9390 0 0
 
   export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
   export TranFlg=${1}
   export Tran=${2}
   export Tint=${3}
   export NMolecules=${4}
-  export MinLevel1=${5}
-  export MaxLevel1=${6}
-  export MinLevel1=${7}
-  export MaxLevel1=${8}
+  export SymmFlg=${5}
+  export MinLevel1=${6}
+  export MaxLevel1=${7}
+  export MinLevel1=${8}
+  export MaxLevel1=${9}
   
   echo "  [Clean]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [Clean]: TranFlg               = "${TranFlg}
   echo "  [Clean]: Tran                  = "${Tran}
   echo "  [Clean]: Tint                  = "${Tint}
   echo "  [Clean]: NMolecules            = "${NMolecules}
+  echo "  [Clean]: SymmFlg               = "${SymmFlg}
   echo "  [Clean]: MinLevel1             = "${MinLevel1}
   echo "  [Clean]: MaxLevel1             = "${MaxLevel1}
   echo "  [Clean]: MinLevel2             = "${MinLevel2}
   echo "  [Clean]: MaxLevel2             = "${MaxLevel2}
 
 
-  MinLevel1Temp=${MinLevel1}
-  MaxLevel1Temp=${MaxLevel1}
-  MinLevel2Temp=${MinLevel2}
-  MaxLevel2Temp=${MaxLevel2}
+  iProcessesTot=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    if [ ${iLevel1} -ge ${MinLevel1Temp} ] && [ ${iLevel1} -le ${MaxLevel1Temp} ]; then
-      if [ ${MinLevel2} -eq 0 ] && [ ${NMolecules} -gt 1 ]; then
-        MinLevel2Temp=${iLevel1}
-      fi
+    if [ ${iLevel1} -ge ${MinLevel1} ] && [ ${iLevel1} -le ${MaxLevel1} ]; then
+      echo "  [Clean]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
       for (( iLevel2=0; iLevel2<=${NLevels2}; iLevel2++ )); do
-        if [ ${iLevel2} -ge ${MinLevel2Temp} ] && [ ${iLevel2} -le ${MaxLevel2Temp} ]; then
-          echo "  [Clean]: --- Molecule 1, Level/Bin " ${iLevels1} " ----------------------------- "
+        TempFlg=1
+        if [ ${SymmFlg} -eq 1 ] && [ ${iLevel2} -le ${iLevel1}]; then
+          TempFlg=0
+        fi
+        if [ ${iLevel2} -ge ${MinLevel2} ] && [ ${iLevel2} -le ${MaxLevel2} ] && [ ${TempFlg} -eq 1]; then
           echo "  [Clean]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
           echo "  [Clean]"
 
@@ -135,13 +137,12 @@ function Clean {
             rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics-*
           fi
 
-
+          echo "  [Clean]: ---------------------------------------------------------- "
         fi
-        echo "  [Clean]: ---------------------------------------------------------- "
       done
+      echo "  [Clean]: ------------------------------------------------------------ "
+      echo " "
     fi
-    echo "  [Clean]: ------------------------------------------------------------ "
-    echo " "
   done     
       
 }
