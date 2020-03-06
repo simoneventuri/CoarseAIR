@@ -309,7 +309,7 @@ function ComputeTrajs {
         fi
         if [ ${ExitCond} -eq 1 ]; then
           iProcessesTot=$((iProcessesTot+1))
-          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
+          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
             echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
             echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------------ "
             echo "  [ComputeTrajs]"
@@ -528,7 +528,7 @@ function SplitTrajsPESs {
       fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
-        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]
+        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
 
           echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
 
