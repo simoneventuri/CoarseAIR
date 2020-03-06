@@ -271,7 +271,7 @@ function ComputeTrajs {
       iNode=1
       NProcessesTot=0
       ExitCond=0
-      iLevel2Start=${MinLevel2}
+      iLevel2Start=0
       if [ ${SymmFlg} -eq 1 ]; then
         iLevel2Start=${iLevel1}
       fi
