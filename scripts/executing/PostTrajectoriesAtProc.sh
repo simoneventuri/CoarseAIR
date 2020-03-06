@@ -169,9 +169,9 @@ else
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       echo "iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}
 
-      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-        ExitCond=1
-      if
+      # if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+      #   ExitCond=1
+      # if
 
       # if [ ${ExitCond} -eq 1 ]; then
       #   iProcessesTot=$((iProcessesTot+1))
