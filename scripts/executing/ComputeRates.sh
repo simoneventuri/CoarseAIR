@@ -112,6 +112,7 @@ function ComputeTrajsPBS {
         iLevel2Start=${iLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        echo "$iLevel1 = "$iLevel1"; $iLevel2 = "$iLevel2"; $ExitCond = "$ExitCond
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           ExitCond=1
         fi
