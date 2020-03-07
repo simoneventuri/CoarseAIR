@@ -105,15 +105,18 @@ function ComputeTrajsPBS {
     ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
+      MinLevel2Temp=0
       if [ ${NMolecules} -eq 2 ]; then 
         iLevel2Start=1
+        MinLevel2Temp=1
       fi
       if [ ${SymmFlg} -eq 1 ]; then
         iLevel2Start=${iLevel1}
+        MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
         echo "$iLevel1 = "$iLevel1"; $iLevel2 = "$iLevel2"; $ExitCond = "$ExitCond
-        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
           ExitCond=1
         fi
         if [ ${ExitCond} -eq 1 ]; then
@@ -654,14 +657,17 @@ function PostTrajectoriesPBS {
     ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
+      MinLevel2Temp=0
       if [ ${NMolecules} -eq 2 ]; then 
         iLevel2Start=1
+        MinLevel2Temp=1
       fi
       if [ ${SymmFlg} -eq 1 ]; then
         iLevel2Start=${iLevel1}
+        MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
           ExitCond=1
         fi
         if [ ${ExitCond} -eq 1 ]; then
