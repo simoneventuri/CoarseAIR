@@ -133,10 +133,10 @@ function ComputeTrajsPBS {
     for (( iNode=1; iNode<=${NNode}; iNode++ )); do
 
       MinProcessInNode=$(($((iNode-1))*NProcessesPerNode+1))
-      if [ ${MinProcessInNode} -le ${NProcessesFromFile} ]; then 
+      if [ ${MinProcessInNode} -le ${NProcessesTot} ]; then 
         MaxProcessInNode=$((iNode*NProcessesPerNode))
-        if [ ${MaxProcessInNode} -gt ${NProcessesFromFile} ]; then 
-          MaxProcessInNode=${NProcessesFromFile}
+        if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
+          MaxProcessInNode=${NProcessesTot}
         fi
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
@@ -681,10 +681,10 @@ function PostTrajectoriesPBS {
     for (( iNode=1; iNode<=${NNode}; iNode++ )); do
 
       MinProcessInNode=$(($((iNode-1))*NProcessesPerNode+1))
-      if [ ${MinProcessInNode} -le ${NProcessesFromFile} ]; then 
+      if [ ${MinProcessInNode} -le ${NProcessesTot} ]; then 
         MaxProcessInNode=$((iNode*NProcessesPerNode))
-        if [ ${MaxProcessInNode} -gt ${NProcessesFromFile} ]; then 
-          MaxProcessInNode=${NProcessesFromFile}
+        if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
+          MaxProcessInNode=${NProcessesTot}
         fi
         
         echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinLevel1 = 0 and MaxLevel1 = "${MinProcessInNode}"; MinLevel2 = 0 and MaxLevel2 = "${MaxProcessInNode}
