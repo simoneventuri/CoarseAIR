@@ -344,18 +344,22 @@ Subroutine O4pes(a, ab, ra, rb, Eref, totdiss, C, R, V, dVdR, igrad)
   !real(rkp) ,dimension(12) ,intent(out)  :: dVdX
 
   integer                              :: i, j, k
+  real(rkp) ,dimension(6)              :: RAng
   integer                              :: nob
+
+  ! The soubroutines receives in input distances in Bohr and gives derivatives in dR
+  RAng = R * B_To_Ang
 
   ! Read cartesian coordinate from input file
   !call coord_convt(X)
 
   if (igrad .le. 1) then
   ! Call subroutine EvV to evaluate potential energy V
-    call EvV(a, ab, ra, rb, C, R, V)
+    call EvV(a, ab, ra, rb, C, RAng, V)
 
     if (igrad .eq. 1) then
       ! Call EvdVdR to evaluate dVdR(6)
-      Call EvdVdR(a, ab, ra, rb, C, R, dVdR)
+      Call EvdVdR(a, ab, ra, rb, C, RAng, dVdR)
       !! Call EvdVdX to evaluate the derivatives of V w.r.t. X
       !call evdvdx(X,dVdX)
     endif
@@ -366,8 +370,8 @@ Subroutine O4pes(a, ab, ra, rb, Eref, totdiss, C, R, V, dVdR, igrad)
 
   ! Initialized v to be totdiss
   
-  V    = (V + Eref + totdiss) * Kcm_To_Hartree
-  dVdR = dVdR                 * Kcm_To_Hartree * B_To_Ang
+  V    = (V + totdiss) * Kcm_To_Hartree !+ Eref
+  dVdR = dVdR          * Kcm_To_Hartree * B_To_Ang
 
 end Subroutine 
 !--------------------------------------------------------------------------------------------------------------------------------!

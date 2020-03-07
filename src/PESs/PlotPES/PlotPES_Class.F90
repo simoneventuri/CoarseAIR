@@ -39,9 +39,6 @@ Module PlotPES_Class
   
   Type    ,abstract     :: PlotPES_Type
     logical                 ::    Initialized         !< Indicator whether the object is initialized
-    real(rkp)               ::    RConverter     = One
-    real(rkp)               ::    VConverter     = One
-    real(rkp)               ::    dVConverter    = One
   contains
     private
     procedure              ,public                          ::    Initialize             =>    PlotPES_Initialize
@@ -88,28 +85,6 @@ Subroutine PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Debug )
   if (i_Debug_Loc) call Logger%Entering( "PlotPES_Initialize" )
   !i_Debug_Loc   =     Logger%On()
 
-
-  if (trim(adjustl(Input%UnitDist)) .eq. 'Angstrom') then           
-    This%RConverter  = One              / B_To_Ang
-    This%dVConverter = This%dVConverter / B_To_Ang
-  end if
-  
-  if (trim(adjustl(Input%UnitPot)) .eq. 'KcalMol') then                                                                           
-    This%VConverter  = One              / Kcm_To_Hartree
-    This%dVConverter = This%dVConverter / Kcm_To_Hartree
-  elseif (trim(adjustl(Input%UnitPot)) .eq. 'ElectronVolt') then                                                                
-    This%VConverter  = One              * Hartree_To_eV
-    This%dVConverter = This%dVConverter * Hartree_To_eV
-  end if
-  if (i_Debug_Loc) call Logger%Write( "This%RConverter  = ", This%RConverter )
-  if (i_Debug_Loc) call Logger%Write( "This%VConverter  = ", This%VConverter )
-  if (i_Debug_Loc) call Logger%Write( "This%dVConverter = ", This%dVConverter )
-
-  
-  call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES' )
-  if (i_Debug_Loc) call Logger%Write( "Created PlotPES Output Folder" )
-
-  
   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine

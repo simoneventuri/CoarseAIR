@@ -369,7 +369,7 @@ Module Input_Class
     character(20) ,dimension(5)               ::    DistrParChar
     real(rkp)     ,dimension(5)               ::    DistrPar
     real(rkp)                                 ::    EnergyCutOff     = 1.d10
-    logical                                   ::    PESZeroRefFlg    = .False.
+    integer                                   ::    PESZeroRefIntFlg = 0
     
   contains
     private
@@ -2704,10 +2704,10 @@ Subroutine PlotPES( This, i_Debug)
             READ(line_input, '(d20.10)') This%EnergyCutOff
             if (i_Debug_Loc) call Logger%Write( "Energy Cut-Off (From Dissociation Energy):      This%EnergyCutOff  = ", This%EnergyCutOff )
             
-          case("Setting the Energy Reference to 0.0?")
+          case("Flag for Energy Reference")
             line_input = line_input(i_eq+2:150)
-            if ((trim(adjustl(line_input)) == 'yes') .or. (trim(adjustl(line_input)) == 'YES')) This%PESZeroRefFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Setting the Energy Reference to 0.0?:      This%PESZeroRefFlg  = ", This%PESZeroRefFlg )
+            READ(line_input, '(I20)') This%PESZeroRefIntFlg
+            if (i_Debug_Loc) call Logger%Write( "Int Flg for Energy Reference:      This%PESZeroRefIntFlg  = ", This%PESZeroRefIntFlg )
         
 
         end select

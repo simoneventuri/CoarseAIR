@@ -87,6 +87,6 @@
      
   Energy Cut-Off (From Dissociation Energy) = 20.d10
   
-  Setting the Energy Reference to 0.0? = yes
+  Flag for Energy Reference
   
   Plotting Only Triatomic Component of PES? = no

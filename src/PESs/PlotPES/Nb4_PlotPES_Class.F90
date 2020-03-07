@@ -41,6 +41,7 @@ Module Nb4_PlotPES_Class
   Type    ,extends(PlotPES_Type)                            ::    Nb4_PlotPES_Type
   contains
     private
+    procedure              ,public                          ::    Initialize             =>    Nb4_PlotPES_Initialize
     procedure              ,public                          ::    IsoTri                 =>    Nb4_PlotPES_IsoTri
     procedure              ,public                          ::    Rot3rd                 =>    Nb4_PlotPES_Rot3rd
     procedure              ,public                          ::    ComputeCuts            =>    Nb4_PlotPES_ComputeCuts
@@ -63,9 +64,59 @@ Module Nb4_PlotPES_Class
   real(rkp)               ::    rVMin_Min      = 2.0d0
   real(rkp)               ::    rVMin_Max      = 2.5d0
   
+  real(rkp)    ,save      ::    RConverter     = One
+  real(rkp)    ,save      ::    VConverter     = One
+  real(rkp)    ,save      ::    dVConverter    = One
+
   logical   ,parameter    ::    i_Debug_Global = .False.
   
   contains
+
+!________________________________________________________________________________________________________________________________!
+Subroutine Nb4_PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Debug )
+
+  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  type(Input_Type)                          ,intent(in)     ::    Input
+  type(Collision_Type)                      ,intent(in)     ::    Collision
+  integer                                   ,intent(in)     ::    NPairs
+  integer                                   ,intent(in)     ::    NAtoms
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  logical                                                   ::    i_Debug_Loc
+  
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "Nb4_PlotPES_Initialize" )
+  !i_Debug_Loc   =     Logger%On()
+
+
+  if (trim(adjustl(Input%UnitDist)) .eq. 'Angstrom') then           
+    RConverter  = One              / B_To_Ang
+    dVConverter = dVConverter / B_To_Ang
+  end if
+  
+  if (trim(adjustl(Input%UnitPot)) .eq. 'KcalMol') then                                                                           
+    VConverter  = One              / Kcm_To_Hartree
+    dVConverter = dVConverter / Kcm_To_Hartree
+  elseif (trim(adjustl(Input%UnitPot)) .eq. 'ElectronVolt') then                                                                
+    VConverter  = One              * Hartree_To_eV
+    dVConverter = dVConverter * Hartree_To_eV
+  end if
+  if (i_Debug_Loc) call Logger%Write( "RConverter  = ", RConverter )
+  if (i_Debug_Loc) call Logger%Write( "VConverter  = ", VConverter )
+  if (i_Debug_Loc) call Logger%Write( "dVConverter = ", dVConverter )
+  
+  call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES' )
+  if (i_Debug_Loc) call Logger%Write( "Created PlotPES Output Folder" )
+
+      write(*,*) RConverter
+      write(*,*) dVConverter
+      write(*,*) dVConverter
+
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
 
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
@@ -147,10 +198,13 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
         end if
       end if
       !VInf  = Zero
-      write(*,*) 'VInf = ', VInf*This%VConverter, ' eV'
+      write(*,*) 'VInf = ', VInf*VConverter, ' eV'
       
-      
-      if (Input%PESZeroRefFlg) then
+      write(*,*) RConverter
+      write(*,*) dVConverter
+      write(*,*) dVConverter
+
+      if (Input%PESZeroRefIntFlg == 0) then
         VRef  = 0.0d0
       else
         if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
@@ -174,7 +228,7 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
           VRef  = VRef !- VInf
         end if
       end if
-      write(*,*) 'VRef = ', VRef*This%VConverter, ' eV'
+      write(*,*) 'VRef = ', VRef*VConverter, ' eV'
   
 
       if (trim(adjustl(Input%yAxisVar)) .eq. 'Distance') then 
@@ -198,10 +252,10 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
               Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
 
               do j = 1,Input%NGridPlot(2)
-                Rp(4)   = ( Input%MinGridPlot(2) + hGrid(2) * (j-1) )     
+                Rp(4)  = ( Input%MinGridPlot(2) + hGrid(2) * (j-1) )     
                 
-                Theta2  = Input%AnglesPlot(iA) / 180.d0 * Pi
-                Rp(2) = sqrt( Rp(1)**2 + Rp(4)**2 - 2.d0 * Rp(1) * Rp(4) * dcos(Theta2) ) 
+                Theta2 = Input%AnglesPlot(iA) / 180.d0 * Pi
+                Rp(2)  = sqrt( Rp(1)**2 + Rp(4)**2 - 2.d0 * Rp(1) * Rp(4) * dcos(Theta2) ) 
 
                 if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
                   call R_to_X(Rp, Qp, Theta=Theta2)
@@ -211,24 +265,24 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
                 if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
 
                   if (Input%PlotPES_OnlyTriatFlg) then 
-                    !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * This%RConverter )
-                    V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * This%RConverter, Qp )
+                    !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * RConverter )
+                    V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp )
                   else
-                    V = Collision%PESsContainer(iPES)%PES%Potential( Rp * This%RConverter, Qp )
+                    V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
                   end if
-                  !Temp = (V - VRef) * This%VConverter / abs((V - VRef) * This%VConverter)
-                  if ( (V - Vinf)*This%VConverter <= Input%EnergyCutOff ) then 
+                  !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
+                  if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
                     write(Unit,'(es17.6E3,6(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
-                                                           (V - VRef) * This%VConverter!Temp*max(abs((V - VRef) * This%VConverter), 1.d-90 )
+                                                           (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
                   end if
                   
                 elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
                   
-                  call Collision%PESsContainer(iPES)%PES%Compute( Rp * This%RConverter, Zero*Rp, V, dVdR, dVdQ )     
-                  if ( (V - Vinf)*This%VConverter <= Input%EnergyCutOff ) then                                           
+                  call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Zero*Rp, V, dVdR, dVdQ )     
+                  if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
                     write(Unit,'(es15.6,12(A,es15.6))')    Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
-                                                           (V - VRef) * This%VConverter, ',',                                      &
-                                                           (dVdR(1)) * This%dVConverter, ',', (dVdR(2)) * This%dVConverter, ',', (dVdR(3)) * This%dVConverter, ',', (dVdR(4)) * This%dVConverter, ',', (dVdR(5)) * This%dVConverter, ',', (dVdR(6)) * This%dVConverter 
+                                                           (V - VRef) * VConverter, ',',                                      &
+                                                           (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter, ',', (dVdR(4)) * dVConverter, ',', (dVdR(5)) * dVConverter, ',', (dVdR(6)) * dVConverter 
                   end if
                   
                 end if  
@@ -274,19 +328,19 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
       !         if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
 
       !           if (Input%PlotPES_OnlyTriatFlg) then 
-      !             V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * This%RConverter, Qp )
+      !             V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp )
       !           else
-      !             V = Collision%PESsContainer(iPES)%PES%Potential( Rp * This%RConverter, Qp )
+      !             V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
       !           end if
-      !           !if ( (V - Vinf)*This%VConverter <= Input%EnergyCutOff ) then 
-      !             write(Unit,'(es15.6,4(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * This%VConverter
+      !           !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
+      !             write(Unit,'(es15.6,4(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter
       !           !end if
                 
       !         elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
                 
-      !           call Collision%PESsContainer(iPES)%PES%Compute( Rp * This%RConverter, Qp, V, dVdR, dVdQ )    
-      !           !if ( (V - Vinf)*This%VConverter <= Input%EnergyCutOff ) then                                       
-      !             write(Unit,'(es15.6,7(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * This%VConverter, ',', (dVdR(1)) * This%dVConverter, ',', (dVdR(2)) * This%dVConverter, ',', (dVdR(3)) * This%dVConverter 
+      !           call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Qp, V, dVdR, dVdQ )    
+      !           !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                       
+      !             write(Unit,'(es15.6,7(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
       !           !end if
               
       !         end if  
@@ -345,13 +399,13 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
           
   !         if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then    
                
-  !           V = Collision%Species(1)%Diapot%DiatomicPotential( Rp(1) * This%RConverter )  
-  !           write(Unit,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * This%VConverter   
+  !           V = Collision%Species(1)%Diapot%DiatomicPotential( Rp(1) * RConverter )  
+  !           write(Unit,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
        
   !         elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then 
           
-  !           call Collision%Species(1)%Diapot%Compute_Vd_dVd( Rp(1) * This%RConverter, V, dV )                                          
-  !           write(Unit,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * This%VConverter, ',', (dV) * This%dVConverter                                           
+  !           call Collision%Species(1)%Diapot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
+  !           write(Unit,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
                          
   !         end if     
               

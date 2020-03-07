@@ -1,0 +1,49 @@
+###########################################################################################
+######                                                                               ######
+######                        Input File for Plotting PES                            ######
+######                                                                               ######
+###########################################################################################
+
+  Reading Grid Points? = no
+  
+  Computing Grid Points? = yes
+
+  
+  ### Potential / Force
+  Potential or Force = Force
+  
+  ### PES / Diatomic
+  PES or Diatomic = PES
+
+  ### Distance / Angle
+  Y Axis Variable = Distance  
+
+  ### Bohr / Angstrom
+  Unit of measure for Distance = Bohr
+  
+  ### Hartree / KcalMol / ElectronVolt
+  Unit of measure for Potential = ElectronVolt
+  
+  Nb of Grid Points, Axis 1 = 200
+  Nb of Grid Points, Axis 2 = 200
+ 
+  Grid Min, Axis 1 = 1.5d0
+  Grid Min, Axis 2 = 1.5d0
+ 
+  Grid Max, Axis 1 = 15.0d0
+  Grid Max, Axis 2 = 15.0d0
+  
+  Nb of Angles = 7
+     Angle 1 = 60.d0
+     Angle 2 = 80.d0
+     Angle 3 = 100.d0
+     Angle 4 = 120.d0
+     Angle 5 = 140.d0
+     Angle 6 = 160.d0
+     Angle 7 = 180.d0
+     
+  Energy Cut-Off (From Dissociation Energy) = 1.d100
+  
+  Flag for Energy Reference = 0
+
+  Plotting Only Triatomic Component of PES? = no

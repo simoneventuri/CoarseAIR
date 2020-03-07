@@ -2789,7 +2789,7 @@
 
       call o4pes_Mod(Xcart,v,dVdX,1)
 
-      E     = (v*Econv)*27.2113839712790
+      E     = (v*Econv)*27.2113839712790 
       dVdR_ = dVdR*Gconv*27.2113839712790
 
       end subroutine pot_Mod
@@ -2884,12 +2884,12 @@ program ComputeDiat
 !  close(Unit)
 !  
   
-  NPoints1 = 300
-  NPoints2 = 300
+  NPoints1 = 200
+  NPoints2 = 200
   RStart1  = 1.5d0
-  REnd1    = 10.d0
+  REnd1    = 15.d0
   RStart2  = 1.5d0
-  REnd2    = 10.d0
+  REnd2    = 15.d0
   hGrid1   = (REnd1 - RStart1) / (NPoints1-1)
   hGrid2   = (REnd2 - RStart2) / (NPoints2-1)
 
