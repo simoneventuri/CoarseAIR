@@ -70,7 +70,7 @@ function ComputeTrajsPBS {
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
 
-        echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinLevel1 = 0 and MaxLevel1 = "${MinProcessInNode}"; MinLevel2 = 0 and MaxLevel2 = "${MaxProcessInNode}
+        echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
@@ -115,7 +115,6 @@ function ComputeTrajsPBS {
         MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        echo "$iLevel1 = "$iLevel1"; $iLevel2 = "$iLevel2"; $ExitCond = "$ExitCond
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
           ExitCond=1
         fi
@@ -145,7 +144,7 @@ function ComputeTrajsPBS {
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
         echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
 
-        echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinLevel1 = 0 and MaxLevel1 = "${MinProcessInNode}"; MinLevel2 = 0 and MaxLevel2 = "${MaxProcessInNode}
+        echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
@@ -621,7 +620,7 @@ function PostTrajectoriesPBS {
           MaxProcessInNode=${NProcessesFromFile}
         fi
 
-        echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinLevel1 = 0 and MaxLevel1 = "${MinProcessInNode}"; MinLevel2 = 0 and MaxLevel2 = "${MaxProcessInNode}
+        echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
             
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                              'PostTrajectories-Format-UIUC.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
@@ -694,7 +693,7 @@ function PostTrajectoriesPBS {
           MaxProcessInNode=${NProcessesTot}
         fi
         
-        echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinLevel1 = 0 and MaxLevel1 = "${MinProcessInNode}"; MinLevel2 = 0 and MaxLevel2 = "${MaxProcessInNode}
+        echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
             
         if [ "${ProcType}" = "none" ]; then
           sed -e '3s/$/1:ppn='${NProc}'/'                              'PostTrajectories-Format-UIUC.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
