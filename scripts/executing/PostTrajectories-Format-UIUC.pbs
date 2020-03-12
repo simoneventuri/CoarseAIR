@@ -8,6 +8,7 @@
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
 NNode=1
+ParNodes=1
 ###################################################################################################  <<<--- WRITE HERE !!!!
 NProc=
 ###################################################################################################  <<<--- WRITE HERE !!!!
@@ -149,6 +150,8 @@ MaxProcessInNode=
 Tran=
 Tint=
 iNode=
+NNode=1
+ParNodes=1
 ###################################################################################################  <<<--- WRITE HERE !!!! 
 echo "[CoarseAIR]: MinProcessInNode = "${MinProcessInNode} 
 echo "[CoarseAIR]: MaxProcessInNode = "${MaxProcessInNode} 
@@ -156,7 +159,7 @@ echo "[CoarseAIR]: Tran             = "${Tran}
 echo "[CoarseAIR]: Tint             = "${Tint} 
 echo "[CoarseAIR]: iNode            = "${iNode} 
 echo " " 
- 
+
  
 # --- Computing Rates ----------------------------------------------------------------------- # 
 if [ ${RunTrajFlg} -eq 1 ] || [ ${PostFlg} -eq 1 ]; then 

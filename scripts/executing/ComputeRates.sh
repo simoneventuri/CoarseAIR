@@ -84,13 +84,12 @@ function ComputeTrajsPBS {
         sed -e '4s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
         sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
 
-        sed -e '147s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
-        sed -e '148s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
+        sed -e '148s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
+        sed -e '149s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
 
-        sed -e '149s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
-        sed -e '150s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
-
-        sed -e '151s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs' > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+        sed -e '150s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
+        sed -e '151s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
+        sed -e '152s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
         qsub ./'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
         
@@ -153,18 +152,17 @@ function ComputeTrajsPBS {
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
         fi
-        sed -e '12s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
+        sed -e '13s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
         
         sed -e '4s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
         sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
 
-        sed -e '147s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
-        sed -e '148s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
+        sed -e '148s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
+        sed -e '149s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
 
-        sed -e '149s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
-        sed -e '150s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
-
-        sed -e '151s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs' > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+        sed -e '150s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
+        sed -e '151s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
+        sed -e '152s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
         qsub ./'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
         
@@ -194,6 +192,7 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [ComputeTrajs]: NNode                 = "${NNode}
+  echo "  [ComputeTrajs]: ParNodesFlg           = "${ParNodesFlg}
   echo "  [ComputeTrajs]: iNode                 = "${iNode}
   echo "  [ComputeTrajs]: NProc                 = "${NProc}
   echo "  [ComputeTrajs]: System                = "${System}
@@ -217,7 +216,7 @@ function ComputeTrajs {
   if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
 
     echo "  [ComputeTrajs]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    if [ ${NNode} -eq 1 ]; then
+    if [ ${ParNodesFlg} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
       NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
@@ -273,7 +272,7 @@ function ComputeTrajs {
 
   else
 
-    if [ ${NNode} -eq 1 ]; then
+    if [ ${ParNodesFlg} -eq 0 ]; then
       iNode=1
       NProcessesTot=0
       ExitCond=0
@@ -627,18 +626,18 @@ function PostTrajectoriesPBS {
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'        'PostTrajectories-Format-Pleiades.pbs' > 'PostTrajectoriesTEMP-1.pbs'
         fi
-        sed -e '12s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
+        sed -e '13s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
         
         sed -e '4s/$/'${MinProcessInNode}'-'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-2.pbs'  > 'PostTrajectoriesTEMP-3.pbs'
         sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-3.pbs'  > 'PostTrajectoriesTEMP-4.pbs'
 
-        sed -e '147s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
-        sed -e '148s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
+        sed -e '148s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
+        sed -e '149s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
         
-        sed -e '149s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
-        sed -e '150s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
+        sed -e '150s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
+        sed -e '151s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
 
-        sed -e '151s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+        sed -e '152s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
         qsub ./'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
@@ -700,18 +699,18 @@ function PostTrajectoriesPBS {
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'        'PostTrajectories-Format-Pleiades.pbs' > 'PostTrajectoriesTEMP-1.pbs'
         fi
-        sed -e '12s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
+        sed -e '13s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
         
         sed -e '4s/$/'${MinProcessInNode}'-'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-2.pbs'  > 'PostTrajectoriesTEMP-3.pbs'
         sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-3.pbs'  > 'PostTrajectoriesTEMP-4.pbs'
 
-        sed -e '147s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
-        sed -e '148s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
+        sed -e '148s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
+        sed -e '149s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
         
-        sed -e '149s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
-        sed -e '150s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
+        sed -e '150s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
+        sed -e '151s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
 
-        sed -e '151s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+        sed -e '152s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
         qsub ./'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
 
@@ -744,6 +743,7 @@ function PostTrajectoriesAtNode {
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [PostTrajectoriesAtNode]: NNode                 = "${NNode}
+  echo "  [PostTrajectoriesAtNode]: ParNodesFlg           = "${ParNodesFlg}
   echo "  [PostTrajectoriesAtNode]: iNode                 = "${iNode}
   echo "  [PostTrajectoriesAtNode]: NProc                 = "${NProc}
   echo "  [PostTrajectoriesAtNode]: System                = "${System}
@@ -782,7 +782,7 @@ function PostTrajectoriesAtNode {
 
 
     echo "  [PostTrajectoriesAtNode]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    if [ ${NNode} -eq 1 ]; then
+    if [ ${ParNodesFlg} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
       NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
@@ -814,7 +814,7 @@ function PostTrajectoriesAtNode {
   else
 
 
-    if [ ${NNode} -eq 1 ]; then
+    if [ ${ParNodesFlg} -eq 0 ]; then
       iNode=1
       NProcessesTot=0
       ExitCond=0

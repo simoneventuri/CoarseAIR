@@ -21,8 +21,7 @@
 #===============================================================================================================
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
-NNode=1                                                                                           # Nb of Nodes
-iNode=1                                                                                           # Current Node
+ParNodes=1                                                                                        # Nb of Nodes =0 -> Through .sh; >0 -> Through .pbs
 ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
 NProc=1                                                                                           # Nb of Processors
 SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
@@ -56,6 +55,12 @@ function SetData() {
   fi
   
   COARSEAIR_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/executing"
+
+  if [ ${ParNodes} -le 1 ]; then
+    NNode=1
+  else
+    NNode=${ParNodes}
+  fi
 }
 
 
@@ -122,7 +127,7 @@ function LoadComputeRates() {
   source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
   if [ ${RunTrajFlg} -eq 1 ]; then
-    if [ ${NNode} -gt 1 ]; then
+    if [ ${ParNodes} -ge 1 ]; then
       echo "[CoarseAIR]: Calling ComputeTrajsPBS"
       echo " "
       ComputeTrajsPBS
@@ -144,7 +149,7 @@ function LoadComputeRates() {
   fi
 
   if [ ${PostFlg} -eq 1 ]; then
-    if [ ${NNode} -gt 1 ]; then
+    if [ ${ParNodes} -ge 1 ]; then
       echo "[CoarseAIR]: Calling PostTrajectoriesPBS"
       echo " "
       PostTrajectoriesPBS
@@ -265,7 +270,7 @@ done
 wait
 
 
-if [ ${NNode} -gt 1 ]; then
+if [ ${ParNodes} -gt 1 ]; then
   echo "[CoarseAIR]: File Executed on Multiple Nodes: waiting for Trajectories' PBSs being Done!"
   exit 0
 fi
