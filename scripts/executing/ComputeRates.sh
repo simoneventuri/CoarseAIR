@@ -67,8 +67,8 @@ function ComputeTrajsPBS {
         if [ ${MaxProcessInNode} -gt ${NProcessesFromFile} ]; then 
           MaxProcessInNode=${NProcessesFromFile}
         fi
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
+        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
+        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
 
         echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
@@ -146,8 +146,8 @@ function ComputeTrajsPBS {
         if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
           MaxProcessInNode=${NProcessesTot}
         fi
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
+        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
+        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
 
         echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
@@ -876,7 +876,7 @@ function PostTrajectoriesAtNode {
             ExitCond=2
             MaxProcessInNode=${NProcessesTot}
           fi
-          
+
         done
       done
     fi
