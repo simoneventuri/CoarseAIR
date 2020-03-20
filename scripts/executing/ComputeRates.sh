@@ -67,8 +67,8 @@ function ComputeTrajsPBS {
         if [ ${MaxProcessInNode} -gt ${NProcessesFromFile} ]; then 
           MaxProcessInNode=${NProcessesFromFile}
         fi
-        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
-        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
+        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
+        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
 
         echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
@@ -103,32 +103,26 @@ function ComputeTrajsPBS {
     NProcessesTot=0
     ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-     
+      iLevel2Start=0
+      MinLevel2Temp=0
       if [ ${NMolecules} -eq 2 ]; then 
-        if [ ${SymmFlg} -eq 1 ]; then
-          iLevel2Start=${iLevel1}
-          MinLevel2Temp=${MinLevel1}
-        else
-          iLevel2Start=1
-          MinLevel2Temp=1
-        fi
-      else
-        iLevel2Start=0
-        MinLevel2Temp=0
+        iLevel2Start=1
+        MinLevel2Temp=1
+      fi
+      if [ ${SymmFlg} -eq 1 ]; then
+        iLevel2Start=${iLevel1}
+        MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
           ExitCond=1
         fi
         if [ ${ExitCond} -eq 1 ]; then
           NProcessesTot=$((NProcessesTot+1))
         fi
-        
         if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
           ExitCond=2
         fi
-
       done
     done
     echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
@@ -146,8 +140,8 @@ function ComputeTrajsPBS {
         if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
           MaxProcessInNode=${NProcessesTot}
         fi
-        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
-        #echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
+        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
+        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
 
         echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
                 
@@ -198,11 +192,7 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [ComputeTrajs]: NNode                 = "${NNode}
-<<<<<<< HEAD
   echo "  [ComputeTrajs]: ParNodes           = "${ParNodes}
-=======
-  echo "  [ComputeTrajs]: ParNodes              = "${ParNodes}
->>>>>>> c0983cb01948e500826e47f044a40dd6ae36eb74
   echo "  [ComputeTrajs]: iNode                 = "${iNode}
   echo "  [ComputeTrajs]: NProc                 = "${NProc}
   echo "  [ComputeTrajs]: System                = "${System}
@@ -287,34 +277,25 @@ function ComputeTrajs {
       NProcessesTot=0
       ExitCond=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        
+        iLevel2Start=0
         if [ ${NMolecules} -eq 2 ]; then 
-          if [ ${SymmFlg} -eq 1 ]; then
-            iLevel2Start=${iLevel1}
-            MinLevel2Temp=${MinLevel1}
-          else
-            iLevel2Start=1
-            MinLevel2Temp=1
-          fi
-        else
-          iLevel2Start=0
-          MinLevel2Temp=0
+          iLevel2Start=1
+        fi
+        if [ ${SymmFlg} -eq 1 ]; then
+          iLevel2Start=${iLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
             MinProcessInNode=${NProcessesTot}
           fi
           if [ ${ExitCond} -eq 1 ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
-
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
             ExitCond=2
             MaxProcessInNode=${NProcessesTot}
           fi
-
           #echo "  [ComputeTrajs]: -> iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}"; ExitCond = "${ExitCond}
         done
       done
@@ -325,7 +306,7 @@ function ComputeTrajs {
 
 
     iProcessesTot=0
-#    ExitCond=0
+    ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
       if [ ${NMolecules} -eq 2 ]; then 
@@ -335,10 +316,10 @@ function ComputeTrajs {
         iLevel2Start=${iLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-#        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-#          ExitCond=1
-#        fi
-#        if [ ${ExitCond} -eq 1 ]; then
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+          ExitCond=1
+        fi
+        if [ ${ExitCond} -eq 1 ]; then
           iProcessesTot=$((iProcessesTot+1))
           if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
             echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
@@ -364,10 +345,10 @@ function ComputeTrajs {
             echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
             echo " "
           fi
-#        fi
-#        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-#          ExitCond=2
-#        fi
+        fi
+        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+          ExitCond=2
+        fi
       done
     done
 
@@ -551,21 +532,14 @@ function SplitTrajsPESs {
   iProcessesTot=0
   ExitCond=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    
+    iLevel2Start=0
     if [ ${NMolecules} -eq 2 ]; then 
-      if [ ${SymmFlg} -eq 1 ]; then
-        iLevel2Start=${iLevel1}
-        MinLevel2Temp=${MinLevel1}
-      else
-        iLevel2Start=1
-        MinLevel2Temp=1
-      fi
-    else
-      iLevel2Start=0
-      MinLevel2Temp=0
+      iLevel2Start=1
+    fi
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
     fi
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
       fi
@@ -585,11 +559,9 @@ function SplitTrajsPESs {
 
         fi
       fi
-
       if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
         ExitCond=2
       fi
-
     done
   done
 
@@ -682,32 +654,26 @@ function PostTrajectoriesPBS {
     NProcessesTot=0
     ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      
+      iLevel2Start=0
+      MinLevel2Temp=0
       if [ ${NMolecules} -eq 2 ]; then 
-        if [ ${SymmFlg} -eq 1 ]; then
-          iLevel2Start=${iLevel1}
-          MinLevel2Temp=${MinLevel1}
-        else
-          iLevel2Start=1
-          MinLevel2Temp=1
-        fi
-      else
-        iLevel2Start=0
-        MinLevel2Temp=0
+        iLevel2Start=1
+        MinLevel2Temp=1
+      fi
+      if [ ${SymmFlg} -eq 1 ]; then
+        iLevel2Start=${iLevel1}
+        MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
           ExitCond=1
         fi
         if [ ${ExitCond} -eq 1 ]; then
           NProcessesTot=$((NProcessesTot+1))
         fi
-
         if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
           ExitCond=2
         fi
-
       done
     done
 
@@ -853,34 +819,25 @@ function PostTrajectoriesAtNode {
       NProcessesTot=0
       ExitCond=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-
+        iLevel2Start=0
         if [ ${NMolecules} -eq 2 ]; then 
-          if [ ${SymmFlg} -eq 1 ]; then
-            iLevel2Start=${iLevel1}
-            MinLevel2Temp=${MinLevel1}
-          else
-            iLevel2Start=1
-            MinLevel2Temp=1
-          fi
-        else
-          iLevel2Start=0
-          MinLevel2Temp=0
+          iLevel2Start=1
+        fi
+        if [ ${SymmFlg} -eq 1 ]; then
+          iLevel2Start=${iLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
             MinProcessInNode=${NProcessesTot}
           fi
           if [ ${ExitCond} -eq 1 ]; then
             NProcessesTot=$((NProcessesTot+1))
           fi
-
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
             ExitCond=2
             MaxProcessInNode=${NProcessesTot}
           fi
-
         done
       done
     fi
@@ -1126,22 +1083,15 @@ function MergeAllRates {
       iProcessesTot=0
       ExitCond=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        
+        iLevel2Start=0
         if [ ${NMolecules} -eq 2 ]; then 
-          if [ ${SymmFlg} -eq 1 ]; then
-            iLevel2Start=${iLevel1}
-            MinLevel2Temp=${MinLevel1}
-          else
-            iLevel2Start=1
-            MinLevel2Temp=1
-          fi
-        else
-          iLevel2Start=0
-          MinLevel2Temp=0
+          iLevel2Start=1
+        fi
+        if [ ${SymmFlg} -eq 1 ]; then
+          iLevel2Start=${iLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
           fi
           if [ ${ExitCond} -eq 1 ]; then
