@@ -77,7 +77,6 @@ Module LevelsContainer_Class
   End Type
   
   public                                              ::    Compute_PartitionRatios
-  public                                              ::    WriteTempList
   logical                                             ::    i_Debug_Global = .False.
 
   contains
@@ -411,15 +410,25 @@ Subroutine WriteList( This, FileName, SortLevelsFlg, i_Debug)
     do iState = 1,NStates
     
       write(Unit, 1)  This%States(IdxVec(iState))%vqn,  &
+                      ',',                              &
                       This%States(IdxVec(iState))%jqn,  &
+                      ',',                              &
                       This%States(IdxVec(iState))%eint, &
+                      ',',                              &
                       This%States(IdxVec(iState))%egam, &
+                      ',',                              &
                       This%States(IdxVec(iState))%rmin, &
+                      ',',                              &
                       This%States(IdxVec(iState))%rmax, &
+                      ',',                              &
                       This%States(IdxVec(iState))%Vmin, &
+                      ',',                              &
                       This%States(IdxVec(iState))%Vmax, &
+                      ',',                              &
                       This%States(IdxVec(iState))%tau,  &
+                      ',',                              &
                       This%States(IdxVec(iState))%ri,   &
+                      ',',                              &
                       This%States(IdxVec(iState))%ro
                       
     end do
@@ -429,167 +438,6 @@ Subroutine WriteList( This, FileName, SortLevelsFlg, i_Debug)
 
   1 format(1X, I4, A, I4, 9(A, es14.7) )
 
-
-  if (i_Debug_Loc) call Logger%Exiting
-
-End Subroutine
-!--------------------------------------------------------------------------------------------------------------------------------!
-
-
-
-!________________________________________________________________________________________________________________________________!
-Subroutine WriteTempList( Input, i_Debug) 
-! This procedure ...
-  
-  use Error_Class                   ,only:  Error
-  use Input_Class                   ,only:  Input_Type
-
-  type(Input_Type)                                       ,intent(in)     ::    Input
-  logical                                  ,optional     ,intent(in)     ::    i_Debug
-
-  character(150)                                                         ::    FileName
-  integer                                                                ::    UnitW, UnitR1, UnitR2        
-  integer                                                                ::    StatusW, StatusR1, StatusR2
-  integer                                                                ::    TempI1, TempI2, TempI3, TempI4, iMol, iLines, LinesToJump
-  character(2)                                                           ::    iMol_char
-  character(1)                                                           ::    cdum
-  real(rkp)                                                              ::    TempR1
-  integer                                                                ::    Bin, vqn, jqn
-  real(rkp)                                                              ::    eint, egam, rmin, rmax, Vmin, Vmax, tau, ri, ro
-  logical                                                                ::    i_Debug_Loc 
-
-
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "WriteList")
-  !i_Debug_Loc   =     Logger%On()
-  
-
-  if (Input%NInitMolecules==1) Then
-    iMol = 1
-
-    FileName = './levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // '.inp'
-    if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
-    open( File=FileName, NewUnit=UnitW, status='REPLACE', iostat=StatusW )
-    if (StatusW/=0) call Error( "Error opening file: " // FileName ) 
-    
-      !write(Unit,'(a)') ('######################################################################################################################################################')
-      !write(Unit,'(a)') ('# jqn   : the rotational q.n. of the i''th quantum state')
-      !write(Unit,'(a)') ('# vqn   : the vibrational q.n. of the i''th quantum state')
-      !write(Unit,'(a)') ('# eint  : internal energy of i''th quantum state [Eh]')
-      !write(Unit,'(a)') ('# egam  : Half width of i''th quantum state')
-      !write(Unit,'(a)') ('# rmin  : the position of the potential minimum (included centrifugal potential) for i''th quantum state')
-      !write(Unit,'(a)') ('# vmin  : the value of the potential minimun (inc. cent. pot.)')
-      !write(Unit,'(a)') ('# vmax  : the value of the local potential maximum (inc. cent. pot.)')
-      !write(Unit,'(a)') ('# tau   : the vibrational period of the i''th quantum state')
-      !write(Unit,'(a)') ('# ri    : inner turning point')
-      !write(Unit,'(a)') ('# ro    : outter turning point')
-      !write(Unit,'(a)') ('# rmax  : location of maximum in centrifugal barrier')
-      !write(Unit,'(a)') ('######################################################################################################################################################')
-      !write(Unit,'(a)') ('#   vqn  jqn      eint           egam           rmin           rmax           vmin           vmax            tau             ri             ro')
-      !write(Unit,'(a)') ('######################################################################################################################################################')
-      
-      write(UnitW,'(A)') ('#================================================================================================================================================')
-      write(UnitW,'(A)') ('#')                                                                                              
-      write(UnitW,'(A)') ('#================================================================================================================================================')
-      write(UnitW,'(A)') ('# vqn, jqn,         E[Eh],      EGam[au],      rMin[a0],      rMax[a0],      VMin[Eh],      VMax[Eh],       Tau[au],       rIn[a0],      rOut[a0]')
-
-    
-    FileName = adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // '/QNsEnBin.csv'
-    if (i_Debug_Loc) call Logger%Write( "Opening Levels Mapping file" )
-    if (i_Debug_Loc) call Logger%Write( "-> FileName = ", FileName )
-    open( NewUnit=UnitR1, File=FileName, iostat=StatusR1)
-    if (StatusR1/=0) call Error( "Error opening file '" // FileName // "' for Levels Mapping" )
-    read(UnitR1, *, iostat=StatusR1)
-
-    FileName = adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/levels_cut.inp'
-    if (i_Debug_Loc) call Logger%Write( "Opening state data file" )
-    if (i_Debug_Loc) call Logger%Write( "-> FileName = ", FileName )
-    open( NewUnit=UnitR2, File=FileName, iostat=StatusR2)
-    if (StatusR2/=0) call Error( "Error opening file '" // FileName // "' for state data" )
-    cdum        = '#'
-    LinesToJump = -1
-    do while (cdum == '#')
-      read(UnitR2, '(A)', iostat=StatusR2) cdum
-      LinesToJump = LinesToJump + 1
-    end do
-    if (i_Debug_Loc) call Logger%Write( "-> Lines To Jump: ", LinesToJump )
-    rewind(UnitR2)
-    do iLines=1,LinesToJump
-      read(UnitR2, '(A)', iostat=StatusR2)
-    end do
-
-      do while (StatusR1==0 .and. StatusR2==0)   
-        read(UnitR1, *, iostat=StatusR1) TempI1, TempI2, TempI3, TempR1, TempI4, Bin
-        read(UnitR2, *, iostat=StatusR2) vqn, jqn, eint, egam, rmin, rmax, Vmin, Vmax, tau, ri, ro
-        if (Bin == Input%BinOI(iMol) ) then
-          write(UnitW, 1) vqn, jqn, eint, egam, rmin, rmax, Vmin, Vmax, tau, ri, ro
-        end if
-      end do
-
-    close(UnitR1)
-    close(UnitR2)    
-    close(UnitW)
-
-  else 
-     do iMol = 1,Input%NInitMolecules
-      Write(Imol_char,'(I2)')iMol
-
-
-      FileName = './levels_' // trim(adjustl(Input%Molecules_Name(iMol))) // trim(adjustl(iMol_char)) // '.inp'
-      if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
-      open( File=FileName, NewUnit=UnitW, status='REPLACE', iostat=StatusW )
-      if (StatusW/=0) call Error( "Error opening file: " // FileName ) 
-      
-        !write(Unit,'(a)') ('######################################################################################################################################################')
-        !write(Unit,'(a)') ('# jqn   : the rotational q.n. of the i''th quantum state')
-        !write(Unit,'(a)') ('# vqn   : the vibrational q.n. of the i''th quantum state')
-        !write(Unit,'(a)') ('# eint  : internal energy of i''th quantum state [Eh]')
-        !write(Unit,'(a)') ('# egam  : Half width of i''th quantum state')
-        !write(Unit,'(a)') ('# rmin  : the position of the potential minimum (included centrifugal potential) for i''th quantum state')
-        !write(Unit,'(a)') ('# vmin  : the value of the potential minimun (inc. cent. pot.)')
-        !write(Unit,'(a)') ('# vmax  : the value of the local potential maximum (inc. cent. pot.)')
-        !write(Unit,'(a)') ('# tau   : the vibrational period of the i''th quantum state')
-        !write(Unit,'(a)') ('# ri    : inner turning point')
-        !write(Unit,'(a)') ('# ro    : outter turning point')
-        !write(Unit,'(a)') ('# rmax  : location of maximum in centrifugal barrier')
-        !write(Unit,'(a)') ('######################################################################################################################################################')
-        !write(Unit,'(a)') ('#   vqn  jqn      eint           egam           rmin           rmax           vmin           vmax            tau             ri             ro')
-        !write(Unit,'(a)') ('######################################################################################################################################################')
-        
-        write(UnitW,'(A)') ('#================================================================================================================================================')
-        write(UnitW,'(A)') ('#')                                                                                              
-        write(UnitW,'(A)') ('#================================================================================================================================================')
-        write(UnitW,'(A)') ('# vqn, jqn,         E[Eh],      EGam[au],      rMin[a0],      rMax[a0],      VMin[Eh],      VMax[Eh],       Tau[au],       rIn[a0],      rOut[a0]')
-
-      
-      FileName = adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/Bins_' // trim(adjustl(Input%NBins_char(iMol))) // '/QNsEnBin.csv'
-      if (i_Debug_Loc) call Logger%Write( "Opening Levels Mapping file" )
-      if (i_Debug_Loc) call Logger%Write( "-> FileName = ", FileName )
-      open( NewUnit=UnitR1, File=FileName, iostat=StatusR1)
-      if (StatusR1/=0) call Error( "Error opening file '" // FileName // "' for Levels Mapping" )
-
-      FileName = adjustl(trim(Input%OutputDir)) // '/' // trim(adjustl(Input%System)) // '/' // trim(adjustl(Input%Molecules_Name(iMol))) // '/levels_cut.inp'
-      if (i_Debug_Loc) call Logger%Write( "Opening state data file" )
-      if (i_Debug_Loc) call Logger%Write( "-> FileName = ", FileName )
-      open( NewUnit=UnitR2, File=FileName, iostat=StatusR2)
-      if (StatusR2/=0) call Error( "Error opening file '" // FileName // "' for state data" )
-
-        do while (StatusR1==0 .and. StatusR2==0)   
-          read(UnitR1, *, iostat=StatusR1) TempI1, TempI2, TempI3, TempR1, TempI4, Bin
-          read(UnitR2, *, iostat=StatusR2) vqn, jqn, eint, egam, rmin, rmax, Vmin, Vmax, tau, ri, ro
-          if (Bin == Input%BinOI(iMol) ) then
-            write(UnitW, 1) vqn, jqn, eint, egam, rmin, rmax, Vmin, Vmax, tau, ri, ro
-          end if
-        end do
-
-      close(UnitR1)
-      close(UnitR2)    
-      close(UnitW)
-
-     enddo
-  endif
-
-  1 format(1X, I4, A, I4, 9(A, es14.7) )
 
   if (i_Debug_Loc) call Logger%Exiting
 
