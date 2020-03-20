@@ -192,7 +192,7 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [ComputeTrajs]: NNode                 = "${NNode}
-  echo "  [ComputeTrajs]: ParNodesFlg           = "${ParNodesFlg}
+  echo "  [ComputeTrajs]: ParNodes           = "${ParNodes}
   echo "  [ComputeTrajs]: iNode                 = "${iNode}
   echo "  [ComputeTrajs]: NProc                 = "${NProc}
   echo "  [ComputeTrajs]: System                = "${System}
@@ -216,7 +216,7 @@ function ComputeTrajs {
   if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
 
     echo "  [ComputeTrajs]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    if [ ${ParNodesFlg} -eq 0 ]; then
+    if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
       NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
@@ -272,7 +272,7 @@ function ComputeTrajs {
 
   else
 
-    if [ ${ParNodesFlg} -eq 0 ]; then
+    if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       NProcessesTot=0
       ExitCond=0
@@ -743,7 +743,7 @@ function PostTrajectoriesAtNode {
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [PostTrajectoriesAtNode]: NNode                 = "${NNode}
-  echo "  [PostTrajectoriesAtNode]: ParNodesFlg           = "${ParNodesFlg}
+  echo "  [PostTrajectoriesAtNode]: ParNodes           = "${ParNodes}
   echo "  [PostTrajectoriesAtNode]: iNode                 = "${iNode}
   echo "  [PostTrajectoriesAtNode]: NProc                 = "${NProc}
   echo "  [PostTrajectoriesAtNode]: System                = "${System}
@@ -782,7 +782,7 @@ function PostTrajectoriesAtNode {
 
 
     echo "  [PostTrajectoriesAtNode]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    if [ ${ParNodesFlg} -eq 0 ]; then
+    if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
       NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
@@ -814,7 +814,7 @@ function PostTrajectoriesAtNode {
   else
 
 
-    if [ ${ParNodesFlg} -eq 0 ]; then
+    if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       NProcessesTot=0
       ExitCond=0
