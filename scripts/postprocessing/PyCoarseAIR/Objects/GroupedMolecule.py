@@ -48,22 +48,7 @@ class groupedmolecule(object):
         self.NbTs          = Temp.NTran+1
         self.TVec          = np.array([InputData.Kin.Group.T0, Temp.TranVec])
         self.T             = [grouped_t_properties(NProcTypes, self.TVec[iT]) for iT in range(self.NbTs)]
-
-
-    def Get_Mapping(self, Mol):
-
-        if (self.Type == 'VibSpec'):
-            self.NbGroups = np.max(Mol.Levelvqn)+1
-            self.Mapping  = Mol.Levelvqn + 1
-        else:
-            Data = pandas.read_csv(self.PathToMapping, header=None, skiprows=1)
-            Data = Data.apply(pandas.to_numeric, errors='coerce')
-            Idx  = np.array(Data.values[:,0], dtype=np.int64  ) - 1
-            Bin  = np.array(Data.values[:,1], dtype=np.int64  ) - 1
-            self.Mapping         = np.zeros((np.max(Idx)+1), dtype=np.int64) 
-            self.Mapping[Idx[:]] = Bin[:]
-            self.NbGroups        = np.max(Bin)+1
-
+s
 
     def Compute_GroupProps(self, Mol):
 

@@ -84,7 +84,7 @@ def Save_qnsEnBin_HDF5(Syst, iMol):
     PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
     f          = h5py.File(PathToFile, 'a')
 
-    TempStr1   = Syst.Molecule[iMol].Name
+    TempStr1   = Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
     TempStr2   = TempStr1 + '/Levelg'
     if TempStr2 in f.keys():
 
@@ -121,7 +121,7 @@ def Save_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt):
     f          = h5py.File(PathToFile, 'a')
 
     TStr     = 'T_' + str(int(TTra)) + '_' + str(int(TInt))
-    TempStr1 = TStr + '/' + Syst.Molecule[iMol].Name 
+    TempStr1 = TStr + '/' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
     TempStr2 = TempStr1 + '/LevelQ'     
     if TempStr2 in f.keys():
         grp       = f[TempStr1]
@@ -141,8 +141,7 @@ def Save_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt):
     f.close()
 
 
-
-def Save_RatesAtT_HDF5(Syst, iT, TTra, TInt):
+def Save_RatesAtT_HDF5_3Atoms(Syst, iT, TTra, TInt):
 
     PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
     f          = h5py.File(PathToFile, 'a')
@@ -179,6 +178,63 @@ def Save_RatesAtT_HDF5(Syst, iT, TTra, TInt):
 
         Proc0         = grp.create_dataset("Diss", data=Syst.T[iT-1].Proc[0].Rates, compression="gzip", compression_opts=9)
         Proc1         = grp.create_dataset("Inel", data=Syst.T[iT-1].Proc[1].Rates, compression="gzip", compression_opts=9)
+        # for iProc in range(2, 4):
+        #     ExchStr   = "Rates_Exch_" + str(iProc-1)
+        #     Proci     = grp.create_dataset(ExchStr, data=Syst.T[iT-1].Proc[iProc].Rates, compression="gzip", compression_opts=9)
+
+        for iProc in range(2, Syst.NProcTypes):
+            ExchStr   = "Exch_" + str(iProc-1)
+            ProcExchi = grp.create_dataset(ExchStr, data=Syst.T[iT-1].ProcExch[iProc-2].Rates, compression="gzip", compression_opts=9)
+
+        # ProcTot0      = grp.create_dataset("Overall_Diss", data=Syst.T[iT-1].ProcTot[0].Rates, compression="gzip", compression_opts=9)
+        # ProcTot1      = grp.create_dataset("Overall_Inel", data=Syst.T[iT-1].ProcTot[1].Rates, compression="gzip", compression_opts=9) 
+        # for iProc in range(2, Syst.NProcTypes):
+        #     ExchStr   = "Overall_Exch_" + str(iProc-1)
+        #     ProcToti  = grp.create_dataset(ExchStr, data=Syst.T[iT-1].ProcTot[iProc].Rates, compression="gzip", compression_opts=9)
+
+    f.close()
+
+
+def Save_RatesAtT_HDF5_4Atoms(Syst, iT, TTra, TInt):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, 'a')
+
+    TStr = 'T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Rates/'       
+    if TStr in f.keys():
+        grp               = f[TStr]
+
+        Data      = grp["Diss"]
+        Data[...] = Syst.T[iT-1].DissRates
+        Data      = grp["DissInel"]
+        Data[...] = Syst.T[iT-1].Proc[0].Rates
+        Data      = grp["Inel"]
+        Data[...] = Syst.T[iT-1].Proc[1].Rates
+        # for iProc in range(2, 4):
+        #     ExchStr       = "Rates_Exch_" + str(iProc-1)
+        #     Data          = grp[ExchStr]
+        #     Data[...]     = Syst.T[iT-1].Proc[iProc].Rates
+
+        for iProc in range(2, Syst.NProcTypes):
+            ExchStr   = "Exch_" + str(iProc-1)
+            Data      = grp[ExchStr]
+            Data[...] = Syst.T[iT-1].ProcExch[iProc-2].Rates
+
+        # Data       = grp["Overall_Diss"]
+        # Data[...]  = Syst.T[iT-1].ProcTot[0].Rates
+        # # Data       = grp["Rates_Overall_Inel"]
+        # # Data[...]  = Syst.T[iT-1].ProcTot[1].Rates
+        # for iProc in range(2, Syst.NProcTypes):
+        #     ExchStr      = "Overall_Exch_" + str(iProc-1)
+        #     Data         = grp[ExchStr] 
+        #     Data[...]    = Syst.T[iT-1].ProcTot[iProc].Rates
+    
+    else:
+        grp           = f.create_group(TStr)
+
+        Proc00        = grp.create_dataset("Diss",     data=Syst.T[iT-1].DissRates,     compression="gzip", compression_opts=9)
+        Proc0         = grp.create_dataset("DissInel", data=Syst.T[iT-1].Proc[0].Rates, compression="gzip", compression_opts=9)
+        Proc1         = grp.create_dataset("Inel",     data=Syst.T[iT-1].Proc[1].Rates, compression="gzip", compression_opts=9)
         # for iProc in range(2, 4):
         #     ExchStr   = "Rates_Exch_" + str(iProc-1)
         #     Proci     = grp.create_dataset(ExchStr, data=Syst.T[iT-1].Proc[iProc].Rates, compression="gzip", compression_opts=9)

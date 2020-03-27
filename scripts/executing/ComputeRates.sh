@@ -827,22 +827,31 @@ function PostTrajectoriesAtNode {
           iLevel2Start=${iLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+          #echo "  [PostTrajectoriesAtNode]: A "${iLevel1}"; "${iLevel2}
+          #echo "  [PostTrajectoriesAtNode]: B "${MinLevel1}"; "${MinLevel2}"; "${MaxLevel1}"; "${MaxLevel2}
+          
+          NProcessesTot=$((${NProcessesTot}+1))
           if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
             ExitCond=1
             MinProcessInNode=${NProcessesTot}
+                
           fi
-          if [ ${ExitCond} -eq 1 ]; then
-            NProcessesTot=$((NProcessesTot+1))
-          fi
+          # if [ ${ExitCond} -eq 1 ]; then
+          #   #NProcessesTot=$((NProcessesTot+1))
+                
+          # fi
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
             ExitCond=2
             MaxProcessInNode=${NProcessesTot}
+              
           fi
         done
       done
     fi
     NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))
     echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
+    echo "  [PostTrajectoriesAtNode]: MinProcessInNode  = "${MinProcessInNode}
+    echo "  [PostTrajectoriesAtNode]: MaxProcessInNode  = "${MaxProcessInNode}
 
     NProcessesPerProc="$(bc <<< "scale = 10; ${NProcessesPerNode} / ${NProc}")"
     NProcessesPerProc="$(echo ${NProcessesPerProc} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
@@ -850,10 +859,10 @@ function PostTrajectoriesAtNode {
     echo "  [PostTrajectoriesAtNode] "
 
     for (( iProc=1; iProc<=${NProc}; iProc++ )); do
-      MinProcessInProc=$(($((iProc-1))*${NProcessesPerProc}+1))
-      MaxProcessInProc=$((${iProc}*${NProcessesPerProc}))
-      if [ ${MaxProcessInProc} -gt ${NProcessesPerNode} ]; then
-        MaxProcessInProc=${NProcessesPerNode}
+      MinProcessInProc=$(( ${MinProcessInNode} + $(($((iProc-1))*${NProcessesPerProc}+1)) - 1 ))
+      MaxProcessInProc=$(( ${MinProcessInNode} + $((${iProc}    *${NProcessesPerProc}  )) - 1 ))
+      if [ ${MaxProcessInProc} -gt $(( ${NProcessesPerNode} + ${MinProcessInNode} - 1 )) ]; then
+        MaxProcessInProc=$(( ${NProcessesPerNode} + ${MinProcessInNode} - 1 ))
       fi
 
       echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the first Process to be computed is the "${MinProcessInProc}"-th in the List"

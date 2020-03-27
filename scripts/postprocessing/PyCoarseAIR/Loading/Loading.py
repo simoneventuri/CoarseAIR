@@ -58,6 +58,8 @@ def Load_Levels_HDF5(Syst, iMol):
 
     f.close()
 
+    return Syst
+
 
 
 def Load_qnsEnBin_HDF5(Syst, iMol):
@@ -65,7 +67,7 @@ def Load_qnsEnBin_HDF5(Syst, iMol):
     PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
     f          = h5py.File(PathToFile, 'a')
 
-    TempStr = Syst.Molecule[iMol].Name   
+    TempStr = Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
     grp     = f[TempStr]
 
     # Data                           = grp["Levelvqn"]
@@ -81,6 +83,7 @@ def Load_qnsEnBin_HDF5(Syst, iMol):
 
     f.close()
 
+    return Syst
 
 
 def Load_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt):
@@ -89,7 +92,7 @@ def Load_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt):
     f          = h5py.File(PathToFile, 'a')
 
     TStr    = 'T_' + str(int(TTra)) + '_' + str(int(TInt))
-    TempStr = TStr + '/' + Syst.Molecule[iMol].Name   
+    TempStr = TStr + '/' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
     grp     = f[TempStr]
 
     Data                                 = grp["LevelEeV"]
@@ -99,9 +102,10 @@ def Load_PartFuncsAndEnergiesAtT_HDF5(Syst, iMol, iT, TTra, TInt):
 
     f.close()
 
+    return Syst
 
 
-def Load_RatesAtT_HDF5(Syst, TTra, TInt, iT):
+def Load_RatesAtT_HDF5_3Atoms(Syst, TTra, TInt, iT):
 
     PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
     f          = h5py.File(PathToFile, "r")
@@ -110,6 +114,45 @@ def Load_RatesAtT_HDF5(Syst, TTra, TInt, iT):
     grp  = f[TStr]
 
     Data                       = grp["Diss"]
+    Syst.T[iT-1].Proc[0].Rates = Data[...]
+    Data                       = grp["Inel"]
+    Syst.T[iT-1].Proc[1].Rates = Data[...]
+    # for iProc in range(2, 4):
+    #     ExchStr                        = "Rates_Exch_" + str(iProc-1)
+    #     Data                           = grp[ExchStr]
+    #     Syst.T[iT-1].Proc[iProc].Rates = Data[...]
+
+    for iProc in range(2, Syst.NProcTypes):
+        ExchStr                              = "Exch_" + str(iProc-1)
+        Data                                 = grp[ExchStr]
+        Syst.T[iT-1].ProcExch[iProc-2].Rates = Data[...]
+
+    # Data                          = grp["Overall_Diss"] 
+    # Syst.T[iT-1].ProcTot[0].Rates = Data[...]
+    # # Data                          = grp["Overall_Inel"]
+    # # Syst.T[iT-1].ProcTot[1].Rates = Data[...]
+    # for iProc in range(2, Syst.NProcTypes):
+    #     ExchStr                           = "Overall_Exch_" + str(iProc-1)
+    #     Data                              = grp[ExchStr]
+    #     Syst.T[iT-1].ProcTot[iProc].Rates = Data[...]
+
+    f.close()
+
+    return Syst
+
+
+
+def Load_RatesAtT_HDF5_4Atoms(Syst, TTra, TInt, iT):
+
+    PathToFile = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    f          = h5py.File(PathToFile, "r")
+
+    TStr = 'T_' + str(int(TTra)) + '_' + str(int(TInt)) + '/Rates/'
+    grp  = f[TStr]
+
+    Data                       = grp["Diss"]
+    Syst.T[iT-1].DissRates     = Data[...]
+    Data                       = grp["DissInel"]
     Syst.T[iT-1].Proc[0].Rates = Data[...]
     Data                       = grp["Inel"]
     Syst.T[iT-1].Proc[1].Rates = Data[...]

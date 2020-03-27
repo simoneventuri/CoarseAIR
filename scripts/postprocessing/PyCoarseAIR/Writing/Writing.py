@@ -71,44 +71,41 @@ def Write_DissRates_Thermal(Syst, Temp, InputData):
     csvTermo.close()
 
 
-def Write_PartFuncsAndEnergies(Syst, Temp, InputData):
+def Write_PartFuncsAndEnergies(Syst, Temp, InputData, iMol):
 
-    mkdirs(    InputData.Kin.WriteFldr + '/thermo/' ) 
-    mkdirs(    InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong )
-    TempFldr = InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong
+    MolName = Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
 
-    for iMol in range(Syst.NMolecules):
+    print('      [Write_PartFuncsAndEnergies]: Computing Ratios of Initial Mole Fractions for Molecule: ' + MolName )
+    Syst.Molecule[iMol].Compute_QRatio0(Temp.T0)
 
+    MoleFracsFile = TempFldr + '/' + MolName + '_InitialMoleFracs_T' + str(int(Temp.T0)) + 'K.dat' 
+    print('      [Write_PartFuncsAndEnergies]: Writing Initial Mole Fractions for Molecule: ' + MolName )
+    csvmole       = open(MoleFracsFile, 'w')
+    Line          = '# Percentage of ' + MolName + ' Contained in Each Level\n'
+    csvmole.write(Line)
 
-        print('      [Write_PartFuncsAndEnergies]: Computing Ratios of Initial Mole Fractions for Molecule: ' + Syst.Molecule[iMol].Name )
-        Syst.Molecule[iMol].Comput_QRatio0(Temp.T0)
-
-        MoleFracsFile = TempFldr + '/' + Syst.Molecule[iMol].Name + '_InitialMoleFracs_T' + str(int(Temp.T0)) + 'K.dat' 
-        print('      [Write_PartFuncsAndEnergies]: Writing Initial Mole Fractions for Molecule: ' + Syst.Molecule[iMol].Name )
-        csvmole       = open(MoleFracsFile, 'w')
-        Line          = '# Percentage of ' + Syst.Molecule[iMol].Name + ' Contained in Each Level\n'
+    for iLevel in range(Syst.Molecule[iMol].NBins):
+        Line     = '%.10e\n' % float(np.maximum( Syst.Molecule[iMol].QRatio0[iLevel], 1.e-99+Syst.Molecule[iMol].QRatio0[iLevel]*0.0 ))
         csvmole.write(Line)
 
-        for iLevel in range(Syst.Molecule[iMol].NBins):
-            Line     = '%.10e\n' % float(np.maximum( Syst.Molecule[iMol].QRatio0[iLevel], 1.e-99+Syst.Molecule[iMol].QRatio0[iLevel]*0.0 ))
-            csvmole.write(Line)
-
-        csvmole.close()
+    csvmole.close()
 
 
-        for iT in Temp.iTVec:
-            print('      [Write_PartFuncsAndEnergies]: Writing Thermo File for Molecule: ' + Syst.Molecule[iMol].Name + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
+    for iT in Temp.iTVec:
+        print('      [Write_PartFuncsAndEnergies]: Writing Thermo File for Molecule: ' + MolName + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
 
-            PathToFileOrig = TempFldr + '/../' + Syst.Molecule[iMol].Name + '_Format'
-            PathToFile     = TempFldr + '/'    + Syst.Molecule[iMol].Name + '_T' + str(int(Temp.TranVec[iT-1])) + 'K'
-            DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
-            print('Copied File to: ', DestTemp)
+        Syst.Molecule[iMol].T[iT-1].LevelEeV0 = Syst.Molecule[iMol].T[iT-1].LevelEeV - Syst.Molecule[iMol].T[iT-1].LevelEeV[0]
 
-            with open(PathToFile, 'a') as f:
-                Line = 'NB_ENERGY_LEVELS = ' + str(Syst.Molecule[iMol].NBins) + '\n'
-                f.write(Line)
-                np.savetxt(f, np.transpose(np.array([Syst.Molecule[iMol].T[iT-1].Q, Syst.Molecule[iMol].T[iT-1].LevelEeV])), fmt='%.8e    %.8e')
-            f.close()
+        PathToFileOrig = TempFldr + '/../' + MolName + '_Format'
+        PathToFile     = TempFldr + '/'    + MolName + '_T' + str(int(Temp.TranVec[iT-1])) + 'K'
+        DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
+        print('Copied File to: ', DestTemp)
+
+        with open(PathToFile, 'a') as f:
+            Line = 'NB_ENERGY_LEVELS = ' + str(Syst.Molecule[iMol].NBins) + '\n'
+            f.write(Line)
+            np.savetxt(f, np.transpose(np.array([Syst.Molecule[iMol].T[iT-1].Q, Syst.Molecule[iMol].T[iT-1].LevelEeV0])), fmt='%.8e    %.8e')
+        f.close()
 
 
 
@@ -122,12 +119,12 @@ def Compute_WindAvrg_Rates(Syst, TempTempRates):
 
 
 
-def Write_Kinetics(Syst, Temp, InputData, iT):
+def Write_Kinetics_3Atoms(Syst, Temp, InputData, iT):
 
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
-    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
 
     if (InputData.Kin.WriteDiss_Flg):
         if (InputData.Kin.CorrFactor != 1.0):
@@ -203,6 +200,195 @@ def Write_Kinetics(Syst, Temp, InputData, iT):
 
             csvkinetics.close()
 
+
+
+def Write_Kinetics_4Atoms(Syst, Temp, InputData, iT):
+
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
+
+
+    iPVec    = np.array([0, 1, 2])
+    iPOppVec = np.array([5, 4, 3])
+
+    for iMol in range(Syst.NMolecules):
+        if ( (InputData.Kin.CGQCTFlg) and (InputData.Kin.Groups.Flg[iMol]) ):
+            Syst.Molecule[iMol].EqNbBins = Syst.Molecule[iMol].Grouped.NbGroups
+            Syst.Molecule[iMol].EqEeV0   = (Syst.Molecule[iMol].Grouped.T[iT].EeV - Syst.Molecule[iMol].Grouped.T[iT].EeV[0])
+        else:
+            Syst.Molecule[iMol].EqNbBins = Syst.Molecule[iMol].NBins          
+            Syst.Molecule[iMol].EqEeV0   = (Syst.Molecule[iMol].LevelEEh - Syst.Molecule[iMol].LevelEEh[0]) * Hartree_To_eV
+
+    NBins0_1 = Syst.Molecule[Syst.Pair[0].ToMol].EqNbBins
+    NBins0_2 = Syst.Molecule[Syst.Pair[5].ToMol].EqNbBins
+    print('      [Write_Kinetics]: Nb of Levels in Initial Molecule 1 = ' + str(NBins0_1) )
+    print('      [Write_Kinetics]: Nb of Levels in Initial Molecule 2 = ' + str(NBins0_2) )
+
+
+    if (InputData.Kin.WriteDiss_Flg):
+        if (InputData.Kin.CorrFactor != 1.0):
+            DissKinetics = TempFldr + '/Diss_Corrected.dat' 
+            print('      [Write_Kinetics]: Writing Corrected Dissociation: ' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name )
+        else:
+            DissKinetics = TempFldr + '/Diss.dat' 
+            print('      [Write_Kinetics]: Writing Dissociation: '           + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name )
+        csvkinetics  = open(DissKinetics, 'w')
+
+        for iBins in range(NBins0_1):
+            jBinsStart = 0 
+            if (Syst.SymmFlg):
+                jBinsStart = iBins
+            for jBins in range(jBinsStart, NBins0_2):
+                
+                TempRate = Syst.T[iT-1].DissRatesTot[iBins, jBins]
+                if (TempRate > 0.0):
+
+                    Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iBins+1) + ')'
+                    Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jBins+1) + ')'
+                    LHS_Str  = Mol1_Str + '+' + Mol2_Str
+                    RHS_Str  = Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name
+                    ProcName = LHS_Str  + '=' + RHS_Str
+                    Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
+                    csvkinetics.write(Line)
+            
+        csvkinetics.close()
+
+
+    if (InputData.Kin.WriteDissInel_Flg):
+      
+        InelKinetics = TempFldr + '/DissInel.dat' 
+        print('      [Write_Kinetics]: Writing Dissociation/Inelastic: ' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name )
+        csvkinetics  = open(InelKinetics, 'w')
+        #InelFile     = InputData.Kin.ReadFldr + '/'         + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '_' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '.csv'
+
+        for iBins in range(NBins0_1):
+            jBinsStart = 0 
+            SymmFct    = 1.0
+            if (Syst.SymmFlg):
+                jBinsStart = iBins
+                #SymmFct    = 2.0
+            for jBins in range(jBinsStart, NBins0_2):
+
+                if (Syst.SymmFlg):
+                    iTemp = 1
+                else:
+                    iTemp = 2
+                for iMol in range(iTemp):
+                    iComp   = Syst.MolToCFDComp[iMol]
+                    NBins_1 = Syst.Molecule[iMol].EqNbBins
+                    for kBins in range(NBins_1):
+
+                        TempRate = Syst.T[iT-1].DissInelRatesTot[iBins, jBins, kBins, iMol]
+                        if (TempRate > 0.0):
+
+                            Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iBins+1) + ')'
+                            Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jBins+1) + ')'
+                            LHS_Str  = Mol1_Str + '+' + Mol2_Str
+                            Mol1_Str = Syst.CFDComp[iComp].Name                                 + '(' + str(kBins+1) + ')'
+                            Atms_Str = Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[0]].Name     + '+' + Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[1]].Name
+                            RHS_Str  = Mol1_Str + '+' + Atms_Str
+                            ProcName = LHS_Str  + '=' + RHS_Str
+                            Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(TempRate)
+                            csvkinetics.write(Line)
+
+        csvkinetics.close()
+
+
+    if (InputData.Kin.WriteInel_Flg):
+      
+        InelKinetics = TempFldr + '/Inel.dat' 
+        Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name 
+        Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name
+        LHS_Str      = Mol1_Str + '+' + Mol2_Str
+        print('      [Write_Kinetics]: Writing Inelastic: ' + LHS_Str + '=' + LHS_Str )
+        csvkinetics  = open(InelKinetics, 'w')
+        #InelFile     = InputData.Kin.ReadFldr + '/'         + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '_' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '.csv'
+
+        for iBins in range(NBins0_1):
+            jBinsStart = 0 
+            if (Syst.SymmFlg):
+                jBinsStart = iBins
+            for jBins in range(jBinsStart, NBins0_2):
+                Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iBins+1) + ')'
+                Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jBins+1) + ')'
+                LHS_Str      = Mol1_Str + '+' + Mol2_Str
+
+                for kBins in range(NBins0_1):
+                    lBinsStart = 0
+                    SymmFct    = 1.0
+                    if (Syst.SymmFlg):
+                        lBinsStart = kBins
+                        #SymmFct    = 2.0
+                    for lBins in range(lBinsStart, NBins0_2):
+                        TempRate = Syst.T[iT-1].Proc[1].Rates[iBins, jBins, kBins, lBins] * SymmFct
+
+                        InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].EqEeV0[iBins] + Syst.Molecule[Syst.Pair[5].ToMol].EqEeV0[jBins]
+                        FinEEh   = Syst.Molecule[Syst.Pair[0].ToMol].EqEeV0[kBins] + Syst.Molecule[Syst.Pair[5].ToMol].EqEeV0[lBins]
+                        if ((TempRate > 0.0) and ( InEEh >= FinEEh )):
+
+                            Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(kBins+1) + ')'
+                            Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(lBins+1) + ')'
+                            RHS_Str  = Mol1_Str + '+' + Mol2_Str
+                            ProcName = LHS_Str  + '=' + RHS_Str
+                            Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(TempRate)
+                            csvkinetics.write(Line)
+
+        csvkinetics.close()
+
+
+    if (InputData.Kin.WriteExch_Flg):
+
+        for iExch in range (2, Syst.NProcTypes):
+            print('      [Write_Kinetics]: iExch =  ' + str(iExch-1) )
+
+            Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name 
+            Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name
+            LHS_Str      = Mol1_Str + '+' + Mol2_Str
+
+            Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,0]]].Name
+            Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,1]]].Name
+            RHS_Str      = Mol1_Str + '+' + Mol2_Str
+
+            ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
+            print('      [Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + LHS_Str + '=' + RHS_Str )
+            csvkinetics  = open(ExchKinetics, 'w')
+            #InelFile     = InputData.Kin.ReadFldr                               + '/'  + LHS_Str + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+
+            NBins_1 = Syst.Molecule[Syst.ExchtoMol[iExch-2,0]].EqNbBins
+            NBins_2 = Syst.Molecule[Syst.ExchtoMol[iExch-2,1]].EqNbBins
+
+            for iBins in range(NBins0_1):
+                jBinsStart = 0 
+                if (Syst.SymmFlg):
+                    jBinsStart = iBins
+                for jBins in range(jBinsStart, NBins0_2):
+                    Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iBins+1) + ')'
+                    Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jBins+1) + ')'
+                    LHS_Str      = Mol1_Str + '+' + Mol2_Str
+
+                    for kBins in range(NBins_1):
+                        lBinsStart = 0
+                        SymmFct    = 1.0
+                        if (Syst.SymmFlg):
+                            lBinsStart = kBins
+                            #SymmFct    = 2.0
+                        for lBins in range(lBinsStart, NBins_2):
+                            TempRate = Syst.T[iT-1].ProcExch[iExch-2].Rates[iBins, jBins, kBins, lBins] * SymmFct
+
+                            InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].EqEeV0[iBins]        + Syst.Molecule[Syst.Pair[5].ToMol].EqEeV0[jBins]
+                            FinEEh   = Syst.Molecule[Syst.ExchtoMol[iExch-2,0]].EqEeV0[kBins] + Syst.Molecule[Syst.ExchtoMol[iExch-2,1]].EqEeV0[lBins]
+                            if ((TempRate > 0.0) and ( InEEh >= FinEEh )):
+
+                                Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,0]]].Name + '(' + str(kBins+1) + ')'
+                                Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,1]]].Name + '(' + str(lBins+1) + ')'
+                                RHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                ProcName = LHS_Str  + '=' + RHS_Str
+                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,6\n' % float(TempRate)
+                                csvkinetics.write(Line)
+
+            csvkinetics.close()
 
 
 def Write_GroupedKinetics(Syst, Temp, InputData, iT, NbGroups):
@@ -298,9 +484,9 @@ def Write_GroupedKinetics(Syst, Temp, InputData, iT, NbGroups):
 def Write_Kinetics_FromOverall(Syst, Temp, InputData):
     
     mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
-    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+    mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/' )    
+    TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/T' + str(int(Temp.TranVec[iT-1])) + 'K/'
 
     for iT in Temp.iTVec:
         print('\nTemperature Nb ', iT, '; T = ', Temp.TranVec[iT-1], 'K')
@@ -430,9 +616,9 @@ def Write_Arrhenius_Diss(Syst, InputData, Ixd, Coeffs, MaxEntOrPlato, csvkinetic
     
     if (csvkinetics == 0):
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
-        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/'
         if (MaxEntOrPlato == 1):
             DissKinetics = TempFldr + '/Dh.dat' 
             print('      [Write_Arrhenius_Diss]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
@@ -464,9 +650,9 @@ def Write_Arrhenius_Inel(Syst, InputData, Ixd, Coeffs, MaxEntOrPlato, iExch, csv
     
     if (csvkinetics == 0):
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
-        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/'
         if (MaxEntOrPlato == 1):
             if (iExch == 0):
                 InelKinetics = TempFldr + '/EXh_WOExch.dat' 
@@ -498,9 +684,9 @@ def Write_Arrhenius_Exch(Syst, InputData, Ixd, Coeffs, iExch, csvkinetics):
     
     if (csvkinetics == 0):
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong )
-        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/' )    
-        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + '/Arrhenius/'
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
+        mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/' )    
+        TempFldr = InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.Groups.FldrName + '/Arrhenius/'
         ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat'  
         print('      [Write_Arrhenius_Inel]: Writing Exchange Processes Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
         csvkinetics  = open(ExchKinetics, 'w')

@@ -505,6 +505,9 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
   if (i_Debug_Loc) call Logger%Entering( "FindingFinalLevel_Nb4Atoms" )
   !i_Debug_Loc   =     Logger%On()
 
+  if (i_Debug_Loc) call Logger%Write( "vqn = ", vqn )
+  if (i_Debug_Loc) call Logger%Write( "jqn = ", jqn )
+  if (i_Debug_Loc) call Logger%Write( "Arr = ", Arr )
 
   iP       = int(Arr / 16.0_rkp)
   if (i_Debug_Loc) call Logger%Write( "iP = ", iP )
@@ -606,7 +609,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     Idx           = 0
     Pairs         = [0, 0]
   end if
-
+ 
   if (i_Debug_Loc) call Logger%Exiting
   
 End Subroutine

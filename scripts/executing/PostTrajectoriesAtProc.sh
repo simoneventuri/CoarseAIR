@@ -166,20 +166,23 @@ else
         MinLevel2Temp=${MinLevel1}
       else
         iLevel2Start=1
-        MinLevel2Temp=1
+        MinLevel2Temp=${MinLevel2}
       fi
     else
       iLevel2Start=0
       MinLevel2Temp=0
     fi
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$((${iProcessesTot}+1))
 
+      #echo "    [PostTrajectoriesAtProc.sh]: A "${MinLevel1}"; "${MinLevel2Temp}
+      #echo "    [PostTrajectoriesAtProc.sh]: B "${MaxLevel1}"; "${MaxLevel2}
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
         ExitCond=1
       fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((${iProcessesTot}+1))
-        if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
+        #if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
           echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
           echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
 
@@ -217,7 +220,7 @@ else
           echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
           echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
           echo " "
-        fi
+        #fi
       fi
 
       if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then

@@ -38,8 +38,8 @@ class grouped_t_properties(object):
 
         self.Value    = T
 
-        self.EeV = 0.0
-        self.EeV0       = 0.0
+        self.EeV      = 0.0
+        self.EeV0     = 0.0
         self.QRatio   = 0.0
         self.Q        = 0.0
         self.QThermo  = 0.0
@@ -58,13 +58,12 @@ class groupedmolecule(object):
         self.PathToMapping = PathToMapping
         self.NbTs          = Temp.NTran+1
         self.TVec          = np.concatenate( (np.array([T0]), Temp.TranVec), axis=0 )
-        print(self.NbTs)
-        print(self.TVec)
         self.T             = [grouped_t_properties(NProcTypes, self.TVec[iT]) for iT in range(self.NbTs)]
 
 
     def Get_Mapping(self, Levelvqn):
 
+        print('  [Get_Mapping]: Computing Nb of Groups and Mapping' )
         if (self.Type == 'VibSpecific'):
             self.NbGroups = np.max(Levelvqn)+1
             self.Mapping  = Levelvqn
@@ -76,10 +75,12 @@ class groupedmolecule(object):
             self.Mapping         = np.zeros((np.max(Idx)+1), dtype=np.int64) 
             self.Mapping[Idx[:]] = Bin[:]
             self.NbGroups        = np.max(Bin)+1
+        print('  [Get_Mapping]: Nb of Groups = ' + str(self.NbGroups) )
 
 
     def Compute_GroupProps(self, NLevels, Levelg, LevelEeV):
 
+        print('  [Compute_GroupProps]: Computing Group Properties' )
         Flg       = np.zeros((self.NbGroups), dtype=np.int8)
         self.EeV0 = np.zeros((self.NbGroups))
         for iLevel in range(NLevels):
@@ -99,7 +100,7 @@ class groupedmolecule(object):
             for iLevel in range(NLevels):
                 self.T[iT].Q[self.Mapping[iLevel]]       = self.T[iT].Q[self.Mapping[iLevel]]        +                    self.T[iT].Expvec[iLevel]
                 self.T[iT].QThermo[self.Mapping[iLevel]] = self.T[iT].QThermo[self.Mapping[iLevel]]  +                    self.T[iT].ExpvecThermo[iLevel]
-                self.T[iT].EeV[self.Mapping[iLevel]]     = self.T[iT].EeV[self.Mapping[iLevel]] + LevelEeV[iLevel] * self.T[iT].Expvec[iLevel]
+                self.T[iT].EeV[self.Mapping[iLevel]]     = self.T[iT].EeV[self.Mapping[iLevel]]      + LevelEeV[iLevel] * self.T[iT].Expvec[iLevel]
             self.T[iT].EeV   = self.T[iT].EeV / self.T[iT].Q
             self.T[iT].Ratio = self.T[iT].Q        / np.sum(self.T[iT].Q)
 
@@ -141,16 +142,16 @@ class groupedmolecule(object):
         print(' ')
 
 
-    def Write_Groups_PartFuncsAndEnergies(self, Syst, InputData, Temp):
+    def Write_Groups_PartFuncsAndEnergies(self, Syst, InputData, Temp, iMol):
 
         mkdirs(    InputData.Kin.WriteFldr + '/thermo/' ) 
         mkdirs(    InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong + InputData.Kin.Groups.FldrName )
         TempFldr = InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong + InputData.Kin.Groups.FldrName
 
-        MoleFracsFile = TempFldr + '/' + self.Name + '_InitialMoleFracs_T' + str(int(self.T[0].Value)) + 'K.dat' 
-        print('      [Write_Groups_PartFuncsAndEnergies]: Writing Initial Mole Fractions for Molecule: ' + self.Name )
+        MoleFracsFile = TempFldr + '/' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name + '_InitialMoleFracs_T' + str(int(self.T[0].Value)) + 'K.dat' 
+        print('  [Write_Groups_PartFuncsAndEnergies]: Writing Initial Mole Fractions for Molecule: ' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name )
         csvmole       = open(MoleFracsFile, 'w')
-        Line          = '# Percentage of ' + self.Name + ' Contained in Each Group\n'
+        Line          = '# Percentage of ' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name + ' Contained in Each Group\n'
         csvmole.write(Line)
 
         for iGroup in range(self.NbGroups):
@@ -161,9 +162,9 @@ class groupedmolecule(object):
 
 
         for iT in range(1, self.NbTs):
-            print('      [Write_Groups_PartFuncsAndEnergies]: Writing Thermo File for Molecule: ' + self.Name + ' at T = ' + str(int(self.TVec[iT])) + ' K' )
-            PathToFileOrig = TempFldr + '/../' + self.Name + '_Format'
-            PathToFile     = TempFldr + '/'    + self.Name + '_T' + str(int(self.TVec[iT])) + 'K'
+            print('  [Write_Groups_PartFuncsAndEnergies]: Writing Thermo File for Molecule: ' + self.Name + ' at T = ' + str(int(self.TVec[iT])) + ' K' )
+            PathToFileOrig = TempFldr + '/../' + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name + '_Format'
+            PathToFile     = TempFldr + '/'    + Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name + '_T' + str(int(self.TVec[iT])) + 'K'
             DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
 
             with open(PathToFile, 'a') as f:
@@ -221,9 +222,11 @@ class molecule(object):
         self.T                 = [t_properties() for iTTran in range(NTTran)]
 
 
-    def Comput_QRatio0(self, T0):
+    def Compute_QRatio0(self, T0):
 
-        self.QRatio0 = self.Levelg * np.exp( - self.LevelEeV * Ue / (T0 * UKb) )
+        LevelEeV0    = (self.LevelEEh - self.LevelEEh[0]) * Hartree_To_eV
+
+        self.QRatio0 = self.Levelg * np.exp( - LevelEeV0 * Ue / (T0 * UKb) )
         self.QRatio0 = self.QRatio0  / np.sum(self.QRatio0)
 
 

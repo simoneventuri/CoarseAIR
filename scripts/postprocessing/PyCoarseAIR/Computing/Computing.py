@@ -73,20 +73,65 @@ def Compute_BackwardRates(Syst, iT):
     return Syst
 
 
-def Compute_Rates_Overall(Syst, iT):
+def Compute_Rates_Overall(InputData, Syst, iT):
 
-    Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
-    Syst.T[iT-1].ProcTot[1].Rates = np.sum(Syst.T[iT-1].Proc[1].Rates, axis=1)
-    for jProc in range(2, Syst.NProcTypes):
-        Syst.T[iT-1].ProcTot[jProc].Rates = np.sum(Syst.T[iT-1].ProcExch[jProc-2].Rates, axis=1)
+    if (Syst.NAtoms == 3):
+        Syst.T[iT-1].ProcTot[0].Rates = np.sum(Syst.T[iT-1].Proc[0].Rates, axis=1)
+        Syst.T[iT-1].ProcTot[1].Rates = np.sum(Syst.T[iT-1].Proc[1].Rates, axis=1)
+        for jProc in range(2, Syst.NProcTypes):
+            Syst.T[iT-1].ProcTot[jProc].Rates = np.sum(Syst.T[iT-1].ProcExch[jProc-2].Rates, axis=1)
+    
+    elif (Syst.NAtoms == 4):
+
+        iPVec    = np.array([0, 1, 2])
+        iPOppVec = np.array([5, 4, 3])
+
+        for iMol in range(Syst.NMolecules):
+            if ( (InputData.Kin.CGQCTFlg) and (InputData.Kin.Groups.Flg[iMol]) ):
+                Syst.Molecule[iMol].EqNbBins = Syst.Molecule[iMol].Grouped.NbGroups
+            else:
+                Syst.Molecule[iMol].EqNbBins = Syst.Molecule[iMol].NBins          
+
+        NBins0_1 = Syst.Molecule[Syst.Pair[0].ToMol].EqNbBins
+        NBins0_2 = Syst.Molecule[Syst.Pair[5].ToMol].EqNbBins
+        print('    [Compute_Rates_Overall]: Nb of Levels in Initial Molecule 1 = ' + str(NBins0_1) )
+        print('    [Compute_Rates_Overall]: Nb of Levels in Initial Molecule 2 = ' + str(NBins0_2) )
+
+        maxNBins = 0
+        print('    [Compute_Rates_Overall]: Nb of Levels Per Final Pair: ')
+        for iP in range(6):
+            maxNBins               = np.maximum(Syst.Molecule[iMol].EqNbBins, maxNBins)
+            iMol                   = Syst.Pair[iP].ToMol
+            Syst.Pair[iP].NBins    = Syst.Molecule[iMol].EqNbBins  
+            print('    [Compute_Rates_Overall]:   Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NBins) )
+
+        Syst.T[iT-1].DissRatesTot     = np.sum(Syst.T[iT-1].DissRates, axis=2)
+
+        if (Syst.SymmFlg):
+            iTemp = 1
+        else:
+            iTemp = 2
+        
+        Syst.T[iT-1].DissInelRatesTot = np.zeros((NBins0_1, NBins0_2, maxNBins, iTemp))
+        for iMol in range(iTemp):
+            for iP in range(6):
+                if ( Syst.MolToCFDComp[Syst.Pair[iP].ToMol] == Syst.MolToCFDComp[iMol] ):
+                    Syst.T[iT-1].DissInelRatesTot[:,:,0:Syst.Molecule[iMol].EqNbBins,iMol] = Syst.T[iT-1].DissInelRatesTot[:,:,0:Syst.Molecule[iMol].EqNbBins,iMol] + Syst.T[iT-1].Proc[0].Rates[:,:,0:Syst.Molecule[iMol].EqNbBins,iP]
+
+        Syst.T[iT-1].ProcTot[0].Rates = np.zeros((NBins0_1, NBins0_2, iTemp))
+        for iMol in range(iTemp):
+            for iP in range(6):
+                if ( Syst.MolToCFDComp[Syst.Pair[iP].ToMol] == Syst.MolToCFDComp[iMol] ):
+                    Syst.T[iT-1].ProcTot[0].Rates[:,:,iMol] = Syst.T[iT-1].ProcTot[0].Rates[:,:,iMol] + np.squeeze( np.sum(Syst.T[iT-1].Proc[0].Rates[:,:,:,iP], axis=2) )
 
     return Syst
 
 
 def Compute_Rates_Thermal(Syst, iT):
 
-    for jProc in range(Syst.NProcTypes):
-        Syst.RatesTh[iT-1,jProc] = sum( Syst.Molecule[0].T[iT-1].LevelQExp * Syst.T[iT-1].ProcTot[jProc].Rates )
+    if (Syst.NAtoms == 3):
+        for jProc in range(Syst.NProcTypes):
+            Syst.RatesTh[iT-1,jProc] = sum( Syst.Molecule[0].T[iT-1].LevelQExp * Syst.T[iT-1].ProcTot[jProc].Rates )
 
     return Syst
 

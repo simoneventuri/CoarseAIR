@@ -184,6 +184,11 @@ Subroutine ReadInputs( This, i_Debug )
   Integer                                                               ::    iCond
   Integer                                                               ::    UnitWrite, StatusWrite
   type(File_Type)                                                       ::    DataFile
+  integer                                                               ::    iTrajExcluded
+  character(10)                                                         ::    iTrajExcluded_Char
+  integer(rkp)                                                          ::    iTemp1, iTemp2
+  real(rkp)                                                             ::    Temp1, Temp2
+  real(rkp)             ,dimension(:) ,allocatable                      ::    TempVec1, TempVec2 
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
@@ -206,18 +211,31 @@ Subroutine ReadInputs( This, i_Debug )
 ! ==============================================================================================================
 !     SETTING THE NUMBER OF TRAJECTORIES TO BE ANALYZED
 ! ==============================================================================================================
+  allocate( TempVec1(This%NCond) )
+  allocate( TempVec2(This%NCond) )
+
   if (i_Debug_Loc) call Logger%Write( "Setting the number of trajectories to be analyzed" )
-  Limit   =   This%NTrajectoriesToAnalyze > 0 
-  iTraj   =   0
+  Limit         =   This%NTrajectoriesToAnalyze > 0 
+  iTraj         =   0
+  iTrajExcluded =   0
   do
-    read(DataFile%Unit,*,iostat=DataFile%Status)
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iTemp2, Temp1, Temp2, TempVec1, TempVec2 
     if ( DataFile%Status == IOStat_End ) exit                                                                                     
-    if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )                        
-    iTraj = iTraj + 1                                                                                  
+    !if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )                        
+    if (DataFile%Status/=0) then
+      iTrajExcluded = iTrajExcluded + 1
+    else
+      iTraj         = iTraj + 1                                                                                  
+    end if
     if ( Limit .and. iTraj > This%NTrajectoriesToAnalyze ) exit                                                 
   end do
   This%NTraj = iTraj
-  if (i_Debug_Loc) call Logger%Write( "-> Number of trajectories: This%NTraj = ", This%NTraj )
+  if (i_Debug_Loc) call Logger%Write( "-> Nb of trajectories: This%NTraj = ", This%NTraj )
+  if (iTrajExcluded>0) then
+    write(iTrajExcluded_Char, '(I10)') iTrajExcluded
+    if (i_Debug_Loc) call Logger%Write( "-> Nb of trajectories Excluded: iTrajExcluded = ", iTrajExcluded )
+    write(*,*) "          [Statistics_Class.F90]: Nb of Excluded Trajectories " // adjustl(trim(iTrajExcluded_Char))
+  end if
 ! ==============================================================================================================
 
 
@@ -226,6 +244,7 @@ Subroutine ReadInputs( This, i_Debug )
 ! ==============================================================================================================
   allocate( This%bMax(This%NTraj) )
   allocate( This%bSampled(This%NTraj) )
+
   allocate( This%Qini(This%NCond,This%NTraj) )
   allocate( This%Qfin(This%NCond,This%NTraj) )
 ! ==============================================================================================================
@@ -242,24 +261,37 @@ Subroutine ReadInputs( This, i_Debug )
 
   if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
   rewind(DataFile%Unit)                                                                                           
-  read(DataFile%Unit,*)                                                                                         
-  do iTraj = 1,This%NTraj                                                                                       
-    read(DataFile%Unit,*,iostat=DataFile%Status) Idx, iPES, This%bMax(iTraj), This%bSampled(iTraj), This%Qini(:,iTraj), This%Qfin(:,iTraj)
-    if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
+  read(DataFile%Unit,*)                                                                                     
+  iTraj=0
+  do                                                                                     
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iTemp2, Temp1, Temp2, TempVec1, TempVec2 
+    !if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
+    if (DataFile%Status==0) then
+      iTraj = iTraj+1 
 
-    if (This%StatWritesBinaryFlg) then
-      write(UnitWrite) int(Idx,  rkp)
-      write(UnitWrite) int(iPES, rkp)
-      write(UnitWrite) This%bMax(iTraj)
-      write(UnitWrite) This%bSampled(iTraj)
-      do iCond=1,This%NCond
-        write(UnitWrite) This%Qini(iCond,iTraj)
-      end do
-      do iCond=1,This%NCond
-        write(UnitWrite) This%Qfin(iCond,iTraj)
-      end do
+      Idx                   = iTemp1
+      iPES                  = iTemp2
+      This%bMax(iTraj)      = Temp1
+      This%bSampled(iTraj)  = Temp2
+      This%Qini(:,iTraj)    = TempVec1
+      This%Qfin(:,iTraj)    = TempVec2
+
+      if (This%StatWritesBinaryFlg) then
+        write(UnitWrite) int(Idx,  rkp)
+        write(UnitWrite) int(iPES, rkp)
+        write(UnitWrite) This%bMax(iTraj)
+        write(UnitWrite) This%bSampled(iTraj)
+        do iCond=1,This%NCond
+          write(UnitWrite) This%Qini(iCond,iTraj)
+        end do
+        do iCond=1,This%NCond
+          write(UnitWrite) This%Qfin(iCond,iTraj)
+        end do
+      end if
+
     end if
 
+    if (iTraj==This%NTraj) exit
   end do                                                                                                        
   if (i_Debug_Loc) then
     call Logger%Write( "-> Done reading the trajectory data" )

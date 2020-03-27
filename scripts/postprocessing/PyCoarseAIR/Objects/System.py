@@ -80,3 +80,5 @@ class system(object):
 
         self.RatesTh      = np.zeros((NTTran, NProcTypes))
         self.RatesQSS     = np.zeros((NTTran, NProcTypes))
+
+        self.MolToCFDComp = np.zeros((NMolecules), dtype=np.int8)

@@ -43,7 +43,7 @@ def Initialize_Data(InputData):
 
 
     ## Path to CoarseAIR Output Folder inside the Run Folder
-    OutputFldr               = InputData.FinalFldr
+    OutputFldr               = InputData.QCTOutFldr
     ## System Name
     SystNameLong             = InputData.SystNameLong
     UploadSystem             = getattr(ChemicalSystems, SystNameLong + '_Upload')
@@ -65,14 +65,8 @@ def Initialize_Data(InputData):
             Syst.Molecule[iMol].Grouped = groupedmolecule(InputData.Kin.Groups.Types[iMol], InputData.Kin.Groups.PathsToMapping[iMol], InputData.Kin.Groups.T0, Syst.NProcTypes, Temp, Syst.Molecule[iMol].Name)
             
 
-    NProcTot = 1
-    for iP in range(3):
-        Syst.Pair[iP].NBins    = Syst.Molecule[Syst.Pair[iP].ToMol].NBins
-        NProcTot               = NProcTot + Syst.Pair[iP].NBins
-        Syst.Pair[iP].NProcTot = NProcTot
     Syst.PathToFolder = OutputFldr + Syst.Name
     Syst.PathToHDF5   = InputData.HDF5.ReadFldr
-
 
 
     Syst.Arr.MinRate           = InputData.Kin.MinRate
