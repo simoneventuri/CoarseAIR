@@ -87,12 +87,8 @@ function MergeTrajectories {
         cd ${COARSEAIR_BIN_OUTPUT_DIR}
 
 
-        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat' ]; then
-
-          typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
-          echo "[MergeTrajectories]: -----> Trajectories from different Processors already merged. Nb of Trajectories = "${NTraj}
-
-        else
+        NTraj=0
+        if [ -f ./Node_1/Proc_1/trajectories.csv ]; then
 
           #iNode=1
           #while [ ${iNode} -le ${NNode} ]; do
@@ -101,32 +97,28 @@ function MergeTrajectories {
             iProc=1
             while [ $iProc -le ${NProc} ]; do  
               echo "[MergeTrajectories]: -----> Merging for iProc = "${iProc}
-              
-              if [ -f ./Node_$iNode/Proc_$iProc/trajectories.csv ]; then
-              
-                if [ -f ./trajectories.csv ]; then
-              
-                  tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.csv >> ./trajectories.csv
-                  if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-                    tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSOl.out >> ./PaQSOl.out
-                    rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
-                  fi
-                  
-                else
-                
-                  cat ./Node_${iNode}/Proc_${iProc}/trajectories.csv > ./trajectories.csv
-                  if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-                    cat ./Node_$iNode/Proc_$iProc/PaQSOl.out > ./PaQSOl.out
-                    rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
-                  fi
-                  
+                          
+              if [ -f ./trajectories.csv ]; then
+            
+                tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.csv >> ./trajectories.csv
+                if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
+                  tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSOl.out >> ./PaQSOl.out
+                  rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
                 fi
                 
-                #rm -rf ./Node_$iNode/Proc_$iProc/trajectories.csv
-
+              else
+              
+                cat ./Node_${iNode}/Proc_${iProc}/trajectories.csv > ./trajectories.csv
+                if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
+                  cat ./Node_$iNode/Proc_$iProc/PaQSOl.out > ./PaQSOl.out
+                  rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
+                fi
+                
               fi
               
-            iProc=$((iProc+1))
+              #rm -rf ./Node_$iNode/Proc_$iProc/trajectories.csv
+              
+              iProc=$((iProc+1))
             done
 
             if [ ${RmTrajFlg} -eq 1 ]; then
@@ -145,8 +137,21 @@ function MergeTrajectories {
           fi
           echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
           echo "[MergeTrajectories]: -----> Tot Nb of Converged Trajectories: "${NTraj}
+
+
+        elif [ -f  ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat' ]; then
+      
+          typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
+          echo "[MergeTrajectories]: -----> Trajectories from different Processors already merged. Nb of Trajectories = "${NTraj}
           
+
+        else
+
+          echo "[MergeTrajectories]: -----> No Trajectories Found. Nb of Trajectories = "${NTraj}
+
         fi
+
+
 
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           echo "#iLevel,jLevel,NTraj" > ${COARSEAIR_OUTPUT_DIR}/'Overall_NConvTraj.csv'
