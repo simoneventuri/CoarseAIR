@@ -63,14 +63,14 @@ function RmAll {
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
 
-        echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
+        echo "  [RmAll]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
         echo "  [RmAll]"
 
      
         if [ ${TranFlg} -eq 0 ]; then 
-          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         else
-          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         fi
 
 
@@ -140,15 +140,16 @@ function Clean {
       fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
-        
-        echo "  [Clean]: ----- Molecule 2, Level/Bin = " ${iLevels2} " --------------------- "
+        echo "  [Clean]: ----- Molecule 1, Level/Bin = " ${iLevel1} " --------------------- "
+        echo "  [Clean]"
+        echo "  [Clean]: ------- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- "
         echo "  [Clean]"
 
     
         if [ ${TranFlg} -eq 0 ]; then 
-          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         else
-          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         fi
 
 
