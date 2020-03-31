@@ -21,8 +21,6 @@
 import os
 import sys
 import numpy as np
-
-
 ##==============================================================================================================
 print("\n[PyCoarseAIR]: Defining Paths")
 
