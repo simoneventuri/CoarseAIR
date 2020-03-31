@@ -52,7 +52,7 @@ function ComputeTrajsPBS {
 
 
     echo "  [ComputeTrajsPBS]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
+    NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")))
     echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesFromFile}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesFromFile} / ${NNode}")"
@@ -219,7 +219,7 @@ function ComputeTrajs {
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
-      NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
+      NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")))
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesFromFile}
       MaxProcessInNode=${NProcessesFromFile}
     fi
@@ -603,7 +603,7 @@ function PostTrajectoriesPBS {
   if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
 
     echo "  [PostTrajectoriesPBS]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
-    NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
+    NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")))
     echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesFromFile}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesFromFile} / ${NNode}")"
@@ -785,7 +785,7 @@ function PostTrajectoriesAtNode {
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
       MinProcessInNode=1
-      NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")+1))
+      NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")))
       MaxProcessInNode=${NProcessesFromFile}
     fi
     NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))

@@ -28,15 +28,15 @@ import pandas
 
 ##==============================================================================================================
 if (len(sys.argv) > 1):
-    COARSEAIR_BIN_OUTPUT_DIR = sys.argv[1]
-    print("[SelectLevelsToRun.py]: COARSEAIR_BIN_OUTPUT_DIR = ", COARSEAIR_BIN_OUTPUT_DIR)
+    COARSEAIR_OUTPUT_DIR = sys.argv[1]
+    print("[SelectLevelsToRun.py]: COARSEAIR_OUTPUT_DIR = ", COARSEAIR_OUTPUT_DIR)
     MinNTraj                 = int(sys.argv[2])
     print("[SelectLevelsToRun.py]: MinNTraj                 = ", MinNTraj)
 else:
-    print("[SelectLevelsToRun.py]: ERROR! This Program requires TWO ARGUMENTS: COARSEAIR_BIN_OUTPUT_DIR and MinNTraj" )
+    print("[SelectLevelsToRun.py]: ERROR! This Program requires TWO ARGUMENTS: COARSEAIR_OUTPUT_DIR and MinNTraj" )
 ##--------------------------------------------------------------------------------------------------------------
 
-PathToFile = COARSEAIR_BIN_OUTPUT_DIR + '/Overall_NConvTraj.csv'
+PathToFile = COARSEAIR_OUTPUT_DIR + '/Overall_NConvTraj.csv'
 print('[SelectLevelsToRun.py]:   Reading File: ', PathToFile)
 
 Data = pandas.read_csv(PathToFile, header=None, skiprows=1)
@@ -47,7 +47,7 @@ jLevelVec = np.array(Data.values[:,1],  dtype=np.int64  )
 NTrajVec  = np.array(Data.values[:,2],  dtype=np.int64  )
 
 
-LevelsFile = COARSEAIR_BIN_OUTPUT_DIR + '/ProcessesToRunList.inp'
+LevelsFile = COARSEAIR_OUTPUT_DIR + '/ProcessesToRunList.inp'
 print('[SelectLevelsToRun.py]: Writing List of Levels to Run in: ' + LevelsFile )
 csvlevels  = open(LevelsFile, 'w')
 iProc = -1

@@ -172,6 +172,7 @@ function MergeTrajectories {
 
   echo "[MergeTrajectories]: Launching Python File "${COARSEAIR_SH_DIR}/SelectLevelsToRun.py" with Min Number of Computed Trajectories MinNTraj = "${MinNTraj}
   python3 ${COARSEAIR_SH_DIR}/SelectLevelsToRun.py ${COARSEAIR_OUTPUT_DIR} ${MinNTraj}
+  echo "[MergeTrajectories]: The List of the Levels to Re-Run is "${COARSEAIR_OUTPUT_DIR}"/ProcessesToRunList.inp"
 
 }
 #================================================================================================================================#
