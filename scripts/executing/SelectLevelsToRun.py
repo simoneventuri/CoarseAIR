@@ -44,7 +44,7 @@ Data = Data.apply(pandas.to_numeric, errors='coerce')
 
 iLevelVec = np.array(Data.values[:,0],  dtype=np.int64  )
 jLevelVec = np.array(Data.values[:,1],  dtype=np.int64  )
-NTrajVec  = np.array(Data.values[:,1],  dtype=np.int64  )
+NTrajVec  = np.array(Data.values[:,2],  dtype=np.int64  )
 
 
 LevelsFile = COARSEAIR_BIN_OUTPUT_DIR + '/ProcessesToRunList.inp'
@@ -56,5 +56,6 @@ for NTraj in NTrajVec:
     iLevel = iLevelVec[iProc]
     jLevel = jLevelVec[iProc]
     if (NTraj < MinNTraj):
+        print('[SelectLevelsToRun.py]: Adding (iLevel, jLevel) = (' + str(iLevel) + ',' + str(jLevel) + '). It has only ' + str(NTraj) + ' Trajectories Converged.' )
         Line = '%d-%d\n' % ((iLevel, jLevel))
         csvlevels.write(Line)
