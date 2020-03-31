@@ -46,8 +46,8 @@ class kinetics(object):
         self.WriteDiss_Flg              = True 
         self.WriteDissInel_Flg          = False
         self.CorrFactor                 = 16.0/3.0
-        self.WriteInel_Flg              = False
-        self.WriteExch_Flg              = False
+        self.WriteInel_Flg              = True
+        self.WriteExch_Flg              = True
 
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
@@ -70,7 +70,7 @@ class kinetics(object):
 
 
         ## Packing + Unpacking Dissocation Rates:
-        self.PackUnpackDiss_Flg         = False
+        self.PackUnpackDiss_Flg         = True
         self.PackUnpackType             = ['VSM']
         self.PackUnpackPathsToMapping   = ['']
         self.PackUnpackSuffix           = '_VS' #_Phys_45Bins
@@ -128,7 +128,7 @@ class inputdata(object):
         self.OldVersion_IntFlg         = 1
         self.SystNameLong              = 'O3_UMN'
 
-        self.TranVec                   = np.array([1500.0, 5000.0, 10000.0, 15000.0, 20000.0]) #np.array([1500.0, 2500.0, 3000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 15000.0, 20000.0]) #np.array([10000.0]) #
+        self.TranVec                   = np.array([1500.0, 2500.0, 3000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 15000.0, 20000.0]) #np.array([10000.0]) #
         self.T0                        = 300.0
         self.NTran                     = np.size(   self.TranVec )
         self.iTVec                     = np.arange( self.NTran   ) + 1

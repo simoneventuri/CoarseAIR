@@ -31,8 +31,8 @@ function RmAll {
   export SymmFlg=${5}
   export MinLevel1=${6}
   export MaxLevel1=${7}
-  export MinLevel1=${8}
-  export MaxLevel1=${9}
+  export MinLevel2=${8}
+  export MaxLevel2=${9}
 
   echo "  [RmAll]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [RmAll]: TranFlg               = "${TranFlg}
@@ -59,7 +59,7 @@ function RmAll {
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
-      if
+      fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
 
@@ -95,7 +95,7 @@ function RmAll {
 
 # ------------------------------------------------------------------------------------------------------------------------ Clean #
 function Clean {
-  # Ex: Clean 1 10000.0 10000.0 1 0 1 9390 0 0
+  # Ex: Clean 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0
 
   export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
   export TranFlg=${1}
@@ -105,9 +105,11 @@ function Clean {
   export SymmFlg=${5}
   export MinLevel1=${6}
   export MaxLevel1=${7}
-  export MinLevel1=${8}
-  export MaxLevel1=${9}
-  
+  export NLevels1=${8}
+  export MinLevel2=${9}
+  export MaxLevel2=${10}
+  export NLevels2=${11}
+
   echo "  [Clean]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [Clean]: TranFlg               = "${TranFlg}
   echo "  [Clean]: Tran                  = "${Tran}
@@ -116,8 +118,10 @@ function Clean {
   echo "  [Clean]: SymmFlg               = "${SymmFlg}
   echo "  [Clean]: MinLevel1             = "${MinLevel1}
   echo "  [Clean]: MaxLevel1             = "${MaxLevel1}
+  echo "  [Clean]: NLevels1              = "${NLevels1}
   echo "  [Clean]: MinLevel2             = "${MinLevel2}
   echo "  [Clean]: MaxLevel2             = "${MaxLevel2}
+  echo "  [Clean]: NLevels2              = "${NLevels2}
 
 
   iProcessesTot=0
@@ -133,7 +137,7 @@ function Clean {
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
         ExitCond=1
-      if
+      fi
       if [ ${ExitCond} -eq 1 ]; then
         iProcessesTot=$((iProcessesTot+1))
         
