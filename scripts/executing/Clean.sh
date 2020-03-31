@@ -84,11 +84,10 @@ function MergeTrajectories {
         else
           export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         fi
-        cd ${COARSEAIR_BIN_OUTPUT_DIR}
 
 
         NTraj=0
-        if [ -f ./Node_1/Proc_1/trajectories.csv ]; then
+        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/Node_1/Proc_1/trajectories.csv ]; then
 
           #iNode=1
           #while [ ${iNode} -le ${NNode} ]; do
@@ -98,39 +97,39 @@ function MergeTrajectories {
             while [ $iProc -le ${NProc} ]; do  
               echo "[MergeTrajectories]: -----> Merging for iProc = "${iProc}
                           
-              if [ -f ./trajectories.csv ]; then
+              if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
             
-                tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.csv >> ./trajectories.csv
-                if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-                  tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSOl.out >> ./PaQSOl.out
-                  rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
+                tail -n+2 ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/trajectories.csv >> ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
+                if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
+                  tail -n+2 ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out >> ${COARSEAIR_BIN_OUTPUT_DIR}/PaQSOl.out
+                  rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out
                 fi
                 
               else
               
-                cat ./Node_${iNode}/Proc_${iProc}/trajectories.csv > ./trajectories.csv
-                if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-                  cat ./Node_$iNode/Proc_$iProc/PaQSOl.out > ./PaQSOl.out
-                  rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
+                cat ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}/trajectories.csv > ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
+                if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
+                  cat ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out > ${COARSEAIR_BIN_OUTPUT_DIR}/PaQSOl.out
+                  rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode/Proc_$iProc/PaQSOl.out
                 fi
                 
               fi
               
-              #rm -rf ./Node_$iNode/Proc_$iProc/trajectories.csv
+              #rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}Node_$iNode/Proc_$iProc/trajectories.csv
               
               iProc=$((iProc+1))
             done
 
             if [ ${RmTrajFlg} -eq 1 ]; then
-              rm -rf ./Node_$iNode
+              rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node_$iNode
               echo "[MergeTrajectories]: -----> Done with merging Trajectories. Now I will remove the Node Folder"
             fi
             
           #iNode=$((iNode+1))
           #done
               
-          if [ -f ./trajectories.csv ]; then
-            NTraj=$(wc -l < ./trajectories.csv)
+          if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
+            NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)
             NTraj=$((NTraj-1))
           else 
             NTraj=0
