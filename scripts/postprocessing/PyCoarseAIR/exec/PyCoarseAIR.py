@@ -22,121 +22,106 @@ import os
 import sys
 import numpy as np
 
-## Paths from where to Import Python Modules
-#WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
-WORKSPACE_PATH = '/home/venturi/WORKSPACE/'
-#WORKSPACE_PATH = '/Users/sventuri/WORKSPACE/'
-#CoarseAIRFldr  = os.environ['COARSEAIR_SOURCE_DIR'] 
+
+##==============================================================================================================
+print("\n[PyCoarseAIR]: Defining Paths")
+
+WORKSPACE_PATH   = '/home/venturi/WORKSPACE/'
+#WORKSPACE_PATH   = os.environ['WORKSPACE_PATH']
 CoarseAIRFldr    = WORKSPACE_PATH + '/CoarseAIR/coarseair/'
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Objects/')
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/ChemicalSystems/')
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Reading/')
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Writing/')
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Computing/')
-sys.path.insert(0, CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/Initializing/')
-
-if (len(sys.argv) > 1):
-    InputFile = sys.argv[1]
-    print("\n[PyCoarseAIR]: Calling PyCoarseAIR with Input File = ", InputFile)
-    sys.path.insert(0, InputFile)
-else:
-    print("[PyCoarseAIR]: Calling PyCoarseAIR without Input File")
-    sys.path.insert(0, CoarseAIRFldr + '/scripts/postprocessing/PyCoarseAIR/InputData/')
-
-from Reading           import Read_Levels, Read_PartFuncsAndEnergies, Read_qnsEnBin, Read_Rates_CGQCT
-from Writing           import Write_PartFuncsAndEnergies, Write_Kinetics_FromOverall, Write_QSS
-from Computing         import Compute_Rates_Thermal_FromOverall, Compute_QSS
-from Initializing      import Initialize_Data
-from InputData         import inputdata
-from ME_Output         import me_output
+#CoarseAIRFldr    = os.environ['COARSEAIR_SOURCE_DIR'] 
+PyCoarseAIRFldr  = CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/'
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
 ##==============================================================================================================
-InputData                       = inputdata()
-InputData.SystNameLong          = 'O3_UMN'
+print("\n[PyCoarseAIR]: Loading Files")
 
-InputData.TranVec               = np.array([8000])
-InputData.iTVec                 = np.arange(1) + 1
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/Objects/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/ChemicalSystems/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/Reading/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/Writing/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/Computing/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/Initializing/')
 
-InputData.QCTOutFldr            = WORKSPACE_PATH + '/CG-QCT/run_O3_ALL/Test/'
-InputData.FinalFldr             = WORKSPACE_PATH + '/Mars_Database/Results/'
-
-InputData.Kin.Read_Flg          = False
-InputData.Kin.Write_Flg         = False
-InputData.Kin.ReadFldr          = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteFldr         = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-InputData.Kin.WriteDiss_Flg     = True     
-InputData.Kin.WriteInel_Flg     = True
-InputData.Kin.WriteExch_Flg     = True
-
-InputData.HDF5.ReadFldr         = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
-InputData.HDF5.ForceReadDat_Flg = False
-InputData.HDF5.Save_Flg         = True
-
-InputData.ME.Read_Flg           = True
-InputData.ME.ProcCode           = '0_1_0_0'
-InputData.ME.ReadFldr 	        = WORKSPACE_PATH + '/Mars_Database/Run_0D/'
-InputData.ME.TimeVec            = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
-
-InputData.PlotShow_Flg          = False
-
-InputData.DelRateMat_Flg        = True
+if (len(sys.argv) > 1):
+    InputFile = sys.argv[1]
+    print("[PyCoarseAIR]:   Calling PyCoarseAIR with Input File = ", InputFile)
+    sys.path.insert(0, InputFile)
+else:
+    InputFile = PyCoarseAIRFldr + '/src/InputData/'
+    print("[PyCoarseAIR]:   Calling PyCoarseAIR with the PRESET Input File Located in " + InputFile )
+    sys.path.insert(0, InputFile)
 ##--------------------------------------------------------------------------------------------------------------
 
 
 
-print("\n[PyCoarseAIR]: Initializing Data")
+##==============================================================================================================
+print("\n[PyCoarseAIR]: Loading Functions")
+
+from Initializing      import Initialize_Data
+from InputData         import inputdata
+##--------------------------------------------------------------------------------------------------------------
+
+
+
+##==============================================================================================================
+print("\n[PyCoarseAIR]: Initializing Input and System Data")
+
+InputData    = inputdata(WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr)
 
 [Syst, Temp] = Initialize_Data(InputData)
 
-
-print("\n[PyCoarseAIR]: Uploading Data")
-
-Syst = Read_Levels(Syst, InputData)
-Syst = Read_qnsEnBin(Syst, InputData)
-Syst = Read_PartFuncsAndEnergies(Syst, Temp, InputData)
-Syst = Read_Rates_CGQCT(Syst, Temp, InputData)
+print("[PyCoarseAIR]: Done Initializing")
+##--------------------------------------------------------------------------------------------------------------
 
 
-if (InputData.Kin.Write_Flg):
-	Write_PartFuncsAndEnergies(Syst, Temp, InputData)
-	#Write_Kinetics_FromOverall(Syst, Temp, InputData)
+
+##==============================================================================================================
+print("\n[PyCoarseAIR]: Uploading and Processing Rates Data")
+
+Syst.Read_Rates( InputData, Temp )
+
+#Syst.Write_Kinetics_FromOverall( InputData, Temp )
+
+print("[PyCoarseAIR]: Done Initializing")
+##--------------------------------------------------------------------------------------------------------------
 
 
-if (InputData.ME.Read_Flg):
 
-	InputData.FinalFldrT = InputData.FinalFldr + '/T' + str(Temp.TranVec[1-1]) + 'K/'
-	if not os.path.exists(InputData.FinalFldrT):
-		os.makedirs(InputData.FinalFldrT)
-	
-	InputData.ME.ReadFldr = InputData.ME.ReadFldr + 'output_' + InputData.SystNameLong + '_T' + str(InputData.TranVec[1-1]) + 'K_' + InputData.ME.ProcCode + '/'
+# if (InputData.ME.Read_Flg):
 
-	ME = me_output(Syst)
-	ME.Read_Box(InputData)
-	ME.Plot_MolFracs_Evolution(InputData, Temp, 1)
-	# ME.Plot_TTran_Evolution(InputData, Temp, 1)
-	# ME.Plot_Rho_Evolution(InputData, Temp, 1)
-	# ME.Plot_P_Evolution(InputData, Temp, 1)
-	# ME.Plot_Nd_Evolution(InputData, Temp, 1)
-	# ME.Plot_Energy_Evolution(InputData, Temp, 1)
+#     InputData.FinalFldrT = InputData.FinalFldr + '/T' + str(Temp.TranVec[1-1]) + 'K/'
+#     if not os.path.exists(InputData.FinalFldrT):
+#         os.makedirs(InputData.FinalFldrT)
+    
+#     InputData.ME.ReadFldr = InputData.ME.ReadFldr + 'output_' + InputData.SystNameLong + '_T' + str(InputData.TranVec[1-1]) + 'K_' + InputData.ME.ProcCode + '/'
 
-	for iComp in range(ME.NCFDComp):
-		if ( ME.Component[iComp].ToMol > -1 ):
-			ME.Component[iComp].Read_Pop(InputData, ME.NTime)
-			ME.Component[iComp].Plot_Pop(InputData, Syst, ME, Temp, 1)
-			ME.Component[iComp].Compute_DistFunc( Syst, ME.NTime )
-			
-			#ME.Component[iComp].Compute_KAveraged( Syst, 1, ME.NTime )
-			#Syst = Compute_QSS( Syst, ME, 1 )
-			#Write_QSS( Syst, Temp, InputData, 1 )
-			#ME.Component[iComp].Plot_KAveraged( InputData, Syst, ME, Temp, 1 )
+#     ME = me_output(Syst)
+#     ME.Read_Box(InputData)
+#     ME.Plot_MolFracs_Evolution(InputData, Temp, 1)
+#     # ME.Plot_TTran_Evolution(InputData, Temp, 1)
+#     # ME.Plot_Rho_Evolution(InputData, Temp, 1)
+#     # ME.Plot_P_Evolution(InputData, Temp, 1)
+#     # ME.Plot_Nd_Evolution(InputData, Temp, 1)
+#     # ME.Plot_Energy_Evolution(InputData, Temp, 1)
 
-			ME.Component[iComp].Compute_EAveraged( Syst, 1, ME.NTime )
-			ME.Component[iComp].Plot_EAveraged( InputData, Syst, ME, Temp, 1 )
-			ME.Component[iComp].Compute_Taus( InputData, Syst, ME, 1)
-			ME.Component[iComp].Write_Taus( Temp, InputData, 1)
+#     for iComp in range(ME.NCFDComp):
+#         if ( ME.Component[iComp].ToMol > -1 ):
+#             ME.Component[iComp].Read_Pop(InputData, ME.NTime)
+#             ME.Component[iComp].Plot_Pop(InputData, Syst, ME, Temp, 1)
+#             ME.Component[iComp].Compute_DistFunc( Syst, ME.NTime )
+            
+#             #ME.Component[iComp].Compute_KAveraged( Syst, 1, ME.NTime )
+#             #Syst = Compute_QSS( Syst, ME, 1 )
+#             #Write_QSS( Syst, Temp, InputData, 1 )
+#             #ME.Component[iComp].Plot_KAveraged( InputData, Syst, ME, Temp, 1 )
+
+#             ME.Component[iComp].Compute_EAveraged( Syst, 1, ME.NTime )
+#             ME.Component[iComp].Plot_EAveraged( InputData, Syst, ME, Temp, 1 )
+#             ME.Component[iComp].Compute_Taus( InputData, Syst, ME, 1)
+#             ME.Component[iComp].Write_Taus( Temp, InputData, 1)
 
 
-#Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)
+# #Syst = Compute_Rates_Thermal_FromOverall(Syst, Temp, InputData)

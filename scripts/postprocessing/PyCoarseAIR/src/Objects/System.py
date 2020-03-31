@@ -685,15 +685,21 @@ class t_properties(object):
 
             if (InputData.Kin.WriteDiss_Flg):
                 if (InputData.Kin.CorrFactor != 1.0):
-                    DissKinetics = TempFldr + '/Diss_Corrected.dat' 
+                    if (InputData.Kin.PackUnpackDiss_Flg):
+                        DissKinetics = TempFldr + '/Diss' + InputData.Kin.PackUnpackSuffix + '.dat' 
+                    else:
+                        DissKinetics = TempFldr + '/Diss_Corrected.dat'
                     print('    [System.py - Write_Kinetics]: Writing Corrected Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
                 else:
-                    DissKinetics = TempFldr + '/Diss.dat' 
+                    if (InputData.Kin.PackUnpackDiss_Flg):
+                        DissKinetics = TempFldr + '/Diss' + InputData.Kin.PackUnpackSuffix + '.dat' 
+                    else:
+                        DissKinetics = TempFldr + '/Diss.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
                 csvkinetics  = open(DissKinetics, 'w')
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
-                    if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_FLg[iLevel]) ):
+                    if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
                         if (self.Proc[0].Rates[iLevel,0] > 0.0):
                             
                             iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
@@ -715,13 +721,13 @@ class t_properties(object):
                 InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
-                    if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_FLg[iLevel]) ):
+                    if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
                         TempRates = self.Proc[1].Rates[iLevel,:]
                         if (InputData.Kin.WindAvrg_Flg):
                             TempRates = Syst.Compute_WindAvrg_Rates( TempRates )                
 
                         for jLevel in range(Syst.Molecule[0].NLevels):
-                            if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_FLg[jLevel]) ):
+                            if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[jLevel]) ):
                                 if ( (TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[0].LevelEEh[jLevel]) ):
                                     
                                     iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
@@ -749,13 +755,13 @@ class t_properties(object):
                     InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
                     for iLevel in range(Syst.Molecule[0].NLevels):
-                        if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_FLg[iLevel]) ):
+                        if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
                             TempRates = self.ProcExch[iExch-2].Rates[iLevel,:]
                             if (InputData.Kin.WindAvrg_Flg):
                                 TempRates = Syst.Compute_WindAvrg_Rates( TempRates )                    
 
                             for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NLevels):
-                                if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_FLg[jLevel]) ):
+                                if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[jLevel]) ):
                                     if ((TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
                                         
                                         iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
@@ -793,7 +799,7 @@ class t_properties(object):
                     if (Syst.SymmFlg):
                         jStatesStart = iStates
                     for jStates in range(jStatesStart, NStates0_2):
-                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_FLg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_FLg[jStates]) ) ):
+                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             TempRate = self.DissRatesTot[iStates, jStates]
                             if (TempRate > 0.0):
@@ -825,7 +831,7 @@ class t_properties(object):
                         jStatesStart = iStates
                         #SymmFct    = 2.0
                     for jStates in range(jStatesStart, NStates0_2):
-                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_FLg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_FLg[jStates]) ) ):
+                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             if (Syst.SymmFlg):
                                 iTemp = 1
@@ -835,7 +841,7 @@ class t_properties(object):
                                 iComp   = Syst.MolToCFDComp[iMol]
                                 NBins_1 = Syst.EqNStatesIn[iMol]
                                 for kStates in range(NBins_1):
-                                    if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[iMol].LevelWrite_FLg[kStates]) ):
+                                    if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[iMol].LevelWrite_Flg[kStates]) ):
 
                                         TempRate = self.DissInelRatesTot[iStates, jStates, kStates, iMol]
                                         if (TempRate > 0.0):
@@ -877,7 +883,7 @@ class t_properties(object):
                         Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
                         Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
                         LHS_Str      = Mol1_Str + '+' + Mol2_Str
-                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_FLg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_FLg[jStates]) ) ):
+                        if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             for kStates in range(NStates0_1):
                                 lStatesStart = 0
@@ -886,7 +892,7 @@ class t_properties(object):
                                     lStatesStart = kStates
                                     #SymmFct    = 2.0
                                 for lStates in range(lStatesStart, NStates0_2):
-                                    if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_FLg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_FLg[lStates]) ) ):
+                                    if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[lStates]) ) ):
 
                                         TempRate = self.Proc[1].Rates[iStates, jStates, kStates, lStates] * SymmFct
                                         InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].T[self.iT-1].EqEeV0In[iStates] + Syst.Molecule[Syst.Pair[5].ToMol].T[self.iT-1].EqEeV0In[jStates]
@@ -937,7 +943,7 @@ class t_properties(object):
                             Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
                             Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
                             LHS_Str      = Mol1_Str + '+' + Mol2_Str
-                            if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_FLg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_FLg[jStates]) ) ):
+                            if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                                 for kStates in range(NBins_1):
                                     lStatesStart = 0
@@ -948,7 +954,7 @@ class t_properties(object):
                                     for lStates in range(lStatesStart, NBins_2):
                                         kMol = Syst.ExchtoMol[iExch-2,0]
                                         lMol = Syst.ExchtoMol[iExch-2,1]
-                                        if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[kMol].LevelWrite_FLg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[lMol].LevelWrite_FLg[lStates]) ) ):
+                                        if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[kMol].LevelWrite_Flg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[lMol].LevelWrite_Flg[lStates]) ) ):
 
                                             TempRate = self.ProcExch[iExch-2].Rates[iStates, jStates, kStates, lStates] * SymmFct
                                             InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].T[self.iT-1].EqEeV0In[iStates]        + Syst.Molecule[Syst.Pair[5].ToMol].T[self.iT-1].EqEeV0In[jStates]
@@ -1038,9 +1044,33 @@ class t_properties(object):
 
 
 
+    def PackUnpackDiss( self, InputData, Syst ):
+
+        if (Syst.NAtoms == 3):
+            print('    [System.py - PackUnpackDiss]: Packing and Unpacking Dissociation StS Rates for 3 Atoms System for Temperature Nb ' + str(self.iT-1) + ' (T = ' + str(int(self.TTra)) + 'K)')
+
+            NGroups = Syst.Molecule[0].PackUnpack.NGroups
+            NLevels = Syst.Molecule[0].NLevels
+            print('    [System.py - PackUnpackDiss]:   Nb of Groups = ' + str(NGroups) + '; Nb of Levels = ' + str(NLevels) )
+
+            GroupsDissRates = np.zeros((NGroups)) 
+            for iLevel in range(NLevels):
+                if (Syst.Molecule[0].LevelWrite_Flg[iLevel]):
+                    iGroup                  = Syst.Molecule[0].PackUnpack.Mapping[iLevel]
+                    GroupsDissRates[iGroup] = GroupsDissRates[iGroup] + self.Proc[0].Rates[iLevel, 0] * Syst.Molecule[0].T[self.iT-1].LevelQ[iLevel] / Syst.Molecule[0].PackUnpack.T[self.iT].Q[iGroup]
+            
+            self.Proc[0].Rates = np.zeros((NLevels,3)) 
+            for iLevel in range(NLevels):
+                if (Syst.Molecule[0].LevelWrite_Flg[iLevel]):
+                    iGroup                        = Syst.Molecule[0].PackUnpack.Mapping[iLevel]
+                    self.Proc[0].Rates[iLevel, 0] = float(GroupsDissRates[iGroup])
+
+        if (Syst.NAtoms == 4):
+            print('    [System.py - PackUnpackDiss]: ERROR! Packing and Unpacking Dissociation StS Rates for 4 Atoms System NOT IMPLEMENTED Yet!')
+
+
+
 class arrhenius(object):
-
-
 
     def __init__(self, NProcTypes):
 
@@ -1051,8 +1081,6 @@ class arrhenius(object):
 
 
 class system(object):
-
-
 
     def __init__(self, SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, NTTran, NProcTypes):
 
@@ -1178,6 +1206,10 @@ class system(object):
                 print('  [System.py - Read_Rates]: Writing   Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')
                 self.T[iT-1].Write_PrefJumps( InputData, self )
                 
+
+            if (InputData.Kin.PackUnpackDiss_Flg):
+                print('  [System.py - Read_Rates]: Packing and Unpacking Dissociation Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')
+                self.T[iT-1].PackUnpackDiss( InputData, self )
 
             if (InputData.Kin.Write_Flg):
                 print('  [System.py - Read_Rates]: Writing Kinetics File for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')

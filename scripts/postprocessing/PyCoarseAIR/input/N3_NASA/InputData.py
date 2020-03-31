@@ -34,6 +34,22 @@ class kinetics(object):
 
     def __init__( self, WORKSPACE_PATH ):
 
+        ## Reading / Writing Kinetics Data
+        self.Read_Flg                   = True
+        self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
+
+        ## Writing Kinetics Data
+        self.Write_Flg                  = True
+        self.WriteFldr                  = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
+        self.WriteExoth_Flg             = False
+        self.WriteQB_IntFlg             = 2
+        self.WriteDiss_Flg              = True 
+        self.WriteDissInel_Flg          = True 
+        self.CorrFactor                 = 1.0
+        self.WriteInel_Flg              = True
+        self.WriteExch_Flg              = True
+
+
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
         self.MolResolutionIn            = ['StS']
         self.MinStateIn                 = np.array([     0], dtype=np.int64)
@@ -51,21 +67,15 @@ class kinetics(object):
         self.GroupsOut_Flg              = False
         self.GroupsOutWrite_Flg         = False
         self.GroupsOutSuffix            = ''
+        self.PackUnpackDiss_Flg         = 
 
-        ## Reading / Writing Kinetics Data
-        self.Read_Flg                   = True
-        self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
 
-        ## Writing Kinetics Data
-        self.Write_Flg                  = True
-        self.WriteFldr                  = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-        self.WriteExoth_Flg             = False
-        self.WriteQB_IntFlg             = 2
-        self.WriteDiss_Flg              = True 
-        self.WriteDissInel_Flg          = True 
-        self.CorrFactor                 = 1.0
-        self.WriteInel_Flg              = True
-        self.WriteExch_Flg              = True
+        ## Packing + Unpacking Dissocation Rates:
+        self.PackUnpackDiss_Flg         = False
+        self.PackUnpackType             = ['VSM']
+        self.PackUnpackPathsToMapping   = ['']
+        self.PackUnpackSuffix           = '_VS' #_Phys_45Bins
+
 
         ## Correcting Kinetics Based on Window-Averaging
         self.WindAvrg_Flg               = False

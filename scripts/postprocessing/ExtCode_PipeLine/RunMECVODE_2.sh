@@ -41,17 +41,17 @@ PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule='O2'
-export FldrName=''
-export Tran_vec=(6000 8000 10000) 
+export FldrName='_OnlyBound'
+export Tran_vec=(10000 15000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
 export DissFlg=2
-export InelFlg=2
-export ExchFlg1=2
-export ExchFlg2=2
+export InelFlg=1
+export ExchFlg1=1
+export ExchFlg2=1
 
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/"

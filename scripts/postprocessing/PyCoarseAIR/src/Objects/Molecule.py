@@ -58,8 +58,6 @@ class grouped_t_properties(object):
 
 class groupedmolecule(object):
 
-
-
     def __init__(self, Temp, PathToMapping, T0, NProcTypes, Name, CFDCompName , Type ):
 
         self.Name          = Name
@@ -72,18 +70,20 @@ class groupedmolecule(object):
 
 
 
-    def Initialize( self, InputData, Syst, Temp, NLevels, Levelvqn, LevelEeV, Levelg, In_Flg ):
+    def Initialize( self, InputData, Syst, Temp, NLevels, Levelvqn, LevelEeV, Levelg, LevelWrite_Flg, In_Flg ):
         print('      [Molecule.py - Initialize]: Initializing Grouped Molecule ' + self.Name )
 
         self.Get_Mapping( Levelvqn )
 
-        self.Compute_GroupProps( NLevels, Levelg, LevelEeV )
+        self.Compute_GroupProps( NLevels, Levelg, LevelEeV, LevelWrite_Flg )
 
-        for iT in Temp.iTVec:
-            TTra = Temp.TranVec[iT-1]
-            TInt = TTra
-            
-            self.Save_PartFuncsAndEnergiesAtT_HDF5( InputData, Syst, TTra, TInt, iT, In_Flg )
+        if (In_Flg >= 0):
+
+            for iT in Temp.iTVec:
+                TTra = Temp.TranVec[iT-1]
+                TInt = TTra
+                
+                self.Save_PartFuncsAndEnergiesAtT_HDF5( InputData, Syst, TTra, TInt, iT, In_Flg )
 
 
 
@@ -110,7 +110,7 @@ class groupedmolecule(object):
 
 
 
-    def Compute_GroupProps( self, NLevels, Levelg, LevelEeV ):
+    def Compute_GroupProps( self, NLevels, Levelg, LevelEeV, LevelWrite_Flg ):
         print('      [Molecule.py - Compute_GroupProps]: Computing Group Properties for Grouped Molecule ' + self.Name )
 
         Flg       = np.zeros((self.NGroups), dtype=np.int8)
@@ -122,7 +122,7 @@ class groupedmolecule(object):
 
         for iT in range(self.NTs):
 
-            self.T[iT].Expvec       = Levelg * np.exp( -                          LevelEeV * Ue / (self.T[iT].Value * UKb) )
+            self.T[iT].Expvec       = Levelg * np.exp( -                       LevelEeV * Ue / (self.T[iT].Value * UKb) )
             self.T[iT].ExpvecThermo = Levelg * np.exp( - (LevelEeV - np.amin(LevelEeV)) * Ue / (self.T[iT].Value * UKb) )
             self.T[iT].Q            = np.zeros((self.NGroups))
             self.T[iT].Q0           = np.zeros((self.NGroups))
@@ -130,9 +130,10 @@ class groupedmolecule(object):
             self.T[iT].QRatio       = np.zeros((self.NGroups))
 
             for iLevel in range(NLevels):
-                self.T[iT].Q[self.Mapping[iLevel]]   = self.T[iT].Q[self.Mapping[iLevel]]   +                    self.T[iT].Expvec[iLevel]
-                self.T[iT].Q0[self.Mapping[iLevel]]  = self.T[iT].Q0[self.Mapping[iLevel]]  +                    self.T[iT].ExpvecThermo[iLevel]
-                self.T[iT].EeV[self.Mapping[iLevel]] = self.T[iT].EeV[self.Mapping[iLevel]] + LevelEeV[iLevel] * self.T[iT].Expvec[iLevel]
+                if (LevelWrite_Flg[iLevel]):
+                    self.T[iT].Q[self.Mapping[iLevel]]   = self.T[iT].Q[self.Mapping[iLevel]]   +                    self.T[iT].Expvec[iLevel]
+                    self.T[iT].Q0[self.Mapping[iLevel]]  = self.T[iT].Q0[self.Mapping[iLevel]]  +                    self.T[iT].ExpvecThermo[iLevel]
+                    self.T[iT].EeV[self.Mapping[iLevel]] = self.T[iT].EeV[self.Mapping[iLevel]] + LevelEeV[iLevel] * self.T[iT].Expvec[iLevel]
 
             self.T[iT].EeV    = self.T[iT].EeV / self.T[iT].Q
             self.T[iT].QRatio = self.T[iT].Q   / np.sum(self.T[iT].Q)
@@ -210,8 +211,6 @@ class groupedmolecule(object):
             print('        [Molecule.py - Save_PartFuncsAndEnergiesAtT_HDF5]: Overwriting the Level Properties in the HDF5 File')
 
             grp       = f[TempStr1]
-            #Data      = grp["LevelEeV"]
-            #Data[...] = self.T[iT-1].LevelEeV
             Data      = grp["GroupEeV"]
             Data[...] = self.T[iT-1].EeV
             Data      = grp["GroupQ"]
@@ -326,7 +325,7 @@ class molecule(object):
         if ( (not self.KinMthdIn  == 'StS') ):            
             print('    [Molecule.py - Initialize]:     Initializing the Intial Grouped Molecule')
             self.GroupsIn = groupedmolecule(Temp, InputData.Kin.GroupsInPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdIn  )
-            self.GroupsIn.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, 1 )
+            self.GroupsIn.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, 1 )
             
             for iT in Temp.iTVec:
                 self.T[iT-1].EqEeV0In = self.GroupsIn.T[iT-1].EeV
@@ -336,10 +335,10 @@ class molecule(object):
                 self.T[iT-1].EqEeV0In = self.LevelEeV0
 
 
-        if ( (not self.KinMthdOut == 'StS') ):   
+        if (not self.KinMthdOut == 'StS'):   
             print('    [Molecule.py - Initialize]:      Initializing the Final Grouped Molecule')
             self.GroupsOut = groupedmolecule(Temp, InputData.Kin.GroupsOutPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdOut )        
-            self.GroupsOut.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, 0 )
+            self.GroupsOut.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, 0 )
 
             self.GroupsOut.Write_InitialConditions( InputData, Syst, Temp, 0 )
             
@@ -357,6 +356,13 @@ class molecule(object):
 
             for iT in Temp.iTVec:
                 self.T[iT-1].EqEeV0Out = self.LevelEeV0
+
+
+        if (InputData.Kin.PackUnpackDiss_Flg):
+            print('    [Molecule.py - Initialize]:    We Desire To Pack the StS Dissociation Rates And then Unpacking Them. Initializing.')
+            self.PackUnpack = groupedmolecule( Temp, InputData.Kin.PackUnpackPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, InputData.Kin.PackUnpackType[iMol]  )
+            self.PackUnpack.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, -1 )
+
 
         print('    [Molecule.py - Initialize]: Done Initializing the Molecule ' + self.Name )
 
@@ -413,13 +419,13 @@ class molecule(object):
         self.Njqn       = np.max(self.Leveljqn)+1
 
 
-        self.LevelWrite_FLg  = np.zeros((self.NLevels), dtype=bool)
+        self.LevelWrite_Flg  = np.zeros((self.NLevels), dtype=bool)
         self.LevelNewMapping = np.zeros((self.NLevels), dtype=np.int64) - 1
         jLevel = -1
         for iLevel in range (self.NLevels):
             if ( (self.LevelEeV[iLevel] < self.DissEeV) and (InputData.Kin.WriteQB_IntFlg != 1) ) or ( (self.LevelEeV[iLevel] > self.DissEeV) and (InputData.Kin.WriteQB_IntFlg != 0) ):
                 jLevel                       = jLevel + 1
-                self.LevelWrite_FLg[iLevel]  = True
+                self.LevelWrite_Flg[iLevel]  = True
                 self.LevelNewMapping[iLevel] = jLevel 
         self.NLevelsNewMapping = jLevel + 1 
 
@@ -751,7 +757,7 @@ class molecule(object):
         csvmole.write(Line)
 
         for iLevel in range(self.NLevels):
-            if (self.LevelWrite_FLg[iLevel]):
+            if (self.LevelWrite_Flg[iLevel]):
                 jLevel = self.LevelNewMapping[iLevel]
                 Line     = '%.10e\n' % float(np.maximum( self.QRatio0[iLevel], 1.e-99+self.QRatio0[iLevel]*0.0 ))
                 csvmole.write(Line)
@@ -782,7 +788,7 @@ class molecule(object):
 
             csvmole = open(PathToFile, 'a')
             for iLevel in range(self.NLevels):
-                if (self.LevelWrite_FLg[iLevel]):
+                if (self.LevelWrite_Flg[iLevel]):
                     jLevel = self.LevelNewMapping[iLevel]
                     Line   = '%.8e    %.8e\n' % ( float(self.Levelg[iLevel]), float(self.LevelEeV0[iLevel]) )
                     csvmole.write(Line)
@@ -796,7 +802,6 @@ class molecule(object):
 
         self.QRatio0 = self.Levelg  * np.exp( - self.LevelEeV0 * Ue / (T0 * UKb) )
         self.QRatio0 = self.QRatio0 / np.sum(self.QRatio0)
-
 
 
 
