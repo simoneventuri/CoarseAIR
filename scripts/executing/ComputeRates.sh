@@ -192,7 +192,7 @@ function ComputeTrajs {
   echo "  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [ComputeTrajs]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [ComputeTrajs]: NNode                 = "${NNode}
-  echo "  [ComputeTrajs]: ParNodes           = "${ParNodes}
+  echo "  [ComputeTrajs]: ParNodes              = "${ParNodes}
   echo "  [ComputeTrajs]: iNode                 = "${iNode}
   echo "  [ComputeTrajs]: NProc                 = "${NProc}
   echo "  [ComputeTrajs]: System                = "${System}

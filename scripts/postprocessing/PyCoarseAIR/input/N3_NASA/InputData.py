@@ -21,12 +21,35 @@
 import numpy as np
 
 
-class rates(object):
 
-    def __init__(self):
+class inputdata(object):
 
-        self.PrefJumps_Flg    = False
-        self.NPrefJumps       = 5
+    def __init__( self, WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr ):
+        
+        self.WORKSPACE_PATH            = WORKSPACE_PATH
+        self.CoarseAIRFldr             = CoarseAIRFldr
+        self.PyCoarseAIRFldr           = PyCoarseAIRFldr
+
+        self.Rates                     = rates()
+        self.Kin                       = kinetics( self.WORKSPACE_PATH )
+        self.HDF5                      = hdf5(     self.WORKSPACE_PATH )
+        self.ME                        = ME(       self.WORKSPACE_PATH )
+
+        self.OldVersion_IntFlg         = 2
+        self.SystNameLong              = 'N3_NASA'
+
+        self.TranVec                   = np.array([1000.0, 2500.0, 3500.0, 7500.0, 10000.0, 12500.0, 15000.0, 20000.0, 25000.0, 30000.0, 40000.0, 50000.0])
+        self.T0                        = 300.0
+        self.NTran                     = np.size(   self.TranVec )
+        self.iTVec                     = np.arange( self.NTran   ) + 1
+
+        self.QCTOutFldr                = self.WORKSPACE_PATH + '/CG-QCT/N3_NASA/Test/'
+        self.FinalFldr                 = self.WORKSPACE_PATH + '/Mars_Database/Results/'
+        self.PathToN3                  = self.WORKSPACE_PATH + '/N3_RVC_StS_lowT_arrhenius/ConvertStSRates/data/'
+
+        self.PlotShow_Flg              = False
+
+        self.DelRateMat_Flg            = True
 
 
 
@@ -60,14 +83,13 @@ class kinetics(object):
 
         ## Resolution of the Kinetics Data in Output? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
         self.MolResolutionOut           = ['StS']
-        self.MinStateOut                = np.array([     0], dtype=np.int64)
-        self.MaxStateOut                = np.array([100000], dtype=np.int64)
+        self.MinStateOut                = np.array([     0,      0], dtype=np.int64)
+        self.MaxStateOut                = np.array([100000, 100000], dtype=np.int64)
         self.NGroupsOut                 = []
         self.GroupsOutPathsToMapping    = ['', '', '', '', '', '']
         self.GroupsOut_Flg              = False
         self.GroupsOutWrite_Flg         = False
         self.GroupsOutSuffix            = ''
-        self.PackUnpackDiss_Flg         = 
 
 
         ## Packing + Unpacking Dissocation Rates:
@@ -113,31 +135,9 @@ class ME(object):
 
 
 
-class inputdata(object):
+class rates(object):
 
-    def __init__( self, WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr ):
-        
-        self.WORKSPACE_PATH            = WORKSPACE_PATH
-        self.CoarseAIRFldr             = CoarseAIRFldr
-        self.PyCoarseAIRFldr           = PyCoarseAIRFldr
+    def __init__(self):
 
-        self.Rates                     = rates()
-        self.Kin                       = kinetics( self.WORKSPACE_PATH )
-        self.HDF5                      = hdf5(     self.WORKSPACE_PATH )
-        self.ME                        = ME(       self.WORKSPACE_PATH )
-
-        self.OldVersion_IntFlg         = 2
-        self.SystNameLong              = 'N3_NASA'
-
-        self.TranVec                   = np.array([10000.0])
-        self.T0                        = 300.0
-        self.NTran                     = np.size(   self.TranVec )
-        self.iTVec                     = np.arange( self.NTran   ) + 1
-
-        self.QCTOutFldr                = self.WORKSPACE_PATH + '/CG-QCT/N3_NASA/Test/'
-        self.FinalFldr                 = self.WORKSPACE_PATH + '/Mars_Database/Results/'
-        self.PathToN3                  = self.WORKSPACE_PATH + '/N3_RVC_StS_lowT_arrhenius/ConvertStSRates/data/'
-
-        self.PlotShow_Flg              = False
-
-        self.DelRateMat_Flg            = True
+        self.PrefJumps_Flg    = False
+        self.NPrefJumps       = 5

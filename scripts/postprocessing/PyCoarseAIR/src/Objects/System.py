@@ -132,7 +132,7 @@ class t_properties(object):
                 print('    [System.py - Read_RatesAtT_N3]:   Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NStates) )
 
 
-            self.Proc[0].Rates = np.zeros((NStates0, 3))
+            self.Proc[0].Rates = np.zeros((NStates0, 4))
             self.Proc[1].Rates = np.zeros((NStates0, Syst.Pair[0].NStates))
             for iProc in range(2, 4):
                 self.Proc[iProc].Rates       = np.zeros((NStates0, Syst.Pair[iP-1].NStates))
@@ -140,23 +140,30 @@ class t_properties(object):
                 self.ProcExch[iExch-2].Rates = np.zeros((NStates0, Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2]]))
 
 
-            kT = 0
+            kT = 1
             for TTemp in Syst.N3Data_TVec:
                 if (TTemp == self.TTra):
                     jT = kT
                 kT = kT + 1 
-            iTemp = int( (jT - 1) * 2.0 + 1 )
-            jTemp = jT + 2
+            iTemp = jT - 1
+            jTemp = jT + 1
 
 
-            self.Proc[0].Rates[:,0] = Syst.N3Data_Diss[:,iTemp]
+            print('    [System.py - Read_RatesAtT_N3]: Reading the ' + str(iTemp+1) + '-th column in the Dissociation Rates File. It corresponds to ' + str(self.TTra) + ' K' )
+            self.Proc[0].Rates[Syst.N3Mapping[:],0] = Syst.N3Data_Diss[:,iTemp]
 
 
-            iLevel    = np.array(Syst.N3Data_Inel[0].values,     dtype=np.int64)
-            jLevel    = np.array(Syst.N3Data_Inel[1].values,     dtype=np.int64)
-            RatesTemp = np.array(Syst.N3Data_Inel[jTemp].values, dtype=np.float64)
-            for iProc in range( np.size(iLevel) ):
-                self.Proc[1].Rates[iLevel[iProc]-1,jLevel[iProc]-1] = RatesTemp[iProc]
+            print('    [System.py - Read_RatesAtT_N3]: Reading the ' + str(jTemp+1) + '-th column in the Inelastic Rates File. It corresponds to ' + str(self.TTra) + ' K' )
+            iLevelTemp = np.array(Syst.N3Data_Inel[0].values,     dtype=np.int64)
+            jLevelTemp = np.array(Syst.N3Data_Inel[1].values,     dtype=np.int64)
+            RatesTemp  = np.array(Syst.N3Data_Inel[jTemp].values, dtype=np.float64)
+            for iProc in range( np.size(iLevelTemp) ):
+                iiLevel = iLevelTemp[iProc]
+                jjLevel = jLevelTemp[iProc]
+                iLevel  = Syst.N3Mapping[iiLevel-1]
+                jLevel  = Syst.N3Mapping[jjLevel-1]
+                #print(iiLevel,jjLevel,iLevel+1,jLevel+1)
+                self.Proc[1].Rates[iLevel,jLevel] = RatesTemp[iProc]
 
 
         if (Syst.NAtoms == 4):
@@ -213,7 +220,7 @@ class t_properties(object):
             print('    [System.py - Read_RatesAtT_OldVersion]: Total Nb of Processes Up to Pair Nb ' + str(iP) + ' = ' + str(Syst.Pair[iP].NLevels) )
         print('    [System.py - Read_RatesAtT_OldVersion]:   Total Nb of Processes = ' + str(NProcTot) )
 
-        self.Proc[0].Rates = np.zeros((Syst.Molecule[0].NLevels, 3))
+        self.Proc[0].Rates = np.zeros((Syst.Molecule[0].NLevels, 4))
         self.Proc[1].Rates = np.zeros((Syst.Molecule[0].NLevels, Syst.Molecule[0].NLevels))
         for iProc in range(2, 4):
             self.Proc[iProc].Rates       = np.zeros((Syst.Molecule[0].NLevels, Syst.Molecule[Syst.Pair[iProc-1].ToMol].NLevels))
@@ -301,7 +308,7 @@ class t_properties(object):
                 print('    [System.py - Read_RatesAtT]:   Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NStates) )
 
 
-            self.Proc[0].Rates = np.zeros((NStates0, 3))
+            self.Proc[0].Rates = np.zeros((NStates0, 4))
             self.Proc[1].Rates = np.zeros((NStates0, Syst.Pair[0].NStates))
             for iProc in range(2, 4):
                 self.Proc[iProc].Rates       = np.zeros((NStates0, Syst.Pair[iP-1].NStates))
@@ -326,6 +333,7 @@ class t_properties(object):
                     self.Proc[1].Rates[iStates,:] = RatesSplitted[1][1:]
                     for iProc in range(2, 4):
                         self.Proc[0].Rates[iStates,iProc-1] = RatesSplitted[iProc][0:0]
+                        self.Proc[0].Rates[iStates,0]       = self.Proc[0].Rates[iStates,0] + self.Proc[0].Rates[iStates,iProc-1]
                         self.Proc[iProc].Rates[iStates,:]   = RatesSplitted[iProc][1:]
                 
             for iProc in range(2, 4):   
@@ -398,7 +406,8 @@ class t_properties(object):
                                         iProc = iProc + 1
 
                                         if ( (kStates == 0) and (lStates == 0) ): 
-                                            self.DissRates[iStates, jStates, iP]                          = self.DissRates[iStates, jStates, iP]                          + RatesTempAll[iProc]
+                                            self.DissRates[iStates, jStates, iP]                            = self.DissRates[iStates, jStates, iP]                            + RatesTempAll[iProc]
+                                            self.DissRates[iStates, jStates,  0]                            = self.DissRates[iStates, jStates,  0]                            + RatesTempAll[iProc]
                                         elif (kStates == 0):
                                             self.Proc[0].Rates[iStates, jStates, lStates-1, iP-1]           = self.Proc[0].Rates[iStates, jStates, lStates-1, iP-1]           + RatesTempAll[iProc]
                                         elif (lStates == 0):
@@ -529,11 +538,11 @@ class t_properties(object):
             print('    [System.py - Compute_GroupRates]: Computing Grouped Rates for 3 Atoms System')
             
             print('      [System.py - Compute_GroupRates]:   Computing Grouped Dissociation Rates for Temperature Nb ' + str(self.iT+1) )
-            self.GroupedProc[0].Rates = np.zeros((Syst.EqNStatesOut[0],3))
+            self.GroupedProc[0].Rates = np.zeros((Syst.EqNStatesOut[0],4))
             
             for iLevel in range(Syst.NLevels[0]):
                 iGroup = Syst.Molecule[0].Mapping[iLevel]
-                for iP in range(3):
+                for iP in range(4):
                     self.GroupedProc[0].Rates[iGroup,iP] = self.GroupedProc[0].Rates[iGroup,iP] + self.Proc[0].Rates[iLevel,iP] * Syst.Molecule[0].GroupsOut.T[self.iT+1].Expvec[iLevel] / Syst.Molecule[0].GroupsOut.T[self.iT+1].Q[iGroup]
 
             print('      [System.py - Compute_GroupRates]:   Computing Grouped Inelastic    Rates for Temperature Nb ' + str(self.iT+1) )
@@ -579,7 +588,7 @@ class t_properties(object):
         if (Syst.NAtoms == 3):
             print('    [System.py - Compute_Rates_Overall]: Computing Overall Rates for 3 Atoms System')
 
-            self.ProcTot[0].Rates = np.sum(self.Proc[0].Rates, axis=1)
+            self.ProcTot[0].Rates = self.Proc[0].Rates[:,0]
             self.ProcTot[1].Rates = np.sum(self.Proc[1].Rates, axis=1)
             for jProc in range(2, Syst.NProcTypes):
                 self.ProcTot[jProc].Rates = np.sum(self.ProcExch[jProc-2].Rates, axis=1)
@@ -603,7 +612,7 @@ class t_properties(object):
                 print('    [System.py - Compute_Rates_Overall]:     Nb of States in Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NLevels) )
             print('    [System.py - Compute_Rates_Overall]:    Max Nb of States in Pair = ' + str(maxNStates) )
 
-            self.DissRatesTot = np.sum(self.DissRates, axis=2)
+            self.DissRatesTot = self.DissRates[:,:,0]
 
             if (Syst.SymmFlg):
                 iTemp = 1
@@ -801,7 +810,7 @@ class t_properties(object):
                     for jStates in range(jStatesStart, NStates0_2):
                         if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
-                            TempRate = self.DissRatesTot[iStates, jStates]
+                            TempRate = self.DissRates[iStates, jStates, 0]
                             if (TempRate > 0.0):
 
                                 iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
@@ -1059,7 +1068,7 @@ class t_properties(object):
                     iGroup                  = Syst.Molecule[0].PackUnpack.Mapping[iLevel]
                     GroupsDissRates[iGroup] = GroupsDissRates[iGroup] + self.Proc[0].Rates[iLevel, 0] * Syst.Molecule[0].T[self.iT-1].LevelQ[iLevel] / Syst.Molecule[0].PackUnpack.T[self.iT].Q[iGroup]
             
-            self.Proc[0].Rates = np.zeros((NLevels,3)) 
+            self.Proc[0].Rates = np.zeros((NLevels,4)) 
             for iLevel in range(NLevels):
                 if (Syst.Molecule[0].LevelWrite_Flg[iLevel]):
                     iGroup                        = Syst.Molecule[0].PackUnpack.Mapping[iLevel]
@@ -1450,7 +1459,16 @@ class system(object):
 
         self.N3NLevels   = 9390
 
+        
+        PathToFile      = InputData.PathToN3 + 'Mapping_OLD_TO_NEW.csv'
+        Data            = pandas.read_csv(PathToFile, header=None, skiprows=1)
+        Data            = Data.apply(pandas.to_numeric, errors='coerce')
+        self.N3Mapping  = np.array(Data[1].values, dtype=np.int64)
+        print('      [System.py - Read_RatesFile_N3]: Old to New Levels List Mapping: ',  self.N3Mapping )
+
+
         self.N3Data_TVec = np.array( [1000.0, 2500.0, 3500.0, 7500.0, 10000.0, 12500.0, 15000.0, 20000.0, 25000.0, 30000.0, 40000.0, 50000.0] )
+
 
         self.N3Data_Diss = np.zeros( (self.N3NLevels, np.size(self.N3Data_TVec)) )
         PathToFile       = InputData.PathToN3 + '/n3.ratecoef3_dissoc'
