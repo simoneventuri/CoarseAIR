@@ -22,17 +22,18 @@ import sys
 import os, errno
 import os.path
 from os import path
+import shutil
 
 import numpy as np
 import pandas
 import h5py
 import csv
-import shutil
 
 sys.path.insert(0, '../src/Parameters/')
 from Parameters import *
   
 from Processes  import processes
+import MolecularProperties
 
 def mkdirs(newdir, mode=0o777):
     os.makedirs(newdir, mode, exist_ok=True)
@@ -58,9 +59,10 @@ class grouped_t_properties(object):
 
 class groupedmolecule(object):
 
-    def __init__(self, Temp, PathToMapping, T0, NProcTypes, Name, CFDCompName , Type ):
+    def __init__(self, Temp, PathToMapping, T0, NProcTypes, Name, CFDCompName, Type, ToMol ):
 
         self.Name          = Name
+        self.ToMol         = ToMol
         self.CFDCompName   = CFDCompName
         self.Type          = Type
         self.PathToMapping = PathToMapping
@@ -180,6 +182,9 @@ class groupedmolecule(object):
             print('      [Molecule.py - Write_ThermoProperties]: Writing Thermo File for Grouped Molecule: ' + self.CFDCompName + ' at T = ' + str(int(self.TVec[iT])) + ' K' )
 
             PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
+            if not os.path.isfile(PathToFileOrig):
+                Syst.Molecule[self.ToMol].Create_ThermoFile_Format( PathToFileOrig )
+
             PathToFile     = TempFldr + '/'    + self.CFDCompName + '_T' + str(int(self.TVec[iT])) + 'K'
             DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
 
@@ -292,6 +297,11 @@ class molecule(object):
 
         self.CFDCompName = Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
 
+
+        GetProperties       = getattr( MolecularProperties, 'GetProperties_' + self.CFDCompName )
+        Syst.Molecule[iMol] = GetProperties( self )
+
+
         print('    [Molecule.py - Initialize]: Reading the Levels for the Molecule ' + self.Name )
         self.Read_Levels( InputData, Syst )
 
@@ -324,7 +334,7 @@ class molecule(object):
         
         if ( (not self.KinMthdIn  == 'StS') ):            
             print('    [Molecule.py - Initialize]:     Initializing the Intial Grouped Molecule')
-            self.GroupsIn = groupedmolecule(Temp, InputData.Kin.GroupsInPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdIn  )
+            self.GroupsIn = groupedmolecule(Temp, InputData.Kin.GroupsInPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdIn, iMol  )
             self.GroupsIn.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, 1 )
             
             for iT in Temp.iTVec:
@@ -337,7 +347,7 @@ class molecule(object):
 
         if (not self.KinMthdOut == 'StS'):   
             print('    [Molecule.py - Initialize]:      Initializing the Final Grouped Molecule')
-            self.GroupsOut = groupedmolecule(Temp, InputData.Kin.GroupsOutPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdOut )        
+            self.GroupsOut = groupedmolecule(Temp, InputData.Kin.GroupsOutPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, self.KinMthdOut, iMol )        
             self.GroupsOut.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, 0 )
 
             self.GroupsOut.Write_InitialConditions( InputData, Syst, Temp, 0 )
@@ -360,7 +370,7 @@ class molecule(object):
 
         if (InputData.Kin.PackUnpackDiss_Flg):
             print('    [Molecule.py - Initialize]:    We Desire To Pack the StS Dissociation Rates And then Unpacking Them. Initializing.')
-            self.PackUnpack = groupedmolecule( Temp, InputData.Kin.PackUnpackPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, InputData.Kin.PackUnpackType[iMol]  )
+            self.PackUnpack = groupedmolecule( Temp, InputData.Kin.PackUnpackPathsToMapping[iMol], InputData.T0, Syst.NProcTypes, self.Name, self.CFDCompName, InputData.Kin.PackUnpackType[iMol], iMol  )
             self.PackUnpack.Initialize( InputData, Syst, Temp, self.NLevels, self.Levelvqn, self.LevelEeV, self.Levelg, self.LevelWrite_Flg, -1 )
 
 
@@ -388,7 +398,7 @@ class molecule(object):
             self.Load_Levels_HDF5(Syst)
 
         else:
-            PathToFile = Syst.PathToFolder + '/' + self.Name + '/levels_cut.inp'
+            PathToFile = Syst.PathToReadFldr + '/' + self.Name + '/levels_cut.inp'
             print('      [Molecule.py - Read_Levels]:     Reading File: ', PathToFile)
             
             Data = pandas.read_csv(PathToFile, header=None, skiprows=15, delimiter=r"\s+")
@@ -449,19 +459,12 @@ class molecule(object):
             print('      [Molecule.py - Read_qnsEnBin]:   Loading Data for Molecule ' + self.Name + ' from HDF5 File')
             self.Load_qnsEnBin_HDF5( InputData, Syst )
 
-            for iT in Temp.iTVec:
-                TTra = Temp.TranVec[iT-1]
-                TInt = TTra
-                
-                print('      [Molecule.py - Read_qnsEnBin]:   Loading Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File')
-                self.Load_PartFuncsAndEnergiesAtT_HDF5( Syst, iT, TTra, TInt )
-
         else:
             if (InputData.OldVersion_IntFlg > 0):
-                PathToFile = Syst.PathToFolder + '/' + self.Name + '/' + self.Name + '_' + str(self.EqNStatesIn) + '/qnsEnBin.dat'
+                PathToFile = Syst.PathToReadFldr + '/' + self.Name + '/' + self.Name + '_' + str(self.EqNStatesIn) + '/qnsEnBin.dat'
                 Data = pandas.read_csv(PathToFile, header=None, skiprows=1, delimiter=r"\s+")
             else:
-                PathToFile = Syst.PathToFolder + '/' + self.Name + '/Bins_' + str(self.EqNStatesIn) + '/QNsEnBin.csv'
+                PathToFile = Syst.PathToReadFldr + '/' + self.Name + '/Bins_' + str(self.EqNStatesIn) + '/QNsEnBin.csv'
                 Data = pandas.read_csv(PathToFile, header=None, skiprows=1)
             print('      [Molecule.py - Read_qnsEnBin]:   Reading File: ', PathToFile)
             
@@ -474,10 +477,24 @@ class molecule(object):
                 print('      [Molecule.py - Read_qnsEnBin]:   Saving Data for Molecule ' + self.Name + ' in the HDF5 File')
                 self.Save_qnsEnBin_HDF5( InputData, Syst )
 
-            for iT in Temp.iTVec:
-                TTra = Temp.TranVec[iT-1]
-                TInt = TTra
 
+
+
+        for iT in Temp.iTVec:
+            TTra = Temp.TranVec[iT-1]
+            TInt = TTra
+
+            TStr       = 'T_' + str(int(TTra)) + '_' + str(int(TInt))
+            TempStr    = TStr + '/' + self.CFDCompName
+            PresentFlg = TempStr in f.keys()
+
+            if ( (PresentFlg) and (not InputData.HDF5.ForceReadDat_Flg) ):
+
+                print('      [Molecule.py - Read_qnsEnBin]:   Loading Data for Temperature Nb ' + str(iT) + ' (T = ' + str(int(TTra)) + 'K) in the HDF5 File')
+                self.Load_PartFuncsAndEnergiesAtT_HDF5( Syst, iT, TTra, TInt )
+            
+            else:
+                    
                 #self.T[iT-1].LevelEeV    = self.LevelEEh * Hartree_To_eV
                 self.T[iT-1].LevelQE      = np.exp( - self.LevelEeV * Ue / (TTra * UKb) )
                 self.T[iT-1].LevelQERatio = self.T[iT-1].LevelQE / np.sum(self.T[iT-1].LevelQE)
@@ -773,12 +790,15 @@ class molecule(object):
         TempFldr = InputData.Kin.WriteFldr + '/thermo/' + Syst.NameLong + InputData.Kin.GroupsOutSuffix
 
         for iT in Temp.iTVec:
-            print('        [Molecule.py - Write_ThermoProperties]: Writing Thermo File for Molecule: ' + self.CFDCompName + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
+            print('      [Molecule.py - Write_ThermoProperties]: Writing Thermo File for Molecule: ' + self.CFDCompName + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
 
             PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
+            if not os.path.isfile(PathToFileOrig):
+                self.Create_ThermoFile_Format( PathToFileOrig )
+
             PathToFile     = TempFldr + '/'    + self.CFDCompName + '_T' + str(int(Temp.TranVec[iT-1])) + 'K'
             DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
-            print('        [Molecule.py - Write_ThermoProperties]: Copied File to: ', DestTemp)
+            print('      [Molecule.py - Write_ThermoProperties]: Copied File to: ', DestTemp)
 
             with open(PathToFile, 'a') as f:
                 Line = 'NB_ENERGY_LEVELS = ' + str(self.NLevelsNewMapping) + '\n'
@@ -798,7 +818,7 @@ class molecule(object):
 
 
     def Compute_QRatio0( self, T0 ):
-        print('        [Molecule.py - Compute_QRatio0]: Computing Molecule Distribution Function at Initial Temperature')
+        print('      [Molecule.py - Compute_QRatio0]: Computing Molecule Distribution Function at Initial Temperature')
 
         self.QRatio0 = self.Levelg  * np.exp( - self.LevelEeV0 * Ue / (T0 * UKb) )
         self.QRatio0 = self.QRatio0 / np.sum(self.QRatio0)
@@ -806,7 +826,7 @@ class molecule(object):
 
 
     def Initialize_WindAvrg_Objects( self, InputData, Syst):
-        print('        [Molecule.py - Initialize_WindAvrg_Objects]: Initializing Objects for Kinetics Window-Averaging')
+        print('      [Molecule.py - Initialize_WindAvrg_Objects]: Initializing Objects for Kinetics Window-Averaging')
         
         self.WindAvrgDet   = int( (2*InputData.Kin.WindAvrgJs+1) * (2*InputData.Kin.WindAvrgVs+1) )
         self.WindAvrgMat   = np.zeros( (self.NLevels,  self.WindAvrgDet), dtype=np.int64)
@@ -820,4 +840,63 @@ class molecule(object):
                     self.WindAvrgMat[iLevel,iFound] = jLevel
             self.WindAvrgFound[iLevel]              = iFound 
         
-        print('        [Molecule.py - Initialize_WindAvrg_Objects]:   Done Initializing Objects for Kinetics Window-Averaging\n')
+        print('      [Molecule.py - Initialize_WindAvrg_Objects]:   Done Initializing Objects for Kinetics Window-Averaging\n')
+
+
+
+    def Create_ThermoFile_Format( self, PathToFileOrig ):
+        print('    [Molecule.py - Create_ThermoFile_Format]: Creating Thermo File Format for Molecule: ' + self.CFDCompName )
+
+        ThermoFile = PathToFileOrig
+        csvthemo   = open(ThermoFile, 'w')
+
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Species file for ' + self.CFDCompName +  '\n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('NAME = '            + self.CFDCompName +  '\n')
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Molecular mass [kg/mol]                   \n')
+        csvthemo.write('MOLAR_MASS = %.8e\n' % self.MolarMass         )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Number of atoms                           \n')
+        csvthemo.write('NB_ATOMS = 2                               \n')
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Chemical elements (symbols and quantities)\n')
+        csvthemo.write('ELEM_NAME = '  + self.ElementNames +      '\n')
+        csvthemo.write('ELEM_QUANT = ' + self.ElementQnts  +      '\n')
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Formation energy [J/mol]                  \n')
+        csvthemo.write('EF = %.8e\n' % self.FormationE                )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Electric charge                           \n')
+        csvthemo.write('CHARGE = 0                                 \n')
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Linearity                                 \n')
+        csvthemo.write('LIN = %d\n' % self.LinFactor                  )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Symmetry factor                           \n')
+        csvthemo.write('SYM = %.2e\n' % self.SymmFactor               )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Thermal model for internal energy         \n')
+        csvthemo.write('MODEL = NONE                               \n')
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Characteristic rotational temperature [K] \n')
+        csvthemo.write('THETA_ROT = %.8e\n' % self.ThetaRot           )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Characteristic vibrational temperature [K]\n')
+        csvthemo.write('THETA_VIB = %.8e\n' % self.ThetaVib           )
+        csvthemo.write('                                           \n')
+        csvthemo.write('#------------------------------------------\n')
+        csvthemo.write('#Levels degeneracies and energies [eV]     \n')
+
+        csvthemo.close()

@@ -22,12 +22,12 @@ import sys
 import os, errno
 import os.path
 from os import path
+import shutil
 
 import numpy as np
 import pandas
 import h5py
 import csv
-import shutil
 from   matplotlib import rc 
 import matplotlib.pyplot as plt
 
@@ -132,12 +132,10 @@ class t_properties(object):
                 print('    [System.py - Read_RatesAtT_N3]:   Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NStates) )
 
 
-            self.Proc[0].Rates = np.zeros((NStates0, 4))
+            self.Proc[0].Rates = np.zeros((NStates0, 3))
             self.Proc[1].Rates = np.zeros((NStates0, Syst.Pair[0].NStates))
             for iProc in range(2, 4):
                 self.Proc[iProc].Rates       = np.zeros((NStates0, Syst.Pair[iP-1].NStates))
-            for iExch in range(2, Syst.NProcTypes):
-                self.ProcExch[iExch-2].Rates = np.zeros((NStates0, Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2]]))
 
 
             kT = 1
@@ -154,14 +152,14 @@ class t_properties(object):
 
 
             print('    [System.py - Read_RatesAtT_N3]: Reading the ' + str(jTemp+1) + '-th column in the Inelastic Rates File. It corresponds to ' + str(self.TTra) + ' K' )
-            iLevelTemp = np.array(Syst.N3Data_Inel[0].values,     dtype=np.int64)
-            jLevelTemp = np.array(Syst.N3Data_Inel[1].values,     dtype=np.int64)
+            iLevelTemp = np.array(Syst.N3Data_Inel[0].values,     dtype=np.int64) - 1
+            jLevelTemp = np.array(Syst.N3Data_Inel[1].values,     dtype=np.int64) - 1
             RatesTemp  = np.array(Syst.N3Data_Inel[jTemp].values, dtype=np.float64)
             for iProc in range( np.size(iLevelTemp) ):
                 iiLevel = iLevelTemp[iProc]
                 jjLevel = jLevelTemp[iProc]
-                iLevel  = Syst.N3Mapping[iiLevel-1]
-                jLevel  = Syst.N3Mapping[jjLevel-1]
+                iLevel  = iiLevel #Syst.N3Mapping[iiLevel]
+                jLevel  = jjLevel #Syst.N3Mapping[jjLevel]
                 #print(iiLevel,jjLevel,iLevel+1,jLevel+1)
                 self.Proc[1].Rates[iLevel,jLevel] = RatesTemp[iProc]
 
@@ -174,7 +172,7 @@ class t_properties(object):
     def Read_RatesFile_OldVersion( self, Syst, iLevel ):
     #sed -i 's/D-/E-/g' *
 
-        PathToFile = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt)) + '/Bin' + str(iLevel+1) + '.dat'
+        PathToFile = Syst.PathToReadFldr + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt)) + '/Bin' + str(iLevel+1) + '.dat'
         #print(PathToFile)
         if (path.isfile(PathToFile)):
             count   = 0
@@ -220,7 +218,7 @@ class t_properties(object):
             print('    [System.py - Read_RatesAtT_OldVersion]: Total Nb of Processes Up to Pair Nb ' + str(iP) + ' = ' + str(Syst.Pair[iP].NLevels) )
         print('    [System.py - Read_RatesAtT_OldVersion]:   Total Nb of Processes = ' + str(NProcTot) )
 
-        self.Proc[0].Rates = np.zeros((Syst.Molecule[0].NLevels, 4))
+        self.Proc[0].Rates = np.zeros((Syst.Molecule[0].NLevels, Syst.NProcTypes))
         self.Proc[1].Rates = np.zeros((Syst.Molecule[0].NLevels, Syst.Molecule[0].NLevels))
         for iProc in range(2, 4):
             self.Proc[iProc].Rates       = np.zeros((Syst.Molecule[0].NLevels, Syst.Molecule[Syst.Pair[iProc-1].ToMol].NLevels))
@@ -255,7 +253,7 @@ class t_properties(object):
     def Read_RatesFile( self, Syst, iProc ):
         #sed -i 's/D-/E-/g' *
 
-        PathToFile = Syst.PathToFolder + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt)) + '/Proc' + str(iProc+1) + '.csv'
+        PathToFile = Syst.PathToReadFldr + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt)) + '/Proc' + str(iProc+1) + '.csv'
         #print(PathToFile)
         if (path.isfile(PathToFile)):
             count   = 0
@@ -308,12 +306,17 @@ class t_properties(object):
                 print('    [System.py - Read_RatesAtT]:   Pair ' + str(iP) + ' = ' + str(Syst.Pair[iP].NStates) )
 
 
-            self.Proc[0].Rates = np.zeros((NStates0, 4))
+            self.Proc[0].Rates = np.zeros((NStates0, Syst.NProcTypes))
             self.Proc[1].Rates = np.zeros((NStates0, Syst.Pair[0].NStates))
             for iProc in range(2, 4):
                 self.Proc[iProc].Rates       = np.zeros((NStates0, Syst.Pair[iP-1].NStates))
             for iExch in range(2, Syst.NProcTypes):
                 self.ProcExch[iExch-2].Rates = np.zeros((NStates0, Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2]]))
+
+            ProcType = np.array([1, 2, 3]) 
+            if (Syst.Pair[2].ToMol == Syst.Pair[1].ToMol ):
+                ProcType[2] = ProcType[1]
+
 
             i  = 0
             ii = 10
@@ -332,9 +335,9 @@ class t_properties(object):
                     self.Proc[0].Rates[iStates,0] = RatesSplitted[1][0:0]
                     self.Proc[1].Rates[iStates,:] = RatesSplitted[1][1:]
                     for iProc in range(2, 4):
-                        self.Proc[0].Rates[iStates,iProc-1] = RatesSplitted[iProc][0:0]
-                        self.Proc[0].Rates[iStates,0]       = self.Proc[0].Rates[iStates,0] + self.Proc[0].Rates[iStates,iProc-1]
-                        self.Proc[iProc].Rates[iStates,:]   = RatesSplitted[iProc][1:]
+                        self.Proc[0].Rates[iStates,ProcType[iProc-2]] = RatesSplitted[iProc][0:0]
+                        self.Proc[0].Rates[iStates,0]                 = self.Proc[0].Rates[iStates,0] + RatesSplitted[iProc][0:0]
+                        self.Proc[iProc].Rates[iStates,:]             = RatesSplitted[iProc][1:]
                 
             for iProc in range(2, 4):   
                 for iExch in range(2, Syst.NProcTypes):
@@ -368,13 +371,17 @@ class t_properties(object):
                 Syst.Pair[iP].NProcTot = NProcTot
 
 
-            self.DissRates     = np.zeros((NStates0_1, NStates0_2, 4))
-            self.Proc[0].Rates = np.zeros((NStates0_1, NStates0_2, maxNStates, 6))
+            self.DissRates     = np.zeros((NStates0_1, NStates0_2, NProcTypes))
+            self.Proc[0].Rates = np.zeros((NStates0_1, NStates0_2, maxNStates, Syst.NMolecules+6))
             for iP in range(1, 4):
                 print('    [System.py - Read_RatesAtT]: Pair ' + str(iP) + '; Rate Matrix shape = (' + str(NStates0_1) + '; ' + str(NStates0_2) + '; ' + str(Syst.Pair[iP-1].NStates) + '; ' + str(Syst.Pair[iPOppVec[iP-1]].NStates) + ')')
                 self.Proc[iP].Rates          = np.zeros((NStates0_1, NStates0_2, Syst.Pair[iP-1].NStates, Syst.Pair[iPOppVec[iP-1]].NStates))
             for iExch in range(2, Syst.NProcTypes):
                 self.ProcExch[iExch-2].Rates = np.zeros((NStates0_1, NStates0_2, Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2,0]], Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2,1]]))
+
+            ProcType = np.array([1, 2, 3]) 
+            if (Syst.Pair[2].ToMol == Syst.Pair[1].ToMol ):
+                ProcType[2] = ProcType[1]
 
 
             i  = 0
@@ -401,17 +408,25 @@ class t_properties(object):
                             self.DissRates[iStates, jStates, 0] = self.DissRates[iStates, jStates, 0] + RatesTempAll[iProc]
 
                             for iP in range(1, 4):
-                                for kStates in range(Syst.Pair[iP].NStates+1):
+                                for kStates in range(Syst.Pair[iP-1].NStates+1):
                                     for lStates in range(Syst.Pair[iPOppVec[iP-1]].NStates+1):
                                         iProc = iProc + 1
 
                                         if ( (kStates == 0) and (lStates == 0) ): 
-                                            self.DissRates[iStates, jStates, iP]                            = self.DissRates[iStates, jStates, iP]                            + RatesTempAll[iProc]
-                                            self.DissRates[iStates, jStates,  0]                            = self.DissRates[iStates, jStates,  0]                            + RatesTempAll[iProc]
+                                            self.DissRates[iStates, jStates, ProcType[iP-1]]           = self.DissRates[iStates, jStates, ProcType[iP-1]]           + RatesTempAll[iProc]
+                                            self.DissRates[iStates, jStates,  0]                       = self.DissRates[iStates, jStates,  0]                       + RatesTempAll[iProc]
                                         elif (kStates == 0):
-                                            self.Proc[0].Rates[iStates, jStates, lStates-1, iP-1]           = self.Proc[0].Rates[iStates, jStates, lStates-1, iP-1]           + RatesTempAll[iProc]
+                                            iPair                                                      = iP-1
+                                            iPairTemp                                                  = Syst.Syst.NMolecules + iPair 
+                                            ToMol                                                      = Syst.Pair[iPair].ToMol
+                                            self.Proc[0].Rates[iStates, jStates, lStates-1, ToMol]     = self.Proc[0].Rates[iStates, jStates, lStates-1, ToMol]     + RatesTempAll[iProc]
+                                            self.Proc[0].Rates[iStates, jStates, lStates-1, iPairTemp] = self.Proc[0].Rates[iStates, jStates, lStates-1, iPairTemp] + RatesTempAll[iProc]
                                         elif (lStates == 0):
-                                            self.Proc[0].Rates[iStates, jStates, kStates-1, iPOppVec[iP-1]] = self.Proc[0].Rates[iStates, jStates, kStates-1, iPOppVec[iP-1]] + RatesTempAll[iProc]
+                                            iPair                                                      = iPOppVec[iP-1]
+                                            iPairTemp                                                  = Syst.Syst.NMolecules + iPair 
+                                            ToMol                                                      = Syst.Pair[iPair].ToMol
+                                            self.Proc[0].Rates[iStates, jStates, kStates-1, ToMol]     = self.Proc[0].Rates[iStates, jStates, kStates-1, ToMol]     + RatesTempAll[iProc]
+                                            self.Proc[0].Rates[iStates, jStates, kStates-1, iPairTemp] = self.Proc[0].Rates[iStates, jStates, kStates-1, iPairTemp] + RatesTempAll[iProc]
                                         else:
                                             iTemp1  = kStates-1
                                             iTemp2  = lStates-1
@@ -423,7 +438,7 @@ class t_properties(object):
                                                     iTemp1 = iTemp3
                                                 elif (iTemp1 == iTemp2):
                                                     SymmFlg = 2.0
-                                            self.Proc[iP].Rates[iStates, jStates, iTemp1, iTemp2]         = self.Proc[iP].Rates[iStates, jStates, iTemp1, iTemp2]        + RatesTempAll[iProc] * SymmFlg
+                                            self.Proc[iP].Rates[iStates, jStates, iTemp1, iTemp2]      = self.Proc[iP].Rates[iStates, jStates, iTemp1, iTemp2]      + RatesTempAll[iProc] * SymmFlg
                         
             for iProc in range(2, 4):
                 for iExch in range(2, Syst.NProcTypes):
@@ -635,7 +650,7 @@ class t_properties(object):
 
     def Compute_PrefJumps( self, InputData, Syst ):
 
-        NJumps = InputData.Rates.NPrefJumps
+        NJumps = InputData.Kin.RatesNPrefJumps
 
         self.Proc[1].PrefJumps = np.zeros((Syst.Molecule[0].NLevels, NJumps), dtype=np.int32)
         for iLevel in range(Syst.Molecule[0].NLevels):
@@ -654,7 +669,7 @@ class t_properties(object):
 
     def Write_PrefJumps( self, InputData, Syst ):
 
-        TempFldr   = Syst.PathToFolder + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt))
+        TempFldr   = Syst.PathToReadFldr + '/' + Syst.Molecule[0].Name + '/Rates/T_' + str(int(self.TTra)) + '_' + str(int(self.TInt))
 
         PathToFile = TempFldr + '/PrefJumps_Inel.csv'
         print('    [System.py - Write_PrefJumps]: Writing Jumps in File: ' + PathToFile ) 
@@ -727,7 +742,7 @@ class t_properties(object):
                     InelKinetics = TempFldr + '/Inel.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
                 csvkinetics  = open(InelKinetics, 'w')
-                InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
+                #InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
                     if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
@@ -752,16 +767,18 @@ class t_properties(object):
             if (InputData.Kin.WriteExch_Flg):
 
                 for iExch in range (2, Syst.NProcTypes):
-                    print('    [System.py - Write_Kinetics]: iExch =  ' + str(iExch-1) )
+                    jToMol  = Syst.ExchtoMol[iExch-2]
+                    jToAtom = Syst.ExchtoAtom[iExch-2] 
+                    print('    [System.py - Write_Kinetics]: iExch =  ' + str(iExch-1) + ', Corresponding to Final Molecule Nb ' + str(jToMol) + ' and Atom Nb ' + str(jToAtom) )
+
 
                     if (InputData.Kin.WindAvrg_Flg):
                         ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '_WindAvrg.dat' 
-                        print('    [System.py - Write_Kinetics]: Writing Window-Averaged Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+                        print('    [System.py - Write_Kinetics]: Writing Window-Averaged Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name  + '+' + Syst.Atom[jToAtom].Name  )
                     else:
                         ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
-                        print('    [System.py - Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
+                        print('    [System.py - Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name  + '+' + Syst.Atom[jToAtom].Name  )
                     csvkinetics  = open(ExchKinetics, 'w')
-                    InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
                     for iLevel in range(Syst.Molecule[0].NLevels):
                         if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
@@ -769,13 +786,13 @@ class t_properties(object):
                             if (InputData.Kin.WindAvrg_Flg):
                                 TempRates = Syst.Compute_WindAvrg_Rates( TempRates )                    
 
-                            for jLevel in range(Syst.Molecule[Syst.ExchtoMol[iExch-2]].NLevels):
-                                if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[jLevel]) ):
-                                    if ((TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelEEh[jLevel]) ):
+                            for jLevel in range(Syst.Molecule[jToMol].NLevels):
+                                if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[jToMol].LevelWrite_Flg[jLevel]) ):
+                                    if ((TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[jToMol].LevelEEh[jLevel]) ):
                                         
                                         iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
-                                        jjLevel  = Syst.Molecule[Syst.ExchtoMol[iExch-2]].LevelNewMapping[jLevel]
-                                        ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name
+                                        jjLevel  = Syst.Molecule[jToMol].LevelNewMapping[jLevel]
+                                        ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[jToAtom].Name
                                         Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % TempRates[jLevel]
                                         csvkinetics.write(Line)
 
@@ -1013,7 +1030,7 @@ class t_properties(object):
             InelKinetics = TempFldr + '/Inel.dat' 
             print('    [System.py - Write_GroupedKinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
             csvkinetics  = open(InelKinetics, 'w')
-            InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
+            #InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
 
 
             for iGroup in range(self.EqNStatesOut[0]):
@@ -1038,7 +1055,7 @@ class t_properties(object):
                 ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
                 print('    [System.py - Write_GroupedKinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name  )
                 csvkinetics  = open(ExchKinetics, 'w')
-                InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+                #InelFile     = InputData.Kin.ReadFldr                               + '/'  + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
 
                 for iGroup in range(self.EqNStatesOut[0]):
                     TempRates = self.GroupedProcExch[iExch-2].Rates[iGroup,:]                  
@@ -1140,8 +1157,8 @@ class system(object):
                 print('  [System.py - Read_Rates]:   ERROR! Window-Averaging not implemented for Nb Atoms > 3!')
 
 
-        if (InputData.OldVersion_IntFlg == 2):
-            print("  [System.py - Read_Rates]: Asked To Read N3 Rates in An Old Format (Panesi's RVC 2012)" )
+        if ( (InputData.OldVersion_IntFlg == 2) and (not self.HDF5Exist_Flg) ):
+            print("  [System.py - Read_Rates]: Asked To Read N3 Rates in An Old Format (Panesi's RVC 2013)" )
             self.Read_RatesFile_N3( InputData )
 
 
@@ -1178,7 +1195,7 @@ class system(object):
                     self.T[iT-1].Save_RatesAtT_HDF5( self )
             
 
-            if ( (InputData.Rates.PrefJumps_Flg) or (InputData.Kin.GroupsOut_Flg)):
+            if ( (InputData.Kin.RatesPrefJumps_Flg) or (InputData.Kin.GroupsOut_Flg)):
                 print('  [System.py - Read_Rates]: Computing Backweard Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')
                 self.T[iT-1].Compute_BackwardRates( self )
 
@@ -1207,7 +1224,7 @@ class system(object):
             self.Compute_ThermalRates( iT )
 
 
-            if (InputData.Rates.PrefJumps_Flg):
+            if (InputData.Kin.RatesPrefJumps_Flg):
                 
                 print('  [System.py - Read_Rates]: Computing Preferred Jumps for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')
                 self.T[iT-1].Compute_PrefJumps( InputData, self )
@@ -1267,7 +1284,7 @@ class system(object):
 
         if (self.NAtoms == 3):
             
-            DissFile = InputData.Kin.ReadFldr   + '/' + self.Molecule[0].Name + '+' + self.Atom[2].Name + '_' + self.Atom[0].Name + '+' + self.Atom[1].Name + '+' + self.Atom[2].Name + '.csv'
+            #DissFile = InputData.Kin.ReadFldr   + '/' + self.Molecule[0].Name + '+' + self.Atom[2].Name + '_' + self.Atom[0].Name + '+' + self.Atom[1].Name + '+' + self.Atom[2].Name + '.csv'
             print('  [Compute_Rates_Thermal_FromOverall]: Reading Dissociation Rates From File: ' + DissFile)
             for iT in Temp.iTVec:
                 LevelKDiss = np.zeros(self.Molecule[0].NLevels)
@@ -1295,8 +1312,8 @@ class system(object):
 
     def Write_ThermalRates_Diss( self, InputData, Temp ):
 
-        mkdirs( InputData.FinalFldr )    
-        PathToFile = InputData.FinalFldr + '/KTh_Diss.csv'
+        mkdirs( InputData.OutputWriteFldr )    
+        PathToFile = InputData.OutputWriteFldr + '/KTh_Diss.csv'
         print('      [System.py - Write_ThermalRates_Diss]: Writing Dissociation Thermal Rates in File: ' + PathToFile )
         if (not path.exists(PathToFile) ):
             WriteFlg = True
@@ -1329,7 +1346,7 @@ class system(object):
         plt.tight_layout()
         if (InputData.PlotShow_Flg):
             plt.show()
-        FigSavePath = InputData.FinalFldr + '/KTh_Diss.png'
+        FigSavePath = InputData.OutputWriteFldr + '/KTh_Diss.png'
         plt.savefig(FigSavePath)
         print('      [System.py - Plot_ThermalRates_Diss]: Saved Dissociation Thermal Rates Plot in: ' + FigSavePath)
 
@@ -1337,8 +1354,8 @@ class system(object):
 
     def Write_Rates_Thermal( self, InputData, Temp ):
 
-        mkdirs( InputData.FinalFldr )    
-        PathToFile = InputData.FinalFldr + '/KTh.csv'
+        mkdirs( InputData.OutputWriteFldr )    
+        PathToFile = InputData.OutputWriteFldr + '/KTh.csv'
         print('    [System.py - Write_Rates_Thermal]: Writing Thermal Rates in File: ' + PathToFile )
         if (not path.exists(PathToFile) ):
             WriteFlg = True
@@ -1455,7 +1472,7 @@ class system(object):
 
     def Read_RatesFile_N3( self, InputData ):
     #sed -i 's/D-/E-/g' *
-        print("      [System.py - Read_RatesFile_N3]: Reading Rates for N3 System in Old Format (Panesi's RVC 2012)" )
+        print("    [System.py - Read_RatesFile_N3]: Reading Rates for N3 System in Old Format (Panesi's RVC 2013)" )
 
         self.N3NLevels   = 9390
 
@@ -1464,7 +1481,7 @@ class system(object):
         Data            = pandas.read_csv(PathToFile, header=None, skiprows=1)
         Data            = Data.apply(pandas.to_numeric, errors='coerce')
         self.N3Mapping  = np.array(Data[1].values, dtype=np.int64)
-        print('      [System.py - Read_RatesFile_N3]: Old to New Levels List Mapping: ',  self.N3Mapping )
+        print('    [System.py - Read_RatesFile_N3]: Old to New Levels List Mapping: ',  self.N3Mapping )
 
 
         self.N3Data_TVec = np.array( [1000.0, 2500.0, 3500.0, 7500.0, 10000.0, 12500.0, 15000.0, 20000.0, 25000.0, 30000.0, 40000.0, 50000.0] )
@@ -1483,10 +1500,10 @@ class system(object):
                 if ( (iLine % 2 == 1) and (jLine < self.N3NLevels) ):
                     self.N3Data_Diss[jLine,:] = row[0::2]
                     jLine                     = jLine + 1
-        print("      [System.py - Read_RatesFile_N3]:   Matrix of Dissociation Rates: ", self.N3Data_Diss )
+        print("    [System.py - Read_RatesFile_N3]:   Matrix of Dissociation Rates: ", self.N3Data_Diss )
 
 
         PathToFile       = InputData.PathToN3 + '/FullSet.ascii.dat'
         Data             = pandas.read_csv(PathToFile, header=None, delimiter=r"\s+")
         self.N3Data_Inel = Data.apply(pandas.to_numeric, errors='coerce')
-        print("      [System.py - Read_RatesFile_N3]:   Matrix of Inelastic + Exchange Rates: ", self.N3Data_Inel )
+        print("    [System.py - Read_RatesFile_N3]:   Matrix of Inelastic + Exchange Rates: ", self.N3Data_Inel )

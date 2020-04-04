@@ -24,11 +24,16 @@ import numpy as np
 ##==============================================================================================================
 print("\n[PyCoarseAIR]: Defining Paths")
 
-WORKSPACE_PATH   = '/home/venturi/WORKSPACE/'
-#WORKSPACE_PATH   = os.environ['WORKSPACE_PATH']
-CoarseAIRFldr    = WORKSPACE_PATH + '/CoarseAIR/coarseair/'
-#CoarseAIRFldr    = os.environ['COARSEAIR_SOURCE_DIR'] 
-PyCoarseAIRFldr  = CoarseAIRFldr  + '/scripts/postprocessing/PyCoarseAIR/'
+WORKSPACE_PATH  = '/home/venturi/WORKSPACE/'                                                                    # It is NOT REQUIRED to change this path
+#WORKSPACE_PATH  = os.environ['WORKSPACE_PATH']   
+CoarseAIRFldr   = WORKSPACE_PATH + '/CoarseAIR/coarseair/'										         	    # It is NOT REQUIRED to change this path
+#CoarseAIRFldr   = os.environ['COARSEAIR_SOURCE_DIR']
+PyCoarseAIRFldr = CoarseAIRFldr  + '/extra/PyCoarseAIR/'		                							    # <--- Please, CHANGE this path to the folder of the PyCoarseAIR Code
+
+DtbHDF5Fldr     = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'                                              # <--- Please, CHANGE this path to the folder containing the HDF5 File
+
+DtbWriteFldr    = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'                                            # <--- Please, CHANGE this path to the folder where you want PYCoareseAIR writing the Postprocessed Kinetics Database
+OutputWriteFldr = WORKSPACE_PATH + '/Mars_Database/Results/'                                                    # <--- Please, CHANGE this path to the folder where you want PYCoareseAIR writing its Output Files and Plots
 ##--------------------------------------------------------------------------------------------------------------
 
 
@@ -38,6 +43,7 @@ print("\n[PyCoarseAIR]: Loading Files")
 
 sys.path.insert(0, PyCoarseAIRFldr  + '/src/Objects/')
 sys.path.insert(0, PyCoarseAIRFldr  + '/src/ChemicalSystems/')
+sys.path.insert(0, PyCoarseAIRFldr  + '/src/MolecularProperties/')
 sys.path.insert(0, PyCoarseAIRFldr  + '/src/Reading/')
 sys.path.insert(0, PyCoarseAIRFldr  + '/src/Writing/')
 sys.path.insert(0, PyCoarseAIRFldr  + '/src/Computing/')
@@ -67,7 +73,7 @@ from InputData         import inputdata
 ##==============================================================================================================
 print("\n[PyCoarseAIR]: Initializing Input and System Data")
 
-InputData    = inputdata(WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr)
+InputData    = inputdata(WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr, DtbHDF5Fldr, DtbWriteFldr, OutputWriteFldr)
 
 [Syst, Temp] = Initialize_Data(InputData)
 

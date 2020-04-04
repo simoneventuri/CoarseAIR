@@ -21,16 +21,15 @@
 import numpy as np
 
 
-
 class inputdata(object):
 
     def __init__( self, WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr, DtbHDF5Fldr, DtbWriteFldr, OutputWriteFldr ):
         self.WORKSPACE_PATH            = WORKSPACE_PATH
         self.CoarseAIRFldr             = CoarseAIRFldr
         self.PyCoarseAIRFldr           = PyCoarseAIRFldr
-        
+
         ### CASE SPECIFIC
-        self.TranVec                   = np.array([20000.0])
+        self.TranVec                   = np.array([2500.0, 5000.0, 7500.0, 10000.0, 12500.0, 15000.0, 20000.0])
         self.T0                        = 300.0
 
         self.DelRateMat_Flg            = True
@@ -39,9 +38,9 @@ class inputdata(object):
 
 
         ### CHEMICAL SYSTEM SPECIFIC
-        self.SystNameLong              = 'N4_NASA'
-        self.OldVersion_IntFlg         = 0
-        self.DtbReadFldr               = self.WORKSPACE_PATH + '/CoarseAIR/N4_VS/Test/'
+        self.SystNameLong              = 'O2C_NASA'
+        self.OldVersion_IntFlg         = 1
+        self.DtbReadFldr               = self.WORKSPACE_PATH + '/CG-QCT/run_O2C_ALL/Test/'
         self.OutputWriteFldr           = OutputWriteFldr 
 
 
@@ -52,6 +51,7 @@ class inputdata(object):
         self.Kin                       = kinetics( self.WORKSPACE_PATH, DtbWriteFldr )
         self.HDF5                      = hdf5(     self.WORKSPACE_PATH, DtbHDF5Fldr )
         self.ME                        = ME(       self.WORKSPACE_PATH )
+
 
 
 class kinetics(object):
@@ -68,7 +68,6 @@ class kinetics(object):
         self.WriteFldr                  = DtbWriteFldr
         self.WriteDiss_Flg              = True 
         self.CorrFactor                 = 1.0
-        self.WriteDissInel_Flg          = True 
         self.WriteInel_Flg              = True
         self.WriteExch_Flg              = True
 
@@ -77,28 +76,28 @@ class kinetics(object):
 
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
-        self.MolResolutionIn            = ['VSM']
-        self.MinStateIn                 = np.array([     0,      0], dtype=np.int64)
-        self.MaxStateIn                 = np.array([100000, 100000], dtype=np.int64)
+        self.MolResolutionIn            = ['StS', 'StS']
+        self.MinStateIn                 = np.array([     0], dtype=np.int64)
+        self.MaxStateIn                 = np.array([100000], dtype=np.int64)
         self.NGroupsIn                  = []
         self.GroupsInPathsToMapping     = ['']
-        self.GroupsInSuffix             = '_VS'
+        self.GroupsInSuffix             = ''
 
         ## Resolution of the Kinetics Data in Output? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
-        self.MolResolutionOut           = ['VSM']
-        self.MinStateOut                = np.array([     0,      0,     0,      0], dtype=np.int64)
-        self.MaxStateOut                = np.array([100000, 100000,100000, 100000], dtype=np.int64)
+        self.MolResolutionOut           = ['StS', 'StS']
+        self.MinStateOut                = np.array([     0,      0], dtype=np.int64)
+        self.MaxStateOut                = np.array([100000, 100000], dtype=np.int64)
         self.NGroupsOut                 = []
         self.GroupsOutPathsToMapping    = ['']
         self.GroupsOut_Flg              = False
         self.GroupsOutWrite_Flg         = False
-        self.GroupsOutSuffix            = '_VS'
+        self.GroupsOutSuffix            = ''
 
 
         ## Packing + Unpacking Dissocation Rates:
         self.PackUnpackDiss_Flg         = False
-        self.PackUnpackType             = ['VSM']
-        self.PackUnpackPathsToMapping   = ['']
+        self.PackUnpackType             = ['VSM', 'VSM']
+        self.PackUnpackPathsToMapping   = ['', '']
         self.PackUnpackSuffix           = '_VS' #_Phys_45Bins
 
 
@@ -106,7 +105,6 @@ class kinetics(object):
         self.WindAvrg_Flg               = False
         self.WindAvrgJs                 = 3
         self.WindAvrgVs                 = 2
-
 
         ## Writing Arrhenius Files
         self.MaxEntOrPlato              = 1
@@ -133,7 +131,7 @@ class hdf5(object):
 
 class ME(object):
 
-    def __init__( self, WORKSPACE_PATH ):
+    def __init__(self, WORKSPACE_PATH):
 
         self.Read_Flg                   = False
         self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/'

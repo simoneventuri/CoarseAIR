@@ -18,11 +18,11 @@
 # 
 #---------------------------------------------------------------------------------------------------------------
 ##==============================================================================================================
-import numpy as np
-import pandas
-import csv
 import sys
 import os
+
+import numpy as np
+
 
 from System            import system
 from Temperatures      import temperatures
@@ -30,11 +30,11 @@ from Molecule          import groupedmolecule
 
 import ChemicalSystems
 
-
 def Initialize_Data(InputData):
 
+    ## Initializing Vectors of Temperatures
+    print("  [Initializing.py - Initialize_Data]: Initializing Vectors of Temperatures")    
     Temp                     = temperatures()
-    ## Vector of Temperatures
     Temp.TranVec             = InputData.TranVec
     Temp.NTran               = Temp.TranVec.size
     Temp.IntVec              = Temp.TranVec
@@ -43,35 +43,40 @@ def Initialize_Data(InputData):
     Temp.iTVec               = InputData.iTVec
 
 
-    ## Path to CoarseAIR Output Folder inside the Run Folder
-    OutputFldr               = InputData.QCTOutFldr
-    ## System Name
+    ## Initializing System
+    print("  [Initializing.py - Initialize_Data]: Initializing System")    
     SystNameLong             = InputData.SystNameLong
     UploadSystem             = getattr(ChemicalSystems, SystNameLong + '_Upload')
     Syst                     = UploadSystem( Temp ) ### Uploading System Properties
 
 
-    Syst.PathToFolder = OutputFldr + Syst.Name
-    Syst.PathToHDF5   = InputData.HDF5.ReadFldr
+    ## Initializng Paths
+    print("  [Initializing.py - Initialize_Data]: Initializng Paths")    
+    Syst.PathToReadFldr = InputData.DtbReadFldr + Syst.Name                                                 ## i.e.: CoarseAIR Output Folder / Run Folder / System Folder        
+    Syst.PathToHDF5     = InputData.HDF5.DtbFldr
     if not os.path.exists(Syst.PathToHDF5):
         os.makedirs(Syst.PathToHDF5)
-
-    Syst.Arr.MinRate  = InputData.Kin.MinRate
-    Syst.Arr.MinNbTs  = InputData.Kin.MinNbTs
+    Syst.HDF5Exist_Flg = True
+    PathToFile         = Syst.PathToHDF5 + '/' + Syst.NameLong + '.hdf5'
+    if not os.path.isfile(PathToFile):
+        Syst.HDF5Exist_Flg = False
+        print("  [Initializing.py - Initialize_Data]: WARNING: The HDF5 File " + PathToFile + " corresponding to the System " + Syst.NameLong + " does not exist. I will create a new one." )    
 
 
     ## Creating Output Folders
-    InputData.FinalFldr = InputData.FinalFldr + '/' + SystNameLong + '/'
-    if not os.path.exists(InputData.FinalFldr):
-        os.makedirs(InputData.FinalFldr)
-    InputData.FinalFldr = InputData.FinalFldr + '/' + InputData.ME.ProcCode + '/'
-    if not os.path.exists(InputData.FinalFldr):
-        os.makedirs(InputData.FinalFldr)
+    print("  [Initializing.py - Initialize_Data]: Creating Output Folders")    
+    InputData.OutputWriteFldr = InputData.OutputWriteFldr + '/' + SystNameLong + '/'
+    if not os.path.exists(InputData.OutputWriteFldr):
+        os.makedirs(InputData.OutputWriteFldr)
+    InputData.OutputWriteFldr = InputData.OutputWriteFldr + '/' + InputData.ME.ProcCode + '/'
+    if not os.path.exists(InputData.OutputWriteFldr):
+        os.makedirs(InputData.OutputWriteFldr)
 
 
+    ##
     Syst.EqNStatesIn  = np.zeros((Syst.NMolecules), dtype=np.int64)
     Syst.EqNStatesOut = np.zeros((Syst.NMolecules), dtype=np.int64)
-    print("  [Initializing.py - Initialize_Data]: Initializing Molecules")    
+    print("  [Initializing.py - Initialize_Data]: Initializing Molecules and Counting Nb of Levels / Groups per Molecule")    
     for iMol in range(Syst.NMolecules):
 
         print("  [Initializing.py - Initialize_Data]:   Initializing Molecule Nb " + str(iMol))    
@@ -80,6 +85,12 @@ def Initialize_Data(InputData):
 
         Syst.EqNStatesIn[iMol]  = Syst.Molecule[iMol].EqNStatesIn
         Syst.EqNStatesOut[iMol] = Syst.Molecule[iMol].EqNStatesOut
+
+
+    ## 
+    print("  [Initializing.py - Initialize_Data]: Initializing Quantities for Arrhenius Fitting")    
+    Syst.Arr.MinRate  = InputData.Kin.MinRate
+    Syst.Arr.MinNbTs  = InputData.Kin.MinNbTs
 
 
     return Syst, Temp

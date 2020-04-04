@@ -100,8 +100,7 @@ function ComputeTrajsPBS {
 
   else
 
-    NProcessesTot=0
-    ExitCond=0
+    iProcessesTot=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
       MinLevel2Temp=0
@@ -114,60 +113,56 @@ function ComputeTrajsPBS {
         MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        iProcessesTot=$(( ${iProcessesTot} + 1 ))
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-          ExitCond=1
-        fi
-        if [ ${ExitCond} -eq 1 ]; then
-          NProcessesTot=$((NProcessesTot+1))
+          MinProcessAll=${iProcessesTot}
         fi
         if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
+          MaxProcessAll=${iProcessesTot}
         fi
       done
     done
-    echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
+    NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
+    echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
-
-    NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesTot} / ${NNode}")"
+    NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesAll} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
     echo "  [ComputeTrajsPBS]: -> Nb of Processes Per Node = "${NProcessesPerNode}
 
     for (( iNode=1; iNode<=${NNode}; iNode++ )); do
 
-      MinProcessInNode=$(($((iNode-1))*NProcessesPerNode+1))
-      if [ ${MinProcessInNode} -le ${NProcessesTot} ]; then 
-        MaxProcessInNode=$((iNode*NProcessesPerNode))
-        if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
-          MaxProcessInNode=${NProcessesTot}
-        fi
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
-        echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
-
-        echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
-                
-        if [ "${ProcType}" = "none" ]; then
-          sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
-        elif [ "${ProcType}" = "test" ]; then
-          sed -e '3s/$/1:ncpus='${NProc}':model=ivy/'               'RunTrajectories-Format-Test.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
-        else
-          sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
-        fi
-        sed -e '13s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
-        
-        sed -e '4s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
-        sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
-
-        sed -e '148s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
-        sed -e '149s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
-
-        sed -e '150s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
-        sed -e '151s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
-        sed -e '152s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
-
-        qsub ./'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
-        
-        rm -rf ./RunTrajectoriesTEMP*    
+      MinProcessInNode=$(( ${MinProcessAll} + $((iNode-1))*NProcessesPerNode     ))
+      MaxProcessInNode=$(( ${MinProcessAll} +     ${iNode}*NProcessesPerNode - 1 ))
+      if [ ${MaxProcessInNode} -gt ${MaxProcessAll} ]; then 
+        MaxProcessInNode=${MaxProcessAll}
       fi
+      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
+      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
+
+      echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
+              
+      if [ "${ProcType}" = "none" ]; then
+        sed -e '3s/$/1:ppn='${NProc}'/'                           'RunTrajectories-Format-UIUC.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
+      elif [ "${ProcType}" = "test" ]; then
+        sed -e '3s/$/1:ncpus='${NProc}':model=ivy/'               'RunTrajectories-Format-Test.pbs'     > 'RunTrajectoriesTEMP-1.pbs'
+      else
+        sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
+      fi
+      sed -e '13s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
+      
+      sed -e '4s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
+      sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
+
+      sed -e '148s/$/'${MinProcessInNode}'/'                      'RunTrajectoriesTEMP-4.pbs'  > 'RunTrajectoriesTEMP-5.pbs' 
+      sed -e '149s/$/'${MaxProcessInNode}'/'                      'RunTrajectoriesTEMP-5.pbs'  > 'RunTrajectoriesTEMP-6.pbs' 
+
+      sed -e '150s/$/'${Tran}'/'                                  'RunTrajectoriesTEMP-6.pbs'  > 'RunTrajectoriesTEMP-7.pbs' 
+      sed -e '151s/$/'${Tint}'/'                                  'RunTrajectoriesTEMP-7.pbs'  > 'RunTrajectoriesTEMP-8.pbs'
+      sed -e '152s/$/'${iNode}'/'                                 'RunTrajectoriesTEMP-8.pbs'  > 'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+
+      qsub ./'RunTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+      
+      rm -rf ./RunTrajectoriesTEMP*    
 
     done
 
@@ -274,39 +269,36 @@ function ComputeTrajs {
 
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
-      NProcessesTot=0
-      ExitCond=0
+      iProcessesTot=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
         iLevel2Start=0
+        MinLevel2Temp=0
         if [ ${NMolecules} -eq 2 ]; then 
           iLevel2Start=1
+          MinLevel2Temp=1
         fi
         if [ ${SymmFlg} -eq 1 ]; then
           iLevel2Start=${iLevel1}
+          MinLevel2Temp=${MinLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-            ExitCond=1
-            MinProcessInNode=${NProcessesTot}
-          fi
-          if [ ${ExitCond} -eq 1 ]; then
-            NProcessesTot=$((NProcessesTot+1))
+          iProcessesTot=$(( ${iProcessesTot} + 1 ))
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+            MinProcessInNode=${iProcessesTot}
           fi
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
-            MaxProcessInNode=${NProcessesTot}
+            MaxProcessInNode=${iProcessesTot}
           fi
-          #echo "  [ComputeTrajs]: -> iLevel1 = "${iLevel1}"; iLevel2 = "${iLevel2}"; ExitCond = "${ExitCond}
         done
       done
-      echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesTot}
+      NProcessesAll=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
+      echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesAll}
     fi
     echo "  [ComputeTrajs]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
     echo "  [ComputeTrajs]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
 
 
     iProcessesTot=0
-    ExitCond=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
       if [ ${NMolecules} -eq 2 ]; then 
@@ -316,39 +308,33 @@ function ComputeTrajs {
         iLevel2Start=${iLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-          ExitCond=1
-        fi
-        if [ ${ExitCond} -eq 1 ]; then
-          iProcessesTot=$((iProcessesTot+1))
-          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
-            echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
-            echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------------ "
-            echo "  [ComputeTrajs]"
-          
-            if [ ${TranFlg} -eq 0 ]; then 
-              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-            else
-              COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-            fi
-          
-          
-            echo "  [ComputeTrajs]: Calling RunTrajectoriesAtNode"
-            RunTrajectoriesAtNode
-            wait
+        iProcessesTot=$((iProcessesTot+1))
 
-            echo "  [ComputeTrajs]: Calling MergeTrajectories"
-            MergeTrajectories
-            wait
-
-            echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ---------------- DONE -- "
-            echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
-            echo " "
+        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+          echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "
+          echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------------ "
+          echo "  [ComputeTrajs]"
+        
+          if [ ${TranFlg} -eq 0 ]; then 
+            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+          else
+            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
           fi
+        
+        
+          echo "  [ComputeTrajs]: Calling RunTrajectoriesAtNode"
+          RunTrajectoriesAtNode
+          wait
+
+          echo "  [ComputeTrajs]: Calling MergeTrajectories"
+          MergeTrajectories
+          wait
+
+          echo "  [ComputeTrajs]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ---------------- DONE -- "
+          echo "  [ComputeTrajs]: --- Molecule 1, Level/Bin " ${iLevel1} " ------------------------ DONE -- "
+          echo " "
         fi
-        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
-        fi
+
       done
     done
 
@@ -530,38 +516,31 @@ function SplitTrajsPESs {
   MaxProcessInNode=${MaxProcess}
 
   iProcessesTot=0
-  ExitCond=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
     iLevel2Start=0
+    MinLevel2Temp=0
     if [ ${NMolecules} -eq 2 ]; then 
       iLevel2Start=1
+      MinLevel2Temp=1
     fi
     if [ ${SymmFlg} -eq 1 ]; then
       iLevel2Start=${iLevel1}
+      MinLevel2Temp=${MinLevel1}
     fi
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-        ExitCond=1
-      fi
-      if [ ${ExitCond} -eq 1 ]; then
-        iProcessesTot=$((iProcessesTot+1))
-        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+      iProcessesTot=$((iProcessesTot+1))
+      if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+        echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
 
-          echo "  [SplitTrajsPESs]: Splitting Trajectories for iLevel1 = "${iLevel1}" and iLevel2 = "${iLevel2}
-
-          if [ ${TranFlg} -eq 0 ]; then 
-            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-          else
-            COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-          fi
-
-          python3 ${COARSEAIR_SH_DIR}/SplitTrajsPESs.py ${COARSEAIR_BIN_OUTPUT_DIR} ${iPESStart}
-
+        if [ ${TranFlg} -eq 0 ]; then 
+          COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+        else
+          COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
         fi
+
+        python3 ${COARSEAIR_SH_DIR}/SplitTrajsPESs.py ${COARSEAIR_BIN_OUTPUT_DIR} ${iPESStart}
       fi
-      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-        ExitCond=2
-      fi
+
     done
   done
 
@@ -651,8 +630,7 @@ function PostTrajectoriesPBS {
   else
 
 
-    NProcessesTot=0
-    ExitCond=0
+    iProcessesTot=0
     for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
       iLevel2Start=0
       MinLevel2Temp=0
@@ -665,58 +643,54 @@ function PostTrajectoriesPBS {
         MinLevel2Temp=${MinLevel1}
       fi
       for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+        iProcessesTot=$(( ${iProcessesTot} + 1 ))
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-          ExitCond=1
-        fi
-        if [ ${ExitCond} -eq 1 ]; then
-          NProcessesTot=$((NProcessesTot+1))
+          MinProcessAll=${iProcessesTot}
         fi
         if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          ExitCond=2
+          MaxProcessAll=${iProcessesTot}
         fi
       done
     done
+    NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
+    echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
-    echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesTot}
-
-    NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesTot} / ${NNode}")"
+    NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesAll} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
     echo "  [PostTrajectoriesPBS]: -> Nb of Processes Per Node = "${NProcessesPerNode}
 
+
     for (( iNode=1; iNode<=${NNode}; iNode++ )); do
 
-      MinProcessInNode=$(($((iNode-1))*NProcessesPerNode+1))
-      if [ ${MinProcessInNode} -le ${NProcessesTot} ]; then 
-        MaxProcessInNode=$((iNode*NProcessesPerNode))
-        if [ ${MaxProcessInNode} -gt ${NProcessesTot} ]; then 
-          MaxProcessInNode=${NProcessesTot}
-        fi
-        
-        echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
-            
-        if [ "${ProcType}" = "none" ]; then
-          sed -e '3s/$/1:ppn='${NProc}'/'                              'PostTrajectories-Format-UIUC.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
-        else
-          sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'        'PostTrajectories-Format-Pleiades.pbs' > 'PostTrajectoriesTEMP-1.pbs'
-        fi
-        sed -e '13s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
-        
-        sed -e '4s/$/'${MinProcessInNode}'-'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-2.pbs'  > 'PostTrajectoriesTEMP-3.pbs'
-        sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-3.pbs'  > 'PostTrajectoriesTEMP-4.pbs'
-
-        sed -e '148s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
-        sed -e '149s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
-        
-        sed -e '150s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
-        sed -e '151s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
-
-        sed -e '152s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
-
-        qsub ./'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
-
-        rm -rf ./PostTrajectoriesTEMP*
-
+      MinProcessInNode=$(( ${MinProcessAll} + $((${iNode}-1))*NProcessesPerNode     ))
+      MaxProcessInNode=$(( ${MinProcessAll} +        ${iNode}*NProcessesPerNode - 1 ))
+      if [ ${MaxProcessInNode} -gt ${MaxProcessAll} ]; then 
+        MaxProcessInNode=${MaxProcessAll}
       fi
+      
+      echo "  [PostTrajectoriesPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
+          
+      if [ "${ProcType}" = "none" ]; then
+        sed -e '3s/$/1:ppn='${NProc}'/'                              'PostTrajectories-Format-UIUC.pbs'     > 'PostTrajectoriesTEMP-1.pbs'
+      else
+        sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'        'PostTrajectories-Format-Pleiades.pbs' > 'PostTrajectoriesTEMP-1.pbs'
+      fi
+      sed -e '13s/$/'${NProc}'/'                                     'PostTrajectoriesTEMP-1.pbs'  > 'PostTrajectoriesTEMP-2.pbs'
+      
+      sed -e '4s/$/'${MinProcessInNode}'-'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-2.pbs'  > 'PostTrajectoriesTEMP-3.pbs'
+      sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'     'PostTrajectoriesTEMP-3.pbs'  > 'PostTrajectoriesTEMP-4.pbs'
+
+      sed -e '148s/$/'${MinProcessInNode}'/'                         'PostTrajectoriesTEMP-4.pbs'  > 'PostTrajectoriesTEMP-5.pbs' 
+      sed -e '149s/$/'${MaxProcessInNode}'/'                         'PostTrajectoriesTEMP-5.pbs'  > 'PostTrajectoriesTEMP-6.pbs' 
+      
+      sed -e '150s/$/'${Tran}'/'                                     'PostTrajectoriesTEMP-6.pbs'  > 'PostTrajectoriesTEMP-7.pbs' 
+      sed -e '151s/$/'${Tint}'/'                                     'PostTrajectoriesTEMP-7.pbs'  > 'PostTrajectoriesTEMP-8.pbs'
+
+      sed -e '152s/$/'${iNode}'/'                                    'PostTrajectoriesTEMP-8.pbs' > 'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+
+      qsub ./'PostTrajectories-'${MinProcessInNode}'-'${MaxProcessInNode}'.pbs'
+
+      rm -rf ./PostTrajectoriesTEMP*
 
     done
 
@@ -743,12 +717,13 @@ function PostTrajectoriesAtNode {
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
   echo "  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
   echo "  [PostTrajectoriesAtNode]: NNode                 = "${NNode}
-  echo "  [PostTrajectoriesAtNode]: ParNodes           = "${ParNodes}
+  echo "  [PostTrajectoriesAtNode]: ParNodes              = "${ParNodes}
   echo "  [PostTrajectoriesAtNode]: iNode                 = "${iNode}
   echo "  [PostTrajectoriesAtNode]: NProc                 = "${NProc}
   echo "  [PostTrajectoriesAtNode]: System                = "${System}
   echo "  [PostTrajectoriesAtNode]: Tran                  = "${Tran}
   echo "  [PostTrajectoriesAtNode]: Tint                  = "${Tint}
+  echo "  [PostTrajectoriesAtNode]: NMolecules            = "${NMolecules}
   echo "  [PostTrajectoriesAtNode]: SymmFlg               = "${SymmFlg}
   echo "  [PostTrajectoriesAtNode]: Molecule1             = "${Molecule1}
   echo "  [PostTrajectoriesAtNode]: NLevels1              = "${NLevels1}
@@ -780,7 +755,6 @@ function PostTrajectoriesAtNode {
 
   if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
 
-
     echo "  [PostTrajectoriesAtNode]: Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
@@ -788,91 +762,107 @@ function PostTrajectoriesAtNode {
       NProcessesFromFile=$(($(wc -l < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp")))
       MaxProcessInNode=${NProcessesFromFile}
     fi
-    NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))
+    NProcessesPerNode=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
     echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
 
     NProcessesPerProc="$(bc <<< "scale = 10; ${NProcessesPerNode} / ${NProc}")"
     NProcessesPerProc="$(echo ${NProcessesPerProc} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
     echo "  [PostTrajectoriesAtNode]: NProcessesPerProc = "${NProcessesPerProc}
 
-    for (( iProc=1; iProc<=${NProc}; iProc++ )); do
-      MinProcessInProc=$(($((iProc-1))*NProcessesPerProc+1))
-      MaxProcessInProc=$((iProc*NProcessesPerProc))
-      if [ ${MaxProcessInProc} -gt ${NProcessesPerNode} ]; then
-        MaxProcessInProc=${NProcessesPerNode}
-      fi
 
-      echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the first Process to be read from file is the "${MinProcessInProc}"-th in the List"
-      echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the last  Process to be read from file is the "${MaxProcessInProc}"-th in the List"
+    if [[ ${NProc} -eq 1 ]]; then
+      bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} 1 ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc}
+    elif [[ ${NProc} -eq 2 ]]; then
+      parallel --xapply -j 2 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..2} 
+    elif [[ ${NProc} -eq 4 ]]; then
+      parallel --xapply -j 4 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..4} 
+    elif [[ ${NProc} -eq 8 ]]; then
+      parallel --xapply -j 8 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..8} 
+    elif [[ ${NProc} -eq 16 ]]; then
+      parallel --xapply -j 16 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..16} 
+    elif [[ ${NProc} -eq 20 ]]; then
+      parallel --xapply -j 20 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..20} 
+    elif [[ ${NProc} -eq 24 ]]; then
+      parallel --xapply -j 24 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..24} 
+    elif [[ ${NProc} -eq 32 ]]; then
+      parallel --xapply -j 32 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..32} 
+    elif [[ ${NProc} -eq 64 ]]; then
+      parallel --xapply -j 64 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..64} 
+    elif [[ ${NProc} -eq 128 ]]; then
+      parallel --xapply -j 128 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..128} 
+    else
+      echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
+      exit 1
+    fi
 
-      echo "  [PostTrajectoriesAtNode]: Postprocessing Trajectories @ iProc = "${iProc}"; MinProcessInProc = "${MinProcessInProc}"; MaxProcessInProc = "${MaxProcessInProc}
-      bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} 0 ${MaxLevel1} ${Molecule2} ${NLevels2} 0 ${MaxLevel2} ${MinProcessInProc} ${MaxProcessInProc} ${RmTrajFlg} ${BinaryTrajFlg} &
-    done
     wait
-
 
   else
 
-
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
-      NProcessesTot=0
-      ExitCond=0
+      iProcessesTot=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
         iLevel2Start=0
+        MinLevel2Temp=0
         if [ ${NMolecules} -eq 2 ]; then 
           iLevel2Start=1
+          MinLevel2Temp=1
         fi
         if [ ${SymmFlg} -eq 1 ]; then
           iLevel2Start=${iLevel1}
+          MinLevel2Temp=${MinLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          #echo "  [PostTrajectoriesAtNode]: A "${iLevel1}"; "${iLevel2}
-          #echo "  [PostTrajectoriesAtNode]: B "${MinLevel1}"; "${MinLevel2}"; "${MaxLevel1}"; "${MaxLevel2}
-          
-          NProcessesTot=$((${NProcessesTot}+1))
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-            ExitCond=1
-            MinProcessInNode=${NProcessesTot}
-                
+          iProcessesTot=$(( ${iProcessesTot} + 1 ))
+          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+            MinProcessInNode=${iProcessesTot}
           fi
-          # if [ ${ExitCond} -eq 1 ]; then
-          #   #NProcessesTot=$((NProcessesTot+1))
-                
-          # fi
           if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
-            MaxProcessInNode=${NProcessesTot}
-              
+            MaxProcessInNode=${iProcessesTot}
           fi
         done
       done
     fi
-    NProcessesPerNode=$((${MaxProcessInNode} - ${MinProcessInNode} + 1))
+
+    NProcessesPerNode=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
     echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
     echo "  [PostTrajectoriesAtNode]: MinProcessInNode  = "${MinProcessInNode}
     echo "  [PostTrajectoriesAtNode]: MaxProcessInNode  = "${MaxProcessInNode}
 
+ 
     NProcessesPerProc="$(bc <<< "scale = 10; ${NProcessesPerNode} / ${NProc}")"
     NProcessesPerProc="$(echo ${NProcessesPerProc} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
-    echo "  [PostTrajectoriesAtNode]: -> Nb of Processes per Processor = "${NProcessesPerProc}
-    echo "  [PostTrajectoriesAtNode] "
+    echo "  [PostTrajectoriesAtNode]: -> Parallelizing the Postprocessing on "${NProc}" Processors. Nb of Processes per Processor = "${NProcessesPerProc}
+    echo "  [PostTrajectoriesAtNode]: -> Wating for ALL the Processors being done"
 
-    for (( iProc=1; iProc<=${NProc}; iProc++ )); do
-      MinProcessInProc=$(( ${MinProcessInNode} + $(($((iProc-1))*${NProcessesPerProc}+1)) - 1 ))
-      MaxProcessInProc=$(( ${MinProcessInNode} + $((${iProc}    *${NProcessesPerProc}  )) - 1 ))
-      if [ ${MaxProcessInProc} -gt $(( ${NProcessesPerNode} + ${MinProcessInNode} - 1 )) ]; then
-        MaxProcessInProc=$(( ${NProcessesPerNode} + ${MinProcessInNode} - 1 ))
-      fi
 
-      echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the first Process to be computed is the "${MinProcessInProc}"-th in the List"
-      echo "  [PostTrajectoriesAtNode]: For Node "${iNode}", Proc "${iProc}", the last  Process to be computed is the "${MaxProcessInProc}"-th in the List"
+    if [[ ${NProc} -eq 1 ]]; then
+      bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} 1 ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc}
+    elif [[ ${NProc} -eq 2 ]]; then
+      parallel --xapply -j 2 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..2} 
+    elif [[ ${NProc} -eq 4 ]]; then
+      parallel --xapply -j 4 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..4} 
+    elif [[ ${NProc} -eq 8 ]]; then
+      parallel --xapply -j 8 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..8} 
+    elif [[ ${NProc} -eq 16 ]]; then
+      parallel --xapply -j 16 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..16} 
+    elif [[ ${NProc} -eq 20 ]]; then
+      parallel --xapply -j 20 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..20} 
+    elif [[ ${NProc} -eq 24 ]]; then
+      parallel --xapply -j 24 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..24} 
+    elif [[ ${NProc} -eq 32 ]]; then
+      parallel --xapply -j 32 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..32} 
+    elif [[ ${NProc} -eq 64 ]]; then
+      parallel --xapply -j 64 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..64} 
+    elif [[ ${NProc} -eq 128 ]]; then
+      parallel --xapply -j 128 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..128} 
+    else
+      echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
+      exit 1
+    fi
 
-      echo "  [PostTrajectoriesAtNode]: Postprocessing Trajectories @ iProc = "${iProc}"; MinProcessInProc = "${MinProcessInProc}"; MaxProcessInProc = "${MaxProcessInProc}
-      bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${StochPESFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${MinProcessInProc} ${MaxProcessInProc} ${RmTrajFlg} ${BinaryTrajFlg} &
-    done
     wait
-
 
   fi
 
@@ -884,198 +874,197 @@ function PostTrajectoriesAtNode {
 #================================================================================================================================#
 
 
-# ------------------------------------------------------------------------------------------------------------- PostTrajectories #
-function PostTrajectories {
+# # ------------------------------------------------------------------------------------------------------------- PostTrajectories #
+# function PostTrajectories {
 
-  echo "      [PostTrajectories]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
-  echo "      [PostTrajectories]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "      [PostTrajectories]: COARSEAIR_SH_DIR         = "${COARSEAIR_SH_DIR}
-  echo "      [PostTrajectories]: System                   = "${System}
-  echo "      [PostTrajectories]: TranFlg                  = "${TranFlg}
-  echo "      [PostTrajectories]: Tran                     = "${Tran}
-  echo "      [PostTrajectories]: Tint                     = "${Tint}
-  echo "      [PostTrajectories]: StochPESFlg              = "${StochPESFlg}
-  echo "      [PostTrajectories]: NPESs                    = "${NPESs}
-  echo "      [PostTrajectories]: iNode                    = "${iNode}
-  echo "      [PostTrajectories]: iProc                    = "${iProc}
-  echo "      [PostTrajectories]: iPESStart                = "${iPESStart}
-  echo "      [PostTrajectories]: Molecule1                = "${Molecule1}
-  echo "      [PostTrajectories]: iLevel1                  = "${iLevel1}
-  echo "      [PostTrajectories]: Molecule2                = "${Molecule2}
-  echo "      [PostTrajectories]: iLevel2                  = "${iLevel2}
-  echo "      [PostTrajectories]: Velocity                 = "${Velocity}
-  echo "      [PostTrajectories]: BinaryTrajFlg            = "${BinaryTrajFlg}
+#   echo "      [PostTrajectories]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
+#   echo "      [PostTrajectories]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
+#   echo "      [PostTrajectories]: COARSEAIR_SH_DIR         = "${COARSEAIR_SH_DIR}
+#   echo "      [PostTrajectories]: System                   = "${System}
+#   echo "      [PostTrajectories]: TranFlg                  = "${TranFlg}
+#   echo "      [PostTrajectories]: Tran                     = "${Tran}
+#   echo "      [PostTrajectories]: Tint                     = "${Tint}
+#   echo "      [PostTrajectories]: StochPESFlg              = "${StochPESFlg}
+#   echo "      [PostTrajectories]: NPESs                    = "${NPESs}
+#   echo "      [PostTrajectories]: iNode                    = "${iNode}
+#   echo "      [PostTrajectories]: iProc                    = "${iProc}
+#   echo "      [PostTrajectories]: iPESStart                = "${iPESStart}
+#   echo "      [PostTrajectories]: Molecule1                = "${Molecule1}
+#   echo "      [PostTrajectories]: iLevel1                  = "${iLevel1}
+#   echo "      [PostTrajectories]: Molecule2                = "${Molecule2}
+#   echo "      [PostTrajectories]: iLevel2                  = "${iLevel2}
+#   echo "      [PostTrajectories]: Velocity                 = "${Velocity}
+#   echo "      [PostTrajectories]: BinaryTrajFlg            = "${BinaryTrajFlg}
 
-  echo "      [PostTrajectories]: -> Postprocessing Molecule 1, Level "${iLevel1}" and Molecule 2, Level "${iLevel2}
-
-
-  if [ ${StochPESFlg} -eq 0 ]; then 
-    NPESs=0
-    iPESEnd=0
-    iPES=0
-  else
-    iPES=${iPESStart}
-    iPESEnd=$((iPESStart + NPESs - 1))
-  fi
+#   echo "      [PostTrajectories]: -> Postprocessing Molecule 1, Level "${iLevel1}" and Molecule 2, Level "${iLevel2}
 
 
-  while [ ${iPES} -le ${iPESEnd} ]
-  do
+#   if [ ${StochPESFlg} -eq 0 ]; then 
+#     NPESs=0
+#     iPESEnd=0
+#     iPES=0
+#   else
+#     iPES=${iPESStart}
+#     iPESEnd=$((iPESStart + NPESs - 1))
+#   fi
 
-    if [ ${StochPESFlg} -eq 1 ]; then 
-      echo "      [PostTrajectories]: --- PES "${iPES}" ----------------------- "
-    fi
 
-    iTry=1
-    NLinesTry=0
-    while [ ${NLinesTry} -le 10 ] && [ ${iTry} -le 3 ]; do
+#   while [ ${iPES} -le ${iPESEnd} ]
+#   do
+
+#     if [ ${StochPESFlg} -eq 1 ]; then 
+#       echo "      [PostTrajectories]: --- PES "${iPES}" ----------------------- "
+#     fi
+
+#     iTry=1
+#     NLinesTry=0
+#     while [ ${NLinesTry} -le 10 ] && [ ${iTry} -le 3 ]; do
       
-      if [ ${StochPESFlg} -eq 1 ]; then 
-        scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES} ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
-      fi
-      if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then                                                              #
-      #if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out ]; then                                                              # FOR COMPATIBILITY WITH CG-QCT CODE
-        NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)                                                           #
-        #NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out)                                                           # FOR COMPATIBILITY WITH CG-QCT CODE
-        NTraj=$((NTraj-1))
-      else 
-        NTraj=0
-      fi
-      echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
-      echo "      [PostTrajectories]: -> Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}": Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
+#       if [ ${StochPESFlg} -eq 1 ]; then 
+#         scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES} ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
+#       fi
+#       if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then                                                              #
+#       #if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out ]; then                                                              # FOR COMPATIBILITY WITH CG-QCT CODE
+#         NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)                                                           #
+#         #NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out)                                                           # FOR COMPATIBILITY WITH CG-QCT CODE
+#         NTraj=$((NTraj-1))
+#       else 
+#         NTraj=0
+#       fi
+#       echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
+#       echo "      [PostTrajectories]: -> Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}": Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
       
-      if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
+#       if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
         
-        echo "      [PostTrajectories]: Calling TrajectoriesStats"
-        TrajectoriesStats
+#         echo "      [PostTrajectories]: Calling TrajectoriesStats"
+#         TrajectoriesStats
         
-      fi
+#       fi
       
-      echo "      [PostTrajectories]: Calling FromCrossToRates"
-      FromCrossToRates  
-      wait
-
-      if [ ${StochPESFlg} -eq 1 ]; then 
-        NLinesTry=$(wc -l < ${COARSEAIR_OUTPUT_DIR}"/"${System}"/"${Molecule1}"/Rates/T_"${Tran%.*}"_"${Tint%.*}"/Bin"$iLevel1".csv."$iPES)
-        iTry=$((iTry+1))
-      else
-        iTry=4
-      fi
-    done
+#       echo "      [PostTrajectories]: Calling FromCrossToRates"
+#       FromCrossToRates  
       
-    if [ ${StochPESFlg} -eq 1 ]; then 
-      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
-      echo "      [PostTrajectories]: --- iPES "${iPES} " --------------- DONE -- "
-    fi
-    iPES=$((iPES+1))
-  done   
-
-
-  if [ ${StochPESFlg} -eq 1 ]; then
-    #scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.Orig ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-  fi
-
-}
-#================================================================================================================================#
-
-
-# ------------------------------------------------------------------------------------------------------------ TrajectoriesStats #
-function TrajectoriesStats {
-
-  echo "        [TrajectoriesStats]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "        [TrajectoriesStats]: Tran                     = "${Tran}
-  echo "        [TrajectoriesStats]: Tint                     = "${Tint}
-  echo "        [TrajectoriesStats]: BinaryTrajFlg            = "${BinaryTrajFlg}
-
-  TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
-
-  cd ${COARSEAIR_BIN_OUTPUT_DIR}
-  
-  echo "        [TrajectoriesStats]: Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
-  eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg}
-  echo "        [TrajectoriesStats]: Done with TrajectoriesStats"
-  
-}
-#================================================================================================================================#
-
-
-# ------------------------------------------------------------------------------------------------------------- FromCrossToRates #
-function FromCrossToRates {
-
-  echo "        [FromCrossToRates]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  echo "        [FromCrossToRates]: Tran                     = "${Tran}
-  echo "        [FromCrossToRates]: Tint                     = "${Tint}
-  echo "        [FromCrossToRates]: iLevel1                  = "${iLevel1}
-  echo "        [FromCrossToRates]: iLevel2                  = "${iLevel2}
-  echo "        [FromCrossToRates]: iPES                     = "${iPES}
-  echo "        [FromCrossToRates]: iNode                    = "${iNode}
-  echo "        [FromCrossToRates]: iProc                    = "${iProc}
-  echo "        [FromCrossToRates]: TranFlg                  = "${TranFlg}
-  echo "        [FromCrossToRates]: Velocity                 = "${Velocity}
-  echo "        [FromCrossToRates]: BinaryTrajFlg            = "${BinaryTrajFlg}
-
-
-  PostTrajectoriesCommand="coarseair-posttrajectories.x"
-  TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat"
-
-  echo "        [FromCrossToRates]: Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand} ${Tran} 
-  start=`date +%s`
-  if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
-  
-    cd ${COARSEAIR_BIN_OUTPUT_DIR}
-    TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
-  
-    if [ -e "$TrajFile" ]; then                                                                                        
-  
-      typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
-
-      if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
-        rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
-        eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
-      else                                                                                                             
-        if [ -e "$TrajErrorFile" ]; then
-          echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-        else
-          echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-          echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-        fi
-        echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-        #rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*
-      fi
+#       if [ ${StochPESFlg} -eq 1 ]; then 
+#         NLinesTry=$(wc -l < ${COARSEAIR_OUTPUT_DIR}"/"${System}"/"${Molecule1}"/Rates/T_"${Tran%.*}"_"${Tint%.*}"/Bin"$iLevel1".csv."$iPES)
+#         iTry=$((iTry+1))
+#       else
+#         iTry=4
+#       fi
+#     done
       
-    else
+#     if [ ${StochPESFlg} -eq 1 ]; then 
+#       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
+#       echo "      [PostTrajectories]: --- iPES "${iPES} " --------------- DONE -- "
+#     fi
+#     iPES=$((iPES+1))
+#   done   
+
+
+#   if [ ${StochPESFlg} -eq 1 ]; then
+#     #scp ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.Orig ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
+#     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
+#     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
+#   fi
+
+# }
+# #================================================================================================================================#
+
+
+# # ------------------------------------------------------------------------------------------------------------ TrajectoriesStats #
+# function TrajectoriesStats {
+
+#   echo "        [TrajectoriesStats]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
+#   echo "        [TrajectoriesStats]: Tran                     = "${Tran}
+#   echo "        [TrajectoriesStats]: Tint                     = "${Tint}
+#   echo "        [TrajectoriesStats]: BinaryTrajFlg            = "${BinaryTrajFlg}
+
+#   TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
+
+#   cd ${COARSEAIR_BIN_OUTPUT_DIR}
+  
+#   echo "        [TrajectoriesStats]: Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
+#   eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg}
+#   echo "        [TrajectoriesStats]: Done with TrajectoriesStats"
+  
+# }
+# #================================================================================================================================#
+
+
+# # ------------------------------------------------------------------------------------------------------------- FromCrossToRates #
+# function FromCrossToRates {
+
+#   echo "        [FromCrossToRates]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
+#   echo "        [FromCrossToRates]: Tran                     = "${Tran}
+#   echo "        [FromCrossToRates]: Tint                     = "${Tint}
+#   echo "        [FromCrossToRates]: iLevel1                  = "${iLevel1}
+#   echo "        [FromCrossToRates]: iLevel2                  = "${iLevel2}
+#   echo "        [FromCrossToRates]: iPES                     = "${iPES}
+#   echo "        [FromCrossToRates]: iNode                    = "${iNode}
+#   echo "        [FromCrossToRates]: iProc                    = "${iProc}
+#   echo "        [FromCrossToRates]: TranFlg                  = "${TranFlg}
+#   echo "        [FromCrossToRates]: Velocity                 = "${Velocity}
+#   echo "        [FromCrossToRates]: BinaryTrajFlg            = "${BinaryTrajFlg}
+
+
+#   PostTrajectoriesCommand="coarseair-posttrajectories.x"
+#   TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat"
+
+#   echo "        [FromCrossToRates]: Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand} ${Tran} 
+#   start=`date +%s`
+#   if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
+  
+#     cd ${COARSEAIR_BIN_OUTPUT_DIR}
+#     TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
+  
+#     if [ -e "$TrajFile" ]; then                                                                                        
+  
+#       typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
+
+#       if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
+#         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
+#         eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
+#       else                                                                                                             
+#         if [ -e "$TrajErrorFile" ]; then
+#           echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#         else
+#           echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
+#           echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#         fi
+#         echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+#         #rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*
+#       fi
+      
+#     else
     
-     if [ -e "$TrajErrorFile" ]; then                                                                                   
-        echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-      else
-        echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-        echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-      fi
-      echo "        [FromCrossToRates]: No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+#      if [ -e "$TrajErrorFile" ]; then                                                                                   
+#         echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#       else
+#         echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
+#         echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#       fi
+#       echo "        [FromCrossToRates]: No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
       
-    fi                                                                                                                  
+#     fi                                                                                                                  
     
-  else
+#   else
   
-    if [ -e "$TrajErrorFile" ]; then
-      echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-    else
-      echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-      echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-    fi
-    echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+#     if [ -e "$TrajErrorFile" ]; then
+#       echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#     else
+#       echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
+#       echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
+#     fi
+#     echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
     
-  fi
+#   fi
   
-  end=`date +%s`
-  runtime=$((end-start))
-  echo "        [FromCrossToRates]: Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
+#   end=`date +%s`
+#   runtime=$((end-start))
+#   echo "        [FromCrossToRates]: Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
 
   
-}
-#================================================================================================================================#
+# }
+# #================================================================================================================================#
 
 
 # ----------------------------------------------------------------------------------------------------------------- ComputeRates #
@@ -1090,7 +1079,6 @@ function MergeAllRates {
       echo '  [MergeAllRates]'     
 
       iProcessesTot=0
-      ExitCond=0
       for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
         iLevel2Start=0
         if [ ${NMolecules} -eq 2 ]; then 
@@ -1100,11 +1088,9 @@ function MergeAllRates {
           iLevel2Start=${iLevel1}
         fi
         for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-            ExitCond=1
-          fi
-          if [ ${ExitCond} -eq 1 ]; then
-            iProcessesTot=$((iProcessesTot+1))
+          iProcessesTot=$((iProcessesTot+1))
+
+          if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
 
             if [ ${TranFlg} -eq 0 ]; then 
               COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
@@ -1133,9 +1119,7 @@ function MergeAllRates {
             rm -rf ./trajectories.csv
 
           fi
-          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            ExitCond=2
-          fi
+
         done
       done
 

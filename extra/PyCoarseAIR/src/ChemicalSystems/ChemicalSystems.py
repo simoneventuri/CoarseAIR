@@ -35,7 +35,7 @@ def CO2_NASA_Upload( Temp ):
     NMolecules    = 2
     NPairs        = 3
     NCFDComp      = 4
-    NProcTypes    = 3
+    NProcTypes    = 4
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
@@ -121,7 +121,7 @@ def CO2_NASA_Upload( Temp ):
     Syst.CFDComp[2].RxLxIdx =  1
     Syst.CFDComp[3].RxLxIdx =  0
 
-    Syst.MolToCFDComp       = np.array([3, 4])
+    Syst.MolToCFDComp       = np.array([2, 3])
 
     Syst.ExchtoMol          = np.array([0,1])
     Syst.ExchtoAtom         = np.array([2,0])
@@ -229,7 +229,7 @@ def O2C_NASA_Upload( Temp ):
     Syst.CFDComp[2].RxLxIdx =  1
     Syst.CFDComp[3].RxLxIdx =  0
 
-    Syst.MolToCFDComp       = np.array([4, 3])
+    Syst.MolToCFDComp       = np.array([3, 2])
 
     Syst.ExchtoMol          = np.array([1])
     Syst.ExchtoAtom         = np.array([0])
@@ -463,7 +463,7 @@ def N3_NASA_Upload( Temp ):
     NMolecules    = 1
     NPairs        = 3
     NCFDComp      = 2
-    NProcTypes    = 3
+    NProcTypes    = 2
     Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 

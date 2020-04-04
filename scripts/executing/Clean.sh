@@ -87,7 +87,15 @@ function MergeTrajectories {
 
 
         NTraj=0
-        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/Node_1/Proc_1/trajectories.csv ]; then
+        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
+
+          echo "[MergeTrajectories]: -----> Trajectories from different Processors already merged."
+          NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)
+          NTraj=$((NTraj-1))
+          echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
+          echo "[MergeTrajectories]: -----> Tot Nb of Converged Trajectories: "${NTraj}
+
+        elif [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/Node_1/Proc_1/trajectories.csv ]; then
 
           #iNode=1
           #while [ ${iNode} -le ${NNode} ]; do
@@ -136,13 +144,6 @@ function MergeTrajectories {
           fi
           echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
           echo "[MergeTrajectories]: -----> Tot Nb of Converged Trajectories: "${NTraj}
-
-
-        elif [ -f  ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat' ]; then
-      
-          typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
-          echo "[MergeTrajectories]: -----> Trajectories from different Processors already merged. Nb of Trajectories = "${NTraj}
-          
 
         else
 

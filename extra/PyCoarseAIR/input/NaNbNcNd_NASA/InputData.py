@@ -21,33 +21,58 @@
 import numpy as np
 
 
-class rates(object):
+class inputdata(object):
 
-    def __init__(self):
+    def __init__( self, WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr, DtbHDF5Fldr, DtbWriteFldr, OutputWriteFldr ):
+        self.WORKSPACE_PATH            = WORKSPACE_PATH
+        self.CoarseAIRFldr             = CoarseAIRFldr
+        self.PyCoarseAIRFldr           = PyCoarseAIRFldr
+        
+        ### CASE SPECIFIC
+        self.TranVec                   = np.array([20000.0])
+        self.T0                        = 300.0
 
-        self.PrefJumps_Flg    = False
-        self.NPrefJumps       = 5
+        self.DelRateMat_Flg            = True
 
+        self.PlotShow_Flg              = False
+
+
+        ### CHEMICAL SYSTEM SPECIFIC
+        self.SystNameLong              = 'NaNbNcNd_NASA'
+        self.OldVersion_IntFlg         = 0
+        self.DtbReadFldr               = self.WORKSPACE_PATH + '/CoarseAIR/N4_VS/Test/'
+        self.OutputWriteFldr           = OutputWriteFldr 
+
+
+        ### DO NOT CHANGE
+        self.NTran                     = np.size(   self.TranVec )
+        self.iTVec                     = np.arange( self.NTran   ) + 1
+
+        self.Kin                       = kinetics( self.WORKSPACE_PATH, DtbWriteFldr )
+        self.HDF5                      = hdf5(     self.WORKSPACE_PATH, DtbHDF5Fldr )
+        self.ME                        = ME(       self.WORKSPACE_PATH )
 
 
 class kinetics(object):
 
-    def __init__( self, WORKSPACE_PATH ):
+    def __init__( self, WORKSPACE_PATH, DtbWriteFldr ):
 
-        ## Reading / Writing Kinetics Data
+        ### Reading Kinetics Data
         self.Read_Flg                   = True
-        self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
+        #self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'                      # To be used Only when Required to read a Database in PLATO's Format
+
 
         ## Writing Kinetics Data
         self.Write_Flg                  = True
-        self.WriteFldr                  = WORKSPACE_PATH + '/Mars_Database/Run_0D/database/'
-        self.WriteExoth_Flg             = True
-        self.WriteQB_IntFlg             = 2
+        self.WriteFldr                  = DtbWriteFldr
         self.WriteDiss_Flg              = True 
-        self.WriteDissInel_Flg          = True 
         self.CorrFactor                 = 1.0
+        self.WriteDissInel_Flg          = True 
         self.WriteInel_Flg              = True
         self.WriteExch_Flg              = True
+
+        self.WriteExoth_Flg             = True
+        self.WriteQB_IntFlg             = 2
 
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
@@ -81,6 +106,7 @@ class kinetics(object):
         self.WindAvrgJs                 = 3
         self.WindAvrgVs                 = 2
 
+
         ## Writing Arrhenius Files
         self.MaxEntOrPlato              = 1
         self.MinRate                    = 1.e-15
@@ -88,13 +114,17 @@ class kinetics(object):
         self.MaxErrArr                  = 1.e-7        
 
 
+        ## Analyzig the Preferential Jumps between Levels
+        self.RatesPrefJumps_Flg         = False
+        self.RatesNPrefJumps            = 5
+
+
 
 class hdf5(object):
 
-    def __init__(self, WORKSPACE_PATH):
+    def __init__( self, WORKSPACE_PATH, DtbHDF5Fldr ):
 
-        self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/HDF5_Database/'
-        self.WriteFolder                = ''
+        self.DtbFldr                    = DtbHDF5Fldr
         self.ForceReadDat_Flg           = False
         self.Save_Flg                   = True
 
@@ -102,40 +132,10 @@ class hdf5(object):
 
 class ME(object):
 
-    def __init__(self, WORKSPACE_PATH):
+    def __init__( self, WORKSPACE_PATH ):
 
         self.Read_Flg                   = False
         self.ReadFldr                   = WORKSPACE_PATH + '/Mars_Database/Run_0D/'
         self.WriteFolder                = ''
         self.ProcCode                   = '0_1_1_1'
         self.TimeVec                    = np.array([1.e-10, 1.e-8, 1.e-6, 1.e-4])
-
-
-
-class inputdata(object):
-
-    def __init__( self, WORKSPACE_PATH, CoarseAIRFldr, PyCoarseAIRFldr ):
-        
-        self.WORKSPACE_PATH            = WORKSPACE_PATH
-        self.CoarseAIRFldr             = CoarseAIRFldr
-        self.PyCoarseAIRFldr           = PyCoarseAIRFldr
-
-        self.Rates                     = rates()
-        self.Kin                       = kinetics( self.WORKSPACE_PATH )
-        self.HDF5                      = hdf5(     self.WORKSPACE_PATH )
-        self.ME                        = ME(       self.WORKSPACE_PATH )
-
-        self.OldVersion_IntFlg         = 0
-        self.SystNameLong              = 'NaNbNcNd_NASA'
-
-        self.TranVec                   = np.array([20000.0])
-        self.T0                        = 300.0
-        self.NTran                     = np.size(   self.TranVec )
-        self.iTVec                     = np.arange( self.NTran   ) + 1
-
-        self.QCTOutFldr                = self.WORKSPACE_PATH + '/CoarseAIR/N4_VS/Test/'
-        self.FinalFldr                 = self.WORKSPACE_PATH + '/Mars_Database/Results/'
-
-        self.PlotShow_Flg              = False
-
-        self.DelRateMat_Flg            = True
