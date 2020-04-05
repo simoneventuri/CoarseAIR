@@ -79,7 +79,7 @@ function ComputeTrajsPBS {
         else
           sed -e '3s/$/1:ncpus='${NProc}':model='${ProcType}'/'     'RunTrajectories-Format-Pleiades.pbs' > 'RunTrajectoriesTEMP-1.pbs'
         fi
-        sed -e '12s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
+        sed -e '13s/$/'${NProc}'/'                                  'RunTrajectoriesTEMP-1.pbs'  > 'RunTrajectoriesTEMP-2.pbs'
         
         sed -e '4s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-2.pbs'  > 'RunTrajectoriesTEMP-3.pbs'
         sed -e '6s/$/'${MinProcessInNode}'_'${MaxProcessInNode}'/'  'RunTrajectoriesTEMP-3.pbs'  > 'RunTrajectoriesTEMP-4.pbs'
