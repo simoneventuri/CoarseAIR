@@ -20,7 +20,7 @@ function [] = WriteRatesAsNetwork_ForAmal(iT, NLevels, LevelEeV, Levelvqn, Level
 
   global RCVec BCVec GCVec KCVec OCVec PCVec WCVec JCVec YCVec CCVec MCVec
   
-  global WriteRatesFlag WriteSrcTermsFlag WriteDissFlag WriteInelasticFlag WriteAllFlag
+  global WriteRatesFlag WriteSrcTermsFlag WriteDissFlag WriteInelasticFlag WriteAllFlag WriteExchangeFlg
 
   iBinnedMol = 1;
   if FinalBin < 2
@@ -30,14 +30,16 @@ function [] = WriteRatesAsNetwork_ForAmal(iT, NLevels, LevelEeV, Levelvqn, Level
 
   
   cm3_To_m3          = 1.d-6;
-  MinValA            = 1.d-14 .* cm3_To_m3;         %%% For Cutting out Rates < MinValA
+  MinValA            = 1.d-16 .* cm3_To_m3;         %%% For Cutting out Rates < MinValA
   fprintf('  Cutting Value for Rates = %e m3/s\n',MinValA)
   MinValW            = 1.d-4;
   MinValW_Bis        = 1.d4;
-
+  NBinsDiss          = 15
+  DissExp            = 1/2
   
   %%% Translational Temperature Conditions:
   ExpVec(1:NLevels(iBinnedMol),1)  = Levelg(1:NLevels(iBinnedMol),1) .* exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
+  %ExpVec(1:NLevels(iBinnedMol),1)  = exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
   ExpVec                           = ExpVec ./ sum(ExpVec);
   ExpMat                           = kron(ExpVec,1.d0./ExpVec');  
   
@@ -47,19 +49,59 @@ function [] = WriteRatesAsNetwork_ForAmal(iT, NLevels, LevelEeV, Levelvqn, Level
   end
   IntDeg(:)  = ComponentDeg(:).^(RxLxIdx(:));
   EqVec      = prod(QTran) .* prod(IntDeg) .* Levelg(1:NLevels(iBinnedMol),1) .* ExpVec(1:NLevels(iBinnedMol),1);
-
-  Kij(:,:)                        = (RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),1,1) + RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),2,1)) .* 1.d-6;
+  
+  if (WriteExchangeFlg)
+    Kij(:,:)                      = (RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),1,1) + RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),2,1) + RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),3,1)) .* 1.d-6;
+  else
+    Kij(:,:)                      = RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),1,1) .* 1.d-6;
+  end
   Kij(Kij < MinValA)              = 0.d0;
   Kji                             = tril(Kij) + tril(Kij.*ExpMat,-1)';
+  Kji                             = Kji';
   
-  KDiss(1:NLevels(iBinnedMol),1)  = ProcessesRates(1:NLevels(iBinnedMol),1,1)' .* 1.d-6;
+  KDiss(1:NLevels(iBinnedMol),1)  = ProcessesRates(1:NLevels(iBinnedMol),1,1)' .* cm3_To_m3;
   KEq(1:NLevels(iBinnedMol),1)    = ( EqVec(1:NLevels(iBinnedMol)) ).^(-1);
   KRecOverg(:,1)                  = KDiss(:,1) ./ KEq(:,1);
   KRec(:,1)                       = KRecOverg(:,1);   
  
   
+  LSpace        = linspace(0.0,1.0,NBinsDiss+1);
+  TSpace        = abs(min(DeltaEintDiss(:,iBinnedMol))).*LSpace + min(DeltaEintDiss(:,iBinnedMol));
+  ModSpace      = LSpace.^DissExp;
+  Extr          = abs(min(DeltaEintDiss(:,iBinnedMol))).*ModSpace + min(DeltaEintDiss(:,iBinnedMol));
+  figure(1)
+  plot(TSpace,'o')
+  hold on
+  plot(Extr,'o')
+  for i = StartBin:FinalBin
+    ii=1;
+    while Extr(ii) <= DeltaEintDiss(i)% && ii < NBinsDiss
+       ii = ii+1;
+    end
+    ii = ii-1;
+    DissBin(i) = ii;
+  end  
+  iBinnedMol = 1;
+  FileName1  = strcat('./BinnedLevels.csv');
+  fileID1    = fopen(FileName1,'w');
+  fprintf(fileID1,'Id,rIn,Longitude,J,v,Latitude,DissBin\n');
+  for i = StartBin:FinalBin
+    fprintf(fileID1,'%i,%11.6e,%11.6e,%i,%i,%11.6e,%i\n', ...
+      i, rIn(i,iBinnedMol), -Leveljqn(i,iBinnedMol)/10,  Leveljqn(i,iBinnedMol), Levelvqn(i,iBinnedMol), LevelEeV(i,iBinnedMol), DissBin(i));
+  end
+  fclose(fileID1);
+
+  
+  FileName1 = strcat('./elevels_g.dat');
+  fileID1   = fopen(FileName1,'w');
+  for i = StartBin:FinalBin
+    fprintf(fileID1,'%i %e %e %e %i %i\n', i-1, LevelEeV(i)-LevelEeV(1), Levelg(i), DeltaEintDiss(i), DissBin(i), i-1);
+  end
+  fclose(fileID1);
+  
+  
   tic
-  FileName = strcat('./DissRatesAmal.net');
+  FileName = strcat('./diss.dat');
   fileID   = fopen(FileName,'w');
   for i = StartBin:FinalBin
     if KDiss(i) > MinValA
@@ -67,9 +109,8 @@ function [] = WriteRatesAsNetwork_ForAmal(iT, NLevels, LevelEeV, Levelvqn, Level
     end
   end
   
-  
-  tic
-  FileName = strcat('./InelRatesAmal.net');
+ 
+  FileName = strcat('./excite.dat');
   fileID   = fopen(FileName,'w');
   for i = StartBin:FinalBin
     for j = i+1:FinalBin
@@ -82,15 +123,6 @@ function [] = WriteRatesAsNetwork_ForAmal(iT, NLevels, LevelEeV, Levelvqn, Level
   timee = toc;
   fprintf('  Inelastic Rates Matrix written in %e s\n', timee)
 
-
-  FileName1 = strcat('./LevelsAmal.csv');
-  fileID1   = fopen(FileName1,'w');
-  for i = StartBin:FinalBin
-    fprintf(fileID1,'%i %e %e %i\n', i-1, LevelEeV(i)-LevelEeV(1), Levelg(i), i-1);
-  end
-  fclose(fileID1);
-  
+ 
   fprintf('DONE WITH WriteRatesAsNetwork')
-  
-
 end

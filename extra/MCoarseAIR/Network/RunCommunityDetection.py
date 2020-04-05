@@ -14,7 +14,7 @@ t0 = time.time()
 G = nx.DiGraph(Rates=RatesType)
 
 #G      = nx.read_pajek("/Users/sventuri/Dropbox/TempRes/InelRates.net")
-#G      = nx.read_pajek("/home/venturi/WORKSPACE/CoarseAIR/RESULTS/CO2/4Networks/InelExchange/InelRates1.net")
+#G      = nx.read_pajek("/home/venturi/WORKSPACE/CG-QCT/RESULTS/CO2/4Networks/InelExchange/InelRates1.net")
 
 Id        = []
 vqn       = []

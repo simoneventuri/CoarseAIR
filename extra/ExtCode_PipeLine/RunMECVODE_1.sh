@@ -41,21 +41,21 @@ PLATO_gnu_release
 
 export System='NaNbNcNd_NASA'
 export Molecule='N2'
-export FldrName=''
-export Tran_vec=(1500 5000) 
+export FldrName='_VS'
+export Tran_vec=(20000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=1
+export DissFlg=0
 export DissInelFlg=1
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=1
 
 
-ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/postprocessing/ExtCode_PipeLine/"
+ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/extra/ExtCode_PipeLine/"
 
 echo '------------------------------------------------------'
 echo '  Paths:'
@@ -90,12 +90,13 @@ function Load_Initialize_0D() {
 
 function Call_MeCvode() {
   cd ${PathToRunFldr}
-  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelDissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${DissInelFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   # export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
   if [ $DissFlg -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
+    #export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'N4_T'${TTran}'K'
   else
     export ExFldr=${PathToMECVODEFldr}/${System}/'N4_T'${TTran}'K'
     #export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'

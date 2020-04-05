@@ -12,7 +12,7 @@ function ComputeSystemQuantities()
   % -- MATLAB --
   %%==============================================================================================================
   % 
-  % Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
   % 
   % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
   %
@@ -35,15 +35,24 @@ function ComputeSystemQuantities()
   global xDim yDim TotDim PlotPair ProcToLevIP TempChar TempChar2 Pair_Name Pair_To_Molecule Pair_to_Atoms iPInternal iPExternal
 
   if NAtoms == 3
+      NPairs = 3 
       Pair_to_Atoms(1,:)=[1,2];
       Pair_to_Atoms(2,:)=[1,3];
       Pair_to_Atoms(3,:)=[2,3];
+  elseif NAtoms == 4
+      NPairs = 6
+      Pair_to_Atoms(1,:)=[1,2];
+      Pair_to_Atoms(2,:)=[1,3];
+      Pair_to_Atoms(3,:)=[1,4];
+      Pair_to_Atoms(4,:)=[2,3];
+      Pair_to_Atoms(5,:)=[2,4];
+      Pair_to_Atoms(6,:)=[3,4];
   end
 
 
   xDim
   TotDim(1)=1;
-  for iP=1:3
+  for iP=1:NPairs
       if (AtomsName(Pair_to_Atoms(iP,1)) == AtomsName(Pair_to_Atoms(iP,2)))
           Pair_Name(iP,:)=strcat(AtomsName(Pair_to_Atoms(iP,1)),'2');
       else

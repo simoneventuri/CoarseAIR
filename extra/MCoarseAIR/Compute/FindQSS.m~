@@ -1,0 +1,90 @@
+function [iQSS_Start, iQSS, iQSS_End] =  FindQSS(iT, t, ProcessesRatesOverall)
+
+  global T0_Vec
+  global DissFlg InelFlg ExchFlg
+
+%   if T0_Vec < 5000
+%     KQSS_Eps = 1.e-9;
+%     EpsT     = 1.e-5;
+%     EpsTT    = 6.e-4;
+%     EpsTTT   = 2.e-3;
+%   elseif T0_Vec < 12000
+%     KQSS_Eps = 1.e-9;
+%     EpsT     = 3.e-5;
+%     EpsTT    = 6.e-4;
+%     EpsTTT   = 2.e-3;
+%   else
+%     KQSS_Eps = 1.e-9;
+%     EpsT     = 5.e-5;
+%     EpsTT    = 6.e-4;
+%     EpsTTT   = 2.e-3;
+%   end
+%   
+  
+  KQSS_Eps = 1.e-9;
+  EpsT     = 5.e-4;%5.e-8;
+  EpsTT    = 1.e-3;
+  
+  yy   = log10(ProcessesRatesOverall(:,1));
+  yyy  = log10(log10(ProcessesRatesOverall(:,1)));
+  [xData, yData] = prepareCurveData( t, yyy );
+  ft = 'splineinterp';
+  [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
+  % figure( 'Name', 'untitled fit 1' );
+  % h = plot( fitresult, xData, yData );
+  % legend( h, 'aa vs. t', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
+  % xlabel( 't', 'Interpreter', 'none' );
+  % ylabel( 'aa', 'Interpreter', 'none' );
+  % grid on
+    = fzero(fitresult-log10(*0.95), t(iQSS_Start))
+
+  
+  iQSS = 1;
+  while (yy(iQSS) <= yy(1) + 0.1*(yy(end) - yy(1)))
+      iQSS = iQSS + 1;
+  end
+  while ( abs(log10(yy(iQSS)) - log10(yy(iQSS+1))) / abs(log10(yy(iQSS))) > EpsT ) && ( iQSS < length(yy)-3)
+      iQSS = iQSS + 1;
+  end
+  iQSS_Start = iQSS - 1;
+  while ( abs(log10(yy(iQSS)) - log10(yy(iQSS+1))) / abs(log10(yy(iQSS))) <= EpsTT ) && ( iQSS < length(yy)-3)
+      iQSS = iQSS + 1;
+  end
+  iQSS_End = iQSS - 1;
+  iQSS     = floor( (iQSS_Start + iQSS_End) / 2.0 );
+  
+  
+  x0 = [0 3.5];
+  x = fzero(fun,t(iQSS_Start))
+
+  jQSS = iQSS_Start;
+  while abs(log10(yy(jQSS)) - log10(yy(iQSS))) > 0.05
+      jQSS = jQSS + 1;
+  end
+  iQSS_Start = jQSS;
+  jQSS       = iQSS;
+  while abs( log10(yy(jQSS)) - log10(yy(iQSS)) ) < 0.05
+      jQSS = jQSS + 1;
+  end
+  iQSS_End   = jQSS;
+  
+  
+  FileName = strcat('./KAveraged_',num2str(DissFlg),'_',num2str(InelFlg),'_',num2str(ExchFlg),'_',num2str(ExchFlg),'.csv');
+  if exist(FileName, 'file')
+    fileID1  = fopen(FileName,'a');
+  else
+    fileID1  = fopen(FileName,'w');
+    fprintf(fileID1,'# T [K], KDiss_Eq, KExch_Eq, KDiss_QSS, KExch_QSS\n');
+  end
+  fprintf(fileID1,'%e,%e,%e,%e,%e\n', T0_Vec(1), ProcessesRatesOverall(end,1,1), ProcessesRatesOverall(end,3,1)+ProcessesRatesOverall(end,4,1), ProcessesRatesOverall(iQSS,1,1), ProcessesRatesOverall(iQSS,3,1)+ProcessesRatesOverall(iQSS,4,1) )
+  fclose(fileID1);
+  
+  
+  figure; 
+  semilogx(t,log10(yy))
+  hold on
+  semilogx(t(iQSS_Start),log10(yy(iQSS_Start)),'o')
+  semilogx(t(iQSS),log10(yy(iQSS)),'o')
+  semilogx(t(iQSS_End),log10(yy(iQSS_End)),'o')
+  
+end

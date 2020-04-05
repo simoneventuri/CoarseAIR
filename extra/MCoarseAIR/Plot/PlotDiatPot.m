@@ -13,7 +13,7 @@ function [iFigure] = PlotDiatPot(iFigure, NLevels, Leveljqn, Levelvqn, LevelEh, 
   
   %%==============================================================================================================
   % 
-  % Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
   % 
   % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
   %

@@ -10,7 +10,7 @@ for iA = [120, 140, 160, 180]
   
   figure(iFigure)
 
-  filename = strcat('/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_NASA/Test/PlotPES/FixedR1_',num2str(iA),'.csv');
+  filename = strcat('/Users/sventuri/WORKSPACE/CG-QCT/run_N3_NASA/Test/PlotPES/FixedR1_',num2str(iA),'.csv');
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%[^\n\r]';
@@ -26,7 +26,7 @@ for iA = [120, 140, 160, 180]
 
   for iPES=1:NPESs
     
-    filename = strcat('/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_CG_BNN_100/Test/PlotPES/FixedR1_',num2str(iA),'.csv.', num2str(iPES));
+    filename = strcat('/Users/sventuri/WORKSPACE/CG-QCT/run_N3_CG_BNN_100/Test/PlotPES/FixedR1_',num2str(iA),'.csv.', num2str(iPES));
     delimiter = ',';
     startRow = 2;
     formatSpec = '%f%f%[^\n\r]';
@@ -40,7 +40,7 @@ for iA = [120, 140, 160, 180]
     
   end
 
-  filename = strcat('/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_CG_BNN_100/Test/PlotPES/FixedR1_Stats_',num2str(iA),'.csv');
+  filename = strcat('/Users/sventuri/WORKSPACE/CG-QCT/run_N3_CG_BNN_100/Test/PlotPES/FixedR1_Stats_',num2str(iA),'.csv');
   startRow = 2;
   formatSpec = '%16s%16s%16s%16s%s%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -98,7 +98,7 @@ end
 
 figure(iFigure)
 
-filename = '/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_NASA/Test/PlotPES/FixedR1R2_1.csv';
+filename = '/Users/sventuri/WORKSPACE/CG-QCT/run_N3_NASA/Test/PlotPES/FixedR1R2_1.csv';
 delimiter = ',';
 startRow = 2;
 formatSpec = '%f%f%[^\n\r]';
@@ -114,7 +114,7 @@ hold on
 
 for iPES=1:NPESs
   
-  filename = strcat('/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_CG_BNN_100/Test/PlotPES/FixedR1R2_1.csv.', num2str(iPES));
+  filename = strcat('/Users/sventuri/WORKSPACE/CG-QCT/run_N3_CG_BNN_100/Test/PlotPES/FixedR1R2_1.csv.', num2str(iPES));
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%[^\n\r]';
@@ -128,7 +128,7 @@ for iPES=1:NPESs
   
 end
 
-filename = '/Users/sventuri/WORKSPACE/CoarseAIR/run_N3_CG_BNN_100/Test/PlotPES/FixedR1R2_Stats_1.csv';
+filename = '/Users/sventuri/WORKSPACE/CG-QCT/run_N3_CG_BNN_100/Test/PlotPES/FixedR1R2_Stats_1.csv';
 startRow = 2;
 formatSpec = '%16s%16s%16s%16s%s%[^\n\r]';
 fileID = fopen(filename,'r');

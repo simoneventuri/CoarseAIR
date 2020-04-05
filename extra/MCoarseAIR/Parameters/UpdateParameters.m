@@ -10,7 +10,7 @@ function [iFigure] = UpdateParameters()
 
   %%==============================================================================================================
   % 
-  % Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
   % 
   % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
   %
@@ -29,7 +29,7 @@ function [iFigure] = UpdateParameters()
   %---------------------------------------------------------------------------------------------------------------
   %%==============================================================================================================
   
-  global System PathToOutput MoleculesName RunKONIGDir
+  global System PathToOutput MoleculesName RunKONIGDir Pair_to_Atoms
   
   global Plnck UKb Ue KeV AvN AMUToKg EhToeV DSWtoKg ATMToPa
   
@@ -47,6 +47,8 @@ function [iFigure] = UpdateParameters()
   DSWtoKg  = 1.d-3/1.8208e+03;
   ATMToPa  = 101325.d0;
 
+  Pair_to_Atoms = [1,2;1,3;2,3];
+  
   System(1,:)
   SystemPath   = strcat(PathToOutput,'/',System(1,:));                                               % For qnsEnBin.dat (Levels Info)
   RatesPath    = strcat(PathToOutput,'/',System(1,:),'/',MoleculesName(1,:),'/Rates/');              % For Levels / Bins Rates
@@ -59,14 +61,23 @@ function [iFigure] = UpdateParameters()
   linS     = {'--','-.',':','-'};
   linST    = {'-','-.',':','--'};
   
-  AxisFontSz = 36;
-  AxisFontNm = 'Arial';
+%   AxisFontSz = 36;
+%   AxisFontNm = 'Arial';
+%   
+%   AxisLabelSz = 44;
+%   AxisLabelNm = 'Arial';
+%   
+%   LegendFontSz = 40;
+%   LegendFontNm = 'Arial';
   
-  AxisLabelSz = 44;
-  AxisLabelNm = 'Arial';
+  AxisFontSz = 26;
+  AxisFontNm = 'Times';
   
-  LegendFontSz = 40;
-  LegendFontNm = 'Arial';
+  AxisLabelSz = 30;
+  AxisLabelNm = 'Times';
+  
+  LegendFontSz = 25;
+  LegendFontNm = 'Times';
   
   RCVec = [255  50  20] ./ 255;
   BCVec = [  0  70 200] ./ 255;

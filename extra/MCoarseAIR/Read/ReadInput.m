@@ -1,4 +1,4 @@
-%% The Function reads the input variables that have been used in the CoarseAIR simulations 
+%% The Function reads the input variables that have been used in the CG-QCT simulations 
 %
 %  Input Global Var: - PathToOutput: The path to the output folder (e.g.: ../Test/ )
 %
@@ -7,7 +7,7 @@ function ReadInput()
 
   %%==============================================================================================================
   % 
-  % Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
   % 
   % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
   %

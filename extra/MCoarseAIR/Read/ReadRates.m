@@ -20,7 +20,7 @@ function [RatesMatrix, DissRates, ProcessesRates, KRec, KRecOverg] = ReadRates(i
 
   %%==============================================================================================================
   % 
-  % Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
   % 
   % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
   %
@@ -39,7 +39,7 @@ function [RatesMatrix, DissRates, ProcessesRates, KRec, KRecOverg] = ReadRates(i
   %---------------------------------------------------------------------------------------------------------------
   %%==============================================================================================================
 
-  global NBins T0_Vec RatesPath ProcToLevIP ReadAllRatesFlg ProduceMatFlg ComponentMass DSWtoKg AvN UKb Ue Plnck RxLxIdx ComponentDeg NComp
+  global NBins T0_Vec RatesPath ProcToLevIP ReadAllRatesFlg ProduceMatFlg ComponentMass DSWtoKg AvN UKb Ue Plnck RxLxIdx ComponentDeg NComp FldrStr
   
   
   if (~exist('iBinsStart', 'var'))
@@ -72,6 +72,10 @@ function [RatesMatrix, DissRates, ProcessesRates, KRec, KRecOverg] = ReadRates(i
     elseif ReadAllRatesFlg == 2
 
       [RatesMatrix, DissRates, ProcessesRates] = ReadRatesAllTint(RatesMatrix, DissRates, ProcessesRates, iBinsStart, iBinsEnd);
+      
+    elseif ReadAllRatesFlg == 3
+
+      [RatesMatrix, DissRates, ProcessesRates] = ReadRatesFromArrhenius(iT, RatesMatrix, DissRates, ProcessesRates, iBinsStart, iBinsEnd);
 
     end
     

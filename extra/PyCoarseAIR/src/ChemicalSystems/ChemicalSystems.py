@@ -456,7 +456,7 @@ def O3_UMN_Upload( Temp ):
 
 
 ################################################################################################################
-### N2 + N System (From NASA Ames, Dr. D. Schwenke and Dr. R. L. Jaffe)
+### N2 + N System (From NASA Ames, Dr. R. L. Jaffe & Dr. D. Schwenke)
 def N3_NASA_Upload( Temp ):   
 
     SystNameLong  = 'N3_NASA'

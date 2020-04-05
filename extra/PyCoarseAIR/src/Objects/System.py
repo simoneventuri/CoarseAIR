@@ -906,7 +906,7 @@ class t_properties(object):
                                                 RHS_Str  = Mol1_Str + '+' + Atms_Str
                                                 
                                                 ProcName = LHS_Str  + '=' + RHS_Str
-                                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(TempRate)
+                                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
                                                 csvkinetics.write(Line)
 
                 csvkinetics.close()

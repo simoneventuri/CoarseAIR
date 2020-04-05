@@ -1,7 +1,7 @@
 % -- MATLAB --
 %%==============================================================================================================
 % 
-% Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
+% Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
 % 
 % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
 %
@@ -103,7 +103,7 @@ ComputePESToRatesCorrFlg   = 1
   ReadPESFlg        = true
   NHL               = [6,10,10,1];
   PreLogShift       = -3.5
-  Network_Folder    = '/home/aracca/WORKSPACE/CoarseAIR/coarseair/dtb/O3/PESs/BNN/PES9_AbInitio_10_10_LHS300/'
+  Network_Folder    = '/home/aracca/WORKSPACE/CG-QCT/cg-qct/dtb/O3/PESs/BNN/PES9_AbInitio_10_10_LHS300/'
   AbscissaConverter = 1.0
   BondOrderFun      = 'MorseFun'
   PIPFun            = 'Simone'

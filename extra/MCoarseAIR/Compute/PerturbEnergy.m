@@ -13,7 +13,7 @@ function [iFigure] = PerturbEnergy(iFigure, Levelvqn, Leveljqn, LevelEeV)
   Half   = 5.d-1;
   Zero   = 0.d0;
   
-  filename = '/Users/sventuri/WORKSPACE/CoarseAIR/run_N3/Test/N3/N2/levels_cut.inp';
+  filename = '/Users/sventuri/WORKSPACE/CG-QCT/run_N3/Test/N3/N2/levels_cut.inp';
   startRow = 16;
   formatSpec = '%*116s%15f%[^\n\r]';
   fileID = fopen(filename,'r');

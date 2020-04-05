@@ -1,4 +1,4 @@
-function [] = WriteRatesToNetwork(iT, NLevels, LevelEeV, Levelvqn, Leveljqn, rIn, Levelg, RatesMatrix, ProcessesRates, LevelEeVVib0, LevelEeVRot)
+function [] = WriteRatesToNetwork(iT, NLevels, LevelEeV, Levelvqn, Leveljqn, rIn, Levelg, RatesMatrix, ProcessesRates, LevelEeVVib0, LevelEeVRot, DeltaEintDiss)
 
   global PathToOutput System T0_Vec NBins KinMthd NTtra NTint TInt_Vec NMolecules StartBin FinalBin NBinnedMol BinnedMolName
 
@@ -33,40 +33,40 @@ function [] = WriteRatesToNetwork(iT, NLevels, LevelEeV, Levelvqn, Leveljqn, rIn
   ExpVec0(1:NLevels(iBinnedMol),1) = exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0 .* UKb) );
   ExpVec0                          = ExpVec0 ./ sum(ExpVec0);
     
-  if (ConsiderDegFlg == 1)
-    ExpVec(1:NLevels(iBinnedMol),1)  = Levelg(1:NLevels(iBinnedMol),1) .* exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
-  else
-    ExpVec(1:NLevels(iBinnedMol),1)  = exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
-  end
-  ExpVec                           = ExpVec ./ sum(ExpVec);
-  ExpMat                           = kron(ExpVec,1.d0./ExpVec');  %%% corect one
-
-  iReac = 1;
-  for iComp = 1:NComp
-    QTran(iComp) = (2.d0 .* pi .* ComponentMass(iComp) .* DSWtoKg ./ AvN .* UKb .* T0_Vec(iT) ./ Plnck.^2).^(3/2 .* RxLxIdx(iComp));
-  end
-  IntDeg(:)  = ComponentDeg(:).^(RxLxIdx(:));
-  EqVec      =      prod(QTran) .* prod(IntDeg)  .* Levelg(1:NLevels(iBinnedMol),1) .* ExpVec(1:NLevels(iBinnedMol),1);
-  LogEqVec   = -log(prod(QTran) .* prod(IntDeg)) .* LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ UKb;
-  
-  KDiss(1:NLevels(iBinnedMol),1)     = ProcessesRates(1:NLevels(iBinnedMol),1,1)' .* 1.d-6;
-  KEq(1:NLevels(iBinnedMol),1)       = ( EqVec(1:NLevels(iBinnedMol)) ).^(-1);
-  KRecOverg(1:NLevels(iBinnedMol),1) = KDiss(1:NLevels(iBinnedMol),1) ./ KEq(1:NLevels(iBinnedMol),1);
-  KRec(1:NLevels(iBinnedMol),1)      = KRecOverg(1:NLevels(iBinnedMol),1) .* Levelg(1:NLevels(iBinnedMol),1);
-  
+%   if (ConsiderDegFlg == 1)
+%     ExpVec(1:NLevels(iBinnedMol),1)  = Levelg(1:NLevels(iBinnedMol),1) .* exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
+%   else
+%     ExpVec(1:NLevels(iBinnedMol),1)  = exp( - LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ (T0_Vec(1) .* UKb) );
+%   end
+%   ExpVec                           = ExpVec ./ sum(ExpVec);
+%   ExpMat                           = kron(ExpVec,1.d0./ExpVec');  %%% corect one
+% 
+%   iReac = 1;
+%   for iComp = 1:NComp
+%     QTran(iComp) = (2.d0 .* pi .* ComponentMass(iComp) .* DSWtoKg ./ AvN .* UKb .* T0_Vec(iT) ./ Plnck.^2).^(3/2 .* RxLxIdx(iComp));
+%   end
+%   IntDeg(:)  = ComponentDeg(:).^(RxLxIdx(:));
+%   EqVec      =      prod(QTran) .* prod(IntDeg)  .* Levelg(1:NLevels(iBinnedMol),1) .* ExpVec(1:NLevels(iBinnedMol),1);
+%   LogEqVec   = -log(prod(QTran) .* prod(IntDeg)) .* LevelEeV(1:NLevels(iBinnedMol),1) .* Ue ./ UKb;
+%   
+%   KDiss(1:NLevels(iBinnedMol),1)     = ProcessesRates(1:NLevels(iBinnedMol),1,1)' .* 1.d-6;
+%   KEq(1:NLevels(iBinnedMol),1)       = ( EqVec(1:NLevels(iBinnedMol)) ).^(-1);
+%   KRecOverg(1:NLevels(iBinnedMol),1) = KDiss(1:NLevels(iBinnedMol),1) ./ KEq(1:NLevels(iBinnedMol),1);
+%   KRec(1:NLevels(iBinnedMol),1)      = KRecOverg(1:NLevels(iBinnedMol),1) .* Levelg(1:NLevels(iBinnedMol),1);
+%   
   if (WriteExchangeFlg == 1)
-    Kij(:,:)                      = (RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),1,1) + RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),2,1) + RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),3,1)) .* 1.d-6;
+    Kij(:,:)                      = (RatesMatrix(1:NBins(iBinnedMol),1:NBins(iBinnedMol),1,1) + RatesMatrix(1:NBins(iBinnedMol),1:NBins(iBinnedMol),2,1) + RatesMatrix(1:NBins(iBinnedMol),1:NBins(iBinnedMol),3,1)) .* 1.d-6;
   else
-    Kij(:,:)                      = RatesMatrix(1:NLevels(iBinnedMol),1:NLevels(iBinnedMol),1,1) .* 1.d-6;
+    Kij(:,:)                      = RatesMatrix(1:NBins(iBinnedMol),1:NBins(iBinnedMol),1,1) .* 1.d-6;
   end
   Kij(Kij < MinValA)              = 0.d0;
-  AInel                           = tril(Kij .* ExpMat,-1) + tril(Kij,-1)'; %%% Kji = AInel
+  AInel                           = Kij;%tril(Kij .* ExpMat,-1) + tril(Kij,-1)'; %%% Kji = AInel
   wOut                            = sum(AInel,1);
   wIn                             = sum(AInel,2);
   AInel = (AInel - diag(wOut));
   clear Kij Kji ExpMat
   
-  NLevelsTemp = NLevels(iBinnedMol);%1000
+  NLevelsTemp = NBins(iBinnedMol);%1000
   
   AInell = AInel(1:NLevelsTemp,1:NLevelsTemp);
   clear AInel
@@ -275,6 +275,16 @@ function [] = WriteRatesToNetwork(iT, NLevels, LevelEeV, Levelvqn, Leveljqn, rIn
   fprintf(fileID,'id,v,Longitude,Latitude,rIn,EeVVib,EeVRot\n');
   for i = 1:NLevelsTemp
     fprintf(fileID,'%i,%i,%e,%e,%e,%e,%e\n', i, Levelvqn(i), -Leveljqn(i), LevelEeV(i).*10.d0, rIn(i), LevelEeVVib0(i), LevelEeVRot(i));
+  end
+  fclose(fileID);
+  
+  
+  %% WRITING LEVELS
+  FileName = strcat(FolderName,'/InelBin.csv');
+  fileID = fopen(FileName,'w');
+  fprintf(fileID,'id,Bin\n');
+  for i = 1:NLevelsTemp
+    fprintf(fileID,'%i,%i\n', i, i);
   end
   fclose(fileID);
   
