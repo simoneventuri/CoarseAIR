@@ -19,6 +19,7 @@
 #---------------------------------------------------------------------------------------------------------------
 #===============================================================================================================
 
+
 # ------------------------------------------------------------------------------------------------------------ MergeTrajectories #
 function MergeTrajectories {
   # Ex: MergeTrajectories 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 1 ${COARSEAIR_SOURCE_DIR} 200000
@@ -60,7 +61,28 @@ function MergeTrajectories {
 
 
   iProcessesTot=0
-  ExitCond=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    MinLevel2Temp=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+      MinLevel2Temp=1
+    fi
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+      MinLevel2Temp=${MinLevel1}
+    fi
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$(( ${iProcessesTot} + 1 ))
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+        MinProcessInNode=${iProcessesTot}
+      fi
+      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        MaxProcessInNode=${iProcessesTot}
+      fi
+    done
+  done
+  iProcessesTot=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
     iLevel2Start=0
     if [ ${NMolecules} -eq 2 ]; then 
@@ -70,11 +92,9 @@ function MergeTrajectories {
       iLevel2Start=${iLevel1}
     fi
     for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
-        ExitCond=1
-      fi
-      if [ ${ExitCond} -eq 1 ]; then
-        iProcessesTot=$((iProcessesTot+1))
+      iProcessesTot=$((iProcessesTot+1))
+      if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+
         echo "[MergeTrajectories]: ----- Molecule 1, Level/Bin = " ${iLevel1} " --------------------- "
         echo "[MergeTrajectories]: ------- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- "
 
@@ -152,6 +172,123 @@ function MergeTrajectories {
         fi
 
 
+        echo "[MergeTrajectories]: ---------------------------------------------------------- "
+        echo "[MergeTrajectories]: ------------------------------------------------------------ "
+        echo " "
+      fi
+
+
+    done
+  done
+
+  cd  ${COARSEAIR_OUTPUT_DIR}/../
+
+}
+#================================================================================================================================#
+#================================================================================================================================#
+
+
+# ------------------------------------------------------------------------------------------------------------ MergeTrajectories #
+function CheckTrajectories {
+  # Ex: MergeTrajectories 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 1 ${COARSEAIR_SOURCE_DIR} 200000
+  # Ex: MergeTrajectories 1 20000.0 20000.0 2 1 1 54 54 1 54 54 1 ${COARSEAIR_SOURCE_DIR} 200000
+
+
+  export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
+  export TranFlg=${1}
+  export Tran=${2}
+  export Tint=${3}
+  export NMolecules=${4}
+  export SymmFlg=${5}
+  export MinLevel1=${6}
+  export MaxLevel1=${7}
+  export NLevels1=${8}
+  export MinLevel2=${9}
+  export MaxLevel2=${10}
+  export NLevels2=${11}
+  export RmTrajFlg=${12}
+  export COARSEAIR_SOURCE_DIR=${13}
+  export MinNTraj=${14}
+  export COARSEAIR_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/executing"
+
+  echo "[CheckTrajectories]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
+  echo "[CheckTrajectories]: TranFlg               = "${TranFlg}
+  echo "[CheckTrajectories]: Tran                  = "${Tran}
+  echo "[CheckTrajectories]: Tint                  = "${Tint}
+  echo "[CheckTrajectories]: NMolecules            = "${NMolecules}
+  echo "[CheckTrajectories]: SymmFlg               = "${SymmFlg}
+  echo "[CheckTrajectories]: MinLevel1             = "${MinLevel1}
+  echo "[CheckTrajectories]: MaxLevel1             = "${MaxLevel1}
+  echo "[CheckTrajectories]: NLevels1              = "${NLevels1}
+  echo "[CheckTrajectories]: MinLevel2             = "${MinLevel2}
+  echo "[CheckTrajectories]: MaxLevel2             = "${MaxLevel2}
+  echo "[CheckTrajectories]: NLevels2              = "${NLevels2}
+  echo "[CheckTrajectories]: RmTrajFlg             = "${RmTrajFlg}
+  echo "[CheckTrajectories]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
+  echo "[CheckTrajectories]: MinNTraj              = "${MinNTraj}
+
+
+  iProcessesTot=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    MinLevel2Temp=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+      MinLevel2Temp=1
+    fi
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+      MinLevel2Temp=${MinLevel1}
+    fi
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$(( ${iProcessesTot} + 1 ))
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+        MinProcessInNode=${iProcessesTot}
+      fi
+      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        MaxProcessInNode=${iProcessesTot}
+      fi
+    done
+  done
+  iProcessesTot=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+    fi
+    if [ ${SymmFlg} -eq 1 ]; then
+      iLevel2Start=${iLevel1}
+    fi
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$((iProcessesTot+1))
+      if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+
+        echo "[CheckTrajectories]: ----- Molecule 1, Level/Bin = " ${iLevel1} " --------------------- "
+        echo "[CheckTrajectories]: ------- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- "
+
+    
+        if [ ${TranFlg} -eq 0 ]; then 
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+        else
+          export COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+        fi
+
+
+        NTraj=0
+        if [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv ]; then
+
+          echo "[CheckTrajectories]: -----> Trajectories from different Processors already merged."
+          NTraj=$(wc -l < ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv)
+          NTraj=$((NTraj-1))
+          echo ${NTraj} > ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
+          echo "[CheckTrajectories]: -----> Tot Nb of Converged Trajectories: "${NTraj}
+
+        else
+
+          echo "[CheckTrajectories]: -----> No Trajectories Found. Nb of Trajectories = "${NTraj}
+
+        fi
+
 
         if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
           echo "#iLevel,jLevel,NTraj" > ${COARSEAIR_OUTPUT_DIR}/'Overall_NConvTraj.csv'
@@ -159,21 +296,139 @@ function MergeTrajectories {
         echo ${iLevel1}","${iLevel2}","${NTraj} >> ${COARSEAIR_OUTPUT_DIR}/'Overall_NConvTraj.csv'
         
 
-        echo "[MergeTrajectories]: ---------------------------------------------------------- "
-        echo "[MergeTrajectories]: ------------------------------------------------------------ "
+        echo "[CheckTrajectories]: ---------------------------------------------------------- "
+        echo "[CheckTrajectories]: ------------------------------------------------------------ "
         echo " "
       fi
-      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-        ExitCond=2
-      fi
+ 
     done
   done
 
   cd  ${COARSEAIR_OUTPUT_DIR}/../
 
-  echo "[MergeTrajectories]: Launching Python File "${COARSEAIR_SH_DIR}/SelectLevelsToRun.py" with Min Number of Computed Trajectories MinNTraj = "${MinNTraj}
-  python3 ${COARSEAIR_SH_DIR}/SelectLevelsToRun.py ${COARSEAIR_OUTPUT_DIR} ${MinNTraj}
-  echo "[MergeTrajectories]: The List of the Levels to Re-Run is "${COARSEAIR_OUTPUT_DIR}"/ProcessesToRunList.inp"
+  echo "[CheckTrajectories]: Launching Python File "${COARSEAIR_SH_DIR}/../preprocessing/SelectLevelsToRun.py" with Min Number of Computed Trajectories MinNTraj = "${MinNTraj}
+  python3 ${COARSEAIR_SH_DIR}/../preprocessing/SelectLevelsToRun.py ${COARSEAIR_OUTPUT_DIR} ${MinNTraj} 1
+  echo "[CheckTrajectories]: The List of the Levels to Re-Run is "${COARSEAIR_OUTPUT_DIR}"/ProcessesToRunList.inp"
+
+}
+#================================================================================================================================#
+#================================================================================================================================#
+
+
+# ------------------------------------------------------------------------------------------------------------ MergeTrajectories #
+function CkeckRates {
+  # Ex: CkeckRates 'N3' 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 ${COARSEAIR_SOURCE_DIR} 
+  # Ex: CkeckRates 'N4' 1 20000.0 20000.0 2 1 1 54 54 1 54 54 ${COARSEAIR_SOURCE_DIR}
+
+  export System=${1}
+  export TranFlg=${2}
+  export Tran=${3}
+  export Tint=${4}
+  export NMolecules=${5}
+  export SymmFlg=${6}
+  export MinLevel1=${7}
+  export MaxLevel1=${8}
+  export NLevels1=${9}
+  export MinLevel2=${10}
+  export MaxLevel2=${11}
+  export NLevels2=${12}
+  export COARSEAIR_SOURCE_DIR=${13}
+
+  export COARSEAIR_OUTPUT_DIR=$(pwd)/Test
+  export COARSEAIR_SH_DIR=${COARSEAIR_SOURCE_DIR}"/scripts/preprocessing/"
+
+  echo "[CkeckRates]: System                = "${System}
+  echo "[CkeckRates]: TranFlg               = "${TranFlg}
+  echo "[CkeckRates]: Tran                  = "${Tran}
+  echo "[CkeckRates]: Tint                  = "${Tint}
+  echo "[CkeckRates]: NMolecules            = "${NMolecules}
+  echo "[CkeckRates]: SymmFlg               = "${SymmFlg}
+  echo "[CkeckRates]: MinLevel1             = "${MinLevel1}
+  echo "[CkeckRates]: MaxLevel1             = "${MaxLevel1}
+  echo "[CkeckRates]: NLevels1              = "${NLevels1}
+  echo "[CkeckRates]: MinLevel2             = "${MinLevel2}
+  echo "[CkeckRates]: MaxLevel2             = "${MaxLevel2}
+  echo "[CkeckRates]: NLevels2              = "${NLevels2}
+  echo "[CkeckRates]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
+  echo "[CkeckRates]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
+
+
+  iProcessesTot=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    MinLevel2Temp=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+      MinLevel2Temp=1
+    fi
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$(( ${iProcessesTot} + 1 ))
+      if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+        MinProcessInNode=${iProcessesTot}
+      fi
+      if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+        MaxProcessInNode=${iProcessesTot}
+      fi
+    done
+  done
+
+  iProcessesTot=0
+  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    iLevel2Start=0
+    if [ ${NMolecules} -eq 2 ]; then 
+      iLevel2Start=1
+    fi
+    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      iProcessesTot=$((iProcessesTot+1))
+      TempFlg=1
+      if [ ${SymmFlg} -eq 1 ]; then
+        if [ ${iLevel2} -lt ${iLevel1} ]; then
+          TempFlg=0
+        fi
+      fi
+      if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ] && [ ${TempFlg} -eq 1 ]; then
+    
+        if [ ${TranFlg} -eq 0 ]; then 
+          export RATES_FILE=${COARSEAIR_OUTPUT_DIR}/${System}/"Rates/E_"${Tran%.*}"_T_"${Tint%.*}/"Proc"${iProcessesTot}".csv"
+        else
+          export RATES_FILE=${COARSEAIR_OUTPUT_DIR}/${System}/"Rates/T_"${Tran%.*}"_"${Tint%.*}/"Proc"${iProcessesTot}".csv"
+        fi
+        echo "[CkeckRates]: Molecule 1, Level/Bin = " ${iLevel1} "; Molecule 2, Level/Bin = " ${iLevel2} ";  Rates File = "${RATES_FILE}
+
+
+        NRates=0
+        if [ -f ${RATES_FILE} ]; then
+
+          echo "[CkeckRates]: -----> Rates File Found."
+          NLines=$(wc -l < ${RATES_FILE})
+          NLines=$((NLines-1))
+          NRates=$((${NLines} - 5))
+          echo "[CkeckRates]: -----> Tot Nb of Rates Found: "${NRates}
+
+        else
+
+          echo "[CkeckRates]: -----> No Rates File Found."
+
+        fi
+
+
+        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2} ]; then
+          echo "#iLevel,jLevel,NRates" > ${COARSEAIR_OUTPUT_DIR}/'Overall_NRates.csv'
+        fi
+        echo ${iLevel1}","${iLevel2}","${NRates} >> ${COARSEAIR_OUTPUT_DIR}/'Overall_NRates.csv'
+        
+
+        echo " "
+      fi
+
+    done
+  done
+
+  cd  ${COARSEAIR_OUTPUT_DIR}/../
+
+  echo "[CkeckRates]: Launching Python File "${COARSEAIR_SH_DIR}/SelectLevelsToRun.py" with Min Number of Rates MinRates = 1"
+  python3 ${COARSEAIR_SH_DIR}/SelectLevelsToRun.py ${COARSEAIR_OUTPUT_DIR} 1 2
+  echo "[CkeckRates]: The List of the Levels to Re-Run / Re-PostProcess is "${COARSEAIR_OUTPUT_DIR}"/ProcessesToRunList.inp"
 
 }
 #================================================================================================================================#

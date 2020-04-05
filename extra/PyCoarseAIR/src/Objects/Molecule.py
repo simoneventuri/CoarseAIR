@@ -39,6 +39,10 @@ def mkdirs(newdir, mode=0o777):
     os.makedirs(newdir, mode, exist_ok=True)
 
 
+
+
+
+# ===================================================================================================================== CLASS ===
 class grouped_t_properties(object):
 
     def __init__(self, NProcTypes, T):
@@ -54,9 +58,13 @@ class grouped_t_properties(object):
         self.Proc     = [processes() for iProc in range(4)]
         self.ProcExch = [processes() for iProc in range(NProcTypes-2)]
         self.ProcTot  = [processes() for iProc in range(NProcTypes)]
+# --------------------------------------------------------------------------------------------------------------------- CLASS ---
 
 
 
+
+
+# ===================================================================================================================== CLASS ===
 class groupedmolecule(object):
 
     def __init__(self, Temp, PathToMapping, T0, NProcTypes, Name, CFDCompName, Type, ToMol ):
@@ -72,6 +80,7 @@ class groupedmolecule(object):
 
 
 
+    # ***************************************************************************************************************************
     def Initialize( self, InputData, Syst, Temp, NLevels, Levelvqn, LevelEeV, Levelg, LevelWrite_Flg, In_Flg ):
         print('      [Molecule.py - Initialize]: Initializing Grouped Molecule ' + self.Name )
 
@@ -86,9 +95,11 @@ class groupedmolecule(object):
                 TInt = TTra
                 
                 self.Save_PartFuncsAndEnergiesAtT_HDF5( InputData, Syst, TTra, TInt, iT, In_Flg )
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Get_Mapping( self, Levelvqn ):
         print('      [Molecule.py - Get_Mapping]: Computing Nb of Groups and Mapping Levels -> Groups for Grouped Molecule ' + self.Name )
 
@@ -109,9 +120,11 @@ class groupedmolecule(object):
             print('      [Molecule.py - Get_Mapping]:   ERROR! Grouping Method "' + self.Type + '" NOT IMPLEMENTED!' )
 
         print('      [Molecule.py - Get_Mapping]:   Nb of Groups = ' + str(self.NGroups) )
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Compute_GroupProps( self, NLevels, Levelg, LevelEeV, LevelWrite_Flg ):
         print('      [Molecule.py - Compute_GroupProps]: Computing Group Properties for Grouped Molecule ' + self.Name )
 
@@ -139,9 +152,11 @@ class groupedmolecule(object):
 
             self.T[iT].EeV    = self.T[iT].EeV / self.T[iT].Q
             self.T[iT].QRatio = self.T[iT].Q   / np.sum(self.T[iT].Q)
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Write_InitialConditions( self, InputData, Syst, Temp, In_Flg ):
         print('    [Molecule.py - Write_InitialConditions]: Writing Initial Mole Fractions for Grouped Molecule: ' + self.CFDCompName )
 
@@ -164,9 +179,11 @@ class groupedmolecule(object):
             csvmole.write(Line)
 
         csvmole.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Write_ThermoProperties( self, InputData, Syst, Temp, In_Flg ):
 
         if (In_Flg == 1):
@@ -193,9 +210,11 @@ class groupedmolecule(object):
                 f.write(Line)
                 np.savetxt(f, np.transpose(np.array([self.T[iT].Q0, self.T[iT].Q0*0.0])), fmt='%.8e    %.8e')
             f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Save_PartFuncsAndEnergiesAtT_HDF5( self, InputData, Syst, TTra, TInt, iT, In_Flg ):
         print('        [Molecule.py - Save_PartFuncsAndEnergiesAtT_HDF5]: Saving Data')
 
@@ -238,9 +257,17 @@ class groupedmolecule(object):
             GroupQRatio  = grp.create_dataset("GroupQRatio", data=self.T[iT-1].QRatio, compression="gzip", compression_opts=9)
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+# --------------------------------------------------------------------------------------------------------------------- CLASS ---
+
+
+
+
+
+# ===================================================================================================================== CLASS ===
 class t_properties(object):
 
     def __init__(self):
@@ -249,9 +276,13 @@ class t_properties(object):
         self.QRatio   = 0.0
         self.Q        = 0.0
         self.QExp     = 0.0
-      
+# --------------------------------------------------------------------------------------------------------------------- CLASS ---
 
 
+
+
+
+# ===================================================================================================================== CLASS ===
 class molecule(object):
 
     def __init__(self, NTTran):
@@ -293,6 +324,7 @@ class molecule(object):
 
 
 
+    # ***************************************************************************************************************************
     def Initialize( self, InputData, Syst, Temp, iMol ):
 
         self.CFDCompName = Syst.CFDComp[Syst.MolToCFDComp[iMol]].Name
@@ -375,9 +407,11 @@ class molecule(object):
 
 
         print('    [Molecule.py - Initialize]: Done Initializing the Molecule ' + self.Name )
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Read_Levels( self, InputData, Syst ):
         print('      [Molecule.py - Read_Levels]: Reading Level Properties')
 
@@ -441,9 +475,11 @@ class molecule(object):
 
 
         self.Compute_ERot()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Read_qnsEnBin( self, InputData, Syst, Temp ):
         print('      [Molecule.py - Read_qnsEnBin]: Reading Level To Group Mapping')
 
@@ -478,8 +514,6 @@ class molecule(object):
                 self.Save_qnsEnBin_HDF5( InputData, Syst )
 
 
-
-
         for iT in Temp.iTVec:
             TTra = Temp.TranVec[iT-1]
             TInt = TTra
@@ -504,9 +538,11 @@ class molecule(object):
                 if (InputData.HDF5.Save_Flg):
                     print('      [Molecule.py - Read_qnsEnBin]:   Saving Data in the HDF5 File')
                     self.Save_PartFuncsAndEnergiesAtT_HDF5( Syst, TTra, TInt, iT )
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Load_Levels_HDF5( self, Syst ):
         print('        [Molecule.py - Load_Levels_HDF5]: Loading Data')
 
@@ -548,9 +584,11 @@ class molecule(object):
         self.LevelrOut = Data[...]
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Load_qnsEnBin_HDF5( self, InputData, Syst ):
         print('        [Molecule.py - Load_qnsEnBin_HDF5]: Loading Data')
 
@@ -571,9 +609,11 @@ class molecule(object):
         self.LevelToGroupIn = Data[...]
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Load_PartFuncsAndEnergiesAtT_HDF5( self, Syst, iT, TTra, TInt ):
         print('        [Molecule.py - Load_PartFuncsAndEnergiesAtT_HDF5]: Loading Data')
 
@@ -594,9 +634,11 @@ class molecule(object):
         self.T[iT-1].LevelQE      = Data[...] 
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Save_Levels_HDF5( self, Syst ):
         print('        [Molecule.py - Save_Levels_HDF5]: Saving Data')
 
@@ -662,9 +704,11 @@ class molecule(object):
             LevelrOut = grp.create_dataset("LevelrOut", data=self.LevelrOut,           compression="gzip", compression_opts=9)
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Save_qnsEnBin_HDF5( self, InputData, Syst ):
         print('        [Molecule.py - Save_qnsEnBin_HDF5]: Saving Data')
 
@@ -698,9 +742,11 @@ class molecule(object):
             LevelToGroupIn = grp.create_dataset(StrTemp,  data=self.LevelToGroupIn, compression="gzip", compression_opts=9)
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Save_PartFuncsAndEnergiesAtT_HDF5( self, Syst, TTra, TInt, iT ):
         print('        [Molecule.py - Save_PartFuncsAndEnergiesAtT_HDF5]: Saving Data')
 
@@ -741,9 +787,11 @@ class molecule(object):
             LevelQERatio = grp.create_dataset("LevelQERatio", data=self.T[iT-1].LevelQERatio, compression="gzip", compression_opts=9)
 
         f.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Compute_ERot( self ):
         print('        [Molecule.py - Compute_ERot]: Computing Vibrational and Rotational Energies from the Ro-Vibrational Ones (By Prioritizing Vibration)')
 
@@ -755,9 +803,11 @@ class molecule(object):
                 self.vEeV[int(self.Levelvqn[iLevel])] = self.LevelEeV[iLevel]
             self.LevelEVib[iLevel] = self.vEeV[int(self.Levelvqn[iLevel])]
             self.LevelERot[iLevel] = self.LevelEeV[iLevel] - self.LevelEVib[iLevel]
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Write_InitialConditions( self, InputData, Syst, Temp ):
 
         print('    [Molecule.py - Write_InitialConditions]: Computing Ratios of Initial Mole Fractions for Molecule: ' + self.CFDCompName )
@@ -780,9 +830,11 @@ class molecule(object):
                 csvmole.write(Line)
 
         csvmole.close()
+    # ...........................................................................................................................
 
 
 
+    # ***************************************************************************************************************************
     def Write_ThermoProperties( self, InputData, Syst, Temp ):
 
         mkdirs(    InputData.Kin.WriteFldr + '/thermo/' ) 
@@ -814,36 +866,11 @@ class molecule(object):
                     csvmole.write(Line)
 
             csvmole.close()
+    # ...........................................................................................................................
 
 
 
-    def Compute_QRatio0( self, T0 ):
-        print('      [Molecule.py - Compute_QRatio0]: Computing Molecule Distribution Function at Initial Temperature')
-
-        self.QRatio0 = self.Levelg  * np.exp( - self.LevelEeV0 * Ue / (T0 * UKb) )
-        self.QRatio0 = self.QRatio0 / np.sum(self.QRatio0)
-
-
-
-    def Initialize_WindAvrg_Objects( self, InputData, Syst):
-        print('      [Molecule.py - Initialize_WindAvrg_Objects]: Initializing Objects for Kinetics Window-Averaging')
-        
-        self.WindAvrgDet   = int( (2*InputData.Kin.WindAvrgJs+1) * (2*InputData.Kin.WindAvrgVs+1) )
-        self.WindAvrgMat   = np.zeros( (self.NLevels,  self.WindAvrgDet), dtype=np.int64)
-        self.WindAvrgFound = np.zeros( (self.NLevels,  1), dtype=np.int64 )
-
-        for iLevel in range(self.NLevels):
-            iFound = -1
-            for jLevel in range(self.NLevels):
-                if (np.absolute(self.Levelvqn[iLevel] - self.Levelvqn[jLevel]) <= InputData.Kin.WindAvrgVs) and  (np.absolute(self.Leveljqn[iLevel] - self.Leveljqn[jLevel]) <= InputData.Kin.WindAvrgJs):
-                    iFound     = iFound  + 1
-                    self.WindAvrgMat[iLevel,iFound] = jLevel
-            self.WindAvrgFound[iLevel]              = iFound 
-        
-        print('      [Molecule.py - Initialize_WindAvrg_Objects]:   Done Initializing Objects for Kinetics Window-Averaging\n')
-
-
-
+    # ***************************************************************************************************************************
     def Create_ThermoFile_Format( self, PathToFileOrig ):
         print('    [Molecule.py - Create_ThermoFile_Format]: Creating Thermo File Format for Molecule: ' + self.CFDCompName )
 
@@ -900,3 +927,39 @@ class molecule(object):
         csvthemo.write('#Levels degeneracies and energies [eV]     \n')
 
         csvthemo.close()
+    # ...........................................................................................................................
+
+
+
+    # ***************************************************************************************************************************
+    def Compute_QRatio0( self, T0 ):
+        print('      [Molecule.py - Compute_QRatio0]: Computing Molecule Distribution Function at Initial Temperature')
+
+        self.QRatio0 = self.Levelg  * np.exp( - self.LevelEeV0 * Ue / (T0 * UKb) )
+        self.QRatio0 = self.QRatio0 / np.sum(self.QRatio0)
+    # ...........................................................................................................................
+
+
+
+    # ***************************************************************************************************************************
+    def Initialize_WindAvrg_Objects( self, InputData, Syst):
+        print('      [Molecule.py - Initialize_WindAvrg_Objects]: Initializing Objects for Kinetics Window-Averaging')
+        
+        self.WindAvrgDet   = int( (2*InputData.Kin.WindAvrgJs+1) * (2*InputData.Kin.WindAvrgVs+1) )
+        self.WindAvrgMat   = np.zeros( (self.NLevels,  self.WindAvrgDet), dtype=np.int64)
+        self.WindAvrgFound = np.zeros( (self.NLevels,  1), dtype=np.int64 )
+
+        for iLevel in range(self.NLevels):
+            iFound = -1
+            for jLevel in range(self.NLevels):
+                if (np.absolute(self.Levelvqn[iLevel] - self.Levelvqn[jLevel]) <= InputData.Kin.WindAvrgVs) and  (np.absolute(self.Leveljqn[iLevel] - self.Leveljqn[jLevel]) <= InputData.Kin.WindAvrgJs):
+                    iFound     = iFound  + 1
+                    self.WindAvrgMat[iLevel,iFound] = jLevel
+            self.WindAvrgFound[iLevel]              = iFound 
+        
+        print('      [Molecule.py - Initialize_WindAvrg_Objects]:   Done Initializing Objects for Kinetics Window-Averaging\n')
+    # ...........................................................................................................................
+
+
+
+# --------------------------------------------------------------------------------------------------------------------- CLASS ---

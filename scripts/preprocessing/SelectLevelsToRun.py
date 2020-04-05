@@ -19,7 +19,7 @@
 #---------------------------------------------------------------------------------------------------------------
 ##==============================================================================================================
 
-# Ex.: python3 ../coarseair/scripts/executing/SelectLevelsToRun.py /home/venturi/WORKSPACE/CoarseAIR/N4_VS/Test/ 1001
+# Ex.: python3 ../coarseair/scripts/executing/SelectLevelsToRun.py /home/venturi/WORKSPACE/CoarseAIR/N4_VS/Test/ 1001 1
 
 import os
 import sys
@@ -30,32 +30,39 @@ import pandas
 if (len(sys.argv) > 1):
     COARSEAIR_OUTPUT_DIR = sys.argv[1]
     print("[SelectLevelsToRun.py]: COARSEAIR_OUTPUT_DIR = ", COARSEAIR_OUTPUT_DIR)
-    MinNTraj                 = int(sys.argv[2])
-    print("[SelectLevelsToRun.py]: MinNTraj                 = ", MinNTraj)
+    MinNQoI              = int(sys.argv[2])
+    print("[SelectLevelsToRun.py]: MinNQoI              = ", MinNQoI)
+    QoIFlg               = int(sys.argv[3])
+    print("[SelectLevelsToRun.py]: QoIFlg               = ", QoIFlg)
 else:
-    print("[SelectLevelsToRun.py]: ERROR! This Program requires TWO ARGUMENTS: COARSEAIR_OUTPUT_DIR and MinNTraj" )
+    print("[SelectLevelsToRun.py]: ERROR! This Program requires 3 ARGUMENTS: COARSEAIR_OUTPUT_DIR;   MinNQoI;   QoIFlg" )
 ##--------------------------------------------------------------------------------------------------------------
 
-PathToFile = COARSEAIR_OUTPUT_DIR + '/Overall_NConvTraj.csv'
-print('[SelectLevelsToRun.py]:   Reading File: ', PathToFile)
+if (QoIFlg == 1):
+    print('[SelectLevelsToRun.py]:   QoI: Number of Trajectories')
+    PathToFile = COARSEAIR_OUTPUT_DIR + '/Overall_NConvTraj.csv'
+elif (QoIFlg == 2):
+    print('[SelectLevelsToRun.py]:   QoI: Number of Rates per File')
+    PathToFile = COARSEAIR_OUTPUT_DIR + '/Overall_NRates.csv'
+print('[SelectLevelsToRun.py]:     Reading File: ', PathToFile)
 
 Data = pandas.read_csv(PathToFile, header=None, skiprows=1)
 Data = Data.apply(pandas.to_numeric, errors='coerce')
 
 iLevelVec = np.array(Data.values[:,0],  dtype=np.int64  )
 jLevelVec = np.array(Data.values[:,1],  dtype=np.int64  )
-NTrajVec  = np.array(Data.values[:,2],  dtype=np.int64  )
+NQoIVec   = np.array(Data.values[:,2],  dtype=np.int64  )
 
 
 LevelsFile = COARSEAIR_OUTPUT_DIR + '/ProcessesToRunList.inp'
 print('[SelectLevelsToRun.py]: Writing List of Levels to Run in: ' + LevelsFile )
 csvlevels  = open(LevelsFile, 'w')
 iProc = -1
-for NTraj in NTrajVec:
+for NQoI in NQoIVec:
     iProc  = iProc + 1
     iLevel = iLevelVec[iProc]
     jLevel = jLevelVec[iProc]
-    if (NTraj < MinNTraj):
-        print('[SelectLevelsToRun.py]: Adding (iLevel, jLevel) = (' + str(iLevel) + ',' + str(jLevel) + '). It has only ' + str(NTraj) + ' Trajectories Converged.' )
+    if (NQoI < MinNQoI):
+        print('[SelectLevelsToRun.py]: Adding (iLevel, jLevel) = (' + str(iLevel) + ',' + str(jLevel) + '). It has only ' + str(NQoI) + ' QoIs.' )
         Line = '%d-%d\n' % ((iLevel, jLevel))
         csvlevels.write(Line)

@@ -33,10 +33,11 @@ def CO2_NASA_Upload( Temp ):
 
     NAtoms        = 3
     NMolecules    = 2
+    NDistMolecules= 2
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 4
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'C'
@@ -142,10 +143,11 @@ def O2C_NASA_Upload( Temp ):
 
     NAtoms        = 3
     NMolecules    = 2
+    NDistMolecules= 2
     NPairs        = 3
     NCFDComp      = 4
     NProcTypes    = 3
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'O'
@@ -250,10 +252,11 @@ def CHN_UIUC_Upload( Temp ):
 
     NAtoms        = 3
     NMolecules    = 3
+    NDistMolecules= 3
     NPairs        = 3
     NCFDComp      = 6
     NProcTypes    = 4
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'C'
@@ -375,10 +378,11 @@ def O3_UMN_Upload( Temp ):
 
     NAtoms        = 3
     NMolecules    = 1
+    NDistMolecules= 1
     NPairs        = 3
     NCFDComp      = 2
     NProcTypes    = 3
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'O'
@@ -461,10 +465,11 @@ def N3_NASA_Upload( Temp ):
 
     NAtoms        = 3
     NMolecules    = 1
+    NDistMolecules= 1
     NPairs        = 3
     NCFDComp      = 2
     NProcTypes    = 2
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'N'
@@ -545,10 +550,11 @@ def N4_NASA_Upload( Temp ):
 
     NAtoms        = 4
     NMolecules    = 1
+    NDistMolecules= 1
     NPairs        = 6
     NCFDComp      = 2
     NProcTypes    = 3
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
 
 
     Syst.Atom[0].Name  = 'N'
@@ -641,10 +647,11 @@ def NaNbNcNd_NASA_Upload( Temp ):
 
     NAtoms        = 4
     NMolecules    = 6
+    NDistMolecules= 1
     NPairs        = 6
     NCFDComp      = 2
     NProcTypes    = 3
-    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
+    Syst          = system(SystNameLong, SystName, NAtoms, NMolecules, NDistMolecules, NPairs, NCFDComp, Temp.NTran, NProcTypes)
     Syst.SymmFlg  = True
 
     Syst.Atom[0].Name  = 'N'

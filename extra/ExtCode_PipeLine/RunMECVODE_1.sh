@@ -39,16 +39,17 @@ COARSEAIR_release
 #PLATONORECOMB_gnu_release
 PLATO_gnu_release
 
-export System='O3_UMN'
-export Molecule='O2'
-export FldrName='_OnlyBound'
+export System='NaNbNcNd_NASA'
+export Molecule='N2'
+export FldrName=''
 export Tran_vec=(1500 5000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=2
+export DissFlg=1
+export DissInelFlg=1
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=1
@@ -73,6 +74,7 @@ echo '------------------------------------------------------'
 echo '  System                         = '${System}
 echo '  Vector of Translational Temp.s = '${Tran_vec}
 echo '  Writing Dissociation?          = '${DissFlg}
+echo '  Writing Inelatic+Dissociation? = '${DissInelFlg}
 echo '  Writing Inelastic?             = '${InelFlg}
 echo '  Firts Exchanges to be Written? = '${ExchFlg1}
 echo '  Last Exchanges  to be Written? = '${ExchFlg2}
@@ -88,13 +90,15 @@ function Load_Initialize_0D() {
 
 function Call_MeCvode() {
   cd ${PathToRunFldr}
-  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelDissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  # export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
   if [ $DissFlg -eq 0 ]; then
     export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
   else
-    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'N4_T'${TTran}'K'
+    #export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'
   fi
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
