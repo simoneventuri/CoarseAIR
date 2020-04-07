@@ -37,7 +37,7 @@ import MolecularProperties
 
 def mkdirs(newdir, mode=0o777):
     os.makedirs(newdir, mode, exist_ok=True)
-
+    
 
 
 
@@ -198,18 +198,39 @@ class groupedmolecule(object):
         for iT in range(1, self.NTs):
             print('      [Molecule.py - Write_ThermoProperties]: Writing Thermo File for Grouped Molecule: ' + self.CFDCompName + ' at T = ' + str(int(self.TVec[iT])) + ' K' )
 
-            PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
-            if not os.path.isfile(PathToFileOrig):
-                Syst.Molecule[self.ToMol].Create_ThermoFile_Format( PathToFileOrig )
+            PathToFile = TempFldr + '/' + self.CFDCompName + '_T' + str(int(self.TVec[iT])) + 'K'
 
-            PathToFile     = TempFldr + '/'    + self.CFDCompName + '_T' + str(int(self.TVec[iT])) + 'K'
-            DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
 
-            with open(PathToFile, 'a') as f:
-                Line = 'NB_ENERGY_LEVELS = ' + str(self.NGroups) + '\n'
-                f.write(Line)
-                np.savetxt(f, np.transpose(np.array([self.T[iT].Q0, self.T[iT].Q0*0.0])), fmt='%.8e    %.8e')
-            f.close()
+            if (InputData.Kin.WriteFormat == 'PLATO'):
+        
+                PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
+                if not os.path.isfile(PathToFileOrig):
+                    Syst.Molecule[self.ToMol].Create_ThermoFile_Format( PathToFileOrig )
+
+                DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
+
+                with open(PathToFile, 'a') as f:
+                    Line = 'NB_ENERGY_LEVELS = ' + str(self.NGroups) + '\n'
+                    f.write(Line)
+                    np.savetxt(f, np.transpose(np.array([self.T[iT].Q0, self.T[iT].Q0*0.0])), fmt='%.8e    %.8e')
+                f.close()
+
+
+            elif (InputData.Kin.WriteFormat == 'csv'):
+                
+                with open(PathToFile, 'w') as f:
+                    f.write('# $Q_I$,$E_I~[eV]$\n')
+                    np.savetxt(f, np.transpose(np.array([self.T[iT].Q0, self.T[iT].EeV])), fmt='%e,%e')
+                f.close()
+
+
+            elif (InputData.Kin.WriteFormat == 'custom'):
+                print('    [System.py - Write_ThermoProperties]: Customize the File by Specifying the Desired Format' )
+
+
+            else:
+                raise NameError("    [System.py - Write_ThermoProperties]: InputData.Kin.WriteFormat must be specified. Select 'PLATO', 'csv', or 'custom'")
+
     # ...........................................................................................................................
 
 
@@ -844,28 +865,52 @@ class molecule(object):
         for iT in Temp.iTVec:
             print('      [Molecule.py - Write_ThermoProperties]: Writing Thermo File for Molecule: ' + self.CFDCompName + ' at T = ' + str(int(Temp.TranVec[iT-1])) + ' K' )
 
-            PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
-            if not os.path.isfile(PathToFileOrig):
-                self.Create_ThermoFile_Format( PathToFileOrig )
-
             PathToFile     = TempFldr + '/'    + self.CFDCompName + '_T' + str(int(Temp.TranVec[iT-1])) + 'K'
-            DestTemp       = shutil.copyfile(PathToFileOrig, PathToFile)
-            print('      [Molecule.py - Write_ThermoProperties]: Copied File to: ', DestTemp)
 
-            with open(PathToFile, 'a') as f:
-                Line = 'NB_ENERGY_LEVELS = ' + str(self.NLevelsNewMapping) + '\n'
-                f.write(Line)
-                #np.savetxt(f, np.transpose(np.array([self.Levelg, self.LevelEeV0])), fmt='%.8e    %.8e')
-            f.close()
 
-            csvmole = open(PathToFile, 'a')
-            for iLevel in range(self.NLevels):
-                if (self.LevelWrite_Flg[iLevel]):
-                    jLevel = self.LevelNewMapping[iLevel]
-                    Line   = '%.8e    %.8e\n' % ( float(self.Levelg[iLevel]), float(self.LevelEeV0[iLevel]) )
-                    csvmole.write(Line)
+            if (InputData.Kin.WriteFormat == 'PLATO'):
 
-            csvmole.close()
+                PathToFileOrig = TempFldr + '/../' + self.CFDCompName + '_Format'
+                if not os.path.isfile(PathToFileOrig):
+                    self.Create_ThermoFile_Format( PathToFileOrig )
+
+                DestTemp  = shutil.copyfile(PathToFileOrig, PathToFile)
+                print('      [Molecule.py - Write_ThermoProperties]: Copied File to: ', DestTemp)
+
+                with open(PathToFile, 'a') as f:
+                    Line = 'NB_ENERGY_LEVELS = ' + str(self.NLevelsNewMapping) + '\n'
+                    f.write(Line)
+                    #np.savetxt(f, np.transpose(np.array([self.Levelg, self.LevelEeV0])), fmt='%.8e    %.8e')
+                f.close()
+
+                csvmole = open(PathToFile, 'a')
+                for iLevel in range(self.NLevels):
+                    if (self.LevelWrite_Flg[iLevel]):
+                        jLevel = self.LevelNewMapping[iLevel]
+                        Line   = '%.8e    %.8e\n' % ( float(self.Levelg[iLevel]), float(self.LevelEeV0[iLevel]) )
+                        csvmole.write(Line)
+                csvmole.close()
+
+
+            elif (InputData.Kin.WriteFormat == 'csv'):
+                
+                csvmole = open(PathToFile, 'w')
+                csvmole.write('# $g_i$,$E_i~[eV]$\n')
+                for iLevel in range(self.NLevels):
+                    if (self.LevelWrite_Flg[iLevel]):
+                        jLevel = self.LevelNewMapping[iLevel]
+                        Line   = '%e,%e\n' % ( float(self.Levelg[iLevel]), float(self.LevelEeV0[iLevel]) )
+                        csvmole.write(Line)
+                csvmole.close()
+
+
+            elif (InputData.Kin.WriteFormat == 'custom'):
+                print('    [System.py - Write_ThermoProperties]: Customize the File by Specifying the Desired Format' )
+
+
+            else: 
+                raise NameError("    [System.py - Write_ThermoProperties]: InputData.Kin.WriteFormat must be specified. Select 'PLATO', 'csv', or 'custom'")
+
     # ...........................................................................................................................
 
 

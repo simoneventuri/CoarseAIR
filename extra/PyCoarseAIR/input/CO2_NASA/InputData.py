@@ -73,6 +73,7 @@ class kinetics(object):
 
         self.WriteExoth_Flg             = True
         self.WriteQB_IntFlg             = 2
+        self.WriteFormat                = 'PLATO'
 
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules

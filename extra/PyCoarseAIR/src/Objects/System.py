@@ -40,7 +40,7 @@ from Molecule  import molecule
 from Pair      import pair
 from CFDComp   import cfdcomp
 from Processes import processes
-from QSS       import qss
+#from QSS       import qss
 
 def mkdirs(newdir, mode=0o777):
     os.makedirs(newdir, mode, exist_ok=True)
@@ -57,7 +57,7 @@ class t_properties(object):
         self.Proc     = [processes() for iProc in range(4)]
         self.ProcExch = [processes() for iProc in range(NProcTypes-2)]
         self.ProcTot  = [processes() for iProc in range(NProcTypes)]
-        self.QSS      = qss(NProcTypes)
+        #self.QSS      = qss(NProcTypes)
 
 
 
@@ -723,6 +723,17 @@ class t_properties(object):
         else:
             TempCoeff = -1.0
 
+
+        if (InputData.Kin.WriteFormat == 'PLATO'):
+            print('    [System.py - Write_Kinetics]: Writing Kinetics in PLATO Format' )
+        elif (InputData.Kin.WriteFormat == 'csv'):
+            print('    [System.py - Write_Kinetics]: Writing Kinetics in .csv Format' )
+        elif (InputData.Kin.WriteFormat == 'custom'):
+            print('    [System.py - Write_Kinetics]: Writing Kinetics in Custom Format' )
+        else:
+            raise NameError("    [System.py - Write_Kinetics]: InputData.Kin.WriteFormat must be specified. Select 'PLATO', 'csv', or 'custom'")
+
+
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' ) 
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.GroupsOutSuffix )
         mkdirs(    InputData.Kin.WriteFldr + '/kinetics/' + Syst.NameLong + InputData.Kin.GroupsOutSuffix + '/T' + str(int(Temp.TranVec[self.iT-1])) + 'K/' )    
@@ -745,20 +756,35 @@ class t_properties(object):
                         DissKinetics = TempFldr + '/Diss.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Dissociation: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name )
                 csvkinetics  = open(DissKinetics, 'w')
+                
+                if (InputData.Kin.WriteFormat == 'csv'):
+                    csvkinetics.write('#i,$k_i^{D}~[cm^3/s]$\n')
+                elif (InputData.Kin.WriteFormat == 'custom'):
+                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                    csvkinetics.write('# HEADER')
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
-                    if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
-                        if (self.Proc[0].Rates[iLevel,0] > 0.0):
-                            
-                            iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
+                    TempRate = self.Proc[0].Rates[iLevel,0]
+                    if ( (TempRate > 0.0) and ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
+                        iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
+
+                        if (InputData.Kin.WriteFormat == 'PLATO'):
                             ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name
-                            Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(self.Proc[0].Rates[iLevel,0])
-                            csvkinetics.write(Line)
+                            Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
+                        
+                        elif (InputData.Kin.WriteFormat == 'csv'):
+                            Line     = '%d,%e\n' % (iiLevel+1, float(TempRate))
+
+                        elif (InputData.Kin.WriteFormat == 'custom'):
+                            print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
+                        csvkinetics.write(Line)
                     
                 csvkinetics.close()
 
 
             if (InputData.Kin.WriteInel_Flg):
+
                 if (InputData.Kin.WindAvrg_Flg):
                     InelKinetics = TempFldr + '/Inel_WindAvrg.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Window-Averaged Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
@@ -766,35 +792,47 @@ class t_properties(object):
                     InelKinetics = TempFldr + '/Inel.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Inelastic: ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name )
                 csvkinetics  = open(InelKinetics, 'w')
-                #InelFile     = InputData.Kin.ReadFldr  + '/' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '_' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '.csv'
+
+                if (InputData.Kin.WriteFormat == 'csv'):
+                    csvkinetics.write('#i,j,$k_{i,j}^{Inel}~[cm^3/s]$\n')
+                elif (InputData.Kin.WriteFormat == 'custom'):
+                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                    csvkinetics.write('# HEADER')
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
                     if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
                         TempRates = self.Proc[1].Rates[iLevel,:]
                         if (InputData.Kin.WindAvrg_Flg):
                             TempRates = Syst.Compute_WindAvrg_Rates( TempRates )                
+                        iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
 
                         for jLevel in range(Syst.Molecule[0].NLevels):
                             if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[jLevel]) ):
                                 if ( (TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[0].LevelEEh[jLevel]) ):
-                                    
-                                    iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
                                     jjLevel  = Syst.Molecule[0].LevelNewMapping[jLevel]
-                                    ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[2].Name
-                                    Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % TempRates[jLevel]
+
+                                    if (InputData.Kin.WriteFormat == 'PLATO'):
+                                        ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[0].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[2].Name
+                                        Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,5\n' % TempRates[jLevel]
+                                    
+                                    elif (InputData.Kin.WriteFormat == 'csv'):
+                                        Line     = '%d,%d,%e\n' % (iiLevel+1, jjLevel+1, float(TempRate))
+
+                                    elif (InputData.Kin.WriteFormat == 'custom'):
+                                        print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                     csvkinetics.write(Line)
                     
-                                
                 csvkinetics.close()
 
 
             if (InputData.Kin.WriteExch_Flg):
 
                 for iExch in range (2, Syst.NProcTypes):
+                    
                     jToMol  = Syst.ExchtoMol[iExch-2]
                     jToAtom = Syst.ExchtoAtom[iExch-2] 
                     print('    [System.py - Write_Kinetics]: iExch =  ' + str(iExch-1) + ', Corresponding to Final Molecule Nb ' + str(jToMol) + ' and Atom Nb ' + str(jToAtom) )
-
 
                     if (InputData.Kin.WindAvrg_Flg):
                         ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '_WindAvrg.dat' 
@@ -804,20 +842,34 @@ class t_properties(object):
                         print('    [System.py - Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + Syst.Molecule[0].Name + '+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name  + '+' + Syst.Atom[jToAtom].Name  )
                     csvkinetics  = open(ExchKinetics, 'w')
 
+                    if (InputData.Kin.WriteFormat == 'csv'):
+                        csvkinetics.write('#i,j,$k_{i,j}^{Exch}~[cm^3/s]$\n')
+                    elif (InputData.Kin.WriteFormat == 'custom'):
+                        print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                        csvkinetics.write('# HEADER')
+
                     for iLevel in range(Syst.Molecule[0].NLevels):
                         if ( ( (iLevel >= InputData.Kin.MinStateOut[0] - 1) and (iLevel <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[0].LevelWrite_Flg[iLevel]) ):
                             TempRates = self.ProcExch[iExch-2].Rates[iLevel,:]
                             if (InputData.Kin.WindAvrg_Flg):
                                 TempRates = Syst.Compute_WindAvrg_Rates( TempRates )                    
+                            iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
 
                             for jLevel in range(Syst.Molecule[jToMol].NLevels):
                                 if ( ( (jLevel >= InputData.Kin.MinStateOut[1] - 1) and (jLevel <= InputData.Kin.MaxStateOut[1] - 1) ) and (Syst.Molecule[jToMol].LevelWrite_Flg[jLevel]) ):
                                     if ((TempRates[jLevel] > 0.0) and ( TempCoeff * Syst.Molecule[0].LevelEEh[iLevel] > TempCoeff * Syst.Molecule[jToMol].LevelEEh[jLevel]) ):
-                                        
-                                        iiLevel  = Syst.Molecule[0].LevelNewMapping[iLevel]
                                         jjLevel  = Syst.Molecule[jToMol].LevelNewMapping[jLevel]
-                                        ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[jToAtom].Name
-                                        Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % TempRates[jLevel]
+                                        
+                                        if (InputData.Kin.WriteFormat == 'PLATO'):
+                                            ProcName = Syst.Molecule[0].Name + '(' + str(iiLevel+1) + ')+' + Syst.Atom[2].Name + '=' + Syst.Molecule[jToMol].Name + '(' + str(jjLevel+1) + ')+' + Syst.Atom[jToAtom].Name
+                                            Line     = ProcName + ':%.4e,+0.0000E+00,+0.0000E+00,6\n' % TempRates[jLevel]
+                                        
+                                        elif (InputData.Kin.WriteFormat == 'csv'):
+                                            Line     = '%d,%d,%e\n' % (iiLevel+1, jjLevel+1, float(TempRate))
+
+                                        elif (InputData.Kin.WriteFormat == 'custom'):
+                                            print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                         csvkinetics.write(Line)
 
                     csvkinetics.close()
@@ -836,6 +888,7 @@ class t_properties(object):
 
 
             if (InputData.Kin.WriteDiss_Flg):
+
                 if (InputData.Kin.CorrFactor != 1.0):
                     DissKinetics = TempFldr + '/Diss_Corrected.dat' 
                     print('    [System.py - Write_Kinetics]: Writing Corrected Dissociation: ' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name )
@@ -844,69 +897,97 @@ class t_properties(object):
                     print('    [System.py - Write_Kinetics]: Writing Dissociation: '           + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name )
                 csvkinetics  = open(DissKinetics, 'w')
 
+                if (InputData.Kin.WriteFormat == 'csv'):
+                    csvkinetics.write('#i,j,$k_{i,j}^{D}~[cm^3/s]$\n')
+                elif (InputData.Kin.WriteFormat == 'custom'):
+                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                    csvkinetics.write('# HEADER')
+
                 for iStates in range(NStates0_1):
+                    iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                     jStatesStart = 0 
                     if (Syst.SymmFlg):
                         jStatesStart = iStates
                     for jStates in range(jStatesStart, NStates0_2):
+                        jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
                         if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             TempRate = self.DissRates[iStates, jStates, 0]
                             if (TempRate > 0.0):
 
-                                iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
-                                jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
-                                Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
-                                Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
-                                LHS_Str  = Mol1_Str + '+' + Mol2_Str
-                                RHS_Str  = Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name
-                                ProcName = LHS_Str  + '=' + RHS_Str
-                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
+                                if (InputData.Kin.WriteFormat == 'PLATO'):
+                                    Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
+                                    Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
+                                    LHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                    RHS_Str  = Syst.Atom[0].Name + '+' + Syst.Atom[1].Name + '+' + Syst.Atom[2].Name + '+' + Syst.Atom[3].Name
+                                    ProcName = LHS_Str  + '=' + RHS_Str
+                                    Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
+                                
+                                elif (InputData.Kin.WriteFormat == 'csv'):
+                                    Line     = '%d,%d,%e\n' % (iiStates+1, jjStates+1, float(TempRate))
+
+                                elif (InputData.Kin.WriteFormat == 'custom'):
+                                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                 csvkinetics.write(Line)
                     
                 csvkinetics.close()
 
 
             if (InputData.Kin.WriteDissInel_Flg):
+
+                Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name 
+                Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name
+                LHS_Str      = Mol1_Str + '+' + Mol2_Str
+                print('    [System.py - Write_Kinetics]: Writing Inelastic + Dissociation: ' + LHS_Str + '= Molecule + Atom + Atom' )
               
                 InelKinetics = TempFldr + '/DissInel.dat' 
-                print('    [System.py - Write_Kinetics]: Writing Dissociation+Inelastic: ' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '=' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name )
                 csvkinetics  = open(InelKinetics, 'w')
-                #InelFile     = InputData.Kin.ReadFldr + '/'         + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '_' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '.csv'
+
+                if (InputData.Kin.WriteFormat == 'csv'):
+                    csvkinetics.write('#i,j,k,$k_{i,j,k}^{D\-Inel}~[cm^3/s]$\n')
+                elif (InputData.Kin.WriteFormat == 'custom'):
+                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                    csvkinetics.write('# HEADER')
 
                 for iStates in range(NStates0_1):
+                    iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                     jStatesStart = 0 
                     SymmFct    = 1.0
                     if (Syst.SymmFlg):
                         jStatesStart = iStates
                         #SymmFct    = 2.0
                     for jStates in range(jStatesStart, NStates0_2):
+                        jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
                         if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             for iComp in range(Syst.NCFDComp):
                                 if (Syst.CFDComp[iComp].ToMol >= 0):
                                     iMol    = Syst.CFDComp[iComp].ToMol
                                     NBins_1 = Syst.EqNStatesIn[iMol]
-                                    #print('    [System.py - Write_Kinetics]: CDF Component Nb ' + str(iComp) + '; Final Molecule Nb ' + str(iMol) + '; Nb Levels/Groups = ' + str(NBins_1) )
                                     for kStates in range(NBins_1):
+                                        kkStates = Syst.Molecule[iMol].LevelNewMapping[kStates]
                                         if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[iMol].LevelWrite_Flg[kStates]) ):
 
                                             TempRate = self.Proc[0].Rates[iStates, jStates, kStates, iMol]
                                             if (TempRate > 0.0):
 
-                                                iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
-                                                jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
-                                                Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
-                                                Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
-                                                LHS_Str  = Mol1_Str + '+' + Mol2_Str
-
-                                                kkStates = Syst.Molecule[iMol].LevelNewMapping[kStates]
-                                                Mol1_Str = Syst.CFDComp[iComp].Name                                 + '(' + str(kkStates+1) + ')'
-                                                Atms_Str = Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[0]].Name     + '+' + Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[1]].Name
-                                                RHS_Str  = Mol1_Str + '+' + Atms_Str
+                                                if (InputData.Kin.WriteFormat == 'PLATO'):
+                                                    Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
+                                                    Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
+                                                    LHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                                    Mol1_Str = Syst.CFDComp[iComp].Name                                 + '(' + str(kkStates+1) + ')'
+                                                    Atms_Str = Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[0]].Name     + '+' + Syst.CFDComp[Syst.CFDComp[iComp].ToOppAtoms[1]].Name
+                                                    RHS_Str  = Mol1_Str + '+' + Atms_Str
+                                                    ProcName = LHS_Str  + '=' + RHS_Str
+                                                    Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
                                                 
-                                                ProcName = LHS_Str  + '=' + RHS_Str
-                                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,2\n' % float(TempRate)
+                                                elif (InputData.Kin.WriteFormat == 'csv'):
+                                                    Line     = '%d,%d,%d,%e\n' % (iiStates+1, jjStates+1, kkStates+1, float(TempRate))
+
+                                                elif (InputData.Kin.WriteFormat == 'custom'):
+                                                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                                 csvkinetics.write(Line)
 
                 csvkinetics.close()
@@ -914,48 +995,62 @@ class t_properties(object):
 
             if (InputData.Kin.WriteInel_Flg):
               
-                InelKinetics = TempFldr + '/Inel.dat' 
                 Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name 
                 Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name
                 LHS_Str      = Mol1_Str + '+' + Mol2_Str
                 print('    [System.py - Write_Kinetics]: Writing Inelastic: ' + LHS_Str + '=' + LHS_Str )
+                
+                InelKinetics = TempFldr + '/Inel.dat' 
                 csvkinetics  = open(InelKinetics, 'w')
-                #InelFile     = InputData.Kin.ReadFldr + '/'         + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '_' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '+' + Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '.csv'
+
+                if (InputData.Kin.WriteFormat == 'csv'):
+                    csvkinetics.write('#i,j,k,l,$k_{i,j,k,l}^{Inel}~[cm^3/s]$\n')
+                elif (InputData.Kin.WriteFormat == 'custom'):
+                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                    csvkinetics.write('# HEADER')
 
                 for iStates in range(NStates0_1):
+                    iiStates     = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                     jStatesStart = 0 
                     if (Syst.SymmFlg):
                         jStatesStart = iStates
                     for jStates in range(jStatesStart, NStates0_2):
-
-                        iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                         jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
-                        Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
-                        Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
-                        LHS_Str      = Mol1_Str + '+' + Mol2_Str
                         if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                             for kStates in range(NStates0_1):
+                                kkStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[kStates]
                                 lStatesStart = 0
                                 SymmFct    = 1.0
                                 if (Syst.SymmFlg):
                                     lStatesStart = kStates
                                     #SymmFct    = 2.0
                                 for lStates in range(lStatesStart, NStates0_2):
+                                    llStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[lStates]
                                     if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[lStates]) ) ):
 
-                                        TempRate = self.Proc[1].Rates[iStates, jStates, kStates, lStates] * SymmFct
+                                        TempRate = self.Proc[1].Rates[iStates, jStates, kStates, lStates]           * SymmFct
                                         InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].T[self.iT-1].EqEeV0In[iStates] + Syst.Molecule[Syst.Pair[5].ToMol].T[self.iT-1].EqEeV0In[jStates]
                                         FinEEh   = Syst.Molecule[Syst.Pair[0].ToMol].T[self.iT-1].EqEeV0In[kStates] + Syst.Molecule[Syst.Pair[5].ToMol].T[self.iT-1].EqEeV0In[lStates]
+                                        
                                         if ((TempRate > 0.0) and ( TempCoeff * InEEh >= TempCoeff * FinEEh )):
 
-                                            kkStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[kStates]
-                                            llStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[lStates]
-                                            Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(kkStates+1) + ')'
-                                            Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(llStates+1) + ')'
-                                            RHS_Str  = Mol1_Str + '+' + Mol2_Str
-                                            ProcName = LHS_Str  + '=' + RHS_Str
-                                            Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(TempRate)
+                                            if (InputData.Kin.WriteFormat == 'PLATO'):
+                                                Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
+                                                Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
+                                                LHS_Str      = Mol1_Str + '+' + Mol2_Str
+                                                Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(kkStates+1) + ')'
+                                                Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(llStates+1) + ')'
+                                                RHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                                ProcName = LHS_Str  + '=' + RHS_Str
+                                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,5\n' % float(TempRate)
+
+                                            elif (InputData.Kin.WriteFormat == 'csv'):
+                                                Line     = '%d,%d,%d,%d,%e\n' % (iiStates+1, jjStates+1, kkStates+1, llStates+1, float(TempRate))
+
+                                            elif (InputData.Kin.WriteFormat == 'custom'):
+                                                print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                             csvkinetics.write(Line)
 
                 csvkinetics.close()
@@ -964,60 +1059,71 @@ class t_properties(object):
             if (InputData.Kin.WriteExch_Flg):
 
                 for iExch in range (2, Syst.NProcTypes):
-                    print('    [System.py - Write_Kinetics]: iExch =  ' + str(iExch-1) )
 
                     Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name 
                     Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name
                     LHS_Str      = Mol1_Str + '+' + Mol2_Str
-
                     Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,0]]].Name
                     Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.ExchtoMol[iExch-2,1]]].Name
                     RHS_Str      = Mol1_Str + '+' + Mol2_Str
+                    print('    [System.py - Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + LHS_Str + '=' + RHS_Str )
 
                     ExchKinetics = TempFldr + 'Exch_Type' + str(iExch-1) + '.dat' 
-                    print('    [System.py - Write_Kinetics]: Writing Exchange Nb. '+ str(iExch-1) + ': ' + LHS_Str + '=' + RHS_Str )
                     csvkinetics  = open(ExchKinetics, 'w')
-                    #InelFile     = InputData.Kin.ReadFldr                               + '/'  + LHS_Str + '=' + Syst.Molecule[Syst.ExchtoMol[iExch-2]].Name  + '+' + Syst.Atom[Syst.ExchtoAtom[iExch-2]].Name + '.csv'
+
+                    if (InputData.Kin.WriteFormat == 'csv'):
+                        csvkinetics.write('#i,j,k,l,$k_{i,j,k,l}^{Exch}~[cm^3/s]$\n')
+                    elif (InputData.Kin.WriteFormat == 'custom'):
+                        print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+                        csvkinetics.write('# HEADER')
 
                     NBins_1 = Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2,0]]
                     NBins_2 = Syst.EqNStatesIn[Syst.ExchtoMol[iExch-2,1]]
 
                     for iStates in range(NStates0_1):
+                        iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                         jStatesStart = 0 
                         if (Syst.SymmFlg):
                             jStatesStart = iStates
                         for jStates in range(jStatesStart, NStates0_2):
-
-                            iiStates = Syst.Molecule[Syst.Pair[0].ToMol].LevelNewMapping[iStates]
                             jjStates = Syst.Molecule[Syst.Pair[5].ToMol].LevelNewMapping[jStates]
-                            Mol1_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
-                            Mol2_Str     = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
-                            LHS_Str      = Mol1_Str + '+' + Mol2_Str
                             if ( ( (iStates >= InputData.Kin.MinStateOut[0] - 1) and (iStates <= InputData.Kin.MaxStateOut[0] - 1) ) and (Syst.Molecule[Syst.Pair[0].ToMol].LevelWrite_Flg[iStates]) and ( (jStates >= InputData.Kin.MinStateOut[1] - 1) and (jStates <= InputData.Kin.MaxStateOut[1] - 1) and (Syst.Molecule[Syst.Pair[5].ToMol].LevelWrite_Flg[jStates]) ) ):
 
                                 for kStates in range(NBins_1):
+                                    kMol     = Syst.ExchtoMol[iExch-2,0]
+                                    kkStates = Syst.Molecule[kMol].LevelNewMapping[kStates]
                                     lStatesStart = 0
-                                    SymmFct    = 1.0
+                                    SymmFct      = 1.0
                                     if (Syst.SymmFlg):
                                         lStatesStart = kStates
                                         #SymmFct    = 2.0
                                     for lStates in range(lStatesStart, NBins_2):
-                                        kMol = Syst.ExchtoMol[iExch-2,0]
-                                        lMol = Syst.ExchtoMol[iExch-2,1]
+                                        lMol     = Syst.ExchtoMol[iExch-2,1]
+                                        llStates = Syst.Molecule[lMol].LevelNewMapping[lStates]
                                         if ( ( (kStates >= InputData.Kin.MinStateOut[2] - 1) and (kStates <= InputData.Kin.MaxStateOut[2] - 1) ) and (Syst.Molecule[kMol].LevelWrite_Flg[kStates]) and ( (lStates >= InputData.Kin.MinStateOut[3] - 1) and (lStates <= InputData.Kin.MaxStateOut[3] - 1) and (Syst.Molecule[lMol].LevelWrite_Flg[lStates]) ) ):
-
-                                            TempRate = self.ProcExch[iExch-2].Rates[iStates, jStates, kStates, lStates] * SymmFct
+ 
+                                            TempRate = self.ProcExch[iExch-2].Rates[iStates, jStates, kStates, lStates]        * SymmFct
                                             InEEh    = Syst.Molecule[Syst.Pair[0].ToMol].T[self.iT-1].EqEeV0In[iStates]        + Syst.Molecule[Syst.Pair[5].ToMol].T[self.iT-1].EqEeV0In[jStates]
                                             FinEEh   = Syst.Molecule[Syst.ExchtoMol[iExch-2,0]].T[self.iT-1].EqEeV0In[kStates] + Syst.Molecule[Syst.ExchtoMol[iExch-2,1]].T[self.iT-1].EqEeV0In[lStates]
+                                            
                                             if ((TempRate > 0.0) and ( TempCoeff * InEEh >= TempCoeff * FinEEh )):
 
-                                                kkStates = Syst.Molecule[kMol].LevelNewMapping[kStates]
-                                                llStates = Syst.Molecule[lMol].LevelNewMapping[lStates]
-                                                Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[kMol]].Name + '(' + str(kkStates+1) + ')'
-                                                Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[lMol]].Name + '(' + str(llStates+1) + ')'
-                                                RHS_Str  = Mol1_Str + '+' + Mol2_Str
-                                                ProcName = LHS_Str  + '=' + RHS_Str
-                                                Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,6\n' % float(TempRate)
+                                                if (InputData.Kin.WriteFormat == 'PLATO'):
+                                                    Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[0].ToMol]].Name + '(' + str(iiStates+1) + ')'
+                                                    Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[Syst.Pair[5].ToMol]].Name + '(' + str(jjStates+1) + ')'
+                                                    LHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                                    Mol1_Str = Syst.CFDComp[Syst.MolToCFDComp[kMol]].Name + '(' + str(kkStates+1) + ')'
+                                                    Mol2_Str = Syst.CFDComp[Syst.MolToCFDComp[lMol]].Name + '(' + str(llStates+1) + ')'
+                                                    RHS_Str  = Mol1_Str + '+' + Mol2_Str
+                                                    ProcName = LHS_Str  + '=' + RHS_Str
+                                                    Line     = ProcName + ':+%.4e,+0.0000E+00,+0.0000E+00,6\n' % float(TempRate)
+                                                
+                                                elif (InputData.Kin.WriteFormat == 'csv'):
+                                                    Line     = '%d,%d,%d,%d,%e\n' % (iiStates+1, jjStates+1, kkStates+1, llStates+1, float(TempRate))
+
+                                                elif (InputData.Kin.WriteFormat == 'custom'):
+                                                    print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
+
                                                 csvkinetics.write(Line)
 
                     csvkinetics.close()
@@ -1181,7 +1287,7 @@ class system(object):
         self.Proc         = [processes() for iProc in range(NProcTypes)]
 
         self.RatesTh      = np.zeros((NTTran, NProcTypes))
-        self.RatesQSS     = np.zeros((NTTran, NProcTypes))
+        #self.RatesQSS     = np.zeros((NTTran, NProcTypes))
 
         self.MolToCFDComp = np.zeros((NMolecules), dtype=np.int8)
 
@@ -1445,7 +1551,7 @@ class system(object):
     #     plt.yscale("log")
         
     #     plt.xlabel(r'10,000/T [1/K]',         fontsize=FontSize)
-    #     plt.ylabel(r'$K_{i}^{D}$ $[cm^3/s]$', fontsize=FontSize)
+    #     plt.ylabel(r'$K_{i}^{D}$ $[cm^3/s]$\n', fontsize=FontSize)
     #     plt.tight_layout()
     #     if (InputData.PlotShow_Flg):
     #         plt.show()

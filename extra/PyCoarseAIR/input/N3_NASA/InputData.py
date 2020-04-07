@@ -44,7 +44,6 @@ class inputdata(object):
         self.OutputWriteFldr           = OutputWriteFldr 
         self.PathToN3                  = self.WORKSPACE_PATH + '/N3_RVC_StS_lowT_arrhenius/ConvertStSRates/data/'
 
-
         ### DO NOT CHANGE
         self.NTran                     = np.size(   self.TranVec )
         self.iTVec                     = np.arange( self.NTran   ) + 1
@@ -74,6 +73,7 @@ class kinetics(object):
 
         self.WriteExoth_Flg             = False
         self.WriteQB_IntFlg             = 2
+        self.WriteFormat                = 'PLATO'
 
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
