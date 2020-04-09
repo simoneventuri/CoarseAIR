@@ -68,12 +68,13 @@ class kinetics(object):
         self.WriteFldr                  = DtbWriteFldr
         self.WriteDiss_Flg              = True 
         self.CorrFactor                 = 16.0/3.0
-        self.WriteInel_Flg              = True
-        self.WriteExch_Flg              = True
+        self.WriteInel_Flg              = False
+        self.WriteExch_Flg              = False
 
         self.WriteExoth_Flg             = True
-        self.WriteQB_IntFlg             = 2
+        self.WriteQB_IntFlg             = 0
         self.WriteFormat                = 'PLATO'
+
 
         ## Resolution of the Kinetics Data in Input? Array of 'StS' / 'VSM' / 'CGM' of size Syst.NMolecules
         self.MolResolutionIn            = ['StS']
@@ -91,11 +92,11 @@ class kinetics(object):
         self.GroupsOutPathsToMapping    = ['']
         self.GroupsOut_Flg              = False
         self.GroupsOutWrite_Flg         = False
-        self.GroupsOutSuffix            = ''
+        self.GroupsOutSuffix            = '_OnlyBound'
 
 
         ## Packing + Unpacking Dissocation Rates:
-        self.PackUnpackDiss_Flg         = False
+        self.PackUnpackDiss_Flg         = True
         self.PackUnpackType             = ['VSM']
         self.PackUnpackPathsToMapping   = ['']
         self.PackUnpackSuffix           = '_VS' #_Phys_45Bins

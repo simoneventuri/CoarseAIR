@@ -43,7 +43,7 @@ Module Species_Class
                                                                                     ! This list corresponds to the variable Collision%Atoms(1:NAtoms), where NAtoms is the total number of atoms, 
                                                                                     ! including atoms from both the target and projectile species.
     type(Atom_Type) ,dimension(:)   ,allocatable    ::    Atoms                     ! List of Atoms object, each one corresponds to a given atom of the current species. Dim=(NAtoms)
-    class(DiatomicPotential_Type)   ,allocatable    ::    DiaPot                    ! Intra-molecular diatomic potenitla object
+    class(DiatomicPotential_Type)   ,allocatable    ::    DiatPot                    ! Intra-molecular diatomic potenitla object
     type(LevelsContainer_Type)                      ::    ListStates
   contains
     private
@@ -60,7 +60,7 @@ Module Species_Class
 !________________________________________________________________________________________________________________________________!
 Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debug )
 !!! The 'Atoms' object has the 'inout' attribute since the component corresponding to the index mapping from the atom to the associated species is being set.
-! @TODO: Do not defined the 'DiaPot' object as a component. Instead, add a pointer to the Pairs object. This will be usefull for species with more than 2 atoms
+! @TODO: Do not defined the 'DiatPot' object as a component. Instead, add a pointer to the Pairs object. This will be usefull for species with more than 2 atoms
 
   use Input_Class                        ,only:  Input_Type
   use DiatomicPotential_Factory_Class     ,only:  DiatomicPotential_Factory_Type
@@ -75,7 +75,7 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
 
   logical                                                   ::    i_Debug_Loc
   integer                                                   ::    iA, jA            ! Index of atoms
-  type(DiatomicPotential_Factory_Type)                       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
   real(rkp)                                                 ::    SumMass
   real(rkp)                                                 ::    ProMass
 
@@ -106,15 +106,15 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
 !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Constructing the diatomic potential object" )
-  if (i_Debug_Loc) call Logger%Write( "-> Calling DiaPotFactory%Construct" )
-  call DiaPotFactory%Construct( Atoms, This%To_Atoms, Input, This%DiaPot, i_Debug=i_Debug_Loc )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling DiatPotFactory%Construct" )
+  call DiatPotFactory%Construct( Atoms, This%To_Atoms, Input, This%DiatPot, i_Debug=i_Debug_Loc )
   if (i_Debug_Loc) call Logger%Write( "-> Done constructing the diatomic potential" )
 ! ==============================================================================================================
 
   if (i_Debug_Loc) then
     call Logger%Write( "This%Idx          = ", This%Idx           )
     call Logger%Write( "This%Name         = ", This%Name          )
-    call Logger%Write( "This%DiaPot%Name  = ", This%DiaPot%Name   )
+    call Logger%Write( "This%DiatPot%Name  = ", This%DiatPot%Name   )
     call Logger%Write( "This%NAtoms       = ", This%NAtoms        )
     call Logger%Write( "This%Mass         = ", This%Mass    , Fr="es15.8" )
     call Logger%Write( "This%RedMass      = ", This%RedMass , Fr="es15.8" )

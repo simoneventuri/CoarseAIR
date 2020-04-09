@@ -25,7 +25,7 @@ Module COAr_NASA_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, Half, One, Two, Four, Six, Eight
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -109,7 +109,7 @@ Subroutine Initialize_COAr_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   integer                                                   :: ipp
   integer                                                   :: nf
   integer            ,dimension(6)                          :: MatrixTemp = (/ 1, 2, 1, 3, 2, 3 /)
-  type(CO_DiatomicPotential_Type)                           :: CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           :: CO_DiatPot
   integer         ,dimension(3,2)                           :: iA
 
   logical                                                   :: i_Debug_Loc
@@ -317,7 +317,7 @@ Subroutine Compute_COAr_NASA_PES_1d_NoTraj( This, R_CO, R_CAr, R_OAr, V, dV, i_D
   real(rkp)       ,dimension(3)             ,intent(out)    :: dV
   logical                         ,optional ,intent(in)     :: i_Debug
   
-  type(CO_DiatomicPotential_Type)                           :: CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           :: CO_DiatPot
   
   integer                                                   :: iCO
   integer                                                   :: iCAr
@@ -392,7 +392,7 @@ Subroutine Compute_COAr_NASA_PES_1d_NoTraj( This, R_CO, R_CAr, R_OAr, V, dV, i_D
   
   dvlr1 = Zero
                      
-  call CO_DiaPot%Compute_Vd_dVd( R_CO, V, dV(iCO) )
+  call CO_DiatPot%Compute_Vd_dVd( R_CO, V, dV(iCO) )
 
   rca   = R_CAr
   roa   = R_OAr
@@ -540,7 +540,7 @@ Subroutine COAr_NASA_Potential_From_R_NoTraj( This, R_CO, R_CAr, R_OAr, V, i_Deb
   real(rkp)                                 ,intent(out)    :: V
   logical                         ,optional ,intent(in)     :: i_Debug
   
-  type(CO_DiatomicPotential_Type)                           :: CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           :: CO_DiatPot
   
   integer                                                   :: iCO
   integer                                                   :: iCAr
@@ -616,7 +616,7 @@ Subroutine COAr_NASA_Potential_From_R_NoTraj( This, R_CO, R_CAr, R_OAr, V, i_Deb
   
   dvlr1 = Zero                     
 
-  call CO_DiaPot%Compute_Vd_dVd( R_CO, V, dVTemp )
+  call CO_DiatPot%Compute_Vd_dVd( R_CO, V, dVTemp )
 
   rca   = R_CAr
   roa   = R_OAr

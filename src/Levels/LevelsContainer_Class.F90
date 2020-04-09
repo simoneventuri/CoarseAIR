@@ -26,7 +26,7 @@ Module LevelsContainer_Class
   use Error_Class             ,only:  Error
   use Level_Class             ,only:  Level_Type
   use Degeneracy_Class        ,only:  Degeneracy_Type
-  
+
   implicit none
 
   private
@@ -82,7 +82,7 @@ Module LevelsContainer_Class
   contains
 
 !________________________________________________________________________________________________________________________________!
-Subroutine InitializeLevelsContainer( This, Input, iMol, FileName, NStates, i_Debug )  !This%NStates,maxst,eint,egam,rmin,vmin,vmax,tau,jqn,vqn,ri,ro,rmax,iunit,iodd,inv,inj)
+Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NStates, ReCheckFlg, i_Debug )  !This%NStates,maxst,eint,egam,rmin,vmin,vmax,tau,jqn,vqn,ri,ro,rmax,iunit,iodd,inv,inj)
 ! This procedure reads the data associated to the vibrational-rotational states.
 ! This procedure was originally called 'statin' and was stored in the 'preini.f' file.
 !     input variables:
@@ -105,19 +105,28 @@ Subroutine InitializeLevelsContainer( This, Input, iMol, FileName, NStates, i_De
 !     iodd - if 0, include all states. if 1, include only odd states. if 2, include only even states. (rotational quantum number that is)
 
   use Input_Class              ,only:  Input_Type
+  use DiatomicPotential_Class  ,only:  DiatomicPotential_Type
 
   class(LevelsContainer_Type)               ,intent(out)    ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
+  class(DiatomicPotential_Type)             ,intent(in)     ::    DiatPot           ! Intra-molecular diatomic potential object
   integer                                   ,intent(in)     ::    iMol
-  integer                         ,optional ,intent(in)     ::    NStates
   character(*)                    ,optional ,intent(in)     ::    FileName         !> Name of the file containing the state data
+  integer                         ,optional ,intent(in)     ::    NStates
+  logical                         ,optional ,intent(in)     ::    ReCheckFlg
   logical                         ,optional ,intent(in)     ::    i_Debug
-  
+ 
+  integer                                                   ::    iState, jqn
+  real(rkp)                                                 ::    VMaxTemp, VMinTemp, rMaxTemp, rMinTemp
+  logical                                                   ::    TempFlg
+  logical                                                   ::    ReCheckFlg_Loc
   logical                                                   ::    i_Debug_Loc
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) ) i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "InitializeLevelsContainer")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
+
+  ReCheckFlg_Loc = .False.; if ( present(ReCheckFlg) ) ReCheckFlg_Loc = ReCheckFlg
 
 ! ! ==============================================================================================================
 ! !   READING FROM THE INPUT FILE THE DIATOMIC QUANTUM STATE INFORMATION OF MOLECULE
@@ -162,10 +171,54 @@ Subroutine InitializeLevelsContainer( This, Input, iMol, FileName, NStates, i_De
     !   READING THE STATE DATA
     ! ==============================================================================================================
       if (i_Debug_Loc) call Logger%Write( "Calling This%ReadLevelsData" )
-      call This%ReadLevelsData( Input, iMol, i_Debug=i_Debug_Loc )
+      call This%ReadLevelsData( Input, iMol, DiatPot%xmui2, i_Debug=i_Debug_Loc )
       if (i_Debug_Loc) call Logger%Write( "-> Done reading level data" )
       if (i_Debug_Loc) call Logger%Write( "-> This%NStates = ", This%NStates )
     ! ==============================================================================================================
+
+    if (ReCheckFlg_Loc) then
+      ! ==============================================================================================================
+      !  CHECKING LEVEL PROPERTIES
+      ! ==============================================================================================================
+        if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%CheckMaxAndMin" )
+        do jqn = 0,This%maxjqn
+          TempFlg = .True.
+          do iState = 1,This%NStates
+            if (jqn == This%States(iState)%jqn) then
+              if (TempFlg) then            
+                call DiatPot%CheckMaxAndMin( This%States(iState), iState, i_Debug=i_Debug_Loc)
+                TempFlg  = .False.
+                VMaxTemp = This%States(iState)%VMaxNew
+                VMinTemp = This%States(iState)%VMinNew
+                rMaxTemp = This%States(iState)%rMaxNew
+                rMinTemp = This%States(iState)%rMinNew 
+              else
+                This%States(iState)%VMaxNew = VMaxTemp
+                This%States(iState)%VMinNew = VMinTemp
+                This%States(iState)%rMaxNew = rMaxTemp
+                This%States(iState)%rMinNew = rMinTemp
+                if  (This%States(iState)%VMaxNew          < This%States(iState)%EInt) then
+                  write(*,'(A,I5,A,I1,A,I2,A,I3,A)') '    [LevelsContainer_Class.F90 - InitializeLevelsContainer]: WARNING!   Level Nb ', iState, ' of Molecule Nb ', iMol, '(', This%States(iState)%vqn, ',', This%States(iState)%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
+                elseif  (This%States(iState)%VMaxNew - 1.e-10 < This%States(iState)%EInt) then
+                  write(*,'(A,I5,A,I1,A,I2,A,I3,A)') '    [LevelsContainer_Class.F90 - InitializeLevelsContainer]: WARNING!!! Level Nb ', iState, ' of Molecule Nb ', iMol, '(', This%States(iState)%vqn, ',', This%States(iState)%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
+                end if
+              end if
+            end if
+          end do
+        end do
+        if (i_Debug_Loc) call Logger%Write( "-> Done checking diatomic potential maxima and minima" )
+
+
+        if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%CheckTurningPoints" )
+        do iState = 1,This%NStates
+          call DiatPot%CheckTurningPoints( This%States(iState), iState, i_Debug=i_Debug_Loc)
+        end do
+        if (i_Debug_Loc) call Logger%Write( "-> Done checking level turning points" )
+
+
+
+      ! ==============================================================================================================
+    end if
 
 
     ! ==============================================================================================================
@@ -193,7 +246,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine ReadLevelsData( This, Input, iMol, i_Debug )
+Subroutine ReadLevelsData( This, Input, iMol, xmui2, i_Debug )
   
   use Input_Class              ,only:  Input_Type
   use Degeneracy_Factory_Class ,only:  Degeneracy_Factory_Type
@@ -201,6 +254,7 @@ Subroutine ReadLevelsData( This, Input, iMol, i_Debug )
   class(LevelsContainer_Type)               ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   integer                                   ,intent(in)     ::    iMol
+  real(rkp)                                 ,intent(in)     ::    xmui2
   logical                         ,optional ,intent(in)     ::    i_Debug
   
   logical                                                   ::    i_Debug_Loc
@@ -307,6 +361,7 @@ Subroutine ReadLevelsData( This, Input, iMol, i_Debug )
       State%ri            =     rArray(i) ; i = i + 1
       State%ro            =     rArray(i)
       State%rlim          =     Zero
+      State%Vc_R2         =     xmui2 * ( State%jqn + Half )**2
       if (State%vqn > This%maxvqn) then
         This%maxvqn = State%vqn
       end if

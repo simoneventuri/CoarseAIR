@@ -52,9 +52,9 @@ Module Nb2_Molecule_Class
 
 Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_Debug )
 
-  use Input_Class                    ,only:  Input_Type
-  use Atom_Class                     ,only:  Atom_Type
-  use AtomsPair_Class                ,only:  AtomsPair_Type
+  use Input_Class                     ,only:  Input_Type
+  use Atom_Class                      ,only:  Atom_Type
+  use AtomsPair_Class                 ,only:  AtomsPair_Type
   use DiatomicPotential_Factory_Class ,only:  DiatomicPotential_Factory_Type
   use BinsContainer_Factory_Class     ,only:  BinsContainer_Factory_Type
 
@@ -73,7 +73,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   character(:)                    ,allocatable              ::    AtA_Name, AtB_Name
   character(:)                    ,allocatable              ::    MolA_Name, MolB_Name
   integer       ,dimension(6)                               ::    To_Pairs_Temp = 0
-  type(DiatomicPotential_Factory_Type)                      ::    DiaPot_Factory
+  type(DiatomicPotential_Factory_Type)                      ::    DiatPot_Factory
   type(BinsContainer_Factory_Type)                          ::    BinsContainer_Factory
   character(150)                                            ::    FileName
   logical                                                   ::    WriteFlg
@@ -194,8 +194,8 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   !   7.3. CONSTRUCTING THE DIATOMIC POTENTIAL ASSOCIATED TO THE TWO ATOMS WITHIN THE CURRENT MOLECULE
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Construction the diatomic potential object" )
-  call DiaPot_Factory%Construct( This%Atom, [1,2], Input, This%DiaPot, i_Debug=i_Debug_Loc ) 
-  if (i_Debug_Loc) call Logger%Write( "Diatomic pot. name: This%DiaPot%Name = ", This%DiaPot%Name )
+  call DiatPot_Factory%Construct( This%Atom, [1,2], Input, This%DiatPot, i_Debug=i_Debug_Loc ) 
+  if (i_Debug_Loc) call Logger%Write( "Diatomic pot. name: This%DiatPot%Name = ", This%DiatPot%Name )
   if (i_Debug_Loc) call Logger%Write( "-> Done" )
   ! ==============================================================================================================
 
@@ -203,7 +203,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   ! ==============================================================================================================
   !   7.4. CREATING LOCAL FOLDER FOR THE MOLECULE
   ! ==============================================================================================================
-  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/Molecules/' // This%Name                   // '/' // trim(adjustl(This%DiaPot%Name)) // '/' )) )
+  allocate( This%PathToMolDtbFldr, source = adjustl(trim( trim(adjustl(Input%DtbPath))   // '/Molecules/' // This%Name                   // '/' // trim(adjustl(This%DiatPot%Name)) // '/' )) )
   allocate( This%PathToMolFldr,    source = adjustl(trim( trim(adjustl(Input%OutputDir)) // '/'           // trim(adjustl(Input%System)) // '/' // trim(adjustl(This%Name))        // '/' )) )
   if (i_Debug_Loc) call Logger%Write( "Path to Folder for Original      Molecule, This%PathToMolDtbFldr = ", This%PathToMolDtbFldr )
   if (i_Debug_Loc) call Logger%Write( "Path to Folder for Pre-Processed Molecule, This%PathToMolFldr    = ", This%PathToMolFldr    )
@@ -237,7 +237,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
     FileName  = This%PathToMolFldr // '/levels_cut.inp'
 
     if (i_Debug_Loc) call Logger%Write( "Calling This%Levels_Container%InitializeLevelsContainer" )
-    allocate(This%LevelsContainer); call This%LevelsContainer%Initialize( Input, iMol, FileName=FileName, i_Debug=i_Debug_Loc )
+    allocate(This%LevelsContainer); call This%LevelsContainer%Initialize( Input, This%DiatPot, iMol, FileName=FileName, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "-> This%Levels_Container%InitializeLevelsContainer" )
     ! ==============================================================================================================
 

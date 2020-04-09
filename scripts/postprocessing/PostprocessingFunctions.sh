@@ -190,8 +190,8 @@ function MergeTrajectories {
 
 # ------------------------------------------------------------------------------------------------------------ MergeTrajectories #
 function CheckTrajectories {
-  # Ex: MergeTrajectories 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 1 ${COARSEAIR_SOURCE_DIR} 200000
-  # Ex: MergeTrajectories 1 20000.0 20000.0 2 1 1 54 54 1 54 54 1 ${COARSEAIR_SOURCE_DIR} 200000
+  # Ex: CheckTrajectories 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 1 ${COARSEAIR_SOURCE_DIR} 200000
+  # Ex: CheckTrajectories 1 20000.0 20000.0 2 1 1 61 61 1 61 61 1 ${COARSEAIR_SOURCE_DIR} 200000
 
 
   export COARSEAIR_OUTPUT_DIR=$(pwd)/Test

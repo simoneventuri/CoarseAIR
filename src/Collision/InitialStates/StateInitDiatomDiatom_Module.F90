@@ -65,7 +65,7 @@ Subroutine InitializeLevels_DiatomDiatom( Input, Species, i_Debug )
      FileName = './levels_' // trim(adjustl(Input%Molecules_Name(iMol)))// trim(iMol_char) // '.inp'
 
      if (i_Debug_Loc) write(Logger%Unit,"(6x,'[InitializeLevels_DiatomDiatom]: Calling Species(',a,')%ListStates%Initialize with FileName = ',a)")trim(iMol_char),FileName
-     call Species(iMol)%ListStates%Initialize( Input, iMol, FileName=FileName, i_Debug=i_Debug_Loc )                                                  
+     call Species(iMol)%ListStates%Initialize( Input, Species(1)%DiatPot, iMol, FileName=FileName, i_Debug=i_Debug_Loc )                                                  
      if (i_Debug_Loc) write(Logger%Unit,"(6x,'[InitializeLevels_DiatomDiatom]: -> Done initializing the Species(',a,')%ListStates object')")trim(iMol_char)
 
   enddo
@@ -129,8 +129,8 @@ Subroutine SetInitialState_DiatomDiatom( Species, Qijk, dQijk, iTraj, iPES, i_De
         Traj_jqn      =   Species(iMol)%ListStates%jIn
      end if
      Traj_vqn        =   Species(iMol)%ListStates%States(i)%vqn
-     if (i_Debug_Loc) call Logger%Write( "Species(iMol)%DiaPot%xmui2 = ", Species(iMol)%DiaPot%xmui2, "; Traj_jqn = ", Traj_jqn )
-     Vc_R2           =   Species(iMol)%DiaPot%xmui2 * ( Traj_jqn + Half )**2
+     if (i_Debug_Loc) call Logger%Write( "Species(iMol)%DiatPot%xmui2 = ", Species(iMol)%DiatPot%xmui2, "; Traj_jqn = ", Traj_jqn )
+     Vc_R2           =   Species(iMol)%DiatPot%xmui2 * ( Traj_jqn + Half )**2
      associate( S => Species(iMol)%ListStates%States(Traj_iState) )
        State%rmin    =   S%rmin
        State%tau     =   S%tau
@@ -143,45 +143,13 @@ Subroutine SetInitialState_DiatomDiatom( Species, Qijk, dQijk, iTraj, iPES, i_De
        State%vmax    =   S%vmax
        State%rlim    =   Zero      ! NOT USED
      end associate
-   
-    ! ! ==============================================================================================================
-    ! !   RE-COMPUTING THE STATE PROPERTIES
-    ! ! ==============================================================================================================
-    ! !!! SIMONE added this subroutine. For some (~20) of the N2 Quasi-Bound levels from NASA Ames (e.g., 7489 from n2.leroy.Sort.dat), 
-    ! ! the difference between the maximum values of the diatomic potential from the Levels list and the one computed in the "period" 
-    ! ! subroutine was of the order of 1.e-5; this fact was making CoarseAIR not entering the if "(Ekin .ge. (State%vmax - Emin)) )" 
-    ! ! statement in the "ComputeKineticEnergy" subroutine, and finally crashing with the error: "NaN found in scalar variable"
-    ! ! in "* Procedure: Integrate_ODE_1d", "* Variable:  h before mmidv".
-
-    ! if ( State%egam > Zero ) then
-    !    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: Found a Quasi Bound Level. Calling RecomputeLevelProperties')")
-    !    call Species(iMol)%DiaPot%RecomputeLevelProperties( State%Eint, Vc_R2, State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, i_Debug=i_Debug_Loc )
-    ! end if
-  
-    ! if (i_Debug_Loc) then
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: -> Internal state:                   Traj_iState = ',g0)")     Traj_iState
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: -> Rotational quantum number:        Traj_jqn    = ',g0)")     Traj_jqn
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: -> Vibrational quantum number:       Traj_vqn    = ',g0)")     Traj_vqn
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: -> Centrifugal potential times R2:   Vc_R2       = ',es15.8)") Vc_R2
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%rmin  = ',es15.8)") State%rmin
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%tau   = ',es15.8)") State%tau
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%Eint  = ',es15.8)") State%Eint
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%ri    = ',es15.8)") State%ri
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%ro    = ',es15.8)") State%ro
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%egam  = ',es15.8)") State%egam
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%rmax  = ',es15.8)") State%rmax
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%vmin  = ',es15.8)") State%vmin
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%vmax  = ',es15.8)") State%vmax
-    !    write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: ->                                   State%rlim  = ',es15.8)") State%rlim
-    ! end if
-    ! ! ==============================================================================================================
 
 
     ! ==============================================================================================================
     !   COMPUTING THE KINETIC ENERGY AND UPDATING SOME COMPONENT IN THE STATE OBJECT
     ! ==============================================================================================================
     if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomDiatom]: Calling ComputeKineticEnergy')")
-    call ComputeKineticEnergy( Ekin, State, Vc_R2, Species(iMol)%DiaPot, iPES, i_Debug=i_Debug_Loc )
+    call ComputeKineticEnergy( Ekin, State, Vc_R2, Species(iMol)%DiatPot, iPES, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) then
       if (i_Debug_Loc) call Logger%Write( "-> Kinetic energy:                   Ekin      = ", Ekin      )
       if (i_Debug_Loc) call Logger%Write( "-> Estimate of outter turning point: State%ro  = ", State%ro  )
@@ -195,7 +163,7 @@ Subroutine SetInitialState_DiatomDiatom( Species, Qijk, dQijk, iTraj, iPES, i_De
     ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Computing the bond length and its derivatives. Calling BondLength" )
     Ekin = Zero                                                                                                                     ! Setting the kinetic energy at the potential minimum
-    call BondLength( BL, dBL, State%ro, State%tau, Ekin, Vc_R2, Species(iMol)%DiaPot, iPES, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )! Computng BL/bBL output, all the rest is input
+    call BondLength( BL, dBL, State%ro, State%tau, Ekin, Vc_R2, Species(iMol)%DiatPot, iPES, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )! Computng BL/bBL output, all the rest is input
     if (i_Debug_Loc) then
       if (i_Debug_Loc) call Logger%Write( "-> Bond length:        BL       = ", BL  )
       if (i_Debug_Loc) call Logger%Write( "-> Bond length Deriv.: dBL      = ", dBL )
@@ -211,7 +179,7 @@ Subroutine SetInitialState_DiatomDiatom( Species, Qijk, dQijk, iTraj, iPES, i_De
     if (i_Debug_Loc) call Logger%Write( "Computing the diatomic coordinates" )
 
     ! Shouldn't it be:    Omega = sqrt(Two * Vc_R2 * xmui2) ??? (SIMONE)
-    Omega = Two * sqrt( Vc_R2 * Species(iMol)%DiaPot%xmui2 ) / BL**2                                                                                         ! Setting the angular velocity for rotation
+    Omega = Two * sqrt( Vc_R2 * Species(iMol)%DiatPot%xmui2 ) / BL**2                                                                                         ! Setting the angular velocity for rotation
     if (i_Debug_Loc) call Logger%Write( "-> Angular velocity: Omega = ", Omega )
     if (i_Debug_Loc) call Logger%Write( "Calling Compute_Coordinates_Velocities" )
     

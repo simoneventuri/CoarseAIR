@@ -25,7 +25,7 @@ Module N2O_UMN_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only: rkp, Zero, One, Two, B_To_Ang, Kcm_To_Hartree, KcmAng_To_HartB
-  use PES_Class             ,only: PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only: PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only: Logger
   use Error_Class           ,only: Error
 
@@ -106,7 +106,7 @@ Subroutine Initialize_N2O_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   character(*), parameter                   :: Name_PES = 'N2O_UMN'
   character(80)                             :: line
   integer         ,dimension(3,2)           :: iA
-  type(DiatomicPotential_Factory_Type)       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)       ::    DiatPotFactory
   logical                                   :: i_Debug_Loc
 
   
@@ -130,10 +130,10 @@ Subroutine Initialize_N2O_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Constructing the diatomic potential object" )
-  if (i_Debug_Loc) call Logger%Write( "-> Calling DiaPotFactory%Construct" )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling DiatPotFactory%Construct" )
   ii=1
   do iP = 1,This%NPairs
-    call DiaPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
+    call DiatPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
 
     if ( ( trim(adjustl(Input%AtomsName(MatrixTemp((iP-1)*2+1))) ) .ne. "O") .and. ( trim(adjustl(Input%AtomsName(MatrixTemp((iP-1)*2+2)))) .ne. "O" ) ) then
       This%iN2 = iP

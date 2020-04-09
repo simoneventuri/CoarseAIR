@@ -39,7 +39,7 @@ Module Null_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot   =   '<NULL>'
+  character(*)  ,parameter  ::    Name_DiatPot   =   '<NULL>'
 
   contains
 
@@ -63,7 +63,7 @@ Subroutine Initialize_Null_DiatomicPotential( This, Input, SpeciesName, iMol, Ma
   if (i_Debug_Loc) call Logger%Entering( "Initialize_Null_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

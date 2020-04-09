@@ -25,7 +25,7 @@ Module N3_NASA_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -100,7 +100,7 @@ Subroutine Initialize_N3_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   integer                                                   ::    iP
   character(*)                    ,parameter                ::    Name_PES = 'N3_NASA'
   integer         ,dimension(3,2)                           ::    iA
-  type(DiatomicPotential_Factory_Type)                       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
   logical                                                   ::    i_Debug_Loc
   
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -122,9 +122,9 @@ Subroutine Initialize_N3_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Constructing the diatomic potential object" )
-  if (i_Debug_Loc) call Logger%Write( "-> Calling DiaPotFactory%Construct" )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling DiatPotFactory%Construct" )
   do iP = 1,This%NPairs
-    call DiaPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
+    call DiatPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
   end do
   if (i_Debug_Loc) call Logger%Write( "-> Done constructing the diatomic potential" )
  ! ==============================================================================================================

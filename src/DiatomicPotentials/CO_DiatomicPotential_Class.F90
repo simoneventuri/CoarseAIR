@@ -41,7 +41,7 @@ Module CO_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'NASA'
+  character(*)  ,parameter  ::    Name_DiatPot = 'NASA'
 
   integer                   ,parameter  :: nf     = 12
   real(rkp) ,dimension(nf) ,parameter   :: coef   = (/  -4.5761074811943886e-2_rkp,    0.22111734303145603_rkp, &
@@ -81,7 +81,7 @@ Subroutine Initialize_CO_DiatomicPotential( This, Input, SpeciesName, iMol, Mass
   if (i_Debug_Loc) call Logger%Entering( "Initialize_CO_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

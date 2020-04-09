@@ -145,16 +145,16 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
       ! !   COMPUTING DIATOMIC POTENTIAL MINIMAX POINTS
       ! ! ============================================================================================================== 
       Vc_R2 = xmui2 * ( ijqn + Half )**2  
-      call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%FindMinimum( [Input%xExtremes(1), Input%xExtremes(2) / Two], Vc_R2, Input%EEpsilon, State%rmin, State%Vmin, ierr)
+      call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%FindMinimum( [Input%xExtremes(1), Input%xExtremes(2) / Two], Vc_R2, Input%EEpsilon, State%rmin, State%Vmin, ierr)
 
-      call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%FindMaximum( [State%rmin, Input%xExtremes(2)], Vc_R2, Input%EEpsilon, State%rmax, State%Vmax, ierr )
+      call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%FindMaximum( [State%rmin, Input%xExtremes(2)], Vc_R2, Input%EEpsilon, State%rmax, State%Vmax, ierr )
       ! ! ==============================================================================================================
       
 
       ! ! ==============================================================================================================
       ! !   CONSTRUCTING x GRID
       ! ! ==============================================================================================================
-      call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%TurningPoint( [1.e-1_rkp, State%rmin], Vc_R2, State%Vmax, GridLeft0, ierr, NBisection=NBisect, NNewton=NNewton )
+      call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%TurningPoint( [1.e-1_rkp, State%rmin], Vc_R2, State%Vmax, GridLeft0, ierr, NBisection=NBisect, NNewton=NNewton )
       GridLeft0 = GridLeft0 - 0.5d0
 
       DeltaGridLocal = max( (State%rmax - GridLeft0) / (Input%NGrid-1), Input%DeltaGrid)
@@ -183,7 +183,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
       ! !   COMPUTING DIATOMIC POTENTIAL
       ! ! ============================================================================================================== 
       do ix = 1,NGridLocal
-        EDiat(ix) = min(Collision%MoleculesContainer(iMol)%Molecule%DiaPot%EffectivePotential( x(ix), Vc_R2 ), 1.e300_rkp)
+        EDiat(ix) = min(Collision%MoleculesContainer(iMol)%Molecule%DiatPot%EffectivePotential( x(ix), Vc_R2 ), 1.e300_rkp)
       end do
       EDiat = EDiat - State%Vmin
       ! ! ============================================================================================================== 
@@ -272,14 +272,14 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
           ! ! ==============================================================================================================
           ! !   COMPUTING TURNING POINTS
           ! ! ============================================================================================================== 
-          call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%TurningPoint( [1.e-1_rkp, State%rmin], Vc_R2, State%eint, State%ri, ierr, NBisection=NBisect, NNewton=NNewton )
+          call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%TurningPoint( [1.e-1_rkp, State%rmin], Vc_R2, State%eint, State%ri, ierr, NBisection=NBisect, NNewton=NNewton )
           ! ! ============================================================================================================== 
                   
           
           ! ! ==============================================================================================================
           ! !   COMPUTING TAU
           ! ! ============================================================================================================== 
-          call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%Period( State%Eint, Vc_R2, .True., State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, State%Tau, i_Debug_Loc_Deep )
+          call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%Period( State%Eint, Vc_R2, .True., State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, State%Tau, i_Debug_Loc_Deep )
           ! ! ============================================================================================================== 
           
           
@@ -289,7 +289,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
           if (State%eint < 0.e0_rkp) then
             State%Egam = 0.e0_rkp
           else 
-            call Collision%MoleculesContainer(iMol)%Molecule%DiaPot%ResonanceWidth( State%Eint, Vc_R2, State%rMin, State%rMax, State%Tau, State%Egam, i_Debug_Loc_Deep )
+            call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%ResonanceWidth( State%Eint, Vc_R2, State%rMin, State%rMax, State%Tau, State%Egam, i_Debug_Loc_Deep )
             !if (abs(State%egam) >= 1.e300_rkp) then
             if ( ieee_is_nan(abs(State%egam)) .or. (.not.ieee_is_finite(abs(State%egam))) ) then 
               write(*,'(a,i2,i4)')'WARNING:: State%egam is NAN or INF for (v,J) pair: ',ivqn,iJqn    
@@ -498,7 +498,7 @@ Subroutine ReadEnergyLevels( Input, Collision, iMol, i_Debug )
   !   7.4. CONSTRUCTING THE LEVEL CONTAINER
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Calling LevelsContainer%Initialize" )
-  call LevelsContainer%Initialize( Input, iMol, NStates=NStates, i_Debug=i_Debug_Loc )
+  call LevelsContainer%Initialize( Input, Collision%MoleculesContainer(iMol)%Molecule%DiatPot, iMol, NStates=NStates, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
   if (i_Debug_Loc) call Logger%Write( "-> Done with LevelsContainer%Initialize" )
   ! ==============================================================================================================  
 

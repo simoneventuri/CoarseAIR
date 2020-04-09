@@ -25,7 +25,7 @@ Module BNN_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, eV_To_Hartree
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -118,7 +118,7 @@ Subroutine Initialize_BNN_PES( This, Input, Atoms, iPES, i_Debug )
   integer                                                   ::    Status
   integer                                                   ::    Unit
   character(5)                                              ::    iPES_Char
-  type(DiatomicPotential_Factory_Type)                       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
   integer         ,dimension(3,2)                           ::    iA
     
   logical                                                   ::    i_Debug_Loc
@@ -141,9 +141,9 @@ Subroutine Initialize_BNN_PES( This, Input, Atoms, iPES, i_Debug )
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Constructing the diatomic potential object" )
-  if (i_Debug_Loc) call Logger%Write( "-> Calling DiaPotFactory%Construct" )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling DiatPotFactory%Construct" )
   do iP = 1,This%NPairs
-    call DiaPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
+    call DiatPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
   end do
   if (i_Debug_Loc) call Logger%Write( "-> Done constructing the diatomic potential" )
  ! ==============================================================================================================

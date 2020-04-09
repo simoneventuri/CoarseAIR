@@ -45,7 +45,7 @@ Module AtomsPair_Class
     integer                                           ::    NProc       =   0
     integer                                           ::    NPrevProc   =   0
     integer                                           ::    To_Pair_Exch=   0
-    class(DiatomicPotential_Type)       ,allocatable  ::    DiaPot                    ! Intra-molecular diatomic potenitla object
+    class(DiatomicPotential_Type)       ,allocatable  ::    DiatPot                    ! Intra-molecular diatomic potenitla object
   contains
     private
     procedure ,public                   ::    Initialize => Initialize_AtomsPair
@@ -75,7 +75,7 @@ Subroutine Initialize_AtomsPair( This, Input, iPair, iAtoms, Atoms, Opposite, i_
   integer                                                   ::    jA, kA
   logical                                                   ::    i_Debug_Loc
   character(:)    ,allocatable                              ::    Atom1Name, Atom2Name
-  type(DiatomicPotential_Factory_Type)                       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "Initialize_AtomsPair")
@@ -113,7 +113,7 @@ Subroutine Initialize_AtomsPair( This, Input, iPair, iAtoms, Atoms, Opposite, i_
 !   CONSTRUCTING THE DIATOMIC POTENTIAL ASSOCIATED TO THE TWO ATOMS WITHIN THE CURRENT PAIR
 ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Construction the diatomic potential object" )
-    call DiaPotFactory%Construct( [Atom1,Atom2], iA, Input, This%DiaPot, i_Debug=i_Debug_Loc )
+    call DiatPotFactory%Construct( [Atom1,Atom2], iA, Input, This%DiatPot, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "-> Done" )
 ! ==============================================================================================================
 
@@ -124,7 +124,7 @@ Subroutine Initialize_AtomsPair( This, Input, iPair, iAtoms, Atoms, Opposite, i_
     call Logger%Write( "Name of pair:       This%Name        = ", This%Name        )
     call Logger%Write( "Mapping to atoms:   This%To_Atoms    = ", This%To_Atoms    )
     call Logger%Write( "Mapping to species: This%To_Species  = ", This%To_Species  )
-    call Logger%Write( "Diatomic pot. name: This%DiaPot%Name = ", This%DiaPot%Name )
+    call Logger%Write( "Diatomic pot. name: This%DiatPot%Name = ", This%DiatPot%Name )
   end if
   
   if (i_Debug_Loc) call Logger%Exiting

@@ -537,6 +537,34 @@ class t_properties(object):
 
 
     # ***************************************************************************************************************************
+    def Transform_ProcToDiss( self, Syst ):
+        if (Syst.NAtoms == 3):
+            print('    [System.py - Transform_ProcToDiss]: Transforming Processes in Dissociation for 3 Atoms System')
+
+            for iLevel in range(Syst.Molecule[0].NLevels):
+                if (Syst.Molecule[0].LevelWrite_Flg[iLevel]):
+                    
+                    for jLevel in range(Syst.Molecule[0].NLevels):
+                        if (not Syst.Molecule[0].LevelWrite_Flg[jLevel]):
+                            TempRate                      = self.Proc[1].Rates[iLevel, jLevel]
+                            self.Proc[0].Rates[iLevel, 0] = self.Proc[0].Rates[iLevel, 0] + float(TempRate)
+                            self.Proc[0].Rates[iLevel, 1] = self.Proc[0].Rates[iLevel, 1] + float(TempRate)
+
+                    for iProc in range(2, Syst.NProcTypes):
+                        jMol = Syst.ExchtoMol[iProc-2]
+                        for jLevel in range(Syst.Molecule[jMol].NLevels):
+                            if (not Syst.Molecule[0].LevelWrite_Flg[jLevel]):
+                                TempRate                          = self.ProcExch[iProc-2].Rates[iLevel, jLevel]
+                                self.Proc[0].Rates[iLevel, 0]     = self.Proc[0].Rates[iLevel, 0]     + float(TempRate)
+                                self.Proc[0].Rates[iLevel, iProc] = self.Proc[0].Rates[iLevel, iProc] + float(TempRate)
+
+        else:
+            print('    [System.py - Transform_ProcToDiss]: ERROR! Transforming Processes in Dissociation for 4 Atoms System NOT IMPLEMENTED yet!')
+    # ...........................................................................................................................
+
+
+
+    # ***************************************************************************************************************************
     def Compute_BackwardRates( self, Syst ):
 
         if (Syst.NAtoms == 3):
@@ -762,6 +790,7 @@ class t_properties(object):
                 elif (InputData.Kin.WriteFormat == 'custom'):
                     print('    [System.py - Write_Kinetics]: Customize the File by Specifying the Desired Format' )
                     csvkinetics.write('# HEADER')
+
 
                 for iLevel in range(Syst.Molecule[0].NLevels):
                     TempRate = self.Proc[0].Rates[iLevel,0]
@@ -1344,6 +1373,11 @@ class system(object):
                     
                     self.T[iT-1].Save_RatesAtT_HDF5( self )
             
+
+            if (InputData.Kin.WriteQB_IntFlg < 2):
+                print('  [System.py - Read_Rates]: Considering Dissociation the Inelastic and Exchange Processes to Excluded Levels')
+                self.T[iT-1].Transform_ProcToDiss( self )
+
 
             if ( (InputData.Kin.RatesPrefJumps_Flg) or (InputData.Kin.GroupsOut_Flg)):
                 print('  [System.py - Read_Rates]: Computing Backweard Rates for Temperature Nb ' + str(iT) + ' (T = ' + str(int(self.T[iT-1].TTra)) + 'K)')

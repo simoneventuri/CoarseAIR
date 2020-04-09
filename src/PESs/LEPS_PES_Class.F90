@@ -25,7 +25,7 @@ Module LEPS_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, Half, One, Two, Three, Four, Five, Six, Seven, Kcm_To_Hartree, B_To_Ang
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
   use Input_Class           ,only:  Input_Type
@@ -80,7 +80,7 @@ Subroutine Initialize_LEPS_PES( This, Input, Atoms, iPES, i_Debug )
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms 
   integer                                   ,intent(in)     ::    iPES
-  type(DiatomicPotential_Factory_Type)                       ::    DiaPotFactory
+  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
   logical                         ,optional ,intent(in)     ::    i_Debug
   
   integer                                                   ::    iP, jP
@@ -130,9 +130,9 @@ Subroutine Initialize_LEPS_PES( This, Input, Atoms, iPES, i_Debug )
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Constructing the diatomic potential object" )
-  if (i_Debug_Loc) call Logger%Write( "-> Calling DiaPotFactory%Construct" )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling DiatPotFactory%Construct" )
   do iP = 1,This%NPairs
-    call DiaPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
+    call DiatPotFactory%Construct( Atoms, iA(iP,:), Input, This%Pairs(iP)%Vd, i_Debug=i_Debug_Loc )
   end do
   if (i_Debug_Loc) call Logger%Write( "-> Done constructing the diatomic potential" )
   ! ==============================================================================================================

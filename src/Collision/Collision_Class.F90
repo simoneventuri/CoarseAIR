@@ -38,7 +38,7 @@ Module Collision_Class
   use AtomsPair_Class             ,only:  AtomsPair_Type
   use Species_Class               ,only:  Species_Type
   use PESsContainer_Class         ,only:  PESsContainer_Type
-  use PES_Class                   ,only:  PES_Type, DiaPotContainer_Type, PESEvoFile, PESEvoFlg
+  use PES_Class                   ,only:  PES_Type, DiatPotContainer_Type, PESEvoFile, PESEvoFlg
   use ImpactParameter_Class       ,only:  ImpactParameter_Type
   use StateInitDiatomAtom_Module  ,only:  Params
   use MoleculesContainer_Class    ,only:  MoleculesContainer_Type
@@ -215,11 +215,13 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   integer                                                   ::    TaskType_Loc
   logical                                                   ::    i_Debug_Loc
   
+  !!! Input%TaskType = 1 in Plotting PESs
+  !!! Input%TaskType = 2 in Computing Levels
+  !!! Input%TaskType = 3 in Preprocessing Levels
+  !!! Input%TaskType = 4 in Running Trajectories
+  !!! Input%TaskType = 5 in Computing Statistics
+  !!! Input%TaskType = 6 in Postprocessing Trajectories
 
-  !!! InitializationType = 0 in Running Trajectories
-  !!! InitializationType = 1 in Postprocessing Trajectories
-  !!! InitializationType = 2 in Plotting PESs
-  !!!
   TaskType_Loc = 4; if ( Input%TaskType > 0 ) TaskType_Loc = Input%TaskType
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -269,7 +271,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   ! 12. INITIALIZING OUTPUT FILES
 
 
-  if (TaskType_Loc == 4) then
+  if (TaskType_Loc == 4) then   !!! <----- ONLY if RUNNING TRAJECTORIES
     ! ==============================================================================================================
     !  1. INITIALIZING RANDOM GENERATOR
     ! ==============================================================================================================
@@ -411,7 +413,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   ! ==============================================================================================================
 
 
-  if (TaskType_Loc == 4) then
+  if (TaskType_Loc == 4) then   !!! <----- ONLY if RUNNING TRAJECTORIES
     ! ==============================================================================================================
     !   5. CONSTRUCTING TRANFORMATION MATRIX FROM/TO CARTESIAN TO/FROM GENERALIZED COORDINATES
     ! ==============================================================================================================
@@ -486,7 +488,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   ! ==============================================================================================================
 
 
-  if ( (TaskType_Loc == 2) .or. (TaskType_Loc == 3) .or. (TaskType_Loc > 5) ) then
+  if ( (TaskType_Loc == 2) .or. (TaskType_Loc == 3) .or. (TaskType_Loc > 5) ) then   !!! <----- If NOT PLOTTING PES, RUNNING TRAJECTORIES or COMPUTING STATISTICS
     ! ==============================================================================================================
     !   7. INITIALING MOLECULES (WITH LEVELS AND BINS)
     ! ==============================================================================================================
@@ -495,7 +497,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   end if
 
 
-  if (TaskType_Loc == 4) then
+  if (TaskType_Loc == 4) then   !!! <----- ONLY if RUNNING TRAJECTORIES
 
     ! ==============================================================================================================
     !   8. SETTING PARAMETERS SPECIFYING THE RELATIVE KINETIC ENERGY AND INITIAL IMPACT PARAMETER
@@ -541,10 +543,11 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     end select
     if (i_Debug_Loc) call Logger%Write( "-> This%icoord = ", This%icoord )
     ! ==============================================================================================================
+
   end if
 
 
-  if (TaskType_Loc > 3) then
+  if (TaskType_Loc > 3) then   !!! <----- ONLY if RUNNING TRAJECTORIES, COMPUTING STATISTICS or POSTPROCESSING CROSS SECTIONS
     ! ==============================================================================================================
     !   10. SETTING THE AVERAGE VELOCITY
     ! ==============================================================================================================
@@ -584,7 +587,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   end if
 
 
-  if (TaskType_Loc == 4) then
+  if (TaskType_Loc == 4) then   !!! <----- ONLY if RUNNING TRAJECTORIES
     ! ==============================================================================================================
     !   11. FIND MOST PROBABLE TRANSLATIONAL ENERGY AT THE CURRENT ENERGY
     ! ==============================================================================================================

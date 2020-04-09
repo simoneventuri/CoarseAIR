@@ -52,6 +52,15 @@ Module Level_Class
     real(rkp)     ::    Q             =   Zero        ! Part Function of the i'th quantum state @ Current Temperature
     real(rkp)     ::    QInit         =   Zero        ! Part Function of the i'th quantum state @ Initial Temperature (From Input File)
     real(rkp)     ::    Q_CG          =   Zero
+    real(rkp)     ::    Vc_R2         =   Zero        ! xmui2 * ( qn + 1/2 )**2
+
+    real(rkp)     ::    rminNew       =   Zero        ! the position of the potential minimum (included centrifugal potential) for i'th quantum state
+    real(rkp)     ::    rmaxNew       =   Zero        ! location of maximum in centrifugal barrier
+    real(rkp)     ::    vminNew       =   Zero        ! the value of the potential minimun (inc. cent. pot.)
+    real(rkp)     ::    vmaxNew       =   Zero        ! the value of the local potential maximum (inc. cent. pot.)
+    real(rkp)     ::    tauNew        =   Zero        ! the vibrational period of the i'th quantum state
+    real(rkp)     ::    riNew         =   Zero        ! inner turning point
+    real(rkp)     ::    roNew         =   Zero        ! outter turning point
   End Type
 
 End Module

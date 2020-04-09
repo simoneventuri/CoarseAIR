@@ -40,7 +40,7 @@ Module O2_UMN_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_O2_UMN
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN'
+  character(*)  ,parameter  ::    Name_DiatPot    = 'UMN'
   logical       ,parameter  ::    i_Debug_Global = .False.
  
   contains
@@ -64,7 +64,7 @@ Subroutine Initialize_O2_UMN_DiatomicPotential( This, Input, SpeciesName, iMol, 
   if (i_Debug_Loc) call Logger%Entering( "Initialize_O2_UMN_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

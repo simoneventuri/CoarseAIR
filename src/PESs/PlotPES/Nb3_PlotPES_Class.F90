@@ -377,12 +377,12 @@ Subroutine Nb3_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
           
           if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then    
                
-            V = Collision%Species(1)%Diapot%DiatomicPotential( Rp(1) * RConverter )  
+            V = Collision%Species(1)%DiatPot%DiatomicPotential( Rp(1) * RConverter )  
             write(Unit,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
        
           elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then 
           
-            call Collision%Species(1)%Diapot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
+            call Collision%Species(1)%DiatPot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
             write(Unit,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
                          
           end if     

@@ -41,7 +41,7 @@ Module O2_NASA_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot   = 'NASA'
+  character(*)  ,parameter  ::    Name_DiatPot   = 'NASA'
 
   integer                         ,parameter   :: nfitco  = 6
   real(rkp) ,dimension(nfitco+1)  ,parameter   :: coefo2  = (/  -187.888473490235_rkp, -47.6881525811959_rkp, &
@@ -78,7 +78,7 @@ Subroutine Initialize_O2_DiatomicPotential( This, Input, SpeciesName, iMol, Mass
   if (i_Debug_Loc) call Logger%Entering( "Initialize_O2_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

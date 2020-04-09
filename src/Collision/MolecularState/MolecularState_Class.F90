@@ -128,7 +128,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
   ierr      =   0
   
   
-  if (trim(adjustl(Collision%Pairs(This%iPair)%DiaPot%Name)) == '<NULL>') then
+  if (trim(adjustl(Collision%Pairs(This%iPair)%DiatPot%Name)) == '<NULL>') then
     ! The final pair is not going to be treated as a molecule 
     
     This%itype     =   3
@@ -201,8 +201,8 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
     Vc_R2         =   half * tis / rms
     eps           =   epss
 
-    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling DiaPot%FindMinimum')")
-    call Collision%Pairs(This%iPair)%DiaPot%FindMinimum( [This%Param%rsmal,This%Param%rcent], Vc_R2, eps, Rmin, Vmin, ierr )
+    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling DiatPot%FindMinimum')")
+    call Collision%Pairs(This%iPair)%DiatPot%FindMinimum( [This%Param%rsmal,This%Param%rcent], Vc_R2, eps, Rmin, Vmin, ierr )
     if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> Rmin = ',es15.8,3x,'Vmin = ',es15.8)") Rmin, Vmin
 
     imin          =   1
@@ -213,8 +213,8 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
     
 
     if ( imin == 1 ) then
-      if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling DiaPot%FindMaximum')")
-      call Collision%Pairs(This%iPair)%DiaPot%FindMaximum( [Rmin,This%Param%rcent], Vc_R2, eps, Rmax, Vmax, ierr )
+      if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling DiatPot%FindMaximum')")
+      call Collision%Pairs(This%iPair)%DiatPot%FindMaximum( [Rmin,This%Param%rcent], Vc_R2, eps, Rmax, Vmax, ierr )
       if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> Rmax = ',es15.8,3x,'Vmax = ',es15.8)") Rmax, Vmax
       ivmx        =   1
       if ( ierr /= 0 ) then
@@ -237,7 +237,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
     else
       if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Case (else)')")
 
-      vib = Collision%Pairs(This%iPair)%DiaPot%DiatomicPotential( Rb )
+      vib = Collision%Pairs(This%iPair)%DiatPot%DiatomicPotential( Rb )
       if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> Rbound = ',es15.8,3x,'VibEn = ',es15.8)") Rb, vib
       This%Eint  = This%Eint + vib
       if ( This%Eint < This%Param%Vinf ) then
@@ -257,7 +257,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
         r00               =   This%Param%rsmal
         do
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling TurningPoint')")
-          call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r00,r1], Vc_R2, This%Eint, ri, ierr, NBisection=4, NNewton=4 )
+          call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r00,r1], Vc_R2, This%Eint, ri, ierr, NBisection=4, NNewton=4 )
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> ri  = ',es15.8)") ri
 
           if ( ri /= Zero ) exit
@@ -277,7 +277,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
         end do
 
         if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling TurningPoint')")
-        call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r1,Rmax], Vc_R2, This%Eint, ro, ierr, NBisection=10, NNewton=4 )
+        call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r1,Rmax], Vc_R2, This%Eint, ro, ierr, NBisection=10, NNewton=4 )
         if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> ro  = ',es15.8)") ro
 
         if ( r1 == Zero ) then
@@ -295,7 +295,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
         if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling ActionIntegral')")
         if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: ri, ro, Vc_R2 = ',3es15.8)") ri, ro, Vc_R2
         
-        This%viba    =   Collision%Pairs(This%iPair)%DiaPot%ActionIntegral( ri, ro, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 )
+        This%viba    =   Collision%Pairs(This%iPair)%DiatPot%ActionIntegral( ri, ro, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 )
         
         
         if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> This%viba  = ',es15.8)") This%viba
@@ -314,7 +314,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
             ipass   =   ipass+1
             if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling turn; ipass = ',g0)") ipass
             
-            call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [rga,rgb], Vc_R2, This%Eint, r3, ierr, NBisection=10, NNewton=4 )
+            call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [rga,rgb], Vc_R2, This%Eint, r3, ierr, NBisection=10, NNewton=4 )
             if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> r3 = ',es15.8)") r3
             if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> ierr = ',g0)") ierr
 
@@ -339,15 +339,15 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
           if ( Eint_p > Vmax ) Eint_p = This%Eint + half * ( Vmax - This%Eint )
           dEint     =   Eint_p - This%Eint
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: -> This%Eint = ',es15.8,3x,'dEint = ',es15.8)") This%Eint, dEint
-          call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r00,r1] , Vc_R2, Eint_p, Ri_p, ierr, NBisection=4 , NNewton=4 )
-          call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r1,Rmax], Vc_R2, Eint_p, Ro_p, ierr, NBisection=10, NNewton=4 )
-          Action_p  =   Collision%Pairs(This%iPair)%DiaPot%ActionIntegral( Ri_p, Ro_p, Vc_R2, Eint_p, This%Param%nquad, TwoMu, QuadratureType=3 )
+          call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r00,r1] , Vc_R2, Eint_p, Ri_p, ierr, NBisection=4 , NNewton=4 )
+          call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r1,Rmax], Vc_R2, Eint_p, Ro_p, ierr, NBisection=10, NNewton=4 )
+          Action_p  =   Collision%Pairs(This%iPair)%DiatPot%ActionIntegral( Ri_p, Ro_p, Vc_R2, Eint_p, This%Param%nquad, TwoMu, QuadratureType=3 )
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: ->  Eint_p = ',es15.8,3x,'Ri_p = ',es15.8,3x,'Ro_p = ',es15.8,3x,'Action_p = ',es15.8)") Eint_p, Ri_p, Ro_p, Action_p
 
           Eint_m    =   This%Eint - dEint
-          call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r00,r1] , Vc_R2, Eint_m, Ri_m, ierr, NBisection=4, NNewton=4 )
-          call Collision%Pairs(This%iPair)%DiaPot%TurningPoint( [r1,Rmax], Vc_R2, Eint_m, Ro_m, ierr, NBisection=10, NNewton=4 )
-          Action_m  =   Collision%Pairs(This%iPair)%DiaPot%ActionIntegral( Ri_m, Ro_m, Vc_R2, Eint_m, This%Param%nquad, TwoMu, QuadratureType=3 )
+          call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r00,r1] , Vc_R2, Eint_m, Ri_m, ierr, NBisection=4, NNewton=4 )
+          call Collision%Pairs(This%iPair)%DiatPot%TurningPoint( [r1,Rmax], Vc_R2, Eint_m, Ro_m, ierr, NBisection=10, NNewton=4 )
+          Action_m  =   Collision%Pairs(This%iPair)%DiatPot%ActionIntegral( Ri_m, Ro_m, Vc_R2, Eint_m, This%Param%nquad, TwoMu, QuadratureType=3 )
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: ->  Eint_m = ',es15.8,3x,'Ri_m = ',es15.8,3x,'Ro_m = ',es15.8,3x,'Action_m = ',es15.8)") Eint_m, Ri_m, Ro_m, Action_m
 
           dAdE      =   half * ( Action_p - Action_m ) / dEint
@@ -355,7 +355,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
   ! ==============================================================================================================
 
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: Calling ActionIntegral for tunneling')")
-          Action    =   Collision%Pairs(This%iPair)%DiaPot%ActionIntegral( ro, r3, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 )
+          Action    =   Collision%Pairs(This%iPair)%DiatPot%ActionIntegral( ro, r3, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 )
           prob      =   exp( - Action )
           gam       =   prob / dAdE
           xlife     =   One / gam
@@ -366,7 +366,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
           end if
           
           if (i_Debug_Loc) write(Logger%Unit,"(10x,'[FindState]: dup action')")
-          Action    =   Collision%Pairs(This%iPair)%DiaPot%ActionIntegral( ro, r3, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 ) * Half / Pi
+          Action    =   Collision%Pairs(This%iPair)%DiatPot%ActionIntegral( ro, r3, Vc_R2, This%Eint, This%Param%nquad, TwoMu, QuadratureType=3 ) * Half / Pi
           rho2      =   GammaFct(Action) - Action * ( log( abs(Action) ) - One )
           This%viba =   This%viba + rho2 * This%Param%rfact
        

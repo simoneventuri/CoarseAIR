@@ -49,7 +49,7 @@ Module Molecule_Class
     real(rkp)                                                ::    xmui
     real(rkp)                                                ::    xmui2
     integer                       ,dimension(:) ,allocatable ::    To_Pairs
-    class(DiatomicPotential_Type)               ,allocatable ::    DiaPot                    ! Intra-molecular diatomic potenitla object
+    class(DiatomicPotential_Type)               ,allocatable ::    DiatPot                    ! Intra-molecular diatomic potenitla object
     class(LevelsContainer_Type)                 ,allocatable ::    LevelsContainer
     class(BinsContainer_Type)                   ,allocatable ::    BinsContainer
   contains

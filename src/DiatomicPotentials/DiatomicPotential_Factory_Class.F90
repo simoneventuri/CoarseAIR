@@ -43,7 +43,7 @@ Module DiatomicPotential_Factory_Class
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
+Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
 
   use Atom_Class                          ,only:  Atom_Type
   use Input_Class                         ,only:  Input_Type
@@ -65,7 +65,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
   type(Atom_Type) ,dimension(:)                 ,intent(in)     ::    Atoms
   integer         ,dimension(:)                 ,intent(in)     ::    iA
   type(Input_Type)                              ,intent(in)     ::    Input
-  class(DiatomicPotential_Type) ,allocatable    ,intent(out)    ::    DiaPot
+  class(DiatomicPotential_Type) ,allocatable    ,intent(out)    ::    DiatPot
   logical                         ,optional     ,intent(in)     ::    i_Debug
 
   logical                                                       ::    i_Debug_Loc
@@ -98,104 +98,104 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
 
       if (adjustl(trim(Input%Diatomic_Model(iMol))) == 'Morse') then
         if (i_Debug_Loc) call Logger%Write( "Constructing a Morse_DiatomicPotential_Type object" )
-        allocate( Morse_DiatomicPotential_Type :: DiaPot )
+        allocate( Morse_DiatomicPotential_Type :: DiatPot )
       else
 
         select case ( SpeciesName )
           case ('N2', 'NNa', 'NNb', 'NNc', 'NNd', 'NaNb','NcNd','NbNc','NaNd','NaNc','NbNd' )
             if (Input%Diatomic_Model(iMol) == 'LeRoy') then
-              allocate( N2_LeRoy_DiatomicPotential_Type :: DiaPot )
+              allocate( N2_LeRoy_DiatomicPotential_Type :: DiatPot )
             
             elseif (Input%Diatomic_Model(iMol) == 'UMN_ForN4') then
-              allocate( N2_UMN_ForN4_DiatomicPotential_Type :: DiaPot )   
+              allocate( N2_UMN_ForN4_DiatomicPotential_Type :: DiatPot )   
             elseif (Input%Diatomic_Model(iMol) == 'UMN_ForN2O2') then
-              allocate( N2_UMN_ForN2O2_DiatomicPotential_Type :: DiaPot )
+              allocate( N2_UMN_ForN2O2_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
           case ('CO')
             if (Input%Diatomic_Model(iMol) == 'NASA') then
-              allocate( CO_DiatomicPotential_Type :: DiaPot )
+              allocate( CO_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
 
           case ('CH')
             if (Input%Diatomic_Model(iMol) == 'UIUC') then
-              allocate( CH_UIUC_DiatomicPotential_Type :: DiaPot )
+              allocate( CH_UIUC_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
 
           case ('CN')
             if (Input%Diatomic_Model(iMol) == 'UIUC') then
-              allocate( CN_UIUC_DiatomicPotential_Type :: DiaPot )
+              allocate( CN_UIUC_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
 
           case ('HN')
             if (Input%Diatomic_Model(iMol) == 'UIUC') then
-              allocate( HN_UIUC_DiatomicPotential_Type :: DiaPot )
+              allocate( HN_UIUC_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
           case ('O2', 'OOa', 'OOb', 'OOc', 'OOd', 'OaOb','OaOc','OaOd','ObOc','ObOd','OcOd')
             if (Input%Diatomic_Model(iMol) == 'NASA') then
-              allocate( O2_NASA_DiatomicPotential_Type :: DiaPot )
+              allocate( O2_NASA_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'UMN') then
-              allocate( O2_UMN_DiatomicPotential_Type :: DiaPot )
+              allocate( O2_UMN_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'Varandas') then
-              allocate( O2_Varandas_DiatomicPotential_Type :: DiaPot )
+              allocate( O2_Varandas_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
           case ('ArC');  
             if (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
           
           case ('ArO');  
             if (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
           case ('NO')
             if (Input%Diatomic_Model(iMol) == 'UMN') then
-              allocate( NO_UMN_DiatomicPotential_Type :: DiaPot )
+              allocate( NO_UMN_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
-              allocate( Null_DiatomicPotential_Type :: DiaPot )
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
-          case ('C2');  allocate( Null_DiatomicPotential_Type :: DiaPot )
+          case ('C2');  allocate( Null_DiatomicPotential_Type :: DiatPot )
             call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
-          case ('H2');  allocate( Null_DiatomicPotential_Type :: DiaPot )
+          case ('H2');  allocate( Null_DiatomicPotential_Type :: DiatPot )
             call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
-          case ('OH');  allocate( Null_DiatomicPotential_Type :: DiaPot )
+          case ('OH');  allocate( Null_DiatomicPotential_Type :: DiatPot )
             call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
         
-          case ('NULL');  allocate( Null_DiatomicPotential_Type :: DiaPot )
+          case ('NULL');  allocate( Null_DiatomicPotential_Type :: DiatPot )
             call Error( "Unrecognized Molcule." )
           
           case default; call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
@@ -211,7 +211,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
       Mass1 = Atoms(1)%Mass
       Mass2 = Zero
 
-      allocate( Null_DiatomicPotential_Type :: DiaPot )
+      allocate( Null_DiatomicPotential_Type :: DiatPot )
 
 
     case (:0)
@@ -220,8 +220,8 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiaPot, i_Debug )
   end select
 
 
-  if (i_Debug_Loc) call Logger%Write( "Calling DiaPot%Initialize" )
-  call DiaPot%Initialize( Input, SpeciesName, iMol, Mass1, Mass2 )
+  if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%Initialize" )
+  call DiatPot%Initialize( Input, SpeciesName, iMol, Mass1, Mass2 )
 
   if (i_Debug_Loc) call Logger%Exiting
 

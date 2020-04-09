@@ -44,7 +44,7 @@ Module StateInitDiatomAtom_Module
   real(rkp)       ,dimension(19)          ::    Params
   real(rkp)                               ::    xmui_Global
   real(rkp)                               ::    Vc_R2_Global
-  class(DiatomicPotential_Type) ,pointer  ::    DiaPot_Global                            !< Local pointer for the intra-nuclear diatomic potential object used in procedure 'FuncRHS'
+  class(DiatomicPotential_Type) ,pointer  ::    DiatPot_Global                            !< Local pointer for the intra-nuclear diatomic potential object used in procedure 'FuncRHS'
   logical   ,parameter                    ::    i_Debug_Global = .False.
   
   contains
@@ -77,7 +77,7 @@ Subroutine InitializeLevels_DiatomAtom( Input, Species, i_Debug )
 
   if (i_Debug_Loc) call Logger%Write( "Initializing the set of levels for a 'Diatom-Atom' collision" )
   if (i_Debug_Loc) call Logger%Write( " Calling Species(1)%ListStates%Initialize with FileName = ", FileName )
-  call Species(1)%ListStates%Initialize( Input, 1, FileName=FileName, i_Debug=i_Debug_Loc )                                                
+  call Species(1)%ListStates%Initialize( Input, Species(1)%DiatPot, 1, FileName=FileName, i_Debug=i_Debug_Loc )                                                
   if (i_Debug_Loc) call Logger%Write( " Done initializing the Species(1)%ListStates object" )
 
   if (i_Debug_Loc) call Logger%Exiting
@@ -147,8 +147,8 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
     Traj_jqn      =   Species(1)%ListStates%jIn
   end if
   Traj_vqn        =   Species(1)%ListStates%States(i)%vqn
-  if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Species(1)%DiaPot%xmui2 = ',es15.8,'; Traj_jqn = ',g0)") Species(1)%DiaPot%xmui2, Traj_jqn
-  Vc_R2           =   Species(1)%DiaPot%xmui2 * ( Traj_jqn + Half )**2
+  if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Species(1)%DiatPot%xmui2 = ',es15.8,'; Traj_jqn = ',g0)") Species(1)%DiatPot%xmui2, Traj_jqn
+  Vc_R2           =   Species(1)%DiatPot%xmui2 * ( Traj_jqn + Half )**2
   associate( S => Species(1)%ListStates%States(Traj_iState) )
     State%rmin    =   S%rmin
     State%tau     =   S%tau
@@ -161,46 +161,13 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
     State%vmax    =   S%vmax
     State%rlim    =   Zero      ! NOT USED
   end associate
-  
-  
-! ! ==============================================================================================================
-! !   RE-COMPUTING THE STATE PROPERTIES
-! ! ==============================================================================================================
-! !!! SIMONE added this subroutine. For some (~20) of the N2 Quasi-Bound levels from NASA Ames (e.g., 7489 from n2.leroy.Sort.dat), 
-! ! the difference between the maximum values of the diatomic potential from the Levels list and the one computed in the "period" 
-! ! subroutine was of the order of 1.e-5; this fact was making CoarseAIR not entering the if "(Ekin .ge. (State%vmax - Emin)) )" 
-! ! statement in the "ComputeKineticEnergy" subroutine, and finally crashing with the error: "NaN found in scalar variable"
-! ! in "* Procedure: Integrate_ODE_1d", "* Variable:  h before mmidv".
-
-!   if ( State%egam > Zero ) then
-!     if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Found a Quasi Bound Level. Calling RecomputeLevelProperties')")
-!     call Species(1)%DiaPot%RecomputeLevelProperties( State%Eint, Vc_R2, State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, i_Debug=i_Debug_Loc)
-!   end if
-  
-!   if (i_Debug_Loc) then
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Internal state:                   Traj_iState = ',g0)")     Traj_iState
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Rotational quantum number:        Traj_jqn    = ',g0)")     Traj_jqn
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Vibrational quantum number:       Traj_vqn    = ',g0)")     Traj_vqn
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Centrifugal potential times R2:   Vc_R2       = ',es15.8)") Vc_R2
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%rmin  = ',es15.8)") State%rmin
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%tau   = ',es15.8)") State%tau
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%Eint  = ',es15.8)") State%Eint
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%ri    = ',es15.8)") State%ri
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%ro    = ',es15.8)") State%ro
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%egam  = ',es15.8)") State%egam
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%rmax  = ',es15.8)") State%rmax
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%vmin  = ',es15.8)") State%vmin
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%vmax  = ',es15.8)") State%vmax
-!     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: ->                                   State%rlim  = ',es15.8)") State%rlim
-!   end if
-! ! ==============================================================================================================
 
 
 ! ==============================================================================================================
 !   COMPUTING THE KINETIC ENERGY AND UPDATING SOME COMPONENT IN THE STATE OBJECT
 ! ==============================================================================================================
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Calling ComputeKineticEnergy')")
-  call ComputeKineticEnergy( Ekin, State, Vc_R2, Species(1)%DiaPot, iPES, i_Debug=i_Debug_Loc )
+  call ComputeKineticEnergy( Ekin, State, Vc_R2, Species(1)%DiatPot, iPES, i_Debug=i_Debug_Loc )
   if (i_Debug_Loc) then
     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Kinetic energy:                   Ekin      = ',es15.8)") Ekin
     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Estimate of outter turning point: State%ro  = ',es15.8)") State%ro
@@ -214,7 +181,7 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
 ! ==============================================================================================================
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Computing the bond length and its derivatives. Calling BondLength')")
   Ekin = Zero                                                                                                                     ! Setting the kinetic energy at the potential minimum
-  call BondLength( BL, dBL, State%ro, State%Tau, Ekin, Vc_R2, Species(1)%DiaPot, iPES, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )! Computng BL/bBL output, all the rest is input
+  call BondLength( BL, dBL, State%ro, State%Tau, Ekin, Vc_R2, Species(1)%DiatPot, iPES, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )! Computng BL/bBL output, all the rest is input
   if (i_Debug_Loc) then
     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Bond length:        BL       = ',es15.8)") BL
     write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Bond length Deriv.: dBL      = ',es15.8)") dBL
@@ -229,7 +196,7 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
 ! ==============================================================================================================
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Computing the diatomic coordinates')")
   ! Shouldn't it be:    Omega = sqrt(Two * Vc_R2 * xmui2) ??? (SIMONE)
-  Omega = Two * sqrt(Vc_R2 * Species(1)%DiaPot%xmui2) / BL**2                                                                                         ! Setting the angular velocity for rotation
+  Omega = Two * sqrt(Vc_R2 * Species(1)%DiatPot%xmui2) / BL**2                                                                                         ! Setting the angular velocity for rotation
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Angular velocity: Omega = ',d20.10)")  Omega
                                                                                         
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Calling Compute_Coordinates_Velocities')")
@@ -254,7 +221,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine ComputeKineticEnergy( Ekin, State, Vc_R2, DiaPot, iPES, i_Debug )
+Subroutine ComputeKineticEnergy( Ekin, State, Vc_R2, DiatPot, iPES, i_Debug )
 ! This procedure sets the initial kinetic energy of diatom for BondLength.
 ! For bound states, this is just the difference between the potential minimum and the internal energy.
 ! For quasibond states, choose the internal energy distributed about the resonance energy.
@@ -295,7 +262,7 @@ Subroutine ComputeKineticEnergy( Ekin, State, Vc_R2, DiaPot, iPES, i_Debug )
   real(rkp)                                 ,intent(out)    ::    Ekin
   type(Level_Type)                          ,intent(inout)  ::    State
   real(rkp)                                 ,intent(in)     ::    Vc_R2                   !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  class(DiatomicPotential_Type)             ,intent(in)     ::    DiaPot                  !< Intra-nuclear diatomic potential object
+  class(DiatomicPotential_Type)             ,intent(in)     ::    DiatPot                  !< Intra-nuclear diatomic potential object
   integer                                   ,intent(in)     ::    iPES
   logical                         ,optional ,intent(in)     ::    i_Debug
 
@@ -356,7 +323,7 @@ Subroutine ComputeKineticEnergy( Ekin, State, Vc_R2, DiaPot, iPES, i_Debug )
 ! For quasibond states, it is necessary to generate new periods. This procedure will only change the variables:
 !  * 'State%ro'   :   estimate of outter turning point
 !  * 'State%Tau'  :   the period in a.u.
-  if ( UpdatePeriod )  call DiaPot%Period( Ekin, Vc_R2, .True., State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, State%Tau, i_Debug=i_Debug_Loc )
+  if ( UpdatePeriod )  call DiatPot%Period( Ekin, Vc_R2, .True., State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, State%Tau, i_Debug=i_Debug_Loc )
 
   Eave      =   Eave
   rms       =   sqrt( (Eave - Ekin)**2 )
@@ -371,7 +338,7 @@ End Subroutine
 
 
 ! !________________________________________________________________________________________________________________________________!
-! Subroutine Period( State, Eint, Vc_R2, xmu, DiaPot, RecompPropFlg, i_Debug )
+! Subroutine Period( State, Eint, Vc_R2, xmu, DiatPot, RecompPropFlg, i_Debug )
 ! ! This Subroutine calculates the vibrational period, performing a numerical derivative of the classical action.
 ! ! In input:
 ! !     NTraj - number of trajectories
@@ -397,7 +364,7 @@ End Subroutine
 !   real(rkp)                                 ,intent(in)     ::    Eint
 !   real(rkp)                                 ,intent(in)     ::    Vc_R2                            !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
 !   real(rkp)                                 ,intent(in)     ::    xmu                              !< Reduced mass
-!   class(DiatomicPotential_Type)             ,intent(in)     ::    DiaPot                           !< Intra-nuclear diatomic potential object
+!   class(DiatomicPotential_Type)             ,intent(in)     ::    DiatPot                           !< Intra-nuclear diatomic potential object
 !   logical                                   ,intent(in)     ::    RecompPropFlg
 !   logical                         ,optional ,intent(in)     ::    i_Debug
 
@@ -425,7 +392,7 @@ End Subroutine
     
 !     ! Looking for Diat. Potential Maximum and its Spatial Coordinate
 !     RrangeExtreme = [State%rmin*1.01d0, 20.d0] 
-!     call DiaPot%FindMaximum( RrangeExtreme, Vc_R2, eps, r22, vmax, ierr )
+!     call DiatPot%FindMaximum( RrangeExtreme, Vc_R2, eps, r22, vmax, ierr )
 !     if (i_Debug_Loc)  call Logger%Write( " -> vmax                              = ", vmax, "; r(vmax) = ", r22)
 
   
@@ -433,7 +400,7 @@ End Subroutine
 !     r11       =   State%ri * Half
 !     Rrange0   =   [r11,r22]
 !     r21       =   State%rmin
-!     call DiaPot%FindMinimum( Rrange0, Vc_R2, eps, r21, vmin, ierr )
+!     call DiatPot%FindMinimum( Rrange0, Vc_R2, eps, r21, vmin, ierr )
 !     if (i_Debug_Loc)  call Logger%Write( " -> vmin                              = ", vmin, "; r(vmin) = ", r21)
 
 !     r12       =   r21
@@ -442,12 +409,12 @@ End Subroutine
 !     Rrange2   =   [r12,r22]
 
 !     ! Looking for Inner Tourning Point
-!     call DiaPot%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisect , NNewton=NNewton )
+!     call DiatPot%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisect , NNewton=NNewton )
 !     State%ri  =   r1
 !     if (i_Debug_Loc)  call Logger%Write( " -> State%ri                          = ", State%ri)
 
 !     ! Looking for Outer Tourning Point
-!     call DiaPot%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisect , NNewton=NNewton )
+!     call DiatPot%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisect , NNewton=NNewton )
 !     State%ro  =   r2
 !     if (i_Debug_Loc)  call Logger%Write( " -> State%ro                          = ", State%ro)
                                        
@@ -473,21 +440,21 @@ End Subroutine
 !   end if
 !   if (i_Debug_Loc)  call Logger%Write( " -> DeltaE                            = ", h )
 !   if (i_Debug_Loc)  call Logger%Write( " -> E+ = E + DeltaE                   = ", e )
-!   call DiaPot%TurningPoint( Rrange1, Vc_R2, e, r1, ierr, NBisection=NBisect , NNewton=NNewton )
-!   call DiaPot%TurningPoint( Rrange2, Vc_R2, e, r2, ierr, NBisection=NBisect , NNewton=NNewton )
+!   call DiatPot%TurningPoint( Rrange1, Vc_R2, e, r1, ierr, NBisection=NBisect , NNewton=NNewton )
+!   call DiatPot%TurningPoint( Rrange2, Vc_R2, e, r2, ierr, NBisection=NBisect , NNewton=NNewton )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E+       = ", r1 )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E+       = ", r2 )
-!   Ap = DiaPot%ActionIntegral( r1, r2, Vc_R2, e, NPtsQuad, Two * xmu, QuadratureType=1 )
+!   Ap = DiatPot%ActionIntegral( r1, r2, Vc_R2, e, NPtsQuad, Two * xmu, QuadratureType=1 )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E+            = ", Ap )
 
 
 !   e  = Eint - h
 !   if (i_Debug_Loc)  call Logger%Write( " -> E- = E - DeltaE                   = ", e )
-!   call DiaPot%TurningPoint( Rrange1, Vc_R2, e, r1, ierr, NBisection=NBisect , NNewton=NNewton )
-!   call DiaPot%TurningPoint( Rrange2, Vc_R2, e, r2, ierr, NBisection=NBisect , NNewton=NNewton )
+!   call DiatPot%TurningPoint( Rrange1, Vc_R2, e, r1, ierr, NBisection=NBisect , NNewton=NNewton )
+!   call DiatPot%TurningPoint( Rrange2, Vc_R2, e, r2, ierr, NBisection=NBisect , NNewton=NNewton )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Inner Tourning Point for E-       = ", r1 )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Outer Tourning Point for E-       = ", r2 )
-!   Am = DiaPot%ActionIntegral( r1, r2, Vc_R2, e, NPtsQuad, Two * xmu, QuadratureType=1 )
+!   Am = DiatPot%ActionIntegral( r1, r2, Vc_R2, e, NPtsQuad, Two * xmu, QuadratureType=1 )
 !   if (i_Debug_Loc)  call Logger%Write( " -> Action Integral for E-            = ", Am )
 
   
@@ -502,7 +469,7 @@ End Subroutine
 
 
 ! !________________________________________________________________________________________________________________________________!
-! Subroutine ResonanceWidth( State, Eint, Vc_R2, xmu, DiaPot )
+! Subroutine ResonanceWidth( State, Eint, Vc_R2, xmu, DiatPot )
 ! ! This Subroutine calculates the vibrational period, performing a numerical derivative of the classical action.
 ! ! In input:
 ! !     NTraj - number of trajectories
@@ -528,7 +495,7 @@ End Subroutine
 !   real(rkp)                                 ,intent(in)     ::    Eint
 !   real(rkp)                                 ,intent(in)     ::    Vc_R2                            !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
 !   real(rkp)                                 ,intent(in)     ::    xmu                              !< Reduced mass
-!   class(DiatomicPotential_Type)             ,intent(in)     ::    DiaPot                           !< Intra-nuclear diatomic potential object
+!   class(DiatomicPotential_Type)             ,intent(in)     ::    DiatPot                           !< Intra-nuclear diatomic potential object
 
 !   integer   ,parameter                                      ::    NBisect   =   10                 ! number of bisection steps to perform
 !   integer   ,parameter                                      ::    NNewton   =   20                 ! number of newton-raphson steps to perform
@@ -550,9 +517,9 @@ End Subroutine
 !   Rrange1   =   [r11,r21]
 !   Rrange2   =   [r12,r22]
  
-!   call DiaPot%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisect , NNewton=NNewton )
-!   call DiaPot%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisect , NNewton=NNewton ) 
-!   Ap = DiaPot%ActionIntegralGamma( r1, r2, Vc_R2, Eint, NPtsQuad, Two * xmu, QuadratureType=3 )
+!   call DiatPot%TurningPoint( Rrange1, Vc_R2, Eint, r1, ierr, NBisection=NBisect , NNewton=NNewton )
+!   call DiatPot%TurningPoint( Rrange2, Vc_R2, Eint, r2, ierr, NBisection=NBisect , NNewton=NNewton ) 
+!   Ap = DiatPot%ActionIntegralGamma( r1, r2, Vc_R2, Eint, NPtsQuad, Two * xmu, QuadratureType=3 )
 
 !   State%egam = Ap / State%tau
 
@@ -561,7 +528,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Debug_Deep )
+Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiatPot, iPES, i_Debug, i_Debug_Deep )
 ! This procedures determines the initial vibrational displacement and velocity.
 ! On input:
 !  * phas:  vibrational phase
@@ -585,7 +552,7 @@ Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Deb
   real(rkp)                                 ,intent(in)     ::    tau                                       !< vibrational period
   real(rkp)                                 ,intent(in)     ::    tm                                        !< kinetic energy at the potential minimum: Always 0 in input variable
   real(rkp)                                 ,intent(in)     ::    Vc_R2                                     !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  class(DiatomicPotential_Type)     ,target ,intent(in)     ::    DiaPot                                    !< Intra-nuclear diatomic potential object
+  class(DiatomicPotential_Type)     ,target ,intent(in)     ::    DiatPot                                    !< Intra-nuclear diatomic potential object
   integer                                   ,intent(in)     ::    iPES
   logical                         ,optional ,intent(in)     ::    i_Debug
   logical                         ,optional ,intent(in)     ::    i_Debug_Deep
@@ -643,9 +610,9 @@ Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Deb
 ! integrator procedure 'bsstepv'. There might be a better (ie. more oriented-object) way of doing this.
 ! This need to be done before calling the ODE integration procedure 'bsstepv'.
 ! ==============================================================================================================
-  xmui_Global     =     DiaPot%xmui
+  xmui_Global     =     DiatPot%xmui
   Vc_R2_Global    =     Vc_R2
-  DiaPot_Global   =>    DiaPot
+  DiatPot_Global   =>    DiatPot
 ! ==============================================================================================================
 
 
@@ -665,11 +632,11 @@ Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Deb
   t         =   Zero                                                                                                              ! Setting the initial time
   dt        =   t_Final / fnum                                                                                                    ! Setting the initial timestep
   y(1)      =   rm                                                                                                                ! Setting the initial solution vector
-  y(2)      =   sqrt( Two * DiaPot%xmui * tm )                                                                                    ! Setting the initial solution vector
+  y(2)      =   sqrt( Two * DiatPot%xmui * tm )                                                                                    ! Setting the initial solution vector
   yscal(1)  =   rm * epse
   yscal(2)  =   yscal(1)
-  V         =   DiaPot%DiatomicPotential( y(1) )
-  d0        =   V  + Vc_R2/y(1)**2 + ( Half *y(2)**2 / DiaPot%xmui )
+  V         =   DiatPot%DiatomicPotential( y(1) )
+  d0        =   V  + Vc_R2/y(1)**2 + ( Half *y(2)**2 / DiatPot%xmui )
 ! ==============================================================================================================
 
 
@@ -699,12 +666,12 @@ Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Deb
   if ( Iter > IterMax ) then
     write(Logger%Unit,"(12x,'[BondLength]: <<< Failure >>> Iter reached IterMax')") ; error stop
   end if
-  nullify(DiaPot_Global) 
+  nullify(DiatPot_Global) 
   Params(8:9) = y(1:2)                                                                                                            !  Tear-down global variables
 ! ==============================================================================================================
 
 
-  EkinVerify = Vc_R2/y(1)**2 + ( Half *y(2)**2 / DiaPot%xmui )
+  EkinVerify = Vc_R2/y(1)**2 + ( Half *y(2)**2 / DiatPot%xmui )
   if (i_Debug_Loc) then
     write(Logger%Unit,"(12x,'[BondLength]: -> EkinVerify = ',es15.8)") EkinVerify
   end if
@@ -713,7 +680,7 @@ Subroutine BondLength( r, rdot, rm, tau, tm, Vc_R2, DiaPot, iPES, i_Debug, i_Deb
 ! ! ==============================================================================================================
 ! !      CHECKING ENERGY CONSERVATION
 ! ! ==============================================================================================================
-!   call DiaPot%Compute_V( y(1), V )
+!   call DiatPot%Compute_V( y(1), V )
 
 !
 !   imax      =   0
@@ -865,7 +832,7 @@ Pure Subroutine FuncRHS( iPES, r, drdx )
 
   Pos     =   r(1,:)
   Vel     =   r(2,:)
-  call DiaPot_Global%Compute_Vd_dVd( Pos, V, dV )                                                                              !
+  call DiatPot_Global%Compute_Vd_dVd( Pos, V, dV )                                                                              !
   drdx(1,:) =   Vel
   drdx(2,:) =   - xmui_Global * ( dV - Two * Vc_R2_Global / Pos**3 )
   

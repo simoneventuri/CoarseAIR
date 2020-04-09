@@ -38,7 +38,7 @@ Module N2_UMN_ForN4_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_N2
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN_ForN4'
+  character(*)  ,parameter  ::    Name_DiatPot    = 'UMN_ForN4'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   real(rkp) ,dimension(0:6)                 ,parameter      ::    cs   = [  2.70963254293_rkp, 1.32620177271e-1_rkp, 2.96757048793e-1_rkp, 1.97112432229e-1_rkp, -5.02002309588e-1_rkp, 3.80734244606e-1_rkp, 1.21001628750_rkp ]
@@ -68,7 +68,7 @@ Subroutine Initialize_N2_UMN_ForN4_DiatomicPotential( This, Input, SpeciesName, 
   if (i_Debug_Loc) call Logger%Entering( "Initialize_N2_UMN_ForN4_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

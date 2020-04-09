@@ -41,19 +41,20 @@ Module DiatomicPotential_Class
   contains
     private
     
-    procedure                                     ,public ::    Initialize    =>    Initialize_DiaPot
-    procedure                                     ,public ::    Output        =>    Output_DiaPot
+    procedure                                     ,public ::    Initialize    =>    Initialize_DiatPot
+    procedure                                     ,public ::    Output        =>    Output_DiatPot
     procedure                                     ,public ::    Period
     procedure                                     ,public ::    ResonanceWidth
-    procedure                                     ,public ::    RecomputeLevelProperties
+    procedure                                     ,public ::    CheckMaxAndMin
+    procedure                                     ,public ::    CheckTurningPoints
     procedure                                     ,public ::    TurningPoint
     procedure                                     ,public ::    ActionIntegral
     procedure                                     ,public ::    ActionIntegralGamma
     procedure                                     ,public ::    FindMinimum
     procedure                                     ,public ::    FindMaximum
 
-    procedure                                     ,public ::    Compute_Vd_dVd    => Compute_Vd_dVd_DiaPot
-    procedure                                     ,public ::    DiatomicPotential => DiatomicPotential_DiaPot
+    procedure                                     ,public ::    Compute_Vd_dVd    => Compute_Vd_dVd_DiatPot
+    procedure                                     ,public ::    DiatomicPotential => DiatomicPotential_DiatPot
 
     generic                                       ,public ::    CentrifualPotential => CenPot_0d, CenPot_1d       
     procedure                             ,nopass         ::    CenPot_0d
@@ -85,7 +86,7 @@ Module DiatomicPotential_Class
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Initialize_DiaPot( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
+Subroutine Initialize_DiatPot( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
 
   use Input_Class   ,only:  Input_Type
 
@@ -100,7 +101,7 @@ Subroutine Initialize_DiaPot( This, Input, SpeciesName, iMol, Mass1, Mass2, i_De
   logical                                                   ::    i_Debug_Loc
   
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Initialize_DiaPot" )
+  if (i_Debug_Loc) call Logger%Entering( "Initialize_DiatPot" )
   !i_Debug_Loc   =     Logger%On()
   
   allocate( This%Name        ,source = '' )
@@ -120,7 +121,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Output_DiaPot( This, Unit )
+Subroutine Output_DiatPot( This, Unit )
 
   class(DiatomicPotential_Type)             ,intent(in)     ::    This          !< Diatomic-Potential object
   integer                                   ,intent(in)     ::    Unit
@@ -136,7 +137,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Elemental Subroutine Compute_Vd_dVd_DiaPot( This, R, V, dV )
+Elemental Subroutine Compute_Vd_dVd_DiatPot( This, R, V, dV )
   use Parameters_Module    ,only:  rkp
   class(DiatomicPotential_Type) ,intent(in)     ::    This          !< Diatomic-Potential object
   real(rkp)                     ,intent(in)     ::    R             !< Internuclear distance [bohr]
@@ -149,7 +150,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Elemental Function DiatomicPotential_DiaPot( This, R ) result( V )
+Elemental Function DiatomicPotential_DiatPot( This, R ) result( V )
   use Parameters_Module    ,only:  rkp
   class(DiatomicPotential_Type) ,intent(in)     ::    This          !< Diatomic-Potential object
   real(rkp)                     ,intent(in)     ::    R             !< Internuclear distance [bohr]
@@ -442,86 +443,125 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine RecomputeLevelProperties( This, Eint, Vc_R2, rMin, VMin, rMax, VMax, rIn, rOut, i_Debug )
+Subroutine CheckMaxAndMin( This, State, iState, i_Debug )
 ! This Subroutine 
 
   use Level_Class           ,only:  Level_Type
 
   class(DiatomicPotential_Type)             ,intent(in)     ::    This                           !< Intra-nuclear diatomic potential object
-  real(rkp)                                 ,intent(in)     ::    Eint
-  real(rkp)                                 ,intent(in)     ::    Vc_R2                            !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  real(rkp)                                 ,intent(inout)  ::    rMin
-  real(rkp)                                 ,intent(inout)  ::    VMin
-  real(rkp)                                 ,intent(inout)  ::    rMax
-  real(rkp)                                 ,intent(inout)  ::    VMax
-  real(rkp)                                 ,intent(inout)  ::    rIn
-  real(rkp)                                 ,intent(inout)  ::    rOut
+  type(Level_Type)                          ,intent(inout)  ::    State 
+  integer                                   ,intent(in)     ::    iState
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   real(rkp)                                                 ::    h
   real(rkp)                                                 ::    e
   real(rkp) ,dimension(2)                                   ::    RrangeExtreme, Rrange0, Rrange1, Rrange2
-  real(rkp)                                                 ::    rMinNew, VMinNew, rMaxNew, VMaxNew, rInNew, rOutNew
+  integer                                                   ::    ierr
+  real(rkp)                                                 ::    rMaxErrAbs, VMaxErrAbs, rMinErrAbs, VMinErrAbs
+  real(rkp)                                                 ::    rMaxErrRel, VMaxErrRel, rMinErrRel, VMinErrRel
+  logical                                                   ::    i_Debug_Loc
+  
+  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-3 !1.d-5
+  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-3 !1.d-8
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) ) i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "CheckMaxAndMin")  !, Active = i_Debug_Loc )
+  !i_Debug_Loc   =     Logger%On()
+
+  if (i_Debug_Loc)  call Logger%Write( " -> State%jqn = ", State%jqn)
+  
+  
+  RrangeExtreme = [State%rMax*0.8d0, State%rMax*1.2d0] 
+  call This%FindMaximum( RrangeExtreme, State%Vc_R2, EpsStatPtsGlobal, State%RMaxNew, State%VMaxNew, ierr )
+  if (i_Debug_Loc)  call Logger%Write( " -> VMax    = ", State%VMax,    "; r(VMax) = ", State%rMax)
+  if (i_Debug_Loc)  call Logger%Write( " -> VMaxNew = ", State%VMaxNew, "; r(VMax) = ", State%rMaxNew)
+  
+  rMaxErrAbs = dabs( State%rMax - State%rMaxNew ) 
+  rMaxErrRel = dabs( rMaxErrAbs / State%rMax )
+  if ( rMaxErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMax from Levels List and the one ricomputed. Absolute Error = ", rMaxErrAbs, "; Relative Error = ", rMaxErrRel*100.d0, "%" )
+  end if
+  
+  VMaxErrAbs = dabs( State%VMax - State%VMaxNew )
+  VMaxErrRel = dabs( VMaxErrAbs / State%VMax )
+  if ( VMaxErrRel > ToleranceV ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMax from Levels List and the one ricomputed. Absolute Error = ", VMaxErrAbs, "; Relative Error = ", VMaxErrRel*100.d0, "%" )
+  end if
+  
+
+  Rrange0 = [State%rMin*0.8d0, State%rMin*1.2d0]
+  call This%FindMinimum( Rrange0, State%Vc_R2, EpsStatPtsGlobal, State%rMinNew, State%VMinNew, ierr )
+  if (i_Debug_Loc)  call Logger%Write( " -> VMin    = ", State%VMin,    "; r(VMin) = ", State%rMin)
+  if (i_Debug_Loc)  call Logger%Write( " -> VMinNew = ", State%VMinNew, "; r(VMin) = ", State%rMinNew)
+  
+  rMinErrAbs = dabs( State%rMin - State%rMinNew )
+  rMinErrRel = dabs( rMinErrAbs / State%rMin )
+  if ( rMinErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMin from Levels List and the one ricomputed. Absolute Error = ", rMinErrAbs, "; Relative Error = ", rMinErrRel*100.d0, "%" )
+  end if
+  
+  VMinErrAbs = dabs( State%VMin - State%VMinNew )
+  VMinErrRel = dabs( VMinErrAbs / State%VMin )
+  if ( VMinErrRel > ToleranceV ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMin from Levels List and the one ricomputed. Absolute Error = ", VMinErrAbs, "; Relative Error = ", VMinErrRel*100.d0, "%" )
+  end if
+
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine CheckTurningPoints( This, State, iState, i_Debug )
+! This Subroutine 
+
+  use Level_Class           ,only:  Level_Type
+
+  class(DiatomicPotential_Type)             ,intent(in)     ::    This                           !< Intra-nuclear diatomic potential object
+  type(Level_Type)                          ,intent(inout)  ::    State 
+  integer                                   ,intent(in)     ::    iState
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  real(rkp)                                                 ::    h
+  real(rkp)                                                 ::    e
+  real(rkp) ,dimension(2)                                   ::    RrangeExtreme, Rrange0, Rrange1, Rrange2
   integer                                                   ::    ierr
   logical                                                   ::    i_Debug_Loc
   
-  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-5
-  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-8
+  real(rkp)                                                 ::    roErrRel, riErrRel
+  real(rkp)                                                 ::    roErrAbs, riErrAbs
+  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-3 !1.d-5
+  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-3 !1.d-8
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "RecomputeLevelProperties")  !, Active = i_Debug_Loc )
+  if (i_Debug_Loc) call Logger%Entering( "CheckTurningPoints")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
 
-  if (i_Debug_Loc)  call Logger%Write( " -> Eint = ", Eint)
-  
-  
-  RrangeExtreme = [rMax*0.8d0, rMax*1.2d0] 
-  call This%FindMaximum( RrangeExtreme, Vc_R2, EpsStatPtsGlobal, RMaxNew, VMaxNew, ierr )
-  if (i_Debug_Loc)  call Logger%Write( " -> VMaxNew      = ", VMaxNew, "; R(VMax) = ", RMaxNew)
-  
-  if (dabs(rMax - rMaxNew) > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMax from Levels List and the one ricomputed. Diff > ", ToleranceR, "; Old R(VMax) = ", rMax, "; New R(VMax) = ", rMaxNew)
-    rMax = rMax
-  end if
-  
-  if (dabs(VMax - VMaxNew) > ToleranceV ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMax from Levels List and the one ricomputed. Diff > ", ToleranceV, "; Old VMax = ", VMax, "; New VMax = ", VMaxNew)
-    VMax = VMaxNew
-  end if
+  if (i_Debug_Loc)  call Logger%Write( " -> Level ", iState, "; State%Eint = ", State%Eint, "; State%vqn = ", State%vqn, "; State%jqn = ", State%jqn)
   
 
-  Rrange0 = [rMin*0.8d0, rMin*1.2d0]
-  call This%FindMinimum( Rrange0, Vc_R2, EpsStatPtsGlobal, rMinNew, VMinNew, ierr )
-  if (i_Debug_Loc)  call Logger%Write( " -> VMinNew = ", VMinNew, "; R(VMin) = ", RMinNew)
+  Rrange1 = [State%ri*0.8d0, State%rMin]
+  call This%TurningPoint( Rrange1, State%Vc_R2, State%Eint, State%riNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
+  if (i_Debug_Loc)  call Logger%Write( " -> ri    = ", State%ri)
+  if (i_Debug_Loc)  call Logger%Write( " -> riNew = ", State%riNew)
   
-  if (abs(rMin - rMinNew) > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMin from Levels List and the one ricomputed. Diff > ", ToleranceR, "; Old R(VMin) = ", rMin, "; New R(VMin) = ", rMinNew)
-    rMin = rMinNew
+  riErrAbs = dabs( State%ri - State%riNew )
+  riErrRel = dabs( riErrAbs / State%ri )  
+  if ( riErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the ri from Levels List and the one ricomputed. Absolute Error = ", riErrAbs, "; Relative Error = ", riErrRel*100.d0, "%")
   end if
   
-  if (abs(VMin - VMinNew) > ToleranceV ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMin from Levels List and the one ricomputed. Diff > ", ToleranceV, "; Old VMin = ", VMin, "; New VMin = ", VMinNew)
-    VMin = VMinNew
-  end if
+  
+  Rrange2 = [State%rMin, State%rMax]
+  call This%TurningPoint( Rrange2, State%Vc_R2, State%Eint, State%roNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
+  if (i_Debug_Loc)  call Logger%Write( " -> ro    = ", State%ro)
+  if (i_Debug_Loc)  call Logger%Write( " -> roNew = ", State%roNew)
 
-
-  Rrange1 = [rIn*0.8d0, rMin]
-  call This%TurningPoint( Rrange1, Vc_R2, Eint, rInNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
-  if (i_Debug_Loc)  call Logger%Write( " -> rInNew = ", rInNew)
-  
-  if (abs(rIn - rInNew) > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the Ri from Levels List and the one ricomputed. Diff > ", ToleranceR, "; Old Ri = ", rIn, "; New Ri = ", rInNew)
-    rIn = rInNew
-  end if
-  
-  
-  Rrange2 = [rMin, rMax]
-  call This%TurningPoint( Rrange2, Vc_R2, Eint, rOutNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
-  if (i_Debug_Loc)  call Logger%Write( " -> rOutNew = ", rOutNew)
-  
-  if (abs(rOut - rOutNew) > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the Ro from Levels List and the one ricomputed. Diff > ", ToleranceR, "; Old Ro = ", rOut, "; New Ro = ", rOutNew)
-    rOut = rOutNew
+  roErrAbs = dabs( State%ri - State%riNew )
+  roErrRel = dabs( roErrAbs / State%ri ) 
+  if ( roErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the ro from Levels List and the one ricomputed. Absolute Error = ", roErrAbs, "; Relative Error = ", roErrRel*100.d0, "%")
   end if
   
 

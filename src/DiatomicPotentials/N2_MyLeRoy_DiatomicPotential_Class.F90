@@ -41,7 +41,7 @@ Module N2_LeRoy_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'LeRoy'
+  character(*)  ,parameter  ::    Name_DiatPot = 'LeRoy'
 
   integer   ,parameter                                      ::    nrep  = 12
   real(rkp) ,parameter                                      ::    co    =  49.0E+00_rkp
@@ -82,7 +82,7 @@ Subroutine Initialize_N2_LeRoy_DiatomicPotential( This, Input, SpeciesName, iMol
   if (i_Debug_Loc) call Logger%Entering( "Initialize_N2_LeRoy_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

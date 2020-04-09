@@ -45,7 +45,7 @@ Module Morse_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'Morse'
+  character(*)  ,parameter  ::    Name_DiatPot = 'Morse'
   
   real(rkp)                               :: re
   real(rkp)                               :: De
@@ -81,7 +81,7 @@ Subroutine Initialize_Morse_DiatomicPotential( This, Input, SpeciesName, iMol, M
   if (i_Debug_Loc) call Logger%Entering( "Initialize_Morse_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

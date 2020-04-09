@@ -40,7 +40,7 @@ Module O2_Varandas_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_O2_Varandas
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'Varandas'
+  character(*)  ,parameter  ::    Name_DiatPot    = 'Varandas'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   real(rkp)                            ,parameter              :: D     = -0.142912d0
@@ -90,7 +90,7 @@ Subroutine Initialize_O2_Varandas_DiatomicPotential( This, Input, SpeciesName, i
   if (i_Debug_Loc) call Logger%Entering( "Initialize_O2_Varandas_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

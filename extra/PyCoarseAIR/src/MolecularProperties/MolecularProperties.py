@@ -45,7 +45,7 @@ def GetProperties_O2( Molecule ):
 
     Molecule.ElementNames = 'O'
     Molecule.ElementQnts  = '2'
-    Molecule.MolarMass    = 31.9988
+    Molecule.MolarMass    = 31.9988e-3
     Molecule.FormationE   = 0.0
     Molecule.LinFactor    = 1
     Molecule.SymmFactor   = 2.0

@@ -25,8 +25,8 @@ clear all
 clc
 
 
-FileOrig = '/Users/sventuri/Desktop/N3_WORKDIR/N2_UMN_Temp.inp';
-FileNew  = '/Users/sventuri/Desktop/N3_WORKDIR/N2_UMN_Sorted.inp';
+FileOrig = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/NaNb/LeRoy/n2.myleroy_OrigFromDavid_Corrected';
+FileNew  = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/NaNb/LeRoy/MyLeroy_FromDavid.inp';
 
 
 startRow = 16;

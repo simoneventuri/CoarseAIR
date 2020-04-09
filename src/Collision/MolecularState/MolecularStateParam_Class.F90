@@ -85,8 +85,8 @@ Subroutine InitializeMolecularStateParam( This, Input, Collision, i_Debug )
 !     COMPUTING THE DIATOMIC POTENITAL OF THE target DISTANCE FOR AN INFINITY BOND LENGTH
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Computing the diatomic potenital of the target distance for an infinity bond length")
-  if (i_Debug_Loc) call Logger%Write( "-> Calling Collision%Species(iSpeTar)%DiaPot%Compute_V")
-  This%Vinf       =   Collision%Species(iSpeTar)%DiaPot%DiatomicPotential( Rinf )
+  if (i_Debug_Loc) call Logger%Write( "-> Calling Collision%Species(iSpeTar)%DiatPot%Compute_V")
+  This%Vinf       =   Collision%Species(iSpeTar)%DiatPot%DiatomicPotential( Rinf )
   if (i_Debug_Loc) call Logger%Write( "-> Rinf = ", Rinf, "This%Vinf = ", This%Vinf, Fr="es15.8" )
 ! ==============================================================================================================
 

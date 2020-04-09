@@ -41,7 +41,7 @@ Module HN_UIUC_DiatomicPotential_Class
   End Type
 
   logical       ,parameter  ::    i_Debug_Global = .False.
-  character(*)  ,parameter  ::    Name_DiaPot = 'UIUC'
+  character(*)  ,parameter  ::    Name_DiatPot = 'UIUC'
 
   integer                        ,parameter  :: PolOrd = 20 !13
   real(rkp)                      ,parameter  :: re     = 1.434108289721189_rkp !1.241140761868844_rkp
@@ -85,7 +85,7 @@ Subroutine Initialize_HN_UIUC_DiatomicPotential( This, Input, SpeciesName, iMol,
   if (i_Debug_Loc) call Logger%Entering( "Initialize_HN_UIUC_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.

@@ -25,7 +25,7 @@ Module CO2_NASA_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, Half, One, Two, Four, Six
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -130,7 +130,7 @@ Subroutine Initialize_CO2_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   integer                                                   ::    kp
   integer                                                   ::    ii
   integer            ,dimension(6)                          ::    MatrixTemp = (/ 1, 2, 1, 3, 2, 3 /)
-  type(CO_DiatomicPotential_Type)                           ::    CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           ::    CO_DiatPot
   integer         ,dimension(3,2)                           ::    iA
 
   logical                                                   ::    i_Debug_Loc
@@ -258,7 +258,7 @@ Subroutine Initialize_CO2_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   read(Unit,*) This%nfcnt
   if (i_Debug_Loc) call Logger%Write( "nfcnt = ", This%nfcnt)
  
-  This%Vd_Inf = CO_DiaPot%DiatomicPotential( 1.0e4_rkp )
+  This%Vd_Inf = CO_DiatPot%DiatomicPotential( 1.0e4_rkp )
   if (i_Debug_Loc) call Logger%Write( "Vd at C+O Limit:     This%Vd_Inf", This%Vd_Inf )
   if (i_Debug_Loc) call Logger%Write( "coefco(1) = ", This%coefco(1) )
   This%diatshift = This%coefco(1) - This%Vd_inf
@@ -322,19 +322,19 @@ Subroutine Compute_CO2_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp) ,dimension(:)          CONTIGUOUS   ,intent(out) ::    dVdR         !< Derivative of the potential wrt pair distances [hartree/bohr]. Dim=(NPairs)
   real(rkp) ,dimension(:)          CONTIGUOUS   ,intent(out) ::    dVdQ         !< Derivative of the potential wrt atom coordinates [hartree/bohr]. Dim=(NAtoms*3)
 
-  type(CO_DiatomicPotential_Type)                            :: CO_DiaPot
-  type(O2_NASA_DiatomicPotential_Type)                       :: O2_NASA_DiaPot
+  type(CO_DiatomicPotential_Type)                            :: CO_DiatPot
+  type(O2_NASA_DiatomicPotential_Type)                       :: O2_NASA_DiatPot
   real(rkp)                                                  :: VTemp
 
   dVdQ         = Zero
   call Compute_CO2_NASA_PES_1d_NoTraj( This, R(This%iO2), R(This%iCO), R(This%jCO), V, dVdR(:) )
 
   ! V = Zero
-  ! call CO_DiaPot%Compute_Vd_dVd( R(This%iCO), VTemp, dVdR(This%iCO) )   
+  ! call CO_DiatPot%Compute_Vd_dVd( R(This%iCO), VTemp, dVdR(This%iCO) )   
   ! V = V + VTemp
-  ! call CO_DiaPot%Compute_Vd_dVd( R(This%jCO), VTemp, dVdR(This%jCO) ) 
+  ! call CO_DiatPot%Compute_Vd_dVd( R(This%jCO), VTemp, dVdR(This%jCO) ) 
   ! V = V + VTemp  
-  ! call O2_NASA_DiaPot%Compute_Vd_dVd( R(This%iO2), VTemp, dVdR(This%iO2) )   
+  ! call O2_NASA_DiatPot%Compute_Vd_dVd( R(This%iO2), VTemp, dVdR(This%iO2) )   
   ! V = V + VTemp
   ! write(*,*) V
 
@@ -356,7 +356,7 @@ Subroutine Compute_CO2_NASA_PES_1d_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, dV, i_
   real(rkp)       ,dimension(3)             ,intent(out)    :: dV
   logical                         ,optional ,intent(in)     :: i_Debug
   
-  type(CO_DiatomicPotential_Type)                           :: CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           :: CO_DiatPot
   
   real(rkp)                                                 :: roo 
    
@@ -429,7 +429,7 @@ Subroutine Compute_CO2_NASA_PES_1d_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, dV, i_
   
   
   
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This is Simply:    O2_NASA_DiaPot%Compute_Vd_dVd_O2( R_O2, V_O2=ham(3,3), dham(3,3,3) )
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This is Simply:    O2_NASA_DiatPot%Compute_Vd_dVd_O2( R_O2, V_O2=ham(3,3), dham(3,3,3) )
   vsr   = 64.0_rkp * dexp(This%alphaco*roo) / roo
   dvsr  = vsr * (This%alphaco-(One/roo))
   vlr   = -This%c6o2 / (roo**6+This%damp6co)
@@ -469,7 +469,7 @@ Subroutine Compute_CO2_NASA_PES_1d_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, dV, i_
       
   do j = 1,2
   
-    call CO_DiaPot%Compute_Vd_dVd( fv1(j), vdiatm, dvdr )   
+    call CO_DiatPot%Compute_Vd_dVd( fv1(j), vdiatm, dvdr )   
    
     vdiatm      = vdiatm + This%diatshift
     dham(j,j,j) = dvdr
@@ -837,7 +837,7 @@ Subroutine CO2_NASA_Potential_From_R_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, i_De
   real(rkp)                                 ,intent(out)    :: V
   logical                         ,optional ,intent(in)     :: i_Debug
   
-  type(CO_DiatomicPotential_Type)                           :: CO_DiaPot
+  type(CO_DiatomicPotential_Type)                           :: CO_DiatPot
   
   real(rkp)                                                 :: roo 
    
@@ -902,7 +902,7 @@ Subroutine CO2_NASA_Potential_From_R_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, i_De
   
   
   
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This is Simply:    O2_NASA_DiaPot%Compute_Vd_dVd_O2( R_O2, V_O2=ham(3,3), dham(3,3,3) )
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This is Simply:    O2_NASA_DiatPot%Compute_Vd_dVd_O2( R_O2, V_O2=ham(3,3), dham(3,3,3) )
   vsr   = 64.0_rkp * dexp(This%alphaco*roo) / roo
   dvsr  = vsr * (This%alphaco-(One/roo))
   vlr   = -This%c6o2 / (roo**6+This%damp6co)
@@ -940,7 +940,7 @@ Subroutine CO2_NASA_Potential_From_R_NoTraj( This, R_O2, R_CO_1, R_CO_2, V, i_De
       
   do j = 1,2
   
-    vdiatm = CO_DiaPot%DiatomicPotential( fv1(j) ) 
+    vdiatm = CO_DiatPot%DiatomicPotential( fv1(j) ) 
    
     vdiatm      = vdiatm + This%diatshift
     

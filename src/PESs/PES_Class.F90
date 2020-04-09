@@ -33,10 +33,10 @@ Module PES_Class
 
   private
   public  ::    PES_Type
-  public  ::    DiaPotContainer_Type
+  public  ::    DiatPotContainer_Type
   public  ::    PESEvoFile, PESEvoFlg
   
-  Type                                                      ::    DiaPotContainer_Type
+  Type                                                      ::    DiatPotContainer_Type
     class(DiatomicPotential_Type) ,allocatable              ::    Vd
   End Type
 
@@ -47,7 +47,7 @@ Module PES_Class
     character(:)                              ,allocatable  ::    Model               !< Name of current PES
     real(rkp)                   ,dimension(:) ,allocatable  ::    mMiMn               !< Opposite of the ratio of the mass of the N-1 first atoms over the mass of 
                                                                                       !< the last atoms: -Mi(1:N-1)/M(N). Dim=(NAtoms-1)
-    type(DiaPotContainer_Type)  ,dimension(:) ,allocatable  ::    Pairs               !< Vector of Pair objects. Each pair can have a different diatomic-potential object
+    type(DiatPotContainer_Type)  ,dimension(:) ,allocatable  ::    Pairs               !< Vector of Pair objects. Each pair can have a different diatomic-potential object
     logical                                                 ::    CartCoordFlg
   contains
     private

@@ -25,7 +25,7 @@ Module N4_NASA_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, Half, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Pi
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -603,7 +603,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   integer                                 ,intent(in)     :: iprt
 
   integer                                                 :: i, j, ipst
-  type(N2_LeRoy_DiatomicPotential_Type)                   :: DiaPot
+  type(N2_LeRoy_DiatomicPotential_Type)                   :: DiatPot
   real(rkp) ,dimension(12)                                :: dr1, dr2, dr3, dr4, dr5, dr6
   real(rkp) ,dimension(12)                                :: dxa1, dxa2, dxa3, dxb1, dxb2, dxb3
   real(rkp) ,dimension(12)                                :: dxa, dxb  
@@ -972,8 +972,8 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
     end do
   end if                                                            
 
-  call DiaPot%Compute_Vd_dVd( r1, v12, dv12dr1 )
-  call DiaPot%Compute_Vd_dVd( r2, v34, dv34dr2 )
+  call DiatPot%Compute_Vd_dVd( r1, v12, dv12dr1 )
+  call DiatPot%Compute_Vd_dVd( r2, v34, dv34dr2 )
   ! dpi: dipole polarizability
   call diatccsdd(r1, dp1, ddp1dr1, 3)
   call diatccsdd(r2, dp2, ddp2dr2, 3)

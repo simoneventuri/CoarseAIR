@@ -25,7 +25,7 @@ Module O3_UMN_PES_Class
 #include "../qct.inc"
 
   use Parameters_Module     ,only:  rkp, Zero, One, Two, B_To_Ang, Kcm_To_Hartree, KcmAng_To_HartB
-  use PES_Class             ,only:  PES_Type, DiaPotContainer_Type
+  use PES_Class             ,only:  PES_Type, DiatPotContainer_Type
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
 
@@ -163,7 +163,7 @@ Function O3_UMN_Potential_From_R( This, R, Q ) result( V )
   real(rkp) ,dimension(56)                                ::    B       
   integer                                                 ::    i
   real(rkp) ,dimension(3)                                 ::    Vd
-  type(O2_UMN_DiatomicPotential_Type)                     ::    DiaPot      ! Diatomic potential object
+  type(O2_UMN_DiatomicPotential_Type)                     ::    DiatPot      ! Diatomic potential object
   
   ! The soubroutines receives in input distances in Bohr and gives derivatives in dR
   RAng = R * B_To_Ang
@@ -174,7 +174,7 @@ Function O3_UMN_Potential_From_R( This, R, Q ) result( V )
   call Unified( This, RAng, rMs, rM, P, B )
 
   ! Evaluate 2-body interactions
-  Vd    = DiaPot%DiatomicPotential( R )
+  Vd    = DiatPot%DiatomicPotential( R )
   VDiat = sum(Vd)
 
   ! Evaluate V by taken the product of C and Basis function array
@@ -206,10 +206,10 @@ Function O3_UMN_Potential_From_R_OnlyDiat( This, R, Q ) result( V )
   real(rkp) ,dimension(56)                                ::    B       
   integer                                                 ::    i
   real(rkp) ,dimension(3)                                 ::    Vd
-  type(O2_UMN_DiatomicPotential_Type)                     ::    DiaPot      ! Diatomic potential object
+  type(O2_UMN_DiatomicPotential_Type)                     ::    DiatPot      ! Diatomic potential object
 
   ! Evaluate 2-body interactions
-  Vd    = DiaPot%DiatomicPotential( R )
+  Vd    = DiatPot%DiatomicPotential( R )
   V     = sum(Vd)
 
 End Function
@@ -274,7 +274,7 @@ Subroutine Compute_O3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp) ,dimension(3,3)                             ::    dMsdR
   real(rkp) ,dimension(3,56)                            ::    dBdR           
   integer                                               ::    i, j
-  type(O2_UMN_DiatomicPotential_Type)                   ::    DiaPot      ! Diatomic potential object
+  type(O2_UMN_DiatomicPotential_Type)                   ::    DiatPot      ! Diatomic potential object
   
   ! The soubroutines receives in input distances in Bohr and gives derivatives in dR
   RAng = R * B_To_Ang
@@ -286,7 +286,7 @@ Subroutine Compute_O3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
 
   ! Evaluate 2-body interactions
   VDiat = Zero 
-  call DiaPot%Compute_Vd_dVd( R, Vd, dVDiat )
+  call DiatPot%Compute_Vd_dVd( R, Vd, dVDiat )
   VDiat = sum(Vd)
 
   ! Evaluate V by taken the product of C and Basis function array

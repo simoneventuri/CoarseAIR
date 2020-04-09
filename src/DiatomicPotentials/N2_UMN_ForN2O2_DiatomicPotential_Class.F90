@@ -38,7 +38,7 @@ Module N2_UMN_ForN2O2_DiatomicPotential_Class
     procedure         ::    DiatomicPotential =>    DiatomicPotential_N2
   End Type
 
-  character(*)  ,parameter  ::    Name_DiaPot    = 'UMN_ForN2O2'
+  character(*)  ,parameter  ::    Name_DiatPot    = 'UMN_ForN2O2'
   logical       ,parameter  ::    i_Debug_Global = .False.
   
   !!! For N2+O
@@ -69,7 +69,7 @@ Subroutine Initialize_N2_DiatomicPotential( This, Input, SpeciesName, iMol, Mass
   if (i_Debug_Loc) call Logger%Entering( "Initialize_N2_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
   
-  allocate( This%Name        ,source = trim(Name_DiaPot) )
+  allocate( This%Name        ,source = trim(Name_DiatPot) )
   allocate( This%SpeciesName ,source = trim(adjustl(SpeciesName)) )
   This%iMol         =    iMol
   This%Initialized  =   .True.
