@@ -61,12 +61,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 2 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 3 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 4 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 5 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 6 = n2.leroy.Sort.dat
+   Levels File Name, Molecule 1 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 2 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 3 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 4 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 5 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 6 = MyLeroy_FromDavid.inp
 
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
