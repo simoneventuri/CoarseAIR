@@ -603,6 +603,52 @@ function UpdateAllInput()
         ColorVec = CompColor
 
       RxLxIdx          = [-1, 1];
+      
+   
+    elseif strcmp(System, 'N4_UMN')
+
+      NTint  = length(T0_Vec);
+
+      NAtoms    = 4;
+      AtomsName = [    'N',     'N',     'N',      'N'];
+      AtomColor = [0 0.3 0; 0 0.3 0; 0 0.3 0;  0 0.3 0];
+      AtomSize  = [    150,     150,     150,      150];
+      AtomMass  = [  25526.04298d0, 25526.04298d0, 25526.04298d0, 25526.04298d0]
+
+
+      MoleculesName    = ['N2'];
+      MoleculedDissEn  = [ 0.0];
+      NMolecules       = size(MoleculesName,1);
+      DegeneracyFactor = [1];
+      MoleculeMu       = [28.0134d-3];
+
+
+      AllMoleculesName = ['N2_NASA'; 'N2_NASA'; 'N2_NASA'; 'N2_NASA'; 'N2_NASA'; 'N2_NASA'];
+
+      PairColor = [0 0 256; 0 256 0; 256 0 0]./256;
+
+      BinnedMolName   = ['N2'];
+      NBinnedMol      = size(BinnedMolName,1);
+      BinnedMolToComp = [   2];
+
+      NComp = 2;
+        CompNames=['  ';'  '];
+        CompNames(1,:) = ' N';
+        CompNames(2,:) = 'N2';
+
+        ComponentMass = [AtomMass(1), 2.d0.*AtomMass(1)];
+        ComponentDeg  = [          4,                 1]
+
+
+      ColPartToComp = 1;
+
+        CompColor(1,:) = [ 102, 102, 102];
+        CompColor(2,:) = [ 204,   0,   0];
+        CompColor      = CompColor ./ 256;
+
+        ColorVec = CompColor
+
+      RxLxIdx          = [-1, 1];
 
     end
 

@@ -154,13 +154,12 @@ if ( DEFINED MODULEFILE_INSTALL_DIR )
 LogMessage ( "Installation directory for the modulefile:            MODULEFILE_INSTALL_DIR = ${MODULEFILE_INSTALL_DIR}")
 endif()
 
-LogMessage ( "GSL  Root Directory:                                   GSL_ROOT_DIR           = ${GSL_ROOT_DIR}")
-LogMessage ( "GSL  Include:                                          GSL_INC                = ${GSL_INCLUDE_DIR}")
-LogMessage ( "GSL  Library:                                          GSL_LIB                = ${GSL_LIBRARIES}")
+#LogMessage ( "GSL  Root Directory:                                   GSL_ROOT_DIR           = ${GSL_ROOT_DIR}")
+#LogMessage ( "GSL  Include:                                          GSL_INC                = ${GSL_INCLUDE_DIR}")
+#LogMessage ( "GSL  Library:                                          GSL_LIB                = ${GSL_LIBRARIES}")
 #find_package( GSL REQUIRED )
 #LogMessage ( "FGSL Include:                                          FGSL_INC               = ${FGSL_INC}")
 #LogMessage ( "FGSL Library:                                          FGSL_LIB               = ${FGSL_LIB}")
-
 #LogMessage ( "HDF5 Include:                                          HDF5_INCLUDE_DIRS      = ")
 #LogMessage ( "HDF5 Library:                                          HDF5_LIBRARIES         = ${HDF5_LIBRARIES}")
 #find_package( HDF5 REQUIRED )
@@ -284,21 +283,6 @@ if (BUILD_APPLICATIONS)
   install( TARGETS ${TARGET_NAME} DESTINATION ${EXECUTABLE_INSTALL_DIR} )             # Installing the exectuable
 endif()
 
-# if (BUILD_APPLICATIONS)
-#  LogMessage ( "GSL  Include:           GSL_INC                = ${GSL_INCLUDE_DIR}")
-#  LogMessage ( "GSL  Library:           GSL_LIB                = ${GSL_LIBRARIES}")
-#  set( APPLICATION_NAME ${LIBRARY_NAME}-derivequantities.x )                          # Set the name of the application (ie the executable) to be build
-#  set( TARGET_NAME ${APPLICATION_NAME} )                                              # Set the name of the target to be build
-#  LogMessage( "Building the ${APPLICATION_NAME} code" )                               # Write log message
-#  add_subdirectory( app/DeriveQuantities )                                            # Adding the directory containing the source files
-#  get_sources( SRCS )                                                                 # Get the list of source files and reseting the global variable
-#  add_executable( ${TARGET_NAME} ${SRCS} )                                            # Create a application code from the list of source files
-#  set_target_properties( ${TARGET_NAME} PROPERTIES OUTPUT_NAME ${APPLICATION_NAME} )  # Change the name of the executable from 'spark-driver' to 'spark'
-#  target_link_libraries( ${TARGET_NAME} PUBLIC ${STATIC_LIBRARY} ${GSL_LIBRARIES} )   # Linking the 'spark' executable to the 'spark-cfd' library, which will #also link to the 'spark' and 'spark-ode' libraries due to the PUBLIC dependency
-#  target_include_directories( ${TARGET_NAME} PUBLIC ${GSL_INCLUDE_DIR}  )
-#  install( TARGETS ${TARGET_NAME} DESTINATION ${EXECUTABLE_INSTALL_DIR} )             # Installing the exectuable
-# endif()
-
 if (BUILD_APPLICATIONS)
   set( APPLICATION_NAME ${LIBRARY_NAME}-plotpes.x )                                   # Set the name of the application (ie the executable) to be build
   set( TARGET_NAME ${APPLICATION_NAME} )                                              # Set the name of the target to be build
@@ -307,8 +291,8 @@ if (BUILD_APPLICATIONS)
   get_sources( SRCS )                                                                 # Get the list of source files and reseting the global variable
   add_executable( ${TARGET_NAME} ${SRCS} )                                            # Create a application code from the list of source files
   set_target_properties( ${TARGET_NAME} PROPERTIES OUTPUT_NAME ${APPLICATION_NAME} )  # Change the name of the executable from 'spark-driver' to 'spark'
-  target_link_libraries( ${TARGET_NAME} PUBLIC ${STATIC_LIBRARY} ${GSL_LIBRARIES} )         # Linking the 'spark' executable to the 'spark-cfd' library, which will also link to the 'spark' and
-  target_include_directories( ${TARGET_NAME} PUBLIC ${GSL_INCLUDE_DIR} )
+  target_link_libraries( ${TARGET_NAME} PUBLIC ${STATIC_LIBRARY} )                    # Linking the 'spark' executable to the 'spark-cfd' library, which will also link to the 'spark' and
+  target_include_directories( ${TARGET_NAME} PUBLIC )
   install( TARGETS ${TARGET_NAME} DESTINATION ${EXECUTABLE_INSTALL_DIR} )             # Installing the exectuable
 endif()
 

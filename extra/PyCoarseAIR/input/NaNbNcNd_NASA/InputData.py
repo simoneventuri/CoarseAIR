@@ -37,7 +37,7 @@ class inputdata(object):
 
 
         ### CHEMICAL SYSTEM SPECIFIC
-        self.SystNameLong              = 'NaNbNcNd_NASA'
+        self.SystNameLong              = 'NaNbNcNd_UMN'
         self.OldVersion_IntFlg         = 0
         self.DtbReadFldr               = self.WORKSPACE_PATH + '/CoarseAIR/N4_VS/Test/'
         self.OutputWriteFldr           = OutputWriteFldr 

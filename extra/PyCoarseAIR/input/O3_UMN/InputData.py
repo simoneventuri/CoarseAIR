@@ -72,7 +72,7 @@ class kinetics(object):
         self.WriteExch_Flg              = False
 
         self.WriteExoth_Flg             = True
-        self.WriteQB_IntFlg             = 0
+        self.WriteQB_IntFlg             = 2
         self.WriteFormat                = 'PLATO'
 
 
@@ -92,7 +92,7 @@ class kinetics(object):
         self.GroupsOutPathsToMapping    = ['']
         self.GroupsOut_Flg              = False
         self.GroupsOutWrite_Flg         = False
-        self.GroupsOutSuffix            = '_OnlyBound'
+        self.GroupsOutSuffix            = ''
 
 
         ## Packing + Unpacking Dissocation Rates:

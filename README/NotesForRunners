@@ -1,5 +1,0 @@
- - In order to write trajectories’ PES evolutions in files (Input%PESEvoFlg), first uncomment IF Cycle in “Compute_PES_1d” in “Collision_Class”.
-    
- - In order to write trajectories’ spatial evolutions in files ((Input%PaQEvoFlg) .or. (Input%XXEvoFlg)), first uncomment IF Cycle in “Integrate” in “Integrator_Class”.
- 
- - In order to write trajectories’ final coordinates in files (Input%PaQSolFlg), first uncomment IF Cycle in “Integrate” in “Integrator_Class”.

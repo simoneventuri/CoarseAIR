@@ -49,7 +49,7 @@ export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
 export DissFlg=0
-export DissInelFlg=1
+export DissInelFlg=0
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=1
@@ -96,9 +96,9 @@ function Call_MeCvode() {
   cd ./${OutputFldr} 
   if [ $DissFlg -eq 0 ]; then
     #export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
-    export ExFldr=${PathToMECVODEFldr}/${System}/'N4_T'${TTran}'K'
+    export ExFldr=${PathToMECVODEFldr}/'NaNbNcNd_NASA/N4_T'${TTran}'K'
   else
-    export ExFldr=${PathToMECVODEFldr}/${System}/'N4_T'${TTran}'K'
+    export ExFldr=${PathToMECVODEFldr}/'NaNbNcNd_NASA/N4_T'${TTran}'K'
     #export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'
   fi
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'

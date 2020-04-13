@@ -34,6 +34,7 @@ Module LevelsContainer_Class
 
   Type      ::    LevelsContainer_Type
     character(:) ,allocatable                         ::    PathToLevelsFile
+    character(:) ,allocatable                         ::    PathToLevelsFldr
     integer                                           ::    NStates     =   0   ! Old name: nst
     integer                                           ::    inj         =   0
     integer                                           ::    inv         =   0
@@ -117,9 +118,11 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
   logical                         ,optional ,intent(in)     ::    i_Debug
  
   integer                                                   ::    iState, jqn
-  real(rkp)                                                 ::    VMaxTemp, VMinTemp, rMaxTemp, rMinTemp
+  real(rkp)                                                 ::    VMaxTemp, VMinTemp, rMaxTemp, rMinTemp, EShiftNew
   logical                                                   ::    TempFlg
   logical                                                   ::    ReCheckFlg_Loc
+  integer                                                   ::    iChar, jChar
+  integer                                                   ::    Unit
   logical                                                   ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) ) i_Debug_Loc = i_Debug
@@ -166,6 +169,11 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
     allocate( This%PathToLevelsFile,  source = adjustl(trim( FileName )) ) 
     if (i_Debug_Loc) call Logger%Write( "Path to File with Pre-Processed Levels = ", This%PathToLevelsFile    )
 
+    do iChar=1,len(This%PathToLevelsFile)
+      if (This%PathToLevelsFile(iChar:iChar) == '/') jChar = iChar 
+    end do
+    allocate( This%PathToLevelsFldr,  source = adjustl(trim( This%PathToLevelsFile(1:jChar) )) ) 
+
 
     ! ==============================================================================================================
     !   READING THE STATE DATA
@@ -180,13 +188,22 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
       ! ==============================================================================================================
       !  CHECKING LEVEL PROPERTIES
       ! ==============================================================================================================
+        do iState = 1,This%NStates
+          if (jqn == This%States(iState)%jqn) then
+            call DiatPot%CheckMaxAndMin( This%States(iState), iState, Zero, i_Debug=i_Debug_Loc)
+            EShiftNew = This%States(iState)%VMaxNew - This%States(iState)%VMax 
+            if (i_Debug_Loc) call Logger%Write( "EShiftNew = ", EShiftNew, "Eh" )
+            exit
+          end if
+        end do 
+
         if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%CheckMaxAndMin" )
         do jqn = 0,This%maxjqn
           TempFlg = .True.
           do iState = 1,This%NStates
             if (jqn == This%States(iState)%jqn) then
               if (TempFlg) then            
-                call DiatPot%CheckMaxAndMin( This%States(iState), iState, i_Debug=i_Debug_Loc)
+                call DiatPot%CheckMaxAndMin( This%States(iState), iState, EShiftNew, i_Debug=i_Debug_Loc)
                 TempFlg  = .False.
                 VMaxTemp = This%States(iState)%VMaxNew
                 VMinTemp = This%States(iState)%VMinNew
@@ -197,11 +214,6 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
                 This%States(iState)%VMinNew = VMinTemp
                 This%States(iState)%rMaxNew = rMaxTemp
                 This%States(iState)%rMinNew = rMinTemp
-                if  (This%States(iState)%VMaxNew          < This%States(iState)%EInt) then
-                  write(*,'(A,I5,A,I1,A,I2,A,I3,A)') '    [LevelsContainer_Class.F90 - InitializeLevelsContainer]: WARNING!   Level Nb ', iState, ' of Molecule Nb ', iMol, '(', This%States(iState)%vqn, ',', This%States(iState)%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
-                elseif  (This%States(iState)%VMaxNew - 1.e-10 < This%States(iState)%EInt) then
-                  write(*,'(A,I5,A,I1,A,I2,A,I3,A)') '    [LevelsContainer_Class.F90 - InitializeLevelsContainer]: WARNING!!! Level Nb ', iState, ' of Molecule Nb ', iMol, '(', This%States(iState)%vqn, ',', This%States(iState)%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
-                end if
               end if
             end if
           end do
@@ -209,14 +221,13 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
         if (i_Debug_Loc) call Logger%Write( "-> Done checking diatomic potential maxima and minima" )
 
 
-        if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%CheckTurningPoints" )
+        if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%CheckTurningPoints and DiatPot%WriteErrors" )
+        Unit = 0
         do iState = 1,This%NStates
-          call DiatPot%CheckTurningPoints( This%States(iState), iState, i_Debug=i_Debug_Loc)
+          call DiatPot%CheckTurningPoints( This%States(iState), iState, EShiftNew, i_Debug=i_Debug_Loc)
+          call DiatPot%WriteErrors( This%States(iState), iState, This%NStates, This%PathToLevelsFldr, Unit, i_Debug=i_Debug_Loc )
         end do
-        if (i_Debug_Loc) call Logger%Write( "-> Done checking level turning points" )
-
-
-
+        if (i_Debug_Loc) call Logger%Write( "-> Done checking level turning points and writing errors" )
       ! ==============================================================================================================
     end if
 

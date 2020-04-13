@@ -47,6 +47,7 @@ Module DiatomicPotential_Class
     procedure                                     ,public ::    ResonanceWidth
     procedure                                     ,public ::    CheckMaxAndMin
     procedure                                     ,public ::    CheckTurningPoints
+    procedure                                     ,public ::    WriteErrors
     procedure                                     ,public ::    TurningPoint
     procedure                                     ,public ::    ActionIntegral
     procedure                                     ,public ::    ActionIntegralGamma
@@ -443,7 +444,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine CheckMaxAndMin( This, State, iState, i_Debug )
+Subroutine CheckMaxAndMin( This, State, iState, EShiftNew, i_Debug )
 ! This Subroutine 
 
   use Level_Class           ,only:  Level_Type
@@ -451,18 +452,15 @@ Subroutine CheckMaxAndMin( This, State, iState, i_Debug )
   class(DiatomicPotential_Type)             ,intent(in)     ::    This                           !< Intra-nuclear diatomic potential object
   type(Level_Type)                          ,intent(inout)  ::    State 
   integer                                   ,intent(in)     ::    iState
+  real(rkp)                                 ,intent(in)     ::    EShiftNew
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   real(rkp)                                                 ::    h
   real(rkp)                                                 ::    e
   real(rkp) ,dimension(2)                                   ::    RrangeExtreme, Rrange0, Rrange1, Rrange2
   integer                                                   ::    ierr
-  real(rkp)                                                 ::    rMaxErrAbs, VMaxErrAbs, rMinErrAbs, VMinErrAbs
-  real(rkp)                                                 ::    rMaxErrRel, VMaxErrRel, rMinErrRel, VMinErrRel
   logical                                                   ::    i_Debug_Loc
   
-  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-3 !1.d-5
-  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-3 !1.d-8
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) ) i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "CheckMaxAndMin")  !, Active = i_Debug_Loc )
@@ -471,40 +469,19 @@ Subroutine CheckMaxAndMin( This, State, iState, i_Debug )
   if (i_Debug_Loc)  call Logger%Write( " -> State%jqn = ", State%jqn)
   
   
-  RrangeExtreme = [State%rMax*0.8d0, State%rMax*1.2d0] 
+  RrangeExtreme = [State%rMax*0.9d0, State%rMax*1.1d0] 
   call This%FindMaximum( RrangeExtreme, State%Vc_R2, EpsStatPtsGlobal, State%RMaxNew, State%VMaxNew, ierr )
+  State%VMaxNew = State%VMaxNew - EShiftNew
   if (i_Debug_Loc)  call Logger%Write( " -> VMax    = ", State%VMax,    "; r(VMax) = ", State%rMax)
   if (i_Debug_Loc)  call Logger%Write( " -> VMaxNew = ", State%VMaxNew, "; r(VMax) = ", State%rMaxNew)
   
-  rMaxErrAbs = dabs( State%rMax - State%rMaxNew ) 
-  rMaxErrRel = dabs( rMaxErrAbs / State%rMax )
-  if ( rMaxErrRel > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMax from Levels List and the one ricomputed. Absolute Error = ", rMaxErrAbs, "; Relative Error = ", rMaxErrRel*100.d0, "%" )
-  end if
-  
-  VMaxErrAbs = dabs( State%VMax - State%VMaxNew )
-  VMaxErrRel = dabs( VMaxErrAbs / State%VMax )
-  if ( VMaxErrRel > ToleranceV ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMax from Levels List and the one ricomputed. Absolute Error = ", VMaxErrAbs, "; Relative Error = ", VMaxErrRel*100.d0, "%" )
-  end if
-  
 
-  Rrange0 = [State%rMin*0.8d0, State%rMin*1.2d0]
+  Rrange0 = [State%rMin*0.9d0, State%rMin*1.1d0]
   call This%FindMinimum( Rrange0, State%Vc_R2, EpsStatPtsGlobal, State%rMinNew, State%VMinNew, ierr )
+  State%VMinNew = State%VMinNew - EShiftNew
   if (i_Debug_Loc)  call Logger%Write( " -> VMin    = ", State%VMin,    "; r(VMin) = ", State%rMin)
   if (i_Debug_Loc)  call Logger%Write( " -> VMinNew = ", State%VMinNew, "; r(VMin) = ", State%rMinNew)
   
-  rMinErrAbs = dabs( State%rMin - State%rMinNew )
-  rMinErrRel = dabs( rMinErrAbs / State%rMin )
-  if ( rMinErrRel > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the r@VMin from Levels List and the one ricomputed. Absolute Error = ", rMinErrAbs, "; Relative Error = ", rMinErrRel*100.d0, "%" )
-  end if
-  
-  VMinErrAbs = dabs( State%VMin - State%VMinNew )
-  VMinErrRel = dabs( VMinErrAbs / State%VMin )
-  if ( VMinErrRel > ToleranceV ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the VMin from Levels List and the one ricomputed. Absolute Error = ", VMinErrAbs, "; Relative Error = ", VMinErrRel*100.d0, "%" )
-  end if
 
   if (i_Debug_Loc) call Logger%Exiting
 
@@ -513,7 +490,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine CheckTurningPoints( This, State, iState, i_Debug )
+Subroutine CheckTurningPoints( This, State, iState, EShiftNew, i_Debug )
 ! This Subroutine 
 
   use Level_Class           ,only:  Level_Type
@@ -521,6 +498,7 @@ Subroutine CheckTurningPoints( This, State, iState, i_Debug )
   class(DiatomicPotential_Type)             ,intent(in)     ::    This                           !< Intra-nuclear diatomic potential object
   type(Level_Type)                          ,intent(inout)  ::    State 
   integer                                   ,intent(in)     ::    iState
+  real(rkp)                                 ,intent(in)     ::    EShiftNew
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   real(rkp)                                                 ::    h
@@ -529,10 +507,6 @@ Subroutine CheckTurningPoints( This, State, iState, i_Debug )
   integer                                                   ::    ierr
   logical                                                   ::    i_Debug_Loc
   
-  real(rkp)                                                 ::    roErrRel, riErrRel
-  real(rkp)                                                 ::    roErrAbs, riErrAbs
-  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-3 !1.d-5
-  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-3 !1.d-8
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "CheckTurningPoints")  !, Active = i_Debug_Loc )
@@ -542,28 +516,124 @@ Subroutine CheckTurningPoints( This, State, iState, i_Debug )
   
 
   Rrange1 = [State%ri*0.8d0, State%rMin]
-  call This%TurningPoint( Rrange1, State%Vc_R2, State%Eint, State%riNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
+  call This%TurningPoint( Rrange1, State%Vc_R2, State%Eint + EShiftNew, State%riNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
   if (i_Debug_Loc)  call Logger%Write( " -> ri    = ", State%ri)
   if (i_Debug_Loc)  call Logger%Write( " -> riNew = ", State%riNew)
   
-  riErrAbs = dabs( State%ri - State%riNew )
-  riErrRel = dabs( riErrAbs / State%ri )  
-  if ( riErrRel > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the ri from Levels List and the one ricomputed. Absolute Error = ", riErrAbs, "; Relative Error = ", riErrRel*100.d0, "%")
-  end if
-  
-  
+    
   Rrange2 = [State%rMin, State%rMax]
-  call This%TurningPoint( Rrange2, State%Vc_R2, State%Eint, State%roNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
+  call This%TurningPoint( Rrange2, State%Vc_R2, State%Eint + EShiftNew, State%roNew, ierr, NBisection=NBisectGlobal, NNewton=NNewtonGlobal)
   if (i_Debug_Loc)  call Logger%Write( " -> ro    = ", State%ro)
   if (i_Debug_Loc)  call Logger%Write( " -> roNew = ", State%roNew)
+
+
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine WriteErrors( This, State, iState, NStates, LevelsFldr, Unit, i_Debug )
+! This Subroutine 
+
+  use Level_Class           ,only:  Level_Type
+  use Error_Class             ,only:  Error
+
+  class(DiatomicPotential_Type)             ,intent(in)     ::    This                           !< Intra-nuclear diatomic potential object
+  type(Level_Type)                          ,intent(inout)  ::    State 
+  integer                                   ,intent(in)     ::    iState
+  integer                                   ,intent(in)     ::    NStates
+  character(*)                              ,intent(in)     ::    LevelsFldr
+  integer                                   ,intent(inout)  ::    Unit
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  real(rkp)                                                 ::    h
+  real(rkp)                                                 ::    e
+  real(rkp) ,dimension(2)                                   ::    RrangeExtreme, Rrange0, Rrange1, Rrange2
+  integer                                                   ::    ierr
+  logical                                                   ::    i_Debug_Loc
+
+  real(rkp)                                                 ::    rMaxErrAbs, VMaxErrAbs, rMinErrAbs, VMinErrAbs
+  real(rkp)                                                 ::    rMaxErrRel, VMaxErrRel, rMinErrRel, VMinErrRel
+  real(rkp)                                                 ::    roErrRel, riErrRel
+  real(rkp)                                                 ::    roErrAbs, riErrAbs
+  real(rkp) ,parameter                                      ::    ToleranceR = 1.d-3 !1.d-5
+  real(rkp) ,parameter                                      ::    ToleranceV = 1.d-3 !1.d-8
+  integer                                                   ::    iErrorFlg
+  integer                                                   ::    Status
+  character(250)                                            ::    FileName
+
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "WriteErrors")  !, Active = i_Debug_Loc )
+  if (i_Debug_Loc) call Logger%Write( " -> Level ", iState, "; State%Eint = ", State%Eint, "; State%vqn = ", State%vqn, "; State%jqn = ", State%jqn)
+  
+
+  if (iState == 1) then
+    FileName = adjustl(trim(LevelsFldr // '/levels_error.out'))
+    if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
+    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName ) 
+      write(Unit, '(A)') '# Flag,                          rMin,                          rMax,                          VMin,                          VMax,                           ri ,                            ro'
+      write(Unit, '(A)') '#             Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative'
+  end if
+
+
+  iErrorFlg = 0
+  if  ( State%VMaxNew < State%EInt ) then
+    iErrorFlg = 2 
+    write(*,'(A,I5,A,I2,A,I3,A)') '      [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!   Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
+  elseif ( State%VMaxNew - 1.e-10 < State%EInt ) then
+    iErrorFlg = 1
+    write(*,'(A,I5,A,I2,A,I3,A)') '      [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!!! Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
+  end if
+
+
+  rMaxErrAbs = dabs( State%rMax - State%rMaxNew ) 
+  rMaxErrRel = dabs( rMaxErrAbs / State%rMax )
+  if ( rMaxErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the r@VMax from Levels List and the one ricomputed. Absolute Error = ", rMaxErrAbs, "; Relative Error = ", rMaxErrRel*100.d0, "%" )
+  end if
+  
+  VMaxErrAbs = dabs( State%VMax - State%VMaxNew )
+  VMaxErrRel = dabs( VMaxErrAbs / State%VMax )
+  if ( VMaxErrRel > ToleranceV ) then
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the VMax from Levels List and the one ricomputed. Absolute Error = ", VMaxErrAbs, "; Relative Error = ", VMaxErrRel*100.d0, "%" )
+  end if
+  
+
+  rMinErrAbs = dabs( State%rMin - State%rMinNew )
+  rMinErrRel = dabs( rMinErrAbs / State%rMin )
+  if ( rMinErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the r@VMin from Levels List and the one ricomputed. Absolute Error = ", rMinErrAbs, "; Relative Error = ", rMinErrRel*100.d0, "%" )
+  end if
+  
+  VMinErrAbs = dabs( State%VMin - State%VMinNew )
+  VMinErrRel = dabs( VMinErrAbs / State%VMin )
+  if ( VMinErrRel > ToleranceV ) then
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the VMin from Levels List and the one ricomputed. Absolute Error = ", VMinErrAbs, "; Relative Error = ", VMinErrRel*100.d0, "%" )
+  end if
+
 
   roErrAbs = dabs( State%ri - State%riNew )
   roErrRel = dabs( roErrAbs / State%ri ) 
   if ( roErrRel > ToleranceR ) then
-    if (i_Debug_Loc)  call Logger%Write( " WARNING! Found a difference between the ro from Levels List and the one ricomputed. Absolute Error = ", roErrAbs, "; Relative Error = ", roErrRel*100.d0, "%")
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the ro from Levels List and the one ricomputed. Absolute Error = ", roErrAbs, "; Relative Error = ", roErrRel*100.d0, "%")
+  end if
+
+  riErrAbs = dabs( State%ri - State%riNew )
+  riErrRel = dabs( riErrAbs / State%ri )  
+  if ( riErrRel > ToleranceR ) then
+    if (i_Debug_Loc)  call Logger%Write( "      WARNING! Found a difference between the ri from Levels List and the one ricomputed. Absolute Error = ", riErrAbs, "; Relative Error = ", riErrRel*100.d0, "%")
   end if
   
+
+      write(Unit, '(I6,6(A,e14.8,A,e14.8))') iErrorFlg, ', ', rMinErrAbs, ',', rMinErrRel, ', ', rMaxErrAbs, ',', rMaxErrRel, ', ', VMinErrAbs, ',', VMinErrRel, ', ', VMaxErrAbs, ',', VMaxErrRel, ', ', riErrAbs, ',', riErrRel, ', ', roErrAbs, ',', roErrRel
+
+
+  if (iState == NStates) then
+    close(Unit)
+  end if
 
   if (i_Debug_Loc) call Logger%Exiting
 

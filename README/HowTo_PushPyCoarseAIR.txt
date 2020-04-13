@@ -1,3 +1,0 @@
-From the coarseair folder:
-
-git subtree push --prefix extra/PyCoarseAIR https://github.com/simoneventuri/PyCoarseAIR.git master
