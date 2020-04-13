@@ -805,7 +805,7 @@ Subroutine ProcessStatistics( This, i_Debug, i_Debug_Deep )
     ! ==============================================================================================================
     do   
 !@TODO: GENERALIZE: The following would not work if we want to compute cross sections from random initial states!
-      if ( This%IniStateCode(jIter) /= IniStateCodeTemp ) exit                         ! Repeating untill either the IniCond of the trajectory is the same OR we finished traj
+      !if ( This%IniStateCode(jIter) /= IniStateCodeTemp ) exit                         ! Repeating untill either the IniCond of the trajectory is the same OR we finished traj
                                                                                                                                   
       if (i_Debug_Deep_Loc) call Logger%Write( "Calling This%AddFinState: jIter = ",jIter )
       call This%AddFinState( jIter, TrajsPerb, iFinStates, FinWeight, FinStateCode, IniState, RMS, NRMS, NCont, bMaxElastic, ToFinState(This%SortedIndx_IniStateCode(jIter)), i_Debug=i_Debug_Deep_Loc )
@@ -848,10 +848,10 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
   integer(rkp)                                          ,intent(in)     ::    jIter                                               ! Current Iteration
   integer(rkp)    ,dimension(:)                         ,intent(inout)  ::    TrajsPerb                                                  ! ? 
   integer(rkp)                                          ,intent(inout)  ::    iFinStates                 
-  real(rkp) ,dimension(:,:)                             ,intent(inout)  ::    FinWeight    
+  real(rkp)       ,dimension(:,:)                       ,intent(inout)  ::    FinWeight    
   integer(rkp)    ,dimension(:)                         ,intent(inout)  ::    FinStateCode  
   integer(rkp)    ,dimension(:)                         ,intent(in)     ::    IniState
-  real(rkp) ,dimension(:)                               ,intent(inout)  ::    RMS                                                 ! RMS = Sum( (IniCond - FinCond)^2 )   
+  real(rkp)       ,dimension(:)                         ,intent(inout)  ::    RMS                                                 ! RMS = Sum( (IniCond - FinCond)^2 )   
   integer(rkp)                                          ,intent(inout)  ::    NRMS                                                ! Nb of Rings with none of FinCond <= -1.d0
   integer(rkp)                                          ,intent(inout)  ::    NCont                                               ! Nb of Rings with one or more FinCond <= -1.d0
   real(rkp)                                             ,intent(inout)  ::    bMaxElastic
@@ -869,12 +869,12 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
   integer(rkp)                                                          ::    IniArrDiv, FinArrDiv
   real(rkp)                                                             ::    InElasticFactor, QRulesFac, Diff, Weight
   real(rkp)                                                             ::    bSampled
-  real(rkp) ,dimension(2,size(This%Qfin,1))                             ::    WeightTemp
-  integer(rkp)    ,dimension(size(This%Qfin,1))                         ::    ido   
+  real(rkp)      ,dimension(2,size(This%Qfin,1))                        ::    WeightTemp
+  integer(rkp)   ,dimension(size(This%Qfin,1))                          ::    ido   
   integer(rkp)                                                          ::    iRings, iRingsPlus, ii, iStates, iCond, jCond,  &
-                                                                            & iCont,part, ipart1, ipart2, & 
-                                                                            & ipartMin, ipartMax, iElastic, iu, ipart
-  integer(rkp)                                                          ::    ifact, iquse, isum, isumTemp, isumIdDiat                                                                 
+                                                                              iCont, isum, isumTemp, isumIdDiat, iquse,       & 
+                                                                              ipart, ipart1, ipart2, ipartMin, ipartMax,      &
+                                                                              ifact, iElastic, iu                                             
   logical                                                               ::    i_Debug_Loc   
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
