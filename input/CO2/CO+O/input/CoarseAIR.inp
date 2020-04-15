@@ -32,7 +32,7 @@
      Atom 3 = O
        Mass [a.u.] of Atom 3  = 29148.94559d0
 
-   Database Path = /Users/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb/
+   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb/
 
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 =
@@ -76,7 +76,7 @@
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
      Starting Level, Molecule 1 = 1
-     Final    Level, Molecule 1 = 1
+     Final    Level, Molecule 1 = 0
    #*##
 
    #:##                                                                      <- Uncomment from #: to #* for Running CoarseAIR with vibrational specific binning
@@ -111,7 +111,7 @@
    # Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 1000   
-   Nb of Trajectories per Level / Bin = 60000
+   Nb of Trajectories per Level / Bin = 100000
 
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
@@ -233,13 +233,11 @@
 #   COMPUTING RATES
 ###########################################################################################
 
-   Flag for Running External Code = 2
-
-   Distinguish Exchanges between Each Other? = no
+   Distinguish Exchanges between Each Other? = yes
 
    Distinguish Exchanges from Inelastic? = yes
 
-   Temperature for Distribution Function Computation [K] = 1400.d0
+   Temperature for Distribution Function Computation [K] = 300.d0
 
    Writing Rate Files in Binary Format? = no
    
