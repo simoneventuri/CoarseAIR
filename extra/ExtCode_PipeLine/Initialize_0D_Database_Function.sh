@@ -49,10 +49,10 @@ elif [ $DissFlg -eq 3 ]; then
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_VS.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"		
 elif [ $DissFlg -eq 4 ]; then
 	echo "  [Initialize_0D_Database]: Adding Phys-Based Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_10Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_"${NBins}"Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
 elif [ $DissFlg -eq 5 ]; then
 	echo "  [Initialize_0D_Database]: Adding Fitted Phys-Based Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_Fitted_10Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_Fitted_"${NBins}"Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
 elif [ $DissFlg -eq 6 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_"$TTran"K"
 	echo "  [Initialize_0D_Database]: MANINDER'S CASE: NO CORRECTION and NO RECOMBINATION"
@@ -71,14 +71,14 @@ elif [ $DissFlg -eq 12 ]; then
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"	
 fi
 
-iDissInel=${DissInelFlg}
-if [ ${iDissInel} -eq 1 ]; then
-	echo "  [Initialize_0D_Database]: Adding Inelastic + Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/DissInel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-# elif [ ${iDissInel} -eq 2 ]; then
-# 	echo "  [Initialize_0D_Database]: Adding Window-Averaged Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-# 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
-fi
+# iDissInel=${DissInelFlg}
+# if [ ${iDissInel} -eq 1 ]; then
+# 	echo "  [Initialize_0D_Database]: Adding Inelastic + Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+# 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/DissInel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+# # elif [ ${iDissInel} -eq 2 ]; then
+# # 	echo "  [Initialize_0D_Database]: Adding Window-Averaged Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+# # 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K"
+# fi
 
 iInel=${InelFlg}
 if [ ${iInel} -eq 1 ]; then

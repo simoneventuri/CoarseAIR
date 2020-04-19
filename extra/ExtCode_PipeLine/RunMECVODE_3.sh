@@ -41,18 +41,19 @@ PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule='O2'
-export FldrName='_OnlyBound'
-export Tran_vec=(5000) 
-export T0=300
+export FldrName='_VS'
+export Tran_vec=(10000) 
+export T0=10000
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=3
-export InelFlg=1
-export ExchFlg1=1
-export ExchFlg2=1
+export DissFlg=2
+export InelFlg=0
+export ExchFlg1=0
+export ExchFlg2=0
 
+export NBins=0
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/extra/ExtCode_PipeLine/"
 
@@ -88,16 +89,25 @@ function Load_Initialize_0D() {
 
 function Call_MeCvode() {
   cd ${PathToRunFldr}
-  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  
+  if [ ${NBins} -ge 1 ]; then
+    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}'_'${NBins}'Bins'
+  else
+    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  fi
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
+
   if [ $DissFlg -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil_NoDiss'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_NoDiss'
+  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_OnlyDiss'
   else
-    export ExFldr=${PathToMECVODEFldr}/${System}/'Mars_T'${TTran}'K_Danil'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil'
   fi  
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
+  
   echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
   ./box_ ${OPENBLAS_NUM_THREADS}
 }
