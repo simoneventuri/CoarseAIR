@@ -123,6 +123,8 @@ function LoadPreprocLevels() {
 }
 
 
+echo
+
 function LoadComputeRates() {
   source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
@@ -139,13 +141,6 @@ function LoadComputeRates() {
       ComputeTrajs
       echo " "
     fi
-
-    if [ ${StochPESFlg} -eq 1 ]; then
-      echo "[CoarseAIR]: Calling SplitTrajsPESs"
-      echo " "
-      SplitTrajsPESs
-      echo " "
-    fi  
   fi
 
   if [ ${PostFlg} -eq 1 ]; then

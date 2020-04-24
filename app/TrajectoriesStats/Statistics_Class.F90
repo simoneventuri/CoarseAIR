@@ -50,6 +50,8 @@ Module Statistics_Class
     integer(rkp)    ,dimension(:)   ,allocatable  ::    SortedIndx_IniStateCode                       !Dim[NTraj]                     !< Sorted Indx for the Vector of Identification Nbs.
     real(rkp)       ,dimension(:)   ,allocatable  ::    RingArea                                      !Dim[<= NRings]                 !< Vector of Impact Parameters' Rings Areas.
     integer(rkp)                                  ::    ifact                                                                         !< Temporary Integer used for computing the Trajectory's IniStateCode.
+    integer                                       ::    PESoI                                                                         !< Potential Energy Surfaces (PES) of Interest
+    character(6)                                  ::    PESoI_char
     type(File_Type)                               ::    ResidOutFile
     type(File_Type)                               ::    ProbaOutFile
     type(File_Type)                               ::    TrajeOutFile
@@ -114,6 +116,9 @@ Subroutine InitializeStatistics( This, Input, i_Debug, i_Debug_Deep )
       call Error( "Error: Unknown assignment method for Fin states" )
     end if
   end if
+
+  This%PESoI      = Input%PESoI 
+  This%PESoI_char = Input%PESoI_char
 ! ==============================================================================================================
 
 
@@ -199,8 +204,13 @@ Subroutine ReadInputs( This, i_Debug )
 !     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
-  DataFile%Name     =   'trajectories.csv'                                                                                         !#
-  !DataFile%Name     =   'trajectories.out'                                                                                        !# FOR COMPATIBILITY WITH CG-QCT CODE
+  if (This%PESoI == 0) then
+    !DataFile%Name     =   'trajectories.out'                                                                                        !# FOR COMPATIBILITY WITH CG-QCT CODE
+    DataFile%Name     =   'trajectories.csv'                                                                                         !#
+  else
+    !DataFile%Name     =   trim(adjustl( 'trajectories.out.' // trim(adjustl(This%PESoI_char)) ))                                     !# FOR COMPATIBILITY WITH CG-QCT CODE
+    DataFile%Name     =   trim(adjustl( 'trajectories.csv.' // trim(adjustl(This%PESoI_char)) ))                                     !#
+  end if
   open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', Form='FORMATTED', iostat=DataFile%Status )
   if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
   DataFile%Format   =   "( i9,3x, 2(es15.8,3x), 2(4(i3,3x)))"

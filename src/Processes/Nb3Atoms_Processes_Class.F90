@@ -69,7 +69,7 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   integer                                                           :: iMol
   integer                                                           :: iP1
   integer                                                           :: Status
-  integer                                                           :: iLevel, jLevel, kLevel
+  integer                                                           :: iLevel, jLevel, kLevel, iTemp
   logical                                                           :: i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -90,8 +90,11 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   This%System       = adjustl(trim(Input%System))
 
   This%NPESs        = Input%NPESs
-  This%PES_Name     = adjustl(trim(Input%PES_Model(1)))
   This%PESoI        = Input%PESoI
+  This%StochPESFlg  = Input%StochPESFlg
+  iTemp             = 1
+  if (.not. This%StochPESFlg) iTemp = This%PESoI
+  This%PES_Name     = adjustl(trim(Input%PES_Model(iTemp)))
   allocate( This%PESoI_char, source = adjustl(trim(Input%PESoI_char)) )
 
   This%MergeExchsFlg      = Input%MergeExchsFlg

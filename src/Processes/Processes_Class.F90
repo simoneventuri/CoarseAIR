@@ -79,6 +79,7 @@ Module Processes_Class
     integer                                                 ::    UnitIssues
     integer                                                 ::    NTraj
     character(17)                                           ::    System
+    logical                                                 ::    StochPESFlg
     integer                                                 ::    NPESs
     character(17)                                           ::    PES_Name
     integer                                                 ::    PESoI
@@ -297,7 +298,11 @@ Subroutine WritingRates( This, iTTra, iTInt, i_Debug )
     end if
   else 
     FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv.' // This%PESoI_char ))
-    PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
+    if (This%StochPESFlg) then
+      PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
+    else
+      PES_Name = adjustl(trim(This%PES_Name))
+    end if
   end if
   if ( i_Debug_Loc ) call Logger%Write( "Writing File: ", FileName )
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )

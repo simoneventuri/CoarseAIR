@@ -82,6 +82,10 @@ Program TrajectoriesStats
   else
     if (i_Debug_TS) call Logger%Write( "Input%StatReadsBinaryFlg = ", Input%StatReadsBinaryFlg, "; Reading Trajectories From ASCI Files" )
   end if
+
+  call getarg( 4, Input%PESoI_char )
+  read( Input%PESoI_char,     '(I6)' ) Input%PESoI
+  if (i_Debug_TS) call Logger%Write( "PES of Interest:     Input%PESoI = ", Input%PESoI)
 ! ==============================================================================================================
 
 

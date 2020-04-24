@@ -186,6 +186,7 @@ Module Input_Class
     character(6)                              ::    PESoI_char
     logical                                   ::    PESRndIniCondFlg = .False.
     logical                                   ::    StochPESFlg      = .False.
+    logical                                   ::    SplitPESsFlg     = .False.
     logical                                   ::    SampleParamsStochPES = .False.
     integer       ,dimension(2)               ::    NHiddenLayerNeurons
     character(150),dimension(:),allocatable   ::    PES_Model                           !< Potential Energy Surface's Model
@@ -242,6 +243,10 @@ Module Input_Class
     real(rkp)      ,dimension(:) ,allocatable ::    PESWeight
     character(150) ,dimension(:) ,allocatable ::    ResultsFile
 
+
+    real(rkp)                                 ::    TInit                  = 300.d0              !< Initial Temperature
+    character(10)                             ::    TInit_char             = '300       '
+
 ! RUNNING EXTERNAL CODE
 ! =================
     logical                                   ::    MergeIntExchFlg        = .false.
@@ -270,8 +275,7 @@ Module Input_Class
     character(150)                            ::    SystemCGPath
     real(rkp)                                 ::    MaxForRates
     real(rkp)                                 ::    MinForRates            = 1.d-30
-    real(rkp)                                 ::    TInit                  = 300.d0              !< Initial Temperature
-    character(10)                             ::    TInit_char
+
     character(150)                            ::    Kinetics_ExoChar       
     logical                                   ::    Kinetics_ExoFlg        = .true.
     character(150)                            ::    Kinetics_EndoChar      
@@ -377,8 +381,6 @@ Module Input_Class
     procedure     ,public                     ::    Initialize          =>    InitializeCGQCTInput
     procedure     ,public                     ::    WriteBashInputVariables
     procedure     ,public                     ::    GenerateLevels
-    procedure     ,public                     ::    DeriveQuantities
-    procedure     ,public                     ::    FwdProagation
     procedure     ,public                     ::    PlotPES
     procedure                                 ::    ReadAtomMass
   End Type
@@ -924,6 +926,13 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "Sample Parameters for Stochastic PES?:       This%SampleParamsStochPES = ", This%SampleParamsStochPES )
             
 
+    	    case("Distinguish between PESs?")
+            if ((trim(line_input(i_eq+2:150)) .eq. "yes") .or. (trim(line_input(i_eq+2:150)) .eq. "YES")) then
+              This%SplitPESsFlg = .true.
+            end if 
+            if (i_Debug_Loc) call Logger%Write( "Distinguish between PESs?:       This%SplitPESsFlg = ", This%SplitPESsFlg )
+
+
           case("Relative Translational Energy Model")
             This%TtraModel = trim(line_input(i_eq+2:150))
             if (i_Debug_Loc) call Logger%Write( "Relative Translational Energy Model:      This%TtraModel  = ", This%TtraModel )
@@ -1266,23 +1275,13 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
 
         !______________ DERIVE QUANTITIES _______________________________________________________________________________________________
         !================================================================================================================================
-          case("KONIG Inital Temperature [K]")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%TInit
-            if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%TInit  = ", This%TInit )
-            write(This%TInit_char,"(I10)") floor(This%TInit)
           
           case("Temperature for Distribution Function Computation [K]")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%TInit
-            if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%TInit  = ", This%TInit )
+            if (i_Debug_Loc) call Logger%Write( "Temperature for Distribution Function Computation [K]:      This%TInit  = ", This%TInit )
             write(This%TInit_char,"(I10)") floor(This%TInit) 
 
-          case("Flag for Running External Code")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%RunExtCodeIntFlg
-            if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%RunExtCodeIntFlg  = ", This%RunExtCodeIntFlg )
-        
         !================================================================================================================================
         !--------------------------------------------------------------------------------------------------------------------------------   
    
@@ -1761,13 +1760,7 @@ Subroutine WriteBashInputVariables( This )
       write(Unit,'(I20)') 0
     end if
     
-    if ((This%CompQuant == 'yes') .or. (This%CompQuant == 'YES')) then
-      write(Unit,'(I20)') 1
-    else
-      write(Unit,'(I20)') 0
-    end if
-    
-    if (This%StochPESFlg) then
+    if ( (This%StochPESFlg) .or. (This%SplitPESsFlg) ) then
       write(Unit,'(I20)') 1
     else
       write(Unit,'(I20)') 0
@@ -1776,8 +1769,6 @@ Subroutine WriteBashInputVariables( This )
     write(Unit,'(I20)') This%NPESs
     
     write(Unit,'(I20)') This%PESiseed
-
-    write(Unit,'(I20)') This%RunExtCodeIntFlg
 
   close(Unit)
 
@@ -1990,505 +1981,6 @@ Subroutine GenerateLevels( This, i_Debug)
 
 End Subroutine
 
-
-Subroutine DeriveQuantities( This, i_Debug)
-
-  class(Input_Type)                         ,intent(inout)  ::    This
-  logical                         ,optional ,intent(in)     ::    i_Debug
-
-  integer                                                   ::    i, Unit
-  integer                                                   ::    Status
-  character(:)  ,allocatable                                ::    FileName
-  integer                                                   ::    NLevels
-  character(100)                                            ::    Line
-
-  character(150)                                            ::    i_case
-  character(150)                                            ::    line_input
-  character(150)                                            ::    line_input_temp
-  integer                                                   ::    i_eq
-
-  integer                                                   ::    iMol
-  character(2)                                              ::    iMol_char
-
-  integer                                                   ::    iComp
-  character(3)                                              ::    iComp_char
-  character(:) ,allocatable                                 ::    iCompName_case
-  character(:) ,allocatable                                 ::    iCompMolFrac_case
-
-  integer                                                   ::    iiPES
-  character(2)                                              ::    iiPES_char
-  character(150)                                            ::    iiPES_case
-  character(150)                                            ::    iiPESWeight_case
-
-  character(150)                                            ::    NBinsCG_case
-
-  integer                                                   ::    len
-  logical                                                   ::    i_Debug_Loc = .true.
-
-
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "DeriveQuantities" )
-  !i_Debug_Loc   =     Logger%On()
-
-
-  This%NCond           = 0
-  This%NPESsToMerge    = 1
-
-
-  allocate(This%NBinsCG(This%NMolecules), Stat=Status )
-  if (Status/=0) call Error( "Error allocating This%NBinsCG" )
-  
-  allocate(This%NBinsCG_char(This%NMolecules), Stat=Status )
-  if (Status/=0) call Error( "Error allocating This%NBinsCG_char" )
-
-
-!   --------------------------------------------------------------------------------------------------------------
-!   --------------------------------------------------------------------------------------------------------------
-  FileName = adjustl(trim(This%InputDir)) // '/DeriveQuantities.inp'
-  if (i_Debug_Loc) call Logger%Write( "Reading the Input file for DeriveQuantities" )
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
-
-  open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
-  if (Status/=0) call Error( "Error opening file: " // FileName )
-
-!   --------------------------------------------------------------------------------------------------------------
-  do
-    read(Unit,'(A150)',iostat=Status) line_input
-    if (Status /= 0) then
-      exit
-    else
-      line_input_temp=trim(adjustl(line_input))
-      if ( (line_input_temp(1:1) == '#') .or. (line_input(1:10) == '          ') ) then
-        continue
-      else
-        i_eq = 1
-        do
-          if (line_input(i_eq:i_eq) == '=') exit
-          i_eq = i_eq + 1
-        end do
-        i_case = adjustl(trim(line_input(1:(i_eq-2))))
-
-        select case (adjustl((TRIM(i_case))))
-
-
-          case("Writing Arrhenius for KONIG?")
-            This%WriteKONIGChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteKONIGChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteKONIGChar))) .eq. 'YES')) This%WriteKONIGFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Arrhenius for KONIG?:      This%WriteKONIGFlg  = ", This%WriteKONIGFlg )
-    
-          case("Writing Arrhenius for HEGEL?")
-            This%WriteHEGELChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteHEGELChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteHEGELChar))) .eq. 'YES')) This%WriteHEGELFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Arrhenius for HEGEL?:      This%WriteHEGELFlg  = ", This%WriteHEGELFlg )
-            
-          case("Running KONIG?")
-            This%RunKONIGChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%RunKONIGChar))) .eq. 'yes') .or. ((trim(adjustl(This%RunKONIGChar))) .eq. 'YES')) This%RunKONIGFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Running KONIG?:      This%RunKONIGFlg  = ", This%RunKONIGFlg )
-
-          case("Running HEGEL?")
-            This%RunHEGELChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%RunHEGELChar))) .eq. 'yes') .or. ((trim(adjustl(This%RunHEGELChar))) .eq. 'YES')) This%RunHEGELFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Running HEGEL?:      This%RunHEGELFlg  = ", This%RunHEGELFlg )
-
-        
-          case("Nb of PESs to Merge")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NPESs
-            if (i_Debug_Loc) call Logger%Write( "Nb of PESs to Merge:      This%NPESs  = ", This%NPESs )
-            allocate( This%ResultsFile(This%NPESs), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%ResultsFile" )
-            allocate( This%PESWeight(This%NPESs), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%PESWeight" )
-            This%PESWeight = One
-            
-          case("Min Value for Bin Rate Coefficient")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%MinForRates
-            if (i_Debug_Loc) call Logger%Write( "Min Value for Bin Rate Coefficient:      This%MinForRates  = ", This%MinForRates )
-            
-            
-          case("Reading Formatted Rates?")
-            This%ReadFormRatesChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%ReadFormRatesChar))) .eq. 'yes') .or. ((trim(adjustl(This%ReadFormRatesChar))) .eq. 'YES')) This%ReadFormRatesFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Reading Rates?:      This%ReadFormRatesFlg  = ", This%ReadFormRatesFlg )
-
-          case("Reading Unformatted Rates?")
-            This%ReadUnformRatesChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%ReadUnformRatesChar))) .eq. 'yes') .or. ((trim(adjustl(This%ReadUnformRatesChar))) .eq. 'YES')) This%ReadUnformRatesFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Reading Rates?:      This%ReadUnformRatesFlg  = ", This%ReadUnformRatesFlg )
-            
-          case("Reading Unique Rate-File for Multiple Temperatures?")
-            This%ReadAllTsChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%ReadAllTsChar))) .eq. 'yes') .or. ((trim(adjustl(This%ReadAllTsChar))) .eq. 'YES')) This%ReadAllTsFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Read a Single File for Rates for Multiple Temperatures?:      This%ReadAllTsFlg  = ", This%ReadAllTsFlg )
-
-          case("Path to Rates Folder")
-            This%RatesFolderPath = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Path to Rates Folder:      This%RatesFolderPath  = ", This%RatesFolderPath )
-            
-            
-
-          case("Writing Formatted Merged Rates?")
-            This%WriteFormRatesChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteFormRatesChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteFormRatesChar))) .eq. 'YES')) This%WriteFormRatesFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Merged Rates?:      This%WriteFormRatesFlg  = ", This%WriteFormRatesFlg )
-
-          case("Writing Unformatted Merged Rates?")
-            This%WriteUnformRatesChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteUnformRatesChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteUnformRatesChar))) .eq. 'YES')) This%WriteUnformRatesFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Merged Rates?:      This%WriteUnformRatesFlg  = ", This%WriteUnformRatesFlg )
-            
-          case("Writing Unique Rate-File for Multiple Temperatures?")
-            This%WriteAllTsChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteAllTsChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteAllTsChar))) .eq. 'YES')) This%WriteAllTsFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Write a Single File for Rates for Multiple Temperatures?:      This%WriteAllTsFlg  = ", This%WriteAllTsFlg )
-
-          case("Writing Arrhenius Coefficients?")
-            This%WriteArrChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteArrChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteArrChar))) .eq. 'YES')) This%WriteArrFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Arrhenius Coefficients?:      This%WriteArrFlg  = ", This%WriteArrFlg )
-
-          case("Merge Internal Exchanges in Arrhenius Rates?")
-            This%MergeIntExchChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%MergeIntExchChar))) .eq. 'yes') .or. ((trim(adjustl(This%MergeIntExchChar))) .eq. 'YES')) This%MergeIntExchFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Merge Internal Exchanges in Arrhenius Rates?:      This%MergeIntExchFlg  = ", This%MergeIntExchFlg )
-
-          case("Nb of Processors for External Code")
-            This%NProcExtCodeChar = trim(adjustl(line_input(i_eq+2:150)))
-            READ(This%NProcExtCodeChar, '(I6)') This%NProcForExtCode
-            if (i_Debug_Loc) call Logger%Write( "Nb Processors for External Code:      This%NProcForExtCode  = ", This%NProcForExtCode )
-
-
-          case("Computing Dissociation Thermal Rates?")
-            This%WriteOverallRatesChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%WriteOverallRatesChar))) .eq. 'yes') .or. ((trim(adjustl(This%WriteOverallRatesChar))) .eq. 'YES')) This%WriteOverallRatesFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Computing Dissociation Thermal Rates?:      This%WriteOverallRatesFlg  = ", This%WriteOverallRatesFlg )
-            
-          
-
-          case("Binning the StS Rates?")
-            This%BinStsChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%BinStsChar))) .eq. 'yes') .or. ((trim(adjustl(This%BinStsChar))) .eq. 'YES')) This%BinStsFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Binning the StS Rates?:      This%BinStsFlgf  = ", This%BinStsFlg )
-
-          case("Path to the Folder of the Coarse-Grained System")
-            This%SystemCGPath = trim(adjustl(line_input(i_eq+2:150)))
-            if (i_Debug_Loc) call Logger%Write( "Path to the Folder of the Coarse-Grained System:      This%SystemCGPath  = ", This%SystemCGPath )
-            
-            
-          case("Writing Exothermic Processes?")
-            This%Kinetics_ExoChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_ExoChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_ExoChar))) .eq. 'YES')) This%Kinetics_ExoFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Exothermic Processes?:      This%Kinetics_ExoFlg  = ", This%Kinetics_ExoFlg )
-
-          case("Writing Endothermic Processes?")
-            This%Kinetics_EndoChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_EndoChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_EndoChar))) .eq. 'YES')) This%Kinetics_EndoFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Endothermic Processes?:      This%Kinetics_EndoFlg  = ", This%Kinetics_EndoFlg )
-            
-            
-          case("Writing Inelastic Processes?")
-            This%Kinetics_InelChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_InelChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_InelChar))) .eq. 'YES')) This%Kinetics_InelFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Inelastic Processes?:      This%Kinetics_InelFlg  = ", This%Kinetics_InelFlg )
-
-          case("Writing Dissociation Processes?")
-            This%Kinetics_DissChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_DissChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_DissChar))) .eq. 'YES')) This%Kinetics_DissFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Dissociation Processes?:      This%Kinetics_DissFlg  = ", This%Kinetics_DissFlg )
-            
-          case("Dissociation Rates Correction Factor")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%DissCorrFactor
-            if (i_Debug_Loc) call Logger%Write( "Dissociation Rates Correction Factor:      This%DissCorrFactor  = ", This%DissCorrFactor )            
-
-          case("Writing Exchange Processes?")
-            This%Kinetics_ExchChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_ExchChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_ExchChar))) .eq. 'YES')) This%Kinetics_ExchFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing Exchange Processes?:      This%Kinetics_ExchFlg  = ", This%Kinetics_ExchFlg )
-
-
-          case("Writing CO+C Dissociation?")
-            This%Kinetics_COCDissChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_COCDissChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_COCDissChar))) .eq. 'YES')) This%Kinetics_COCDissFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing CO+C Dissociation?:      This%Kinetics_COCDissFlg  = ", This%Kinetics_COCDissFlg )
-
-          case("Writing O2+M Dissociation?")
-            This%Kinetics_O2DissChar = trim(adjustl(line_input(i_eq+2:150)))
-            if (((trim(adjustl(This%Kinetics_O2DissChar))) .eq. 'yes') .or. ((trim(adjustl(This%Kinetics_O2DissChar))) .eq. 'YES')) This%Kinetics_O2DissFlg = .true.
-            if (i_Debug_Loc) call Logger%Write( "Writing O2+M Dissociation?:      This%Kinetics_O2DissFlg  = ", This%Kinetics_O2DissFlg )
-
-
-          case("KONIG Inital Temperature [K]")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%TInit
-            if (i_Debug_Loc) call Logger%Write( "KONIG Inital Temperature [K]:      This%TInit  = ", This%TInit )
-            write(This%TInit_char,"(I10)") floor(This%TInit)
-            
-    
-          case("Path to KONIG Executable")
-            This%KONIGRunCMD = trim(adjustl(line_input(i_eq+2:150)))
-            if (i_Debug_Loc) call Logger%Write( "Path to KONIG Executable:      This%KONIGRunCMD  = ", This%KONIGRunCMD )
-
-          case("Path to HEGEL Executable")
-            This%HEGELRunCMD = trim(adjustl(line_input(i_eq+2:150)))
-            if (i_Debug_Loc) call Logger%Write( "Path to HEGEL Executable:      This%HEGELRunCMD  = ", This%HEGELRunCMD )
-            
-
-          case("Nb of Chemical Components")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NComp
-            if (i_Debug_Loc) call Logger%Write( "Nb of Chemical Components:      This%NComp  = ", This%NComp )
-            allocate( This%CompName(This%NComp), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%CompName" )
-            allocate( This%CompMolFrac(This%NComp), Stat=Status )
-            if (Status/=0) call Error( "Error allocating This%CompMolFrac" )
-
-        end select
-        
-        
-        do iMol = 1,This%NMolecules
-          write(iMol_char, "(I2)") iMol
-
-          NBinsCG_case = "Nb of Bins for Binning StS, Molecule" // iMol_char
-          if (adjustl(trim(i_case)) == TRIM(NBinsCG_case)) then
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NBinsCG(iMol)
-            WRITE(This%NBinsCG_char(iMol), '(I6)') This%NBinsCG(iMol)
-            if (i_Debug_Loc) call Logger%Write( "Nb of Bins for Binning StS, Molecule Nb", iMol, ":      This%NBinsCG(i)  = ", This%NBinsCG(iMol), " = ", This%NBinsCG_char(iMol) )
-          end if
-
-        end do
-        
-        
-        do iiPES = 1,This%NPESs
-          write(iiPES_char, "(I2)") iiPES
-
-          iiPES_case = "Results File Path, PES" // iiPES_char
-          if (adjustl(trim(i_case)) == TRIM(iiPES_case)) then
-            This%ResultsFile(iiPES) = line_input(i_eq+2:150)
-          end if
-          
-          iiPESWeight_case = "Weight, PES" // iiPES_char
-          if (adjustl(trim(i_case)) == TRIM(iiPESWeight_case)) then
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%PESWeight(iiPES)
-            if (i_Debug_Loc) call Logger%Write( "Weight, PES Nb", iiPES, ":      This%PESWeight(iiPES)  = ", This%PESWeight(iiPES) )
-          end if
-          
-        end do
-        
-        
-        do iComp = 1,This%NComp
-          write(iComp_char, "(I3)") iComp
-
-          iCompName_case = "Comp " // adjustl(trim(iComp_char)) // 'Name'
-          if (adjustl(trim(i_case)) == TRIM(iCompName_case)) then
-            This%CompName(iComp) = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Component ", iComp, " Name:      This%CompName(iComp)  = ", This%CompName(iComp) )
-          end if
-
-          iCompMolFrac_case = "Comp " // adjustl(trim(iComp_char)) // 'Initial Mole Fraction'
-          if (adjustl(trim(i_case)) == TRIM(iCompMolFrac_case)) then
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)')  This%CompMolFrac(iComp)
-            if (i_Debug_Loc) call Logger%Write( "Initial Mole Fraction for Component ", iComp, ":      This%CompMolFrac(iComp)  = ", This%CompMolFrac(iComp) )
-          end if
-
-        end do
-
-
-      end if
-
-    end if
-
-
-  end do
-
-  close(Unit)
-  
-  if (.not. allocated(This%PESWeight)) then
-    allocate( This%PESWeight(1), Stat=Status )
-    if (Status/=0) call Error( "Error allocating This%PESWeight" )
-    This%PESWeight = 1
-    if (i_Debug_Loc) call Logger%Write( "This%PESWeight Allocated with Lenght 1 and Set to This%PESWeight=1" )
-  end if
-
-  if (i_Debug_Loc) call Logger%Exiting
-
-End Subroutine
-
-
-Subroutine FwdProagation( This, i_Debug)
-
-  class(Input_Type)                         ,intent(inout)  ::    This
-  logical                         ,optional ,intent(in)     ::    i_Debug
-
-  integer                                                   ::    i, Unit
-  integer                                                   ::    Status
-  character(:)  ,allocatable                                ::    FileName
-  integer                                                   ::    NLevels
-  character(100)                                            ::    Line
-
-  character(150)                                            ::    i_case
-  character(150)                                            ::    line_input
-  character(150)                                            ::    line_input_temp
-  integer                                                   ::    i_eq
-
-  integer                                                   ::    len
-  logical                                                   ::    i_Debug_Loc = .true.
-
-
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "FwdProagation" )
-  !i_Debug_Loc   =     Logger%On()
-
-  This%NTtra           = 1
-  This%NTint           = 1
-  This%NSpecies        = 0
-  This%NMolecules      = 0
-  This%NAtoms          = 0
-  This%nring           = 0
-
-!   --------------------------------------------------------------------------------------------------------------
-!   --------------------------------------------------------------------------------------------------------------
-  FileName = adjustl(trim(This%InputDir)) // '/FwdProagation.inp'
-  if (i_Debug_Loc) call Logger%Write( "Reading the Input file for FwdProagation" )
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
-
-  open( File=FileName, NewUnit=Unit, status='OLD', iostat=Status )
-  if (Status/=0) call Error( "Error opening file: " // FileName )
-
-!   --------------------------------------------------------------------------------------------------------------
-  do
-    read(Unit,'(A150)',iostat=Status) line_input
-    if (Status /= 0) then
-      exit
-    else
-      line_input_temp=trim(adjustl(line_input))
-      if ( (line_input_temp(1:1) == '#') .or. (line_input(1:10) == '          ') ) then
-        continue
-      else
-        i_eq = 1
-        do
-          if (line_input(i_eq:i_eq) == '=') exit
-          i_eq = i_eq + 1
-        end do
-        i_case = adjustl(trim(line_input(1:(i_eq-2))))
-
-        select case (adjustl((TRIM(i_case))))
-
-          case("Nb of Iterations for Forward Progation")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NFwdProp
-            if (i_Debug_Loc) call Logger%Write( "Nb of Iterations for Forward Progation:      This%NFwdProp  = ", This%NFwdProp )
-            This%NFwdPropProc = floor(real(This%NFwdProp) / real(This%NProc))
-            if (i_Debug_Loc) call Logger%Write( "Nb of Fwd Propagation Iterations per Processor:     NFwdProp = ", This%NFwdPropProc )
-            
-          case("Seed for Forward Progation")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%FwdSeed
-            if (i_Debug_Loc) call Logger%Write( "Seed for Forward Progation:      This%FwdSeed  = ", This%FwdSeed )
-            This%FwdSeed = int(This%FwdSeed * This%iProc * This%iNode)
-            if (i_Debug_Loc) call Logger%Write( "The random Nb seed has been multiplied by the PROCESSOR Nb (", This%iProc ,") and by  the NODE Nb (", This%iNode ,"). Initial random Nb seed now is: This%FwdSeed  = ", This%FwdSeed )
-            
-          case("KONIG Input File")
-            This%KONIGInputFileName = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Run KONIG Command:      This%KONIGInputFileName  = ", This%KONIGInputFileName )
-
-          case("HEGEL Input File")
-            This%HEGELInputFileName = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Run HEGEL Command:      This%HEGELInputFileName  = ", This%HEGELInputFileName )
-            
-          case("Time Min")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%FwdTimeMin
-            if (i_Debug_Loc) call Logger%Write( "Time Min:      This%FwdTimeMin  = ", This%FwdTimeMin )
-
-          case("Time Max")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%FwdTimeMax
-            if (i_Debug_Loc) call Logger%Write( "Time Max:      This%FwdTimeMax  = ", This%FwdTimeMax )
-
-          case("Nb of Time Nodes")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NTimeNodes
-            if (i_Debug_Loc) call Logger%Write( "Nb of Time Steps:      This%NTimeNodes  = ", This%NTimeNodes )
-
-          case("Time Scale")
-            This%TimeScale = line_input(i_eq+2:150)
-            if (i_Debug_Loc) call Logger%Write( "Time Scale:      This%TimeScale  = ", This%TimeScale )
-
-          case("Forward Propagating Mole Fractions?")
-            This%FWD_MolFractions = line_input(i_eq+2:150)
-            
-          case("Mole Fractions Min")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%MolFractionsMin
-            if (i_Debug_Loc) call Logger%Write( "Mole Fractions Min:      This%MolFractionsMin  = ", This%MolFractionsMin )
-
-          case("Mole Fractions Max")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%MolFractionsMax
-            if (i_Debug_Loc) call Logger%Write( "Mole Fractions Max:      This%MolFractionsMax  = ", This%MolFractionsMax )
-
-          case("Nb of Mole Fractions Bins")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NMolFractionsBins
-            if (i_Debug_Loc) call Logger%Write( "Nb of Mole Fractions Bins:      This%NMolFractionsBins  = ", This%NMolFractionsBins )
-            
-          case("Forward Propagating Temperatures?")
-            This%FWD_Temperatures = line_input(i_eq+2:150)
-
-          case("Temperatures Min")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%TemperaturesMin
-            if (i_Debug_Loc) call Logger%Write( "Temperatures Min:      This%TemperaturesMin  = ", This%TemperaturesMin )
-
-          case("Temperatures Max")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%TemperaturesMax
-            if (i_Debug_Loc) call Logger%Write( "Temperatures Max:      This%TemperaturesMax  = ", This%TemperaturesMax )
-
-          case("Nb of Temperatures Bins")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NTemperaturesBins
-            if (i_Debug_Loc) call Logger%Write( "Nb of Temperatures Bins:      This%NTemperaturesBins  = ", This%NTemperaturesBins )
-
-          case("Forward Propagating Bins Populations?")
-            This%FWD_Populations = line_input(i_eq+2:150)
-
-          case("Bins Populations Min")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%PopulationsMin
-            if (i_Debug_Loc) call Logger%Write( "Temperatures Min:      This%PopulationsMin  = ", This%PopulationsMin )
-
-          case("Bins Populations Max")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(d20.10)') This%PopulationsMax
-            if (i_Debug_Loc) call Logger%Write( "Temperatures Max:      This%PopulationsMax  = ", This%PopulationsMax )
-
-          case("Nb of Bins Populations Bins")
-            line_input = line_input(i_eq+2:150)
-            READ(line_input, '(I10)') This%NPopulationsBins
-            if (i_Debug_Loc) call Logger%Write( "Nb of Populations Bins:      This%NPopulationsBins  = ", This%NPopulationsBins )
-        
-        end select
-
-      end if
-
-    end if
-
-
-  end do
-
-  close(Unit)
-
-
-  if (i_Debug_Loc) call Logger%Exiting
-
-End Subroutine
 
 
 Subroutine PlotPES( This, i_Debug)

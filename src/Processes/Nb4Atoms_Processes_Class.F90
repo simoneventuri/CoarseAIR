@@ -67,7 +67,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   
   integer                                                           :: iP, iOpp
   integer                                                           :: iMol, iMolOpp
-  integer                                                           :: iLevel, jLevel, kLevel
+  integer                                                           :: iLevel, jLevel, kLevel, iTemp
   integer                                                           :: Status
   integer                                                           :: NProc
   integer                                                           :: NLevelsOpp
@@ -93,8 +93,11 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   This%System       = adjustl(trim(Input%System))
 
   This%NPESs        = Input%NPESs
-  This%PES_Name     = adjustl(trim(Input%PES_Model(1)))
   This%PESoI        = Input%PESoI
+  This%StochPESFlg  = Input%StochPESFlg
+  iTemp             = 1
+  if (.not. This%StochPESFlg) iTemp = This%PESoI
+  This%PES_Name     = adjustl(trim(Input%PES_Model(iTemp)))
   allocate( This%PESoI_char, source = adjustl(trim(Input%PESoI_char)) )
 
   This%MergeExchsFlg      = Input%MergeExchsFlg

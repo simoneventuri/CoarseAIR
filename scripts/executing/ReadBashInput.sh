@@ -227,16 +227,13 @@ function ReadBashInput {
   PostFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
   PostFlg=$(echo $PostFlg | tr -d " ")
   echo "  [ReadBashInput]:  Postprocessing Trajectories?       = "${PostFlg}
-  
-  iLine=$((iLine+1))
-  DerQntFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
-  DerQntFlg=$(echo $DerQntFlg | tr -d " ")
-  echo "  [ReadBashInput]:  Computing Derived Quantities?      = "${DerQntFlg}
+
+
 
   iLine=$((iLine+1))
-  StochPESFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
-  StochPESFlg=$(echo $StochPESFlg | tr -d " ")
-  echo "  [ReadBashInput]:  Stochastic PES?                    = "${StochPESFlg}
+  SplitPESsFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
+  SplitPESsFlg=$(echo $SplitPESsFlg | tr -d " ")
+  echo "  [ReadBashInput]:  Splitting PESs?                    = "${SplitPESsFlg}
   
   iLine=$((iLine+1))
   NPESs=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
@@ -250,11 +247,8 @@ function ReadBashInput {
   echo "  [ReadBashInput]:  Starting Index for Stochastic PESs = "${iPESStart}
   echo "  [ReadBashInput]:  "
 
-  iLine=$((iLine+1))
-  RunExtCodeFlg=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
-  RunExtCodeFlg=$(echo $RunExtCodeFlg | tr -d " ")
-  echo "  [ReadBashInput]:  RunExtCodeFlg = "${RunExtCodeFlg}
-  
+
+
   echo "  [ReadBashInput]:  -----------------------"
     
 }
