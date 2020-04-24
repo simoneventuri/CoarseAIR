@@ -770,8 +770,6 @@ function PostTrajectoriesAtNode {
       exit 1
     fi
 
-    wait
-
   else
 
     if [ ${ParNodes} -eq 0 ]; then
@@ -838,8 +836,6 @@ function PostTrajectoriesAtNode {
       echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
       exit 1
     fi
-
-    wait
 
   fi
 
