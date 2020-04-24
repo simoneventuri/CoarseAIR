@@ -21,9 +21,9 @@
 #===============================================================================================================
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
-ParNodes=1                                                                                        # Nb of Nodes =0 -> Through .sh; >0 -> Through .pbs
+ParNodes=2                                                                                        # Nb of Nodes =0 -> Through .sh; >0 -> Through .pbs
 ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
-NProc=1                                                                                           # Nb of Processors
+NProc=3                                                                                           # Nb of Processors
 SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
 MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
 RmTrajFlg=0                                                                                       # =1 -> Removing Traj Files from Single Processors
@@ -276,16 +276,6 @@ if [ ${MergeAllFlg} -eq 1 ]; then
   echo "[CoarseAIR]: Merging All the Trajectories in One File"
   echo " "
   LoadMergeAllRates
-  echo " "
-fi
-#=============================================================================================#
-
-
-# --- Computing Derived Quantities ---------------------------------------------------------- #
-if [ ${DerQntFlg} -eq 1 ]; then
-  echo "[CoarseAIR]: Calling DeriveQuantities"
-  echo " "
-  LoadDeriveQuantities
   echo " "
 fi
 #=============================================================================================#

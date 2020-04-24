@@ -141,6 +141,7 @@
      # Randomize PES Initial Conditions? = no
      # Initial Random Nb Seed for PES Parameters Sampling = 0
      
+   Distinguish between PESs? = no
 
    Diatomic Potential Model, Molecule 1 = UMN
 

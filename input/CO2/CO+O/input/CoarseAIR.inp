@@ -126,6 +126,8 @@
      Model, PES 3 = NASA_23A2
      Degeneracy, PES 3 = 1.0
 
+   Distinguish between PESs? = no
+
    Diatomic Potential Model, Molecule 1 = NASA
    Diatomic Potential Model, Molecule 2 = NASA
 
