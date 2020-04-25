@@ -144,8 +144,6 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
 
 else
 
-  echo "sdasdsa"${NLevels1}
-
   iProcessesTot=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
     
