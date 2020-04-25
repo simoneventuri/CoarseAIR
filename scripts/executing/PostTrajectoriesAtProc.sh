@@ -28,8 +28,11 @@
 
 
 
-function PostTrajectories
+function PostTrajectoriesHERE
 {
+
+  TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
+  PostTrajectoriesCommand="coarseair-posttrajectories.x"
 
   ############################################################################################################################################################################## <= PostTrajectories
 
@@ -285,8 +288,7 @@ echo "    [PostTrajectoriesAtProc.sh]: NProcessesPerNode     = "${NProcessesPerN
 echo "    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = "${NProcessesPerProc}
 
 
-TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
-PostTrajectoriesCommand="coarseair-posttrajectories.x"
+
 #source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
 
@@ -326,7 +328,7 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
       echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "        
       
 
-      PostTrajectories
+      PostTrajectoriesHERE
     
 
       echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
@@ -364,7 +366,7 @@ else
         echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
 
         
-        PostTrajectories
+        PostTrajectoriesHERE
 
 
         echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
