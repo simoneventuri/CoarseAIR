@@ -144,6 +144,8 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
 
 else
 
+  echo "sdasdsa"${NLevels1}
+
   iProcessesTot=0
   for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
     
@@ -169,8 +171,7 @@ else
 
         
 
-
-
+        ############################################################################################################################################################################## <= PostTrajectories
 
         if [ ${TranFlg} -eq 0 ]; then 
           COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
@@ -215,6 +216,8 @@ else
             
 
 
+            ########################################################################################################################################################################## <= SplitTrajsPESs
+
             iPES=${iPESStart}
             while [[ ${iPES} -le ${iPESEnd} ]]; do
               PESFile=${COARSEAIR_BIN_OUTPUT_DIR}'/trajectories.csv.'${iPES}
@@ -236,7 +239,10 @@ else
             done 
             IFS=$OLDIFS
 
-            
+            ########################################################################################################################################################################## <= SplitTrajsPESs
+
+
+
           fi
           iPES=${iPESStart}
         fi
@@ -326,11 +332,7 @@ else
           #echo "      [PostTrajectories]:    -> Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
 
 
-
-
-
-
-            
+           
           if [ ${SplitPESsFlg} -eq 1 ]; then 
             rm -rf ${TrajFile}
             rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
@@ -338,7 +340,6 @@ else
           fi
           iPES=$((iPES+1))
         done   
-        ############################################################################################################################################################################## <= PostTrajectories
 
 
         if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
@@ -350,6 +351,10 @@ else
             rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
           fi
         fi
+
+        ############################################################################################################################################################################## <= PostTrajectories
+
+
 
         echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
         echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "

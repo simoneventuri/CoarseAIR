@@ -96,7 +96,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   This%PESoI        = Input%PESoI
   This%StochPESFlg  = Input%StochPESFlg
   iTemp             = 1
-  if (.not. This%StochPESFlg) iTemp = This%PESoI
+  if ( (.not. This%StochPESFlg) .and. (This%PESoI>0) ) iTemp = This%PESoI
   This%PES_Name     = adjustl(trim(Input%PES_Model(iTemp)))
   allocate( This%PESoI_char, source = adjustl(trim(Input%PESoI_char)) )
 
