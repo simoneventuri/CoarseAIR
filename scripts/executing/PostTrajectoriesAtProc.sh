@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #===============================================================================================================
 # 
 # Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
@@ -145,7 +145,8 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
 else
 
   iProcessesTot=0
-  for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+  for iLevel1 in `seq 1 ${NLevels1}`; do
+  #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
     
     iLevel2Start=0
     MinLevel2Temp=0
@@ -158,7 +159,8 @@ else
       MinLevel2Temp=${MinLevel1}
     fi
 
-    for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+    for iLevel2 in `seq ${iLevel2Start} ${NLevels2}`; do
+    #for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       iProcessesTot=$(( ${iProcessesTot} + 1 ))
       
       if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
@@ -285,8 +287,9 @@ else
             cd ${COARSEAIR_BIN_OUTPUT_DIR}
           
             if [ -e "${NTrajFile}" ]; then                                                                                        
-          
-              typeset -i NTraj=$(cat ${NTrajFile})
+              
+              NTraj=`cat ${NTrajFile}`
+              #typeset -i NTraj=$(cat ${NTrajFile})
 
               if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
                 rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
