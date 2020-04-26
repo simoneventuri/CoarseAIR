@@ -319,6 +319,7 @@ function CheckTrajectories {
 function CkeckRates {
   # Ex: CkeckRates 'N3' 1 10000.0 10000.0 1 0 1 9390 9390 0 0 0 ${COARSEAIR_SOURCE_DIR} 
   # Ex: CkeckRates 'N4' 1 20000.0 20000.0 2 1 1 61 61 1 61 61 ${COARSEAIR_SOURCE_DIR}
+  # Ex: CkeckRates 'CO2' 1 20000.0 20000.0 1 0 1 13521 13521 0 0 0 ${COARSEAIR_SOURCE_DIR}
 
   export System=${1}
   export TranFlg=${2}
