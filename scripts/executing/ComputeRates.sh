@@ -812,7 +812,7 @@ function PostTrajectoriesAtNode {
 
     for (( iProc=1; iProc<=${NProc}; iProc++ )); do
       echo $iProc
-      bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} &
+      ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} &
     done
 
     # if [[ ${NProc} -eq 1 ]]; then

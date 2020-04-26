@@ -22,9 +22,9 @@
 #set -e
 
 
-#. ~/.bash_profile
-#COARSEAIR_UPDATE
-#COARSEAIR_release
+. ~/.bash_profile
+COARSEAIR_UPDATE
+COARSEAIR_release
 
 
 
