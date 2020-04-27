@@ -569,23 +569,23 @@ Subroutine WriteErrors( This, State, iState, NStates, LevelsFldr, Unit, i_Debug 
   if (i_Debug_Loc) call Logger%Write( " -> Level ", iState, "; State%Eint = ", State%Eint, "; State%vqn = ", State%vqn, "; State%jqn = ", State%jqn)
   
 
-  if (iState == 1) then
-    FileName = adjustl(trim(LevelsFldr // '/levels_error.out'))
-    if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
-    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
-    if (Status/=0) call Error( "Error opening file: " // FileName ) 
-      write(Unit, '(A)') '# Flag,                          rMin,                          rMax,                          VMin,                          VMax,                           ri ,                            ro'
-      write(Unit, '(A)') '#             Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative'
-  end if
+  ! if (iState == 1) then
+  !   FileName = adjustl(trim(LevelsFldr // '/levels_error.out'))
+  !   if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", FileName )
+  !   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+  !   if (Status/=0) call Error( "Error opening file: " // FileName ) 
+  !     write(Unit, '(A)') '# Flag,                          rMin,                          rMax,                          VMin,                          VMax,                           ri ,                            ro'
+  !     write(Unit, '(A)') '#             Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative,       Absolute,      Relative'
+  ! end if
 
 
   iErrorFlg = 0
   if  ( State%VMaxNew < State%EInt ) then
     iErrorFlg = 2 
-    write(*,'(A,I5,A,I2,A,I3,A)') '      [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!   Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
+    write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!   Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
   elseif ( State%VMaxNew - 1.e-10 < State%EInt ) then
     iErrorFlg = 1
-    write(*,'(A,I5,A,I2,A,I3,A)') '      [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!!! Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
+    write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!!! Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
   end if
 
 
@@ -628,12 +628,12 @@ Subroutine WriteErrors( This, State, iState, NStates, LevelsFldr, Unit, i_Debug 
   end if
   
 
-      write(Unit, '(I6,6(A,e14.8,A,e14.8))') iErrorFlg, ', ', rMinErrAbs, ',', rMinErrRel, ', ', rMaxErrAbs, ',', rMaxErrRel, ', ', VMinErrAbs, ',', VMinErrRel, ', ', VMaxErrAbs, ',', VMaxErrRel, ', ', riErrAbs, ',', riErrRel, ', ', roErrAbs, ',', roErrRel
+  !     write(Unit, '(I6,6(A,e14.8,A,e14.8))') iErrorFlg, ', ', rMinErrAbs, ',', rMinErrRel, ', ', rMaxErrAbs, ',', rMaxErrRel, ', ', VMinErrAbs, ',', VMinErrRel, ', ', VMaxErrAbs, ',', VMaxErrRel, ', ', riErrAbs, ',', riErrRel, ', ', roErrAbs, ',', roErrRel
 
 
-  if (iState == NStates) then
-    close(Unit)
-  end if
+  ! if (iState == NStates) then
+  !   close(Unit)
+  ! end if
 
   if (i_Debug_Loc) call Logger%Exiting
 
