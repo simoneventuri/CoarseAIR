@@ -2,7 +2,7 @@
 %
 %  Initializing Input Global Var: - Syst.Paths.ToReadFldr: The path to the output folder (e.g.: .../CoarseAIR/run_O3/Test/ )
 %
-function [QBins, EeV] = Read_EeV_and_Q_CG(iT)     
+function Read_EeV_and_Q_CG()     
 
     % -- MATLAB --
     %%==============================================================================================================
@@ -26,24 +26,36 @@ function [QBins, EeV] = Read_EeV_and_Q_CG(iT)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Syst Input Temp
-    T0_Vec BinnedMolName NBinnedMol NBins DatabasePath OutputPath SystemPath KinMthd
+    global Syst Input Temp Kin Param
 
+ 
     for iMol = 1:Syst.NMolecules        
 
-        filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.NameLong, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/T', Temp.TranNowChar, '.csv')
-        opts = delimitedTextImportOptions("NumVariables", 3);
-        opts.DataLines = [2, Inf];
-        opts.Delimiter = ",";
-        opts.VariableNames = ["LevelBinRatio", "PartFunc", "EnergyeV"];
-        opts.VariableTypes = ["double", "double", "double"];
-        opts.ExtraColumnsRule = "ignore";
-        opts.EmptyLineRule = "read";
-        tbl = readtable(filename, opts);
-        QRatio = tbl.LevelBinRatio;
-        Q      = tbl.PartFunc;
-        EeV    = tbl.EnergyeV;
-        clear opts tbl 
+        
+%         %% Read T5000.csv
+%         filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/T', Temp.TNowChar, '.csv')
+%         opts = delimitedTextImportOptions("NumVariables", 3);
+%         opts.DataLines = [2, Inf];
+%         opts.Delimiter = ",";
+%         opts.VariableNames = ["LevelBinRatio", "PartFunc", "EnergyeV"];
+%         opts.VariableTypes = ["double", "double", "double"];
+%         opts.ExtraColumnsRule = "ignore";
+%         opts.EmptyLineRule = "read";
+%         tbl = readtable(filename, opts);
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QRatio = tbl.LevelBinRatio;
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q      = tbl.PartFunc;
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = tbl.EnergyeV + Syst.Molecule(iMol).EeVRef;
+%         clear opts tbl 
+
+        
+        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* ( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
+        
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q = zeros(Syst.Molecule(iMol).EqNStatesIn
+        for iLevel = 1:Syst.Molecule(iMol).NLevels
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin) = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin) + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
+        end
+        
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot   = sum(Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q);
         
     end
     

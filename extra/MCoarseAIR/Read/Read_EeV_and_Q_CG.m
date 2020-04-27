@@ -26,26 +26,40 @@ function Read_EeV_and_Q_CG()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Syst Input Temp
+    global Syst Input Temp Kin Param
 
  
     for iMol = 1:Syst.NMolecules        
+
         
+%         %% Read T5000.csv
+%         filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/T', Temp.TNowChar, '.csv')
+%         opts = delimitedTextImportOptions("NumVariables", 3);
+%         opts.DataLines = [2, Inf];
+%         opts.Delimiter = ",";
+%         opts.VariableNames = ["LevelBinRatio", "PartFunc", "EnergyeV"];
+%         opts.VariableTypes = ["double", "double", "double"];
+%         opts.ExtraColumnsRule = "ignore";
+%         opts.EmptyLineRule = "read";
+%         tbl = readtable(filename, opts);
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QRatio = tbl.LevelBinRatio;
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q      = tbl.PartFunc;
+%         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = tbl.EnergyeV + Syst.Molecule(iMol).EeVRef;
+%         clear opts tbl 
+
+        %% Read Compute Group Energy and Part Function
+        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* ( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
         
-        %% Read T5000.csv
-        filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/T', Temp.TNowChar, '.csv')
-        opts = delimitedTextImportOptions("NumVariables", 3);
-        opts.DataLines = [2, Inf];
-        opts.Delimiter = ",";
-        opts.VariableNames = ["LevelBinRatio", "PartFunc", "EnergyeV"];
-        opts.VariableTypes = ["double", "double", "double"];
-        opts.ExtraColumnsRule = "ignore";
-        opts.EmptyLineRule = "read";
-        tbl = readtable(filename, opts);
-        Syst.Molecule(iMol).GroupsIn.QRatio = tbl.LevelBinRatio;
-        Syst.Molecule(iMol).GroupsIn.Q      = tbl.PartFunc;
-        Syst.Molecule(iMol).GroupsIn.EeV    = tbl.EnergyeV + Syst.Molecule(iMol).EeVRef;
-        clear opts tbl 
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
+        for iLevel = 1:Syst.Molecule(iMol).NLevels
+            iBin                                              = Syst.Molecule(iMol).LevelToBin(iLevel);
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel) * Syst.Molecule(iMol).LevelEeV(iLevel);
+        end
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q;
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot   = sum(Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q);
+        Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QRatio = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
         
         
     end

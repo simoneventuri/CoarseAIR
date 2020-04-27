@@ -52,7 +52,7 @@ export DissFlg=0
 export DissInelFlg=1
 export InelFlg=1
 export ExchFlg1=1
-export ExchFlg2=1
+export ExchFlg2=0
 
 export NBins=0
 

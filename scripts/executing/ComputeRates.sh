@@ -745,31 +745,6 @@ function PostTrajectoriesAtNode {
     echo "  [PostTrajectoriesAtNode]: NProcessesPerProc = "${NProcessesPerProc}
 
 
-    if [[ ${NProc} -eq 1 ]]; then
-      ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} 1 ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc}
-    elif [[ ${NProc} -eq 2 ]]; then
-      parallel --xapply -j 2 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..2} 
-    elif [[ ${NProc} -eq 4 ]]; then
-      parallel --xapply -j 4 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..4} 
-    elif [[ ${NProc} -eq 8 ]]; then
-      parallel --xapply -j 8 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..8} 
-    elif [[ ${NProc} -eq 16 ]]; then
-      parallel --xapply -j 16 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..16} 
-    elif [[ ${NProc} -eq 20 ]]; then
-      parallel --xapply -j 20 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..20} 
-    elif [[ ${NProc} -eq 24 ]]; then
-      parallel --xapply -j 24 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..24} 
-    elif [[ ${NProc} -eq 32 ]]; then
-      parallel --xapply -j 32 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..32} 
-    elif [[ ${NProc} -eq 64 ]]; then
-      parallel --xapply -j 64 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..64} 
-    elif [[ ${NProc} -eq 128 ]]; then
-      parallel --xapply -j 128 "${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..128} 
-    else
-      echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
-      exit 1
-    fi
-
   else
 
     if [ ${ParNodes} -eq 0 ]; then
@@ -810,39 +785,42 @@ function PostTrajectoriesAtNode {
     echo "  [PostTrajectoriesAtNode]: -> Wating for ALL the Processors being done"
 
 
-    for (( iProc=1; iProc<=${NProc}; iProc++ )); do
-      echo $iProc
-      ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} ${iProc} ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} &
-    done
-
-    # if [[ ${NProc} -eq 1 ]]; then
-    #   sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_WORKING_DIR} ${COARSEAIR_OUTPUT_DIR} ${COARSEAIR_SH_DIR} ${System} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} 1 ${NMolecules} ${SymmFlg} ${Molecule1} ${NLevels1} ${MinLevel1} ${MaxLevel1} ${Molecule2} ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc}
-    # elif [[ ${NProc} -eq 2 ]]; then
-    #   parallel --xapply -j 2 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..2} 
-    # elif [[ ${NProc} -eq 4 ]]; then
-    #   parallel --xapply -j 4 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..4} 
-    # elif [[ ${NProc} -eq 8 ]]; then
-    #   parallel --xapply -j 8 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..8} 
-    # elif [[ ${NProc} -eq 12 ]]; then
-    #   parallel --xapply -j 12 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..12} 
-    # elif [[ ${NProc} -eq 16 ]]; then
-    #   parallel --xapply -j 16 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..16} 
-    # elif [[ ${NProc} -eq 20 ]]; then
-    #   parallel --xapply -j 20 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..20} 
-    # elif [[ ${NProc} -eq 24 ]]; then
-    #   parallel --xapply -j 24 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..24} 
-    # elif [[ ${NProc} -eq 32 ]]; then
-    #   parallel --xapply -j 32 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..32} 
-    # elif [[ ${NProc} -eq 64 ]]; then
-    #   parallel --xapply -j 64 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..64} 
-    # elif [[ ${NProc} -eq 128 ]]; then
-    #   parallel --xapply -j 128 "sh ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_WORKING_DIR}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_SH_DIR}' '${System}' ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${NNode} ${iNode} ${NProc} {1} ${NMolecules} ${SymmFlg} '${Molecule1}' ${NLevels1} ${MinLevel1} ${MaxLevel1} '${Molecule2}' ${NLevels2} ${MinLevel2} ${MaxLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerNode} ${NProcessesPerProc} " ::: {1..128} 
-    # else
-    #   echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
-    #   exit 1
-    # fi
-
   fi
+
+
+  for (( iProc=1; iProc<=${NProc}; iProc++ )); do
+    bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc} &
+  done
+                  
+
+  # if [[ ${NProc} -eq 1 ]]; then
+  #   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${SplitPESsFlg}' ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
+  # elif [[ ${NProc} -eq 2 ]]; then
+  #   parallel --xapply -j 2 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..2} 
+  # elif [[ ${NProc} -eq 4 ]]; then
+  #   parallel --xapply -j 4 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..4} 
+  # elif [[ ${NProc} -eq 8 ]]; then
+  #   parallel --xapply -j 8 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..8} 
+  # elif [[ ${NProc} -eq 12 ]]; then
+  #   parallel --xapply -j 12 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..12} 
+  # elif [[ ${NProc} -eq 16 ]]; then
+  #   parallel --xapply -j 16 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..16} 
+  # elif [[ ${NProc} -eq 20 ]]; then
+  #   parallel --xapply -j 20 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..20} 
+  # elif [[ ${NProc} -eq 24 ]]; then
+  #   parallel --xapply -j 24 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..24} 
+  # elif [[ ${NProc} -eq 32 ]]; then
+  #   parallel --xapply -j 32 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..32} 
+  # elif [[ ${NProc} -eq 64 ]]; then
+  #   parallel --xapply -j 64 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..64} 
+  # elif [[ ${NProc} -eq 128 ]]; then
+  #   parallel --xapply -j 128 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..128} 
+  # else
+  #   echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
+  #   exit 1
+  # fi
+
+  wait
 
   end=`date +%s`
   runtime=$((end-start))
@@ -852,283 +830,6 @@ function PostTrajectoriesAtNode {
 #================================================================================================================================#
 
 
-# ------------------------------------------------------------------------------------------------------------- PostTrajectories #
-function PostTrajectories {
-
-  # echo "      [PostTrajectories]: COARSEAIR_OUTPUT_DIR     = "${COARSEAIR_OUTPUT_DIR}
-  # echo "      [PostTrajectories]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-  # echo "      [PostTrajectories]: COARSEAIR_SH_DIR         = "${COARSEAIR_SH_DIR}
-  # echo "      [PostTrajectories]: System                   = "${System}
-  # echo "      [PostTrajectories]: TranFlg                  = "${TranFlg}
-  # echo "      [PostTrajectories]: Tran                     = "${Tran}
-  # echo "      [PostTrajectories]: Tint                     = "${Tint}
-  # echo "      [PostTrajectories]: SplitPESsFlg             = "${SplitPESsFlg}
-  # echo "      [PostTrajectories]: NPESs                    = "${NPESs}
-  # echo "      [PostTrajectories]: iNode                    = "${iNode}
-  # echo "      [PostTrajectories]: iProc                    = "${iProc}
-  # echo "      [PostTrajectories]: iPESStart                = "${iPESStart}
-  # echo "      [PostTrajectories]: Molecule1                = "${Molecule1}
-  # echo "      [PostTrajectories]: iLevel1                  = "${iLevel1}
-  # echo "      [PostTrajectories]: Molecule2                = "${Molecule2}
-  # echo "      [PostTrajectories]: iLevel2                  = "${iLevel2}
-  # echo "      [PostTrajectories]: Velocity                 = "${Velocity}
-  # echo "      [PostTrajectories]: BinaryTrajFlg            = "${BinaryTrajFlg}
-  # echo "      [PostTrajectories]: -> Postprocessing Molecule 1, Level "${iLevel1}" and Molecule 2, Level "${iLevel2}
-
-  TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
-  PostTrajectoriesCommand="coarseair-posttrajectories.x"
-
-
-
-  if [ ${TranFlg} -eq 0 ]; then 
-    COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-  else
-    COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-  fi
-  
-
-  VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
-  if [ -f $exist ]; then
-    Velocity=$(sed '2q;d' ${VelocityFile})
-    echo "      [PostTrajectories]: Velocity = "${Velocity}
-  else
-    echo "      [PostTrajectories]: -> ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
-    exit1
-  fi
-
-
-   
-  #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
-  TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
-  NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
-  TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat"
-  if [ -f ${TrajFile} ]; then                                                              
-    NTraj=$(wc -l < ${TrajFile})                                                        
-    NTraj=$((NTraj-1))
-  else 
-    NTraj=0
-  fi
-  echo ${NTraj} > ${NTrajFile}
-  echo "      [PostTrajectories]: Tot Nb of Trajectories: "${NTraj}
-
-
-  if [ ${SplitPESsFlg} -eq 0 ]; then 
-    NPESs=0
-    iPESEnd=0
-    iPES=0
-  else
-    iPESEnd=$((iPESStart + NPESs - 1))
-    if [[ ${NTraj} -gt 0 ]]; then     
-      echo "      [PostTrajectories]: Calling SplitTrajsPESs"
-      SplitTrajsPESs
-    fi
-    iPES=${iPESStart}
-  fi
-
-
-  while [ ${iPES} -le ${iPESEnd} ]
-  do
-
-    if [ ${SplitPESsFlg} -eq 1 ]; then 
-      echo "      [PostTrajectories]: ------- PES "${iPES}" ----------------------- "
-    
-      #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
-      TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES}
-      NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'.${iPES}
-      TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat".${iPES}
-   
-      if [ -f ${TrajFile} ]; then                                                              
-        NTraj=$(wc -l < ${TrajFile})                                                        
-        NTraj=$((NTraj-1))
-      else 
-        NTraj=0
-      fi
-      echo ${NTraj} > ${NTrajFile}
-      echo "      [PostTrajectories]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
-    
-    fi
-
-
-    
-    if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
-      cd ${COARSEAIR_BIN_OUTPUT_DIR}
-      
-      echo "      [PostTrajectories]:         Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
-      eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
-    fi
-        
-
-    echo "      [PostTrajectories]:         Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand}
-    start=`date +%s`
-    if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
-    
-      cd ${COARSEAIR_BIN_OUTPUT_DIR}
-    
-      if [ -e "${NTrajFile}" ]; then                                                                                        
-    
-        typeset -i NTraj=$(cat ${NTrajFile})
-
-        if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
-          rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
-          eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
-        else                                                                                                             
-          if [ -e "${TrajErrorFile}" ]; then
-            echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-          else
-            echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-            echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-          fi
-          echo "      [PostTrajectories]:         -> No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-        fi
-        
-      else
-      
-       if [ -e "${TrajErrorFile}" ]; then                                                                                   
-          echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-        else
-          echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-          echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-        fi
-        echo "      [PostTrajectories]:         -> No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-        
-      fi                                                                                                                  
-      
-    else
-    
-      if [ -e "$TrajErrorFile" ]; then
-        echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-      else
-        echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-        echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
-      fi
-      echo "      [PostTrajectories]:         -> No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-      
-    fi
-    
-    end=`date +%s`
-    runtime=$((end-start))
-    #echo "      [PostTrajectories]:    -> Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
-
-      
-    if [ ${SplitPESsFlg} -eq 1 ]; then 
-      rm -rf ${TrajFile}
-      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-      echo "      [PostTrajectories]: ------- PES "${iPES} " --------------- DONE - "
-    fi
-    iPES=$((iPES+1))
-  done   
-  ############################################################################################################################################################################## <= PostTrajectories
-
-
-  if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
-    if [ ${BinaryTrajFlg} -eq 1 ]; then
-      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv*
-    fi
-  fi
-
-}
-#================================================================================================================================#
-
-
-# # ------------------------------------------------------------------------------------------------------------ TrajectoriesStats #
-# function TrajectoriesStats {
-
-#   echo "        [TrajectoriesStats]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-#   echo "        [TrajectoriesStats]: Tran                     = "${Tran}
-#   echo "        [TrajectoriesStats]: Tint                     = "${Tint}
-#   echo "        [TrajectoriesStats]: BinaryTrajFlg            = "${BinaryTrajFlg}
-
-#   TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
-
-#   cd ${COARSEAIR_BIN_OUTPUT_DIR}
-  
-#   echo "        [TrajectoriesStats]: Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
-#   eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg}
-#   echo "        [TrajectoriesStats]: Done with TrajectoriesStats"
-  
-# }
-# #================================================================================================================================#
-
-
-# # ------------------------------------------------------------------------------------------------------------- FromCrossToRates #
-# function FromCrossToRates {
-
-#   echo "        [FromCrossToRates]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
-#   echo "        [FromCrossToRates]: Tran                     = "${Tran}
-#   echo "        [FromCrossToRates]: Tint                     = "${Tint}
-#   echo "        [FromCrossToRates]: iLevel1                  = "${iLevel1}
-#   echo "        [FromCrossToRates]: iLevel2                  = "${iLevel2}
-#   echo "        [FromCrossToRates]: iPES                     = "${iPES}
-#   echo "        [FromCrossToRates]: iNode                    = "${iNode}
-#   echo "        [FromCrossToRates]: iProc                    = "${iProc}
-#   echo "        [FromCrossToRates]: TranFlg                  = "${TranFlg}
-#   echo "        [FromCrossToRates]: Velocity                 = "${Velocity}
-#   echo "        [FromCrossToRates]: BinaryTrajFlg            = "${BinaryTrajFlg}
-
-
-#   PostTrajectoriesCommand="coarseair-posttrajectories.x"
-#   TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat"
-
-#   echo "        [FromCrossToRates]: Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand} ${Tran} 
-#   start=`date +%s`
-#   if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
-  
-#     cd ${COARSEAIR_BIN_OUTPUT_DIR}
-#     TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
-  
-#     if [ -e "$TrajFile" ]; then                                                                                        
-  
-#       typeset -i NTraj=$(cat ${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat')
-
-#       if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
-#         rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
-#         eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
-#       else                                                                                                             
-#         if [ -e "$TrajErrorFile" ]; then
-#           echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#         else
-#           echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-#           echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#         fi
-#         echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-#         #rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*
-#       fi
-      
-#     else
-    
-#      if [ -e "$TrajErrorFile" ]; then                                                                                   
-#         echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#       else
-#         echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-#         echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#       fi
-#       echo "        [FromCrossToRates]: No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-      
-#     fi                                                                                                                  
-    
-#   else
-  
-#     if [ -e "$TrajErrorFile" ]; then
-#       echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#     else
-#       echo "# List of Levels / Bins that Generated Errors during Rates Computation" > $TrajErrorFile
-#       echo ${iLevel1}","${iLevel2} >> $TrajErrorFile
-#     fi
-#     echo "        [FromCrossToRates]: No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
-    
-#   fi
-  
-#   end=`date +%s`
-#   runtime=$((end-start))
-#   echo "        [FromCrossToRates]: Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
-
-  
-# }
-# #================================================================================================================================#
 
 
 # ----------------------------------------------------------------------------------------------------------------- ComputeRates #

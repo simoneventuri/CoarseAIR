@@ -63,7 +63,7 @@ function ReadLevelInfo()
         Syst.Molecule(iMol).LevelEeV0 = Syst.Molecule(iMol).LevelEeV - min(Syst.Molecule(iMol).LevelEeV(1));
         Syst.Molecule(iMol).Nvqn      = max(Syst.Molecule(iMol).Levelvqn) + 1;
         Syst.Molecule(iMol).Njqn      = max(Syst.Molecule(iMol).Leveljqn) + 1;
-        
+
         
         %% Computing Equivalent Number of States = Levels/Groups
         if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
@@ -73,6 +73,23 @@ function ReadLevelInfo()
         elseif strcmp(Syst.Molecule(iMol).KinMthdIn, 'CGM')
             Syst.Molecule(iMol).EqNStatesIn = Syst.Molecule(iMol).NGroupsIn;
         end
+        
+        
+        %% Reading QNsEnBin
+        opts = delimitedTextImportOptions("NumVariables", 6);
+        opts.DataLines = [2, Inf];
+        opts.Delimiter = ",";
+        opts.VariableNames = ["Var1", "Var2", "Var3", "Var4", "Levelg", "LevelToBin"];
+        opts.SelectedVariableNames = ["Levelg", "LevelToBin"];
+        opts.VariableTypes = ["string", "string", "string", "string", "double", "double"];
+        opts.ExtraColumnsRule = "ignore";
+        opts.EmptyLineRule = "read";
+        opts = setvaropts(opts, ["Var1", "Var2", "Var3", "Var4"], "WhitespaceRule", "preserve");
+        opts = setvaropts(opts, ["Var1", "Var2", "Var3", "Var4"], "EmptyFieldRule", "auto");
+        tbl = readtable(strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/QNsEnBin.csv'), opts);
+        Syst.Molecule(iMol).Levelg     = tbl.Levelg;
+        Syst.Molecule(iMol).LevelToBin = tbl.LevelToBin;
+        clear opts tbl
         
     end
     

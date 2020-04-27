@@ -22,38 +22,81 @@
 #set -e
 
 
-. ~/.bash_profile
-COARSEAIR_UPDATE
-COARSEAIR_release
+# . ~/.bash_profile
+# COARSEAIR_UPDATE
+# COARSEAIR_release
 
 
 
+
+########################################################################################################################################################################## <= SplitTrajsPESsHERE
+## Splitting Lines in Trajectory File Based on the Collision PES
+##
+function SplitTrajsPESsHERE
+{
+
+  iPES=${iPESStart}
+  while [[ ${iPES} -le ${iPESEnd} ]]; do
+    PESFile=${COARSEAIR_BIN_OUTPUT_DIR}'/trajectories.csv.'${iPES}
+    echo '#    iTraj, iPES,       bmax,        b_i,           j_i,           v_i,         arr_i,           j_f,           v_f,         arr_f' > ${PESFile} 
+    iPES=$(($iPES+1))
+  done        
+
+  OrigFile=$COARSEAIR_BIN_OUTPUT_DIR/trajectories.csv
+  OLDIFS=$IFS
+  IFS=','
+  [ ! -f ${OrigFile} ] && { echo "$OrigFile file not found"; exit 99; }
+  sed 1d ${OrigFile} | while read Idx iPES bmax b_i j_i v_i arr_i j_f v_f arr_f
+  do
+    jPES=$(($iPES+0))
+    if [[ ${jPES} -ge ${iPESStart} ]] && [[ ${jPES} -le ${iPESEnd} ]]; then
+      PESFile=${COARSEAIR_BIN_OUTPUT_DIR}'/trajectories.csv.'${jPES}
+      echo $Idx','$iPES','$bmax','$b_i','$j_i','$v_i','$arr_i','$j_f','$v_f','$arr_f >> ${PESFile} 
+    fi
+  done 
+  IFS=$OLDIFS
+
+}
+########################################################################################################################################################################## <= SplitTrajsPESsHERE
+
+
+
+########################################################################################################################################################################## <= PostTrajectoriesHERE
+## Computing Trajectory Statistics -> Cross Sections -> Rate Coefficients
+##
 function PostTrajectoriesHERE
 {
 
+
+  ###########################################################################################################
+  ## Defining Executables for Fortran Code
+  ##
   TrajectoriesStatsCommand="coarseair-trajectoriesstats.x"
   PostTrajectoriesCommand="coarseair-posttrajectories.x"
 
-  ############################################################################################################################################################################## <= PostTrajectories
 
+  echo "      [PostTrajectoriesHERE]: "
+  echo "      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin " ${iLevel1} " ----------------------------- "
+  echo "      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------------- "
+  echo "      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand}
+  
+
+  ###########################################################################################################
+  ## Defining the Run Folder Corresponding to the Current Process
+  ##
   if [ ${TranFlg} -eq 0 ]; then 
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
   else
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
   fi
-  
-
-  VelocityFile=${COARSEAIR_OUTPUT_DIR}/Velocity_${Tran}.dat
-  if [ -f $exist ]; then
-    Velocity=$(sed '2q;d' ${VelocityFile})
-    echo "      [PostTrajectories]: Velocity = "${Velocity}
-  else
-    echo "      [PostTrajectories]: -> ERROR! Velocity File does exist! CoarseAIR cannot compute Cross Sections!"
-    exit1
-  fi
-
-
    
+
+  ###########################################################################################################
+  ## Defining Files for:
+  ##      - Trajectories Output
+  ##      - Nb of Trajectories in the Trajectory File
+  ##      - Error File 
+  ## 
   #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
   TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv
   NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'
@@ -65,9 +108,12 @@ function PostTrajectoriesHERE
     NTraj=0
   fi
   echo ${NTraj} > ${NTrajFile}
-  echo "      [PostTrajectories]: Tot Nb of Trajectories: "${NTraj}
+  echo "      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: "${NTraj}
 
 
+  ###########################################################################################################
+  ## Deciding Whether to Split the Trajectories Based on Their PESs
+  ## 
   if [ ${SplitPESsFlg} -eq 0 ]; then 
     NPESs=0
     iPESEnd=0
@@ -75,53 +121,33 @@ function PostTrajectoriesHERE
   else
     iPESEnd=$((iPESStart + NPESs - 1))
     if [[ ${NTraj} -gt 0 ]]; then     
-      echo "      [PostTrajectories]: Calling SplitTrajsPESs"
+      echo "      [PostTrajectoriesHERE]:         Calling SplitTrajsPESs"
       
-
-
-      ########################################################################################################################################################################## <= SplitTrajsPESs
-
-      iPES=${iPESStart}
-      while [[ ${iPES} -le ${iPESEnd} ]]; do
-        PESFile=${COARSEAIR_BIN_OUTPUT_DIR}'/trajectories.csv.'${iPES}
-        echo '#    iTraj, iPES,       bmax,        b_i,           j_i,           v_i,         arr_i,           j_f,           v_f,         arr_f' > ${PESFile} 
-        iPES=$(($iPES+1))
-      done        
-
-      OrigFile=$COARSEAIR_BIN_OUTPUT_DIR/trajectories.csv
-      OLDIFS=$IFS
-      IFS=','
-      [ ! -f ${OrigFile} ] && { echo "$OrigFile file not found"; exit 99; }
-      sed 1d ${OrigFile} | while read Idx iPES bmax b_i j_i v_i arr_i j_f v_f arr_f
-      do
-        jPES=$(($iPES+0))
-        if [[ ${jPES} -ge ${iPESStart} ]] && [[ ${jPES} -le ${iPESEnd} ]]; then
-          PESFile=${COARSEAIR_BIN_OUTPUT_DIR}'/trajectories.csv.'${jPES}
-          echo $Idx','$iPES','$bmax','$b_i','$j_i','$v_i','$arr_i','$j_f','$v_f','$arr_f >> ${PESFile} 
-        fi
-      done 
-      IFS=$OLDIFS
-
-      ########################################################################################################################################################################## <= SplitTrajsPESs
-
-
+      ########################################################################################################################################################################## <= SplitTrajsPESsHERE
+      SplitTrajsPESsHERE
+      ########################################################################################################################################################################## <= SplitTrajsPESsHERE
 
     fi
     iPES=${iPESStart}
   fi
 
 
-  while [ ${iPES} -le ${iPESEnd} ]
-  do
+  ###########################################################################################################
+  ## Looping on PESs
+  ## 
+  while [ ${iPES} -le ${iPESEnd} ]; do
+    start=`date +%s`
 
+
+    ###########################################################################################################
+    ## If We are Splitting Trajectories, then we need new Definitions of TrajFile, NTrajFile, and TrajErrorFile
+    ## 
     if [ ${SplitPESsFlg} -eq 1 ]; then 
-      echo "      [PostTrajectories]: ------- PES "${iPES}" ----------------------- "
-    
+      echo "      [PostTrajectoriesHERE]: ------- PES "${iPES}" ----------------------- "    
       #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
       TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES}
       NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'.${iPES}
       TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat".${iPES}
-   
       if [ -f ${TrajFile} ]; then                                                              
         NTraj=$(wc -l < ${TrajFile})                                                        
         NTraj=$((NTraj-1))
@@ -129,83 +155,103 @@ function PostTrajectoriesHERE
         NTraj=0
       fi
       echo ${NTraj} > ${NTrajFile}
-      echo "      [PostTrajectories]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
-    
+      echo "      [PostTrajectoriesHERE]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
     fi
+        
 
-
-    
-    if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
+    ###########################################################################################################
+    ## Checking Whether the Run Folder Exists
+    ## 
+    if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
       cd ${COARSEAIR_BIN_OUTPUT_DIR}
       
-      echo "      [PostTrajectories]:         Computing Statistics for Trajectories. Command: "${TrajectoriesStatsCommand}
-      eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
-    fi
-        
-
-    echo "      [PostTrajectories]:         Postprocessing Trajectories for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". Command: "${PostTrajectoriesCommand}
-    start=`date +%s`
-    if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
-    
-      cd ${COARSEAIR_BIN_OUTPUT_DIR}
-    
+      ###########################################################################################################
+      ## Checking Whether the Trajectory File Existed and Getting Nb of Trajectories
+      ## 
       if [ -e "${NTrajFile}" ]; then                                                                                        
-        
         NTraj=`cat ${NTrajFile}`
         #typeset -i NTraj=$(cat ${NTrajFile})
 
+
         if [ ${NTraj} -gt 0 ] || [ ${BinaryTrajFlg} -gt 0 ]; then
+          ###########################################################################################################
+          ## If the Trajectory File actually contains Trajectories, then Compute Cross Sections and Rate Coefficients
+          ## 
+
+          echo "      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      "${TrajectoriesStatsCommand}
+          eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
+
+          echo "      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: "${TrajectoriesStatsCommand}
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
           eval ${PostTrajectoriesCommand} ${Tran} ${Tint} ${NTraj} ${Velocity} ${iPES} ${iLevel1} ${iLevel2} 
+        
         else                                                                                                             
+          ###########################################################################################################
+          ## If the Trajectory File is Empty, then Report the Current Process in the Error File
+          ## 
+          echo "      [PostTrajectoriesHERE]:         No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+
           if [ -e "${TrajErrorFile}" ]; then
-            echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+            echo ${iLevel1}","${iLevel2}",1" >> ${TrajErrorFile}
           else
-            echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-            echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+          echo "# List of Levels / Bins that Generated Errors during Rates Computation (iLevel, jLevel, Flag). Flag == 1: No Trajectories; Flag == 2: No Trajectory File; Flag == 3: No Process Folder" > ${TrajErrorFile}
+            echo ${iLevel1}","${iLevel2}",1" >> ${TrajErrorFile}
           fi
-          echo "      [PostTrajectories]:         -> No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+
         fi
         
       else
+        ###########################################################################################################
+        ## If the Trajectory File Does Not Exist, then Report the Current Process in the Error File
+        ## 
+        echo "      [PostTrajectoriesHERE]:         No Trajectory File for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
       
-       if [ -e "${TrajErrorFile}" ]; then                                                                                   
-          echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+        if [ -e "${TrajErrorFile}" ]; then                                                                                   
+          echo ${iLevel1}","${iLevel2}",2" >> ${TrajErrorFile}
         else
-          echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-          echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+          echo "# List of Levels / Bins that Generated Errors during Rates Computation (iLevel, jLevel, Flag). Flag == 1: No Trajectories; Flag == 2: No Trajectory File; Flag == 3: No Process Folder" > ${TrajErrorFile}
+          echo ${iLevel1}","${iLevel2}",2" >> ${TrajErrorFile}
         fi
-        echo "      [PostTrajectories]:         -> No Trajectories for Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
         
       fi                                                                                                                  
       
     else
-    
+      ###########################################################################################################
+      ## If the Process Folder Does Not Exist, then Report the Current Process in the Error File
+      ##   
+      echo "      [PostTrajectoriesHERE]:          No Process Folder for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
+
       if [ -e "$TrajErrorFile" ]; then
-        echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+        echo ${iLevel1}","${iLevel2}",3" >> ${TrajErrorFile}
       else
-        echo "# List of Levels / Bins that Generated Errors during Rates Computation" > ${TrajErrorFile}
-        echo ${iLevel1}","${iLevel2} >> ${TrajErrorFile}
+          echo "# List of Levels / Bins that Generated Errors during Rates Computation (iLevel, jLevel, Flag). Flag == 1: No Trajectories; Flag == 2: No Trajectory File; Flag == 3: No Process Folder" > ${TrajErrorFile}
+        echo ${iLevel1}","${iLevel2}",3" >> ${TrajErrorFile}
       fi
-      echo "      [PostTrajectories]:         -> No Trajectories for Molecule 1, Level/Bin "${iLevel1}"; Molecule 2, Level/Bin "${iLevel2}
       
     fi
     
-    end=`date +%s`
-    runtime=$((end-start))
-    #echo "      [PostTrajectories]:    -> Done with FromCrossToRates for iLevel1 = "${iLevel1}" and for iLevel2 = "${iLevel2}", @ iProc = "${iProc}". RunTime = "${runtime}"s"
 
-
-     
+    ###########################################################################################################
+    ## Cleaning Files for the Current PES
+    ##
     if [ ${SplitPESsFlg} -eq 1 ]; then 
       rm -rf ${TrajFile}
-      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
-      echo "      [PostTrajectories]: ------- PES "${iPES} " --------------- DONE - "
+      rm -rf ${NTrajFile}
+      rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*.{iPES}
+      echo "      [PostTrajectoriesHERE]: ------- PES "${iPES} " --------------- DONE - "
     fi
+  
+
+    end=`date +%s`
+    runtime=$((end-start))
+
     iPES=$((iPES+1))
   done   
 
 
+  ###########################################################################################################
+  ## Cleaning Files and Folders 
+  ## 
   if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
@@ -216,49 +262,45 @@ function PostTrajectoriesHERE
     fi
   fi
 
-  ############################################################################################################################################################################## <= PostTrajectories
+
+
+  echo "      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
+  echo "      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin " ${iLevel1} " --------------------- DONE -- "
+  echo " "
+
 
 }
+########################################################################################################################################################################## <= PostTrajectoriesHERE
 
 
 
-COARSEAIR_WORKING_DIR=${1}
-COARSEAIR_OUTPUT_DIR=${2}
-COARSEAIR_SH_DIR=${3}
-System=${4}
-SplitPESsFlg=${5}
-NPESs=${6}
-iPESStart=${7}
-TranFlg=${8}
-Tran=${9}
-Tint=${10}
-Velocity=${11}
-NNode=${12}
-iNode=${13}
-NProc=${14}
-iProc=${15}
-NMolecules=${16}
-SymmFlg=${17}
-Molecule1=${18}
-NLevels1=${19}
-MinLevel1=${20}
-MaxLevel1=${21}
-Molecule2=${22}
-NLevels2=${23}
-MinLevel2=${24}
-MaxLevel2=${25}
-RmTrajFlg=${26}
-BinaryTrajFlg=${27}   
-MinProcessInNode=${28}
-MaxProcessInNode=${29}
-NProcessesPerNode=${30}
-NProcessesPerProc=${31}
-                                                         
+# ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
 
-echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
+COARSEAIR_OUTPUT_DIR=${1}
+SplitPESsFlg=${2}
+NPESs=${3}
+iPESStart=${4}
+TranFlg=${5}
+Tran=${6}
+Tint=${7}
+Velocity=${8}
+iNode=${9}
+iProc=${10}
+NMolecules=${11}
+SymmFlg=${12}
+NLevels1=${13}
+MinLevel1=${14}
+NLevels2=${15}
+MinLevel2=${16}
+RmTrajFlg=${17}
+BinaryTrajFlg=${18}   
+MinProcessInNode=${19}
+MaxProcessInNode=${20}
+NProcessesPerProc=${21}
+                                   
+
+
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
-echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
-echo "    [PostTrajectoriesAtProc.sh]: System                = "${System}
 echo "    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = "${SplitTrajsPESs}
 echo "    [PostTrajectoriesAtProc.sh]: NPESs                 = "${NPESs}
 echo "    [PostTrajectoriesAtProc.sh]: iPESStart             = "${iPESStart}
@@ -266,33 +308,39 @@ echo "    [PostTrajectoriesAtProc.sh]: TranFlg               = "${TranFlg}
 echo "    [PostTrajectoriesAtProc.sh]: Tran                  = "${Tran}
 echo "    [PostTrajectoriesAtProc.sh]: Tint                  = "${Tint}
 echo "    [PostTrajectoriesAtProc.sh]: Velocity              = "${Velocity}
-echo "    [PostTrajectoriesAtProc.sh]: NNode                 = "${NNode}
 echo "    [PostTrajectoriesAtProc.sh]: iNode                 = "${iNode}
-echo "    [PostTrajectoriesAtProc.sh]: NProc                 = "${NProc}
 echo "    [PostTrajectoriesAtProc.sh]: iProc                 = "${iProc}
 echo "    [PostTrajectoriesAtProc.sh]: NMolecules            = "${NMolecules}
 echo "    [PostTrajectoriesAtProc.sh]: SymmFlg               = "${SymmFlg}
-echo "    [PostTrajectoriesAtProc.sh]: Molecule1             = "${Molecule1}
 echo "    [PostTrajectoriesAtProc.sh]: NLevels1              = "${NLevels1}
 echo "    [PostTrajectoriesAtProc.sh]: MinLevel1             = "${MinLevel1}
-echo "    [PostTrajectoriesAtProc.sh]: MaxLevel1             = "${MaxLevel1}
-echo "    [PostTrajectoriesAtProc.sh]: Molecule2             = "${Molecule2}
 echo "    [PostTrajectoriesAtProc.sh]: NLevels2              = "${NLevels2}
 echo "    [PostTrajectoriesAtProc.sh]: MinLevel2             = "${MinLevel2}
-echo "    [PostTrajectoriesAtProc.sh]: MaxLevel2             = "${MaxLevel2}
 echo "    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = "${RmTrajFlg}
 echo "    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = "${BinaryTrajFlg}
 echo "    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = "${MinProcessInNode}
 echo "    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = "${MaxProcessInNode}
-echo "    [PostTrajectoriesAtProc.sh]: NProcessesPerNode     = "${NProcessesPerNode}
 echo "    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = "${NProcessesPerProc}
 
 
+# echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_WORKING_DIR = "${COARSEAIR_WORKING_DIR}
+# echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_SH_DIR      = "${COARSEAIR_SH_DIR}
+# echo "    [PostTrajectoriesAtProc.sh]: System                = "${System}
+# echo "    [PostTrajectoriesAtProc.sh]: NNode                 = "${NNode}
+# echo "    [PostTrajectoriesAtProc.sh]: NProc                 = "${NProc}
+# echo "    [PostTrajectoriesAtProc.sh]: Molecule1             = "${Molecule1}
+# echo "    [PostTrajectoriesAtProc.sh]: MaxLevel1             = "${MaxLevel1}
+# echo "    [PostTrajectoriesAtProc.sh]: Molecule2             = "${Molecule2}
+# echo "    [PostTrajectoriesAtProc.sh]: MaxLevel2             = "${MaxLevel2}
+# echo "    [PostTrajectoriesAtProc.sh]: NProcessesPerNode     = "${NProcessesPerNode}
 
 #source ${COARSEAIR_SH_DIR}/ComputeRates.sh
 
 
 
+###########################################################################################################
+## Deciding Minimum and Maximum Indexes for the Process to compute in this PROCESSOR
+##
 MinProcessInProc=$(( ${MinProcessInNode} + $((iProc-1))*${NProcessesPerProc}    ))
 MaxProcessInProc=$(( ${MinProcessInNode} +     ${iProc}*${NProcessesPerProc} -1 ))
 if [ ${MaxProcessInProc} -gt  ${MaxProcessInNode} ]; then
@@ -304,15 +352,21 @@ echo "    [PostTrajectoriesAtProc.sh] For Node "${iNode}", Processor "${iProc}",
 
 
 
+###########################################################################################################
+## Deciding Whether to Read the List of Processes to run from the ProcessesToRunList.inp File ...
+##     ... or to Go in Increasing Order
+##
 if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then 
   echo "    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp
   
   
+  ###########################################################################################################
+  ## Reading the List of Processes and Checking if the Current is OK for this Processor
+  ##
   iProcess=0
   while IFS= read -r ProcessLine
     do
     iProcess=$((iProcess+1))
-    
     if [ ${iProcess} -ge ${MinProcessInProc} ] && [ ${iProcess} -le ${MaxProcessInProc} ]; then
       iLevel1=$(echo $ProcessLine | awk -F'-' '{print $1}')
       if [ -z "$iLevel1" ]; then 
@@ -323,27 +377,23 @@ if [ ${MinLevel1} -eq 0 -a ${MinLevel2} -eq 0 ]; then
         iLevel2=0
       fi
 
-      echo "    [PostTrajectoriesAtProc.sh]: "
-      echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin " ${iLevel1} " ----------------------------- "
-      echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "        
-      
-
+      ############################################################################################################################################################################## <= PostTrajectoriesHERE
       PostTrajectoriesHERE
-    
+      ############################################################################################################################################################################## <= PostTrajectoriesHERE
 
-      echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
-      echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin " ${iLevel1} " --------------------- DONE -- "
-      echo " "
     fi
-    
   done < "${COARSEAIR_INPUT_DIR}/ProcessesToRunList.inp"
+
 
 else
 
+
+  ###########################################################################################################
+  ## Going in Increasing Order (Paying Attention to System Symmetries e.g., AB_i + AB_j is the same as AB_j + AB_i) and Deciding if the Current Process is OK for this Processor
+  ##
   iProcessesTot=0
   for iLevel1 in `seq 1 ${NLevels1}`; do
-  #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-    
+  #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do    
     iLevel2Start=0
     MinLevel2Temp=0
     if [ ${NMolecules} -eq 2 ]; then 
@@ -354,29 +404,17 @@ else
       iLevel2Start=${iLevel1}
       MinLevel2Temp=${MinLevel1}
     fi
-
     for iLevel2 in `seq ${iLevel2Start} ${NLevels2}`; do
     #for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
       iProcessesTot=$(( ${iProcessesTot} + 1 ))
-      
       if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
 
-        echo "    [PostTrajectoriesAtProc.sh]: "
-        echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin  = " ${iLevel1} " --------------------------- "
-        echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " --------------------- "
-
-        
+        ############################################################################################################################################################################## <= PostTrajectoriesHERE
         PostTrajectoriesHERE
-
-
-        echo "    [PostTrajectoriesAtProc.sh]: ----- Molecule 2, Level/Bin = " ${iLevel2} " ------------------- DONE -- "
-        echo "    [PostTrajectoriesAtProc.sh]: --- Molecule 1, Level/Bin = " ${iLevel1} " ------------------- DONE -- "
-        echo " "
+        ############################################################################################################################################################################## <= PostTrajectoriesHERE
 
       fi
-
     done
-
   done
   
 
@@ -384,3 +422,7 @@ fi
 
 
 exit 0
+
+
+
+
