@@ -32,13 +32,13 @@ function Read_Rates_FromHDF5()
     DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Diss/');
     h5disp(Syst.HDF5_File, DissChar)
     RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
-    Rates.T(Temp.iT).Diss_    = permute(RatesTemp, [3,2,1]);
+    Rates.T(Temp.iT).Diss     = permute(RatesTemp, [3,2,1]);
     
     
     DissCharInel   = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/DissInel/');
     h5disp(Syst.HDF5_File, DissCharInel)
     RatesTemp                 = h5read(Syst.HDF5_File, DissCharInel);
-    Rates.T(Temp.iT).DissInel_ = permute(RatesTemp, [4,3,2,1]);
+    Rates.T(Temp.iT).DissInel = permute(RatesTemp, [4,3,2,1]);
 
 
 end

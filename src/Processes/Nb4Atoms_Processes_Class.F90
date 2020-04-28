@@ -945,7 +945,7 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, 
             jqnFin(2) = 0
             jTypeFin  = 2
           else
-            Issue = 11 ! Current Trajectory has a Final Condition that should not exist
+            Issue = 12 ! Current Trajectory has a Final Condition that should not exist
           endif
         else
           ! Current Trajectory has a Final Condition that is accettable!

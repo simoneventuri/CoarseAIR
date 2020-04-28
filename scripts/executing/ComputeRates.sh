@@ -788,37 +788,37 @@ function PostTrajectoriesAtNode {
   fi
 
 
-  for (( iProc=1; iProc<=${NProc}; iProc++ )); do
-    bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc} &
-  done
+  # for (( iProc=1; iProc<=${NProc}; iProc++ )); do
+  #   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc} &
+  # done
                   
 
-  # if [[ ${NProc} -eq 1 ]]; then
-  #   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
-  # elif [[ ${NProc} -eq 2 ]]; then
-  #   parallel --xapply -j 2 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..2} 
-  # elif [[ ${NProc} -eq 4 ]]; then
-  #   parallel --xapply -j 4 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..4} 
-  # elif [[ ${NProc} -eq 8 ]]; then
-  #   parallel --xapply -j 8 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..8} 
-  # elif [[ ${NProc} -eq 12 ]]; then
-  #   parallel --xapply -j 12 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..12} 
-  # elif [[ ${NProc} -eq 16 ]]; then
-  #   parallel --xapply -j 16 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..16} 
-  # elif [[ ${NProc} -eq 20 ]]; then
-  #   parallel --xapply -j 20 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..20} 
-  # elif [[ ${NProc} -eq 24 ]]; then
-  #   parallel --xapply -j 24 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..24} 
-  # elif [[ ${NProc} -eq 32 ]]; then
-  #   parallel --xapply -j 32 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..32} 
-  # elif [[ ${NProc} -eq 64 ]]; then
-  #   parallel --xapply -j 64 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..64} 
-  # elif [[ ${NProc} -eq 128 ]]; then
-  #   parallel --xapply -j 128 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..128} 
-  # else
-  #   echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
-  #   exit 1
-  # fi
+  if [[ ${NProc} -eq 1 ]]; then
+   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh  ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} 1 ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
+  elif [[ ${NProc} -eq 2 ]]; then
+    parallel --xapply -j 2 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..2} 
+  elif [[ ${NProc} -eq 4 ]]; then
+    parallel --xapply -j 4 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..4} 
+  elif [[ ${NProc} -eq 8 ]]; then
+    parallel --xapply -j 8 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..8} 
+  elif [[ ${NProc} -eq 12 ]]; then
+    parallel --xapply -j 12 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..12} 
+  elif [[ ${NProc} -eq 16 ]]; then
+    parallel --xapply -j 16 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..16} 
+  elif [[ ${NProc} -eq 20 ]]; then
+    parallel --xapply -j 20 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..20} 
+  elif [[ ${NProc} -eq 24 ]]; then
+    parallel --xapply -j 24 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..24} 
+  elif [[ ${NProc} -eq 32 ]]; then
+    parallel --xapply -j 32 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..32} 
+  elif [[ ${NProc} -eq 64 ]]; then
+    parallel --xapply -j 64 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..64} 
+  elif [[ ${NProc} -eq 128 ]]; then
+    parallel --xapply -j 128 -u "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..128} 
+  else
+    echo "ERROR: Number of Precessors not Coherent with PostTrajectoriesAtNode! (Check ComputeRates.sh)"
+    exit 1
+  fi
 
   wait
 
