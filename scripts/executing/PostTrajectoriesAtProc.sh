@@ -253,7 +253,7 @@ function PostTrajectoriesHERE
   ## Cleaning Files and Folders 
   ## 
   if [ ${RmTrajFlg} -eq 1 ] && [ -f ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat ]; then
-    rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
+    #rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/NConvTraj.dat
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/Node*
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*
     rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/*.log
