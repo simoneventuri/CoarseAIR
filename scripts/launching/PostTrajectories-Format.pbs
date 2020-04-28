@@ -1,8 +1,8 @@
 #!/bin/bash
-#PBS -q low
+#PBS -q 
 #PBS -l select=
 #PBS -N PostTraj_
-#PBS -l walltime=4:00:00
+#PBS -l walltime=
 #PBS -o PostTraj_
 
 
@@ -11,11 +11,11 @@ NNode=1
 ParNodes=1
 ###################################################################################################  <<<--- WRITE HERE !!!!
 NProc=
+SlncFlg=
+MergeAllFlg=
+RmTrajFlg=
+BinaryTrajFlg=
 ###################################################################################################  <<<--- WRITE HERE !!!!
-SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
-MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
-RmTrajFlg=1                                                                                       # =1 -> Removing Traj Files from Single Processors
-BinaryTrajFlg=0                                                                                   # =1 -> Statistics Reads Binary Traj Files
 #-------------------------------------------------------------------------------------------------#
 
 
