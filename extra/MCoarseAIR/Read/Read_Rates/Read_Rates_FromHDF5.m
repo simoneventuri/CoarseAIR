@@ -3,7 +3,7 @@
 %  Input Global Var: - Temp.TNowChar
 %                    - Syst.HDF5_File
 %
-function Compute_Rates_Thermal()    
+function Read_Rates_FromHDF5()    
 
     %%==============================================================================================================
     % 
@@ -27,29 +27,18 @@ function Compute_Rates_Thermal()
     %%==============================================================================================================
     
     global Rates Syst Temp
-    
-    iMol   = Syst.Pair(1).ToMol;
-    jMol   = Syst.Pair(6).ToMol;
-    
-    iQTemp = Kin.T(Temp.iT).Molecule(iMol).GroupsIn.Q;
-    jQTemp = Kin.T(Temp.iT).Molecule(jMol).GroupsIn.Q;
-
-    for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
-        for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-            Rates.T(Temp.iT).DissTh = Rates.T(Temp.iT).Diss + Rates.T(Temp.iT).DissInel(iBin,
-        end
-    end
+  
     
     DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Diss/');
     h5disp(Syst.HDF5_File, DissChar)
-    RatesTemp      = h5read(Syst.HDF5_File, DissChar);
-    Rates.Diss     = permute(RatesTemp, [3,2,1]);
+    RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
+    Rates.T(Temp.iT).Diss_    = permute(RatesTemp, [3,2,1]);
     
     
     DissCharInel   = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/DissInel/');
     h5disp(Syst.HDF5_File, DissCharInel)
-    RatesTemp      = h5read(Syst.HDF5_File, DissCharInel);
-    Rates.DissInel = permute(RatesTemp, [4,3,2,1]);
+    RatesTemp                 = h5read(Syst.HDF5_File, DissCharInel);
+    Rates.T(Temp.iT).DissInel_ = permute(RatesTemp, [4,3,2,1]);
 
 
 end

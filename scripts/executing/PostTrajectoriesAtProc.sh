@@ -274,7 +274,16 @@ function PostTrajectoriesHERE
 
 
 
-# ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
+
+##########################################################################################################################################################################
+##########################################################################################################################################################################
+##########################################################################################################################################################################
+
+
+###########################################################################################################
+## From ComputeRates.sh, PostTrajectoriesAtNode
+##    bash  ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
+
 
 COARSEAIR_OUTPUT_DIR=${1}
 SplitPESsFlg=${2}
@@ -296,8 +305,7 @@ RmTrajFlg=${17}
 BinaryTrajFlg=${18}   
 MinProcessInNode=${19}
 MaxProcessInNode=${20}
-NProcessesPerProc=${21}
-                                   
+NProcessesPerProc=${21}                                   
 
 
 echo "    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = "${COARSEAIR_OUTPUT_DIR}
@@ -423,6 +431,6 @@ fi
 
 exit 0
 
-
-
-
+##########################################################################################################################################################################
+##########################################################################################################################################################################
+##########################################################################################################################################################################

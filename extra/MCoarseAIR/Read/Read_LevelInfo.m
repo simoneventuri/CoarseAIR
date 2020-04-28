@@ -74,6 +74,14 @@ function ReadLevelInfo()
             Syst.Molecule(iMol).EqNStatesIn = Syst.Molecule(iMol).NGroupsIn;
         end
         
+        Syst.NTotProc = 1;
+        for iP = 1:3
+           jP            = Param.iPOpp(iP);
+           iMol          = Syst.Pair(iP).ToMol;
+           jMol          = Syst.Pair(jP).ToMol;
+           Syst.NTotProc = Syst.NTotProc + (Syst.Molecule(iMol).EqNStatesIn + 1) * (Syst.Molecule(jMol).EqNStatesIn + 1);
+        end
+        
         
         %% Reading QNsEnBin
         opts = delimitedTextImportOptions("NumVariables", 6);

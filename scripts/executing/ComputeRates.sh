@@ -794,7 +794,7 @@ function PostTrajectoriesAtNode {
                   
 
   # if [[ ${NProc} -eq 1 ]]; then
-  #   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${SplitPESsFlg}' ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
+  #   bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} ${iProc} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}
   # elif [[ ${NProc} -eq 2 ]]; then
   #   parallel --xapply -j 2 "bash ${COARSEAIR_SH_DIR}/PostTrajectoriesAtProc.sh ${COARSEAIR_OUTPUT_DIR} ${SplitPESsFlg} ${NPESs} ${iPESStart} ${TranFlg} ${Tran} ${Tint} ${Velocity} ${iNode} {1} ${NMolecules} ${SymmFlg} ${NLevels1} ${MinLevel1} ${NLevels2} ${MinLevel2} ${RmTrajFlg} ${BinaryTrajFlg} ${MinProcessInNode} ${MaxProcessInNode} ${NProcessesPerProc}" ::: {1..2} 
   # elif [[ ${NProc} -eq 4 ]]; then

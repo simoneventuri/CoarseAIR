@@ -911,8 +911,13 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, 
       iMolFin  = Collision%Pairs(iPFin)%To_Molecule
       jMolFin  = Collision%Pairs(jPFin)%To_Molecule
 
-      iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
-      jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
+
+      !!! SIMONE CHANGED
+      iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),0)
+      jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),0)
+      !iBinTemp  = Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1))
+      !jBinTemp  = Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2))
+
 
       if (iTypeFin < 2) then
         if ( iBinTemp .eq. -1 ) then

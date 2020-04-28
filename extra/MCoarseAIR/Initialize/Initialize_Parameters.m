@@ -42,6 +42,7 @@ function Initialize_Parameters
         Param.Pair_to_Atoms = [1,2;1,3;2,3];
     else
         Param.Pair_to_Atoms = [1,2;1,3;1,4;2,3;2,4;3,4];
+        Param.iPOpp         = [6,5,4,3,2,1];
     end
     
     Param.iFigure  = 1;

@@ -46,6 +46,7 @@ Input.Kin.Proc.DissInelFlg  = 1
 Input.Kin.Proc.InelFlg      = 1
 Input.Kin.Proc.ExchFlg1     = 1
 Input.Kin.Proc.ExchFlg2     = 0
+Input.Kin.RateSource        = 'CoarseAIR' % CoarseAIR / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint'
 Input.ReLoad                = 1
 
@@ -100,7 +101,7 @@ for iT = 1:length(Temp.TranVec)
         Read_EeV_and_Q_CG(); 
         
         %% Reading Rates
-        Read_Rates_FromHDF5();
+        Read_Rates();
         
         %% Reading Thermodynamics Variables Outputted by KONIG
         Read_KONIGBox() 
