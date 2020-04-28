@@ -120,14 +120,14 @@ function PostTrajectoriesHERE
     iPES=0
   else
     iPESEnd=$((iPESStart + NPESs - 1))
-    if [[ ${NTraj} -gt 0 ]]; then     
-      echo "      [PostTrajectoriesHERE]:         Calling SplitTrajsPESs"
+    # if [[ ${NTraj} -gt 0 ]]; then     
+    #   echo "      [PostTrajectoriesHERE]:         Calling SplitTrajsPESs"
       
-      ########################################################################################################################################################################## <= SplitTrajsPESsHERE
-      SplitTrajsPESsHERE
-      ########################################################################################################################################################################## <= SplitTrajsPESsHERE
+    #   ########################################################################################################################################################################## <= SplitTrajsPESsHERE
+    #   SplitTrajsPESsHERE
+    #   ########################################################################################################################################################################## <= SplitTrajsPESsHERE
 
-    fi
+    # fi
     iPES=${iPESStart}
   fi
 
@@ -142,21 +142,21 @@ function PostTrajectoriesHERE
     ###########################################################################################################
     ## If We are Splitting Trajectories, then we need new Definitions of TrajFile, NTrajFile, and TrajErrorFile
     ## 
-    if [ ${SplitPESsFlg} -eq 1 ]; then 
-      echo "      [PostTrajectoriesHERE]: ------- PES "${iPES}" ----------------------- "    
-      #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
-      TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES}
-      NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'.${iPES}
-      TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat".${iPES}
-      if [ -f ${TrajFile} ]; then                                                              
-        NTraj=$(wc -l < ${TrajFile})                                                        
-        NTraj=$((NTraj-1))
-      else 
-        NTraj=0
-      fi
-      echo ${NTraj} > ${NTrajFile}
-      echo "      [PostTrajectoriesHERE]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
-    fi
+    # if [ ${SplitPESsFlg} -eq 1 ]; then 
+    #   echo "      [PostTrajectoriesHERE]: ------- PES "${iPES}" ----------------------- "    
+    #   #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
+    #   TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES}
+    #   NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'.${iPES}
+    #   TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat".${iPES}
+    #   if [ -f ${TrajFile} ]; then                                                              
+    #     NTraj=$(wc -l < ${TrajFile})                                                        
+    #     NTraj=$((NTraj-1))
+    #   else 
+    #     NTraj=0
+    #   fi
+    #   echo ${NTraj} > ${NTrajFile}
+    #   echo "      [PostTrajectoriesHERE]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
+    # fi
         
 
     ###########################################################################################################
@@ -235,8 +235,8 @@ function PostTrajectoriesHERE
     ## Cleaning Files for the Current PES
     ##
     if [ ${SplitPESsFlg} -eq 1 ]; then 
-      rm -rf ${TrajFile}
-      rm -rf ${NTrajFile}
+      # rm -rf ${TrajFile}
+      # rm -rf ${NTrajFile}
       rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/statistics*.{iPES}
       echo "      [PostTrajectoriesHERE]: ------- PES "${iPES} " --------------- DONE - "
     fi

@@ -191,7 +191,7 @@ Subroutine ReadInputs( This, i_Debug )
   type(File_Type)                                                       ::    DataFile
   integer                                                               ::    iTrajExcluded
   character(10)                                                         ::    iTrajExcluded_Char
-  integer(rkp)                                                          ::    iTemp1, iTemp2
+  integer(rkp)                                                          ::    iTemp1, iTemp2, PESoI
   real(rkp)                                                             ::    Temp1, Temp2
   real(rkp)             ,dimension(:) ,allocatable                      ::    TempVec1, TempVec2 
 
@@ -204,13 +204,13 @@ Subroutine ReadInputs( This, i_Debug )
 !     OPENING AND WRITING HEADER FOR THE PROGRESS FILE
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Opening the data file" )
-  if (This%PESoI == 0) then
+  !!!!if (This%PESoI == 0) then
     !DataFile%Name     =   'trajectories.out'                                                                                        !# FOR COMPATIBILITY WITH CG-QCT CODE
     DataFile%Name     =   'trajectories.csv'                                                                                         !#
-  else
-    !DataFile%Name     =   trim(adjustl( 'trajectories.out.' // trim(adjustl(This%PESoI_char)) ))                                     !# FOR COMPATIBILITY WITH CG-QCT CODE
-    DataFile%Name     =   trim(adjustl( 'trajectories.csv.' // trim(adjustl(This%PESoI_char)) ))                                     !#
-  end if
+  !!!!else
+  !!!! !DataFile%Name     =   trim(adjustl( 'trajectories.out.' // trim(adjustl(This%PESoI_char)) ))                                     !# FOR COMPATIBILITY WITH CG-QCT CODE
+  !!!!  DataFile%Name     =   trim(adjustl( 'trajectories.csv.' // trim(adjustl(This%PESoI_char)) ))                                     !#
+  !!!!end if
   open( NewUnit=DataFile%Unit, File=DataFile%Name, Action='READ', Form='FORMATTED', iostat=DataFile%Status )
   if (DataFile%Status/=0) call Error( "Error opening file: " // DataFile%Name )
   DataFile%Format   =   "( i9,3x, 2(es15.8,3x), 2(4(i3,3x)))"
@@ -229,12 +229,16 @@ Subroutine ReadInputs( This, i_Debug )
   iTraj         =   0
   iTrajExcluded =   0
   do
-    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iTemp2, Temp1, Temp2, TempVec1, TempVec2 
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2 
+    
+    PESoI = iPES
+    if (This%PESoI /= 0) PESoI = This%PESoI
+
     if ( DataFile%Status == IOStat_End ) exit                                                                                     
-    !if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )                        
+    
     if (DataFile%Status/=0) then
       iTrajExcluded = iTrajExcluded + 1
-    else
+    else if (iPES == PESoI) then
       iTraj         = iTraj + 1                                                                                  
     end if
     if ( Limit .and. iTraj > This%NTrajectoriesToAnalyze ) exit                                                 
@@ -274,13 +278,16 @@ Subroutine ReadInputs( This, i_Debug )
   read(DataFile%Unit,*)                                                                                     
   iTraj=0
   do                                                                                     
-    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iTemp2, Temp1, Temp2, TempVec1, TempVec2 
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2 
     !if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
-    if (DataFile%Status==0) then
+    
+    PESoI = iPES
+    if (This%PESoI /= 0) PESoI = This%PESoI
+    
+    if ( (DataFile%Status==0) .and. (iPES == PESoI) ) then
       iTraj = iTraj+1 
 
       Idx                   = iTemp1
-      iPES                  = iTemp2
       This%bMax(iTraj)      = Temp1
       This%bSampled(iTraj)  = Temp2
       This%Qini(:,iTraj)    = TempVec1

@@ -47,8 +47,8 @@ Program TrajectoriesStats
   integer                                 ::    Status
   integer                                 ::    StatReadsBinary
   character(1)                            ::    StatReadsBinaryChar
-  logical                                 ::    i_Debug_TS      = .False.
-  logical                                 ::    i_Debug_TS_Deep = .False.
+  logical                                 ::    i_Debug_TS      = .True.
+  logical                                 ::    i_Debug_TS_Deep = .True.
 !  real(rkp)                               ::    StartTime, EndTime
 
 
