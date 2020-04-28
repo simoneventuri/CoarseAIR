@@ -1,8 +1,8 @@
 #!/bin/bash
-#PBS -q debug
+#PBS -q low
 #PBS -l select=
 #PBS -N PostTraj_
-#PBS -l walltime=2:00:00
+#PBS -l walltime=4:00:00
 #PBS -o PostTraj_
 
 
