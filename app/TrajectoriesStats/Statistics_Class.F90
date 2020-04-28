@@ -22,7 +22,7 @@
 
 Module Statistics_Class
 
-  use Parameters_Module     ,only:  rkp
+  use Parameters_Module     ,only:  rkp, Zero
   use Logger_Class          ,only:  Logger
   use Error_Class           ,only:  Error
   use File_Class            ,only:  File_Type
@@ -46,6 +46,10 @@ Module Statistics_Class
     real(rkp)       ,dimension(:)   ,allocatable  ::    bMax                                          !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories.
     real(rkp)       ,dimension(:,:) ,allocatable  ::    Qini                                          !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions.
     real(rkp)       ,dimension(:,:) ,allocatable  ::    Qfin                                          !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bSampled_TEMP                                 !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bMax_TEMP                                     !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories.
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qini_TEMP                                     !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions.
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qfin_TEMP                                     !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions.
     integer(rkp)    ,dimension(:)   ,allocatable  ::    IniStateCode                                  !Dim[NTraj]                     !< Vector of Identification Nbs for the Trajectories' Initial States.
     integer(rkp)    ,dimension(:)   ,allocatable  ::    SortedIndx_IniStateCode                       !Dim[NTraj]                     !< Sorted Indx for the Vector of Identification Nbs.
     real(rkp)       ,dimension(:)   ,allocatable  ::    RingArea                                      !Dim[<= NRings]                 !< Vector of Impact Parameters' Rings Areas.
@@ -191,6 +195,7 @@ Subroutine ReadInputs( This, i_Debug )
   type(File_Type)                                                       ::    DataFile
   integer                                                               ::    iTrajExcluded
   character(10)                                                         ::    iTrajExcluded_Char
+  character(150)                                                        ::    FileName
   integer(rkp)                                                          ::    iTemp1, iTemp2, PESoI
   real(rkp)                                                             ::    Temp1, Temp2
   real(rkp)             ,dimension(:) ,allocatable                      ::    TempVec1, TempVec2 
@@ -267,9 +272,21 @@ Subroutine ReadInputs( This, i_Debug )
 ! ==============================================================================================================
 !   IDENTIFYING AND SORTING INITIAL STATES AND IMPACT PARAMETER RINGS
 ! ==============================================================================================================
+
+
+
+  !!!! !DataFile%Name     =   trim(adjustl( 'trajectories.out.' // trim(adjustl(This%PESoI_char)) ))                                     !# FOR COMPATIBILITY WITH CG-QCT CODE
+  !!!!  DataFile%Name     =   trim(adjustl( 'trajectories.csv.' // trim(adjustl(This%PESoI_char)) ))                                     !#
+  !!!!end if
+
   if (This%StatWritesBinaryFlg) then
-    open( NewUnit=UnitWrite, File='./trajectories.bin', Action='WRITE', access="Stream", form="Unformatted", iostat=StatusWrite )
-    if (StatusWrite/=0) call Error( "Error writing the binary data file for statistics: " // './trajectories.bin'  ) 
+    if (This%PESoI == 0) then
+      FileName ='./trajectories.bin'
+    else
+      FileName ='./trajectories.bin.' // trim(adjustl(This%PESoI_char))
+    end if
+    open( NewUnit=UnitWrite, File=trim(adjustl(FileName)), Action='WRITE', access="Stream", form="Unformatted", iostat=StatusWrite )
+    if (StatusWrite/=0) call Error( "Error writing the binary data file for statistics: " // trim(adjustl(FileName))  ) 
       write(UnitWrite) int(This%NTraj, rkp)
   end if
 
@@ -334,12 +351,14 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
   logical                                       ,optional ,intent(in)   ::    i_Debug
 
   logical                                                               ::    i_Debug_Loc
-  integer(rkp)                                                          ::    iTraj, Idx, iPES
+  integer(rkp)                                                          ::    iTraj, jTraj, Idx, iPES
   logical                                                               ::    Limit                                               ! TRUE if There is a limit on the Nb of Trajs to Analyze
   Integer                                                               ::    iCond
-  Integer                                                               ::    POSTemp, TotBytes
+  Integer                                                               ::    POSTemp, TotBytes, PESoI
   Integer                                                               ::    UnitWrite, StatusWrite
   type(File_Type)                                                       ::    DataFile
+  real(rkp)                                                             ::    bMax_TEMP, bSampled_TEMP
+  real(rkp)               ,dimension(:) ,allocatable                    ::    Qini_TEMP,Qfin_TEMP
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
@@ -373,10 +392,18 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
     ! ==============================================================================================================
     !     ALLOCATE THE DATA
     ! ==============================================================================================================
-    allocate( This%bMax(This%NTraj) )
-    allocate( This%bSampled(This%NTraj) )
-    allocate( This%Qini(This%NCond,This%NTraj) )
-    allocate( This%Qfin(This%NCond,This%NTraj) )
+    allocate( This%bMax_TEMP(This%NTraj) )
+    allocate( This%bSampled_TEMP(This%NTraj) )
+    allocate( This%Qini_TEMP(This%NCond,This%NTraj) )
+    allocate( This%Qfin_TEMP(This%NCond,This%NTraj) )
+
+    This%bMax_TEMP(This%NTraj)            = Zero
+    This%bSampled_TEMP(This%NTraj)        = Zero
+    This%Qini_TEMP(This%NCond,This%NTraj) = Zero
+    This%Qfin_TEMP(This%NCond,This%NTraj) = Zero
+
+    allocate( Qini_TEMP(This%NCond) )
+    allocate( Qfin_TEMP(This%NCond) )
     ! ==============================================================================================================
 
 
@@ -386,6 +413,8 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "Reading the trajectory data: bMax, bSampled, Qini, Qfin" )
     
     TotBytes = int(2 * rkp) + int(2 * rkp) + int(This%NCond * rkp) + int(This%NCond * rkp)
+    
+    jTraj    = 0
     do iTraj = 1,This%NTraj
 
       POSTemp = rkp + (iTraj-1)*TotBytes + 1
@@ -393,32 +422,75 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
       
       POSTemp = rkp + (iTraj-1)*TotBytes + 1 + rkp
       read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) iPES
-      
+      PESoI = iPES
+      if (This%PESoI /= 0) PESoI = This%PESoI
+     
       POSTemp = rkp + (iTraj-1)*TotBytes + 1 + int(2*rkp)
-      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bMax(iTraj)
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) bMax_TEMP
       
       POSTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp)
-      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%bSampled(iTraj)  
+      read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) bSampled_TEMP
       
       do iCond = 1,This%NCond
         PosTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp) + iCond*rkp
-        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qini(iCond,iTraj)  
+        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) Qini_TEMP(iCond)  
       end do
       
       do iCond = 1,This%NCond
         PosTemp = rkp + (iTraj-1)*TotBytes + 1 + int(3*rkp) + int(This%NCond*rkp) + iCond*rkp
-        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) This%Qfin(iCond,iTraj)  
+        read(DataFile%Unit, POS=PosTemp, iostat=DataFile%Status ) Qfin_TEMP(iCond)  
       end do                                                                              
-      
-      if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )      
-      if (i_Debug_Loc) then
-        call Logger%Write( "-> Done reading the trajectory data" )
-        call Logger%Write( "-> Last line: iTraj = ", "This%bMax(iTraj) = ", This%bMax(This%NTraj), "This%bSampled(iTraj) = ", This%bSampled(This%NTraj), Fi="i9", Fr="es15.8")
+
+      if (iPES == PESoI) then
+        jTraj = jTraj + 1
+
+        This%bMax_TEMP(jTraj)     = bMax_TEMP
+        This%bSampled_TEMP(jTraj) = bSampled_TEMP
+        This%Qini_TEMP(:,jTraj)   = Qini_TEMP
+        This%Qfin_TEMP(:,jTraj)   = Qfin_TEMP
+
+        if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )      
+        if (i_Debug_Loc) then
+          call Logger%Write( "-> Idx           = ", Idx )
+          call Logger%Write( "-> iPES          = ", iPES )
+          call Logger%Write( "-> bMax_TEMP     = ", bMax_TEMP )
+          call Logger%Write( "-> bSampled_TEMP = ", bSampled_TEMP )
+          call Logger%Write( "-> Qini_TEMP     = ", Qini_TEMP )
+          call Logger%Write( "-> Qfin_TEMP     = ", Qfin_TEMP )
+          call Logger%Write( "=============================================" )
+        end if
+
       end if
     end do
     
   call DataFile%Close()
   ! ==============================================================================================================
+
+
+  This%NTraj = jTraj
+  if (i_Debug_Loc) call Logger%Write( "-> New Number of trajectories: This%NTraj = ", This%NTraj )
+
+
+  ! ==============================================================================================================
+  !     ALLOCATE THE DATA
+  ! ==============================================================================================================
+  allocate( This%bMax(This%NTraj) )
+  allocate( This%bSampled(This%NTraj) )
+  allocate( This%Qini(This%NCond,This%NTraj) )
+  allocate( This%Qfin(This%NCond,This%NTraj) )
+
+  This%bMax(1:This%NTraj)     = This%bMax_TEMP(1:This%NTraj)
+  This%bSampled(1:This%NTraj) = This%bSampled_TEMP(1:This%NTraj)
+  This%Qini(:,1:This%NTraj)   = This%Qini_TEMP(:,1:This%NTraj)
+  This%Qfin(:,1:This%NTraj)   = This%Qfin_TEMP(:,1:This%NTraj)
+
+  deallocate( This%bMax_TEMP )
+  deallocate( This%bSampled_TEMP )
+  deallocate( This%Qini_TEMP )
+  deallocate( This%Qfin_TEMP)
+  if (i_Debug_Loc) call Logger%Write( "-> This%bSampled = ", This%bSampled )
+  ! ==============================================================================================================
+
 
 
   ! ==============================================================================================================
@@ -542,6 +614,9 @@ Subroutine IdentifyInitialStates( This, i_Debug, i_Debug_Deep )
 
   allocate( This%IniStateCode(This%NTraj) )
   allocate( This%SortedIndx_IniStateCode(This%NTraj) )
+
+
+  if (i_Debug_Loc) call Logger%Write( "This%Qini = ", This%Qini )
 
   do iTraj = 1,This%NTraj
 
