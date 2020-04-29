@@ -51,17 +51,9 @@ Input.FigureFormat          = 'PrePrint'
 Input.ReLoad                = 1
 
 
-%% Inputs for Plotting
-Input.iFig               = 1
-Input.SaveFigsFlgInt     = 0
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CO2_Paper/Figures/Temp/CO+O/'
-
-
-%% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/CO+O/'
-
 
 %% Tasks Inputs
+
 % Plotting Mole Fractions
 Input.Tasks.Plot_MoleFracs.Flg       = true
 Input.Tasks.Plot_MoleFracs.CompStart = 3
@@ -69,6 +61,12 @@ Input.Tasks.Plot_MoleFracs.CompEnd   = 3
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg     = true
 
+
+
+%% Plots Inputs
+Input.iFig           = 1
+Input.SaveFigsFlgInt = 0
+Input.SaveFigsFldr   = 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

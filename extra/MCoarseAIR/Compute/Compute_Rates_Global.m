@@ -30,16 +30,40 @@ function Compute_Rates_Global()
     
     
     if (Syst.NAtoms == 3)
-    
         
         
-    else 
+        iMol   = Syst.Pair(1).ToMol;
+        iNBins = Syst.Molecule(iMol).EqNStatesIn;
+        
+        ExchTot = zeros(iNBins, Syst.NProc-2);
+        for iExch = 1:Syst.NProc-2
+            ExchTot(:,iExch) = sum(Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+        end
+        
+        Rates.T(Temp.iT).DissGlobal = zeros(Kin.T(Temp.iT).NSteps,1);
+        Rates.T(Temp.iT).ExchGlobal = zeros(Kin.T(Temp.iT).NSteps,Syst.NProc-2);
+        
+        for iStep = 1:Kin.T(Temp.iT).NSteps
+            Rates.T(Temp.iT).DissGlobal(iStep)           = sum( Rates.T(Temp.iT).Diss(:,1) .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+            for iExch = 1:Syst.NProc-2
+                Rates.T(Temp.iT).ExchGlobal(iStep,iExch) = sum( ExchTot(:,iExch)           .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+            end
+        end
+        
+        fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
+        fprintf('====================================================\n')
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
+        for iExch = 1:Syst.NProc-2
+            fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
+        end
+        fprintf('====================================================\n\n')
 
+        
+    else
+        
+        
         iMol   = Syst.Pair(1).ToMol;
         jMol   = Syst.Pair(6).ToMol;
-
-        iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
-        jQTemp = Syst.Molecule(jMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(jMol).T(Temp.iT).GroupsIn.QTot;
 
         Rates.T(Temp.iT).DissGlobal          = zeros(Kin.T(Temp.iT).NSteps,1);
         Rates.T(Temp.iT).DissGlobal_Diss     = zeros(Kin.T(Temp.iT).NSteps,1);
@@ -60,11 +84,19 @@ function Compute_Rates_Global()
             end
 
             Rates.T(Temp.iT).DissGlobal(iStep)                  = Rates.T(Temp.iT).DissGlobal_Diss(iStep)     + Rates.T(Temp.iT).DissGlobal_DissInel(iStep);
-        
+
         end
+        
+        fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
+        fprintf('====================================================\n')
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
+%         for iExch = 1:Syst.NProc-2
+%             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
+%         end
+        fprintf('====================================================\n\n')
+        
         
     end
     
-    sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1)))
-
+    
 end

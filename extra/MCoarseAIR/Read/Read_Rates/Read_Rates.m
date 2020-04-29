@@ -29,17 +29,39 @@ function Read_Rates()
     global Input Rates Syst Temp
   
     
-    iMol    = Syst.Pair(1).ToMol;
-    jMol    = Syst.Pair(6).ToMol;
-    iNBins  = Syst.Molecule(iMol).EqNStatesIn;
-    jNBins  = Syst.Molecule(iMol).EqNStatesIn;    
+    if (Syst.NAtoms == 3)
+        
+        iMol    = Syst.Pair(1).ToMol;
+        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
     
-    
-    Rates.T(Temp.iT).Diss     = zeros(iNBins, jNBins, 4);
-    Rates.T(Temp.iT).DissInel = zeros(iNBins, jNBins, iNBins, Syst.NMolecules+6);
-    Rates.T(Temp.iT).Inel     = zeros(iNBins, jNBins, iNBins, jNBins);
-    Rates.T(Temp.iT).Exch     = zeros(iNBins, jNBins, iNBins, jNBins);
+        Rates.T(Temp.iT).Diss                 = zeros(iNBins, 4);
+        Rates.T(Temp.iT).Inel                 = zeros(iNBins, iNBins);
+        for iExch = 1:size(Syst.ExchToMol,1)
+            kMol    = Syst.ExchToMol(iExch,1);
+            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
+            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, kNBins);
+        end
+        
+    else
 
+        iMol    = Syst.Pair(1).ToMol;
+        jMol    = Syst.Pair(6).ToMol;
+        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
+        jNBins  = Syst.Molecule(jMol).EqNStatesIn;    
+
+        Rates.T(Temp.iT).Diss                 = zeros(iNBins, jNBins, 4);
+        Rates.T(Temp.iT).DissInel             = zeros(iNBins, jNBins, iNBins, Syst.NMolecules+6);
+        Rates.T(Temp.iT).Inel                 = zeros(iNBins, jNBins, iNBins, jNBins);
+        for iExch = 1:size(Syst.ExchToMol,1)
+            kMol    = Syst.ExchToMol(iExch,1);
+            lMol    = Syst.ExchToMol(iExch,2);
+            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
+            lNBins  = Syst.Molecule(lMol).EqNStatesIn; 
+            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, jNBins, kNBins, lNBins);
+        end
+        
+    end
+    
     
     if strcmp(Input.Kin.RateSource, 'HDF5')
         
@@ -50,6 +72,10 @@ function Read_Rates()
         Read_Rates_FromPLATO();
         
     elseif strcmp(Input.Kin.RateSource, 'CoarseAIR')
+        
+        Read_Rates_FromCoarseAIR() 
+        
+    elseif strcmp(Input.Kin.RateSource, 'CG-QCT')
         
         Read_Rates_FromCoarseAIR() 
    

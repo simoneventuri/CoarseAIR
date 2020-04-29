@@ -26,7 +26,25 @@ function Compute_Rates_StS_FromTrajectories()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Rates Syst Temp Kin
+    global Rates Syst Temp Kin Input
+    
+    
+    opts = delimitedTextImportOptions("NumVariables", 4);
+    opts.DataLines = [2, Inf];
+    opts.Delimiter = " ";
+    opts.VariableNames = ["vv", "Var2", "Var3", "Var4"];
+    opts.SelectedVariableNames = "vv";
+    opts.VariableTypes = ["double", "string", "string", "string"];
+    opts.ExtraColumnsRule = "ignore";
+    opts.EmptyLineRule = "read";
+    opts.ConsecutiveDelimitersRule = "join";
+    opts.LeadingDelimitersRule = "ignore";
+    opts = setvaropts(opts, ["Var2", "Var3", "Var4"], "WhitespaceRule", "preserve");
+    opts = setvaropts(opts, ["Var2", "Var3", "Var4"], "EmptyFieldRule", "auto");
+    FileName = strcat(Input.Paths.ToQCTFldr, '/Velocity_', Temp.TNowChar, '.0.dat');
+    tbl = readtable("/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/Velocity_20000.0.dat", opts);
+    vv  = tbl.vv;
+    clear opts tbl
     
     
     if (Syst.NAtoms == 3)
@@ -103,14 +121,11 @@ function Compute_Rates_StS_FromTrajectories()
                     end
 
                     Rates.T(Temp.iT).Diss(iBin,jBin,1)       = sum(DissVecTemp_1 ./ TotTraj .* bVecRing) .* vv;
-                    Rates.T(Temp.iT).DissInel(iBin,jBin,:,1) = zeros(NBins,     1); 
-                    InelMat_1(iBin,jBin,:,:) = zeros(NBins, NBins); 
-                    ExchMat_1(iBin,jBin,:,:) = zeros(NBins, NBins); 
-                    for i=1:NBins
-                        DissMat_1(iBin,jBin,i)       = sum(squeeze(DissMatTemp_1(i,:))' ./  TotTraj .* bVecRing) .* vv;
-                        for j=1:NBins
-                            InelMat_1(iBin,jBin,i,j) = sum(squeeze(InelMatTemp_1(i,j,:)) ./ TotTraj .* bVecRing) .* vv;
-                            ExchMat_1(iBin,jBin,i,j) = sum(squeeze(ExchMatTemp_1(i,j,:)) ./ TotTraj .* bVecRing) .* vv;
+                    for kBin = 1:iNBins
+                        Rates.T(Temp.iT).DissInel(iBin,jBin,kBin,lBin)    = sum(squeeze(DissMatTemp_1(kBin,:))'     ./ TotTraj .* bVecRing) .* vv;
+                        for lBin = 1:jNBins
+                            Rates.T(Temp.iT).InelMat(iBin,jBin,kBin,lBin) = sum(squeeze(InelMatTemp_1(kBin,lBin,:)) ./ TotTraj .* bVecRing) .* vv;
+                            Rates.T(Temp.iT).ExchMat(iBin,jBin,kBin,lBin) = sum(squeeze(ExchMatTemp_1(kBin,lBin,:)) ./ TotTraj .* bVecRing) .* vv;
                         end
                     end
 
@@ -120,39 +135,7 @@ function Compute_Rates_StS_FromTrajectories()
             end
         end
 
-        
-        
-
-        iMol   = Syst.Pair(1).ToMol;
-        jMol   = Syst.Pair(6).ToMol;
-
-        iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
-        jQTemp = Syst.Molecule(jMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(jMol).T(Temp.iT).GroupsIn.QTot;
-
-        Rates.T(Temp.iT).DissGlobal          = zeros(Kin.T(Temp.iT).NSteps,1);
-        Rates.T(Temp.iT).DissGlobal_Diss     = zeros(Kin.T(Temp.iT).NSteps,1);
-        Rates.T(Temp.iT).DissGlobal_DissInel = zeros(Kin.T(Temp.iT).NSteps,1);
-        
-        for iStep = 1:Kin.T(Temp.iT).NSteps
-
-            for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
-                for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                    Rates.T(Temp.iT).DissGlobal_Diss(iStep)     = Rates.T(Temp.iT).DissGlobal_Diss(iStep)     + 2.0 * Rates.T(Temp.iT).Diss(iBin,jBin,1)            * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
-                end
-            end
-
-            for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
-                for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                    Rates.T(Temp.iT).DissGlobal_DissInel(iStep) = Rates.T(Temp.iT).DissGlobal_DissInel(iStep) + sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1)))  * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
-                end
-            end
-
-            Rates.T(Temp.iT).DissGlobal(iStep)                  = Rates.T(Temp.iT).DissGlobal_Diss(iStep)     + Rates.T(Temp.iT).DissGlobal_DissInel(iStep);
-        
-        end
-        
     end
     
-    sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1)))
-
+    
 end

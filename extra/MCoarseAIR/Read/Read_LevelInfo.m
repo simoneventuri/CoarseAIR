@@ -74,12 +74,21 @@ function ReadLevelInfo()
             Syst.Molecule(iMol).EqNStatesIn = Syst.Molecule(iMol).NGroupsIn;
         end
         
+        
+        %% Computing the Overall number of possible final processes
         Syst.NTotProc = 1;
-        for iP = 1:3
-           jP            = Param.iPOpp(iP);
-           iMol          = Syst.Pair(iP).ToMol;
-           jMol          = Syst.Pair(jP).ToMol;
-           Syst.NTotProc = Syst.NTotProc + (Syst.Molecule(iMol).EqNStatesIn + 1) * (Syst.Molecule(jMol).EqNStatesIn + 1);
+        if Syst.NAtoms == 3
+            for kP = 1:3
+               kMol          = Syst.Pair(kP).ToMol;
+               Syst.NTotProc = Syst.NTotProc + (Syst.Molecule(kMol).EqNStatesIn + 1);
+            end
+        else
+            for kP = 1:3
+               lP            = Param.iPOpp(kP);
+               kMol          = Syst.Pair(kP).ToMol;
+               lMol          = Syst.Pair(lP).ToMol;
+               Syst.NTotProc = Syst.NTotProc + (Syst.Molecule(kMol).EqNStatesIn + 1) * (Syst.Molecule(lMol).EqNStatesIn + 1);
+            end
         end
         
         

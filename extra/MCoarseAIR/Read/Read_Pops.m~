@@ -72,7 +72,7 @@ function Read_Pops()
             fprintf('Found %i Steps in the 0-D Solution', Kin.T(Temp.iT).NSteps) 
             
             NSteps   = Kin.T(Temp.iT).NSteps;
-            PopOverg = Kin.T(Temp.iT).Molecule(iMol).PopOverg; 
+            PopOverg = Kin.T(Temp.iT).Molecule(iMol).PopOverQ; 
             save(PopFile, 'NSteps', 'PopOverg', '-v7.3');
             
             
@@ -83,7 +83,7 @@ function Read_Pops()
         for iStep = 1:Kin.T(Temp.iT).NSteps
             Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:) .* Syst.Molecule(iMol).T(Temp.iT).GroupsIn.g';
             TotPop   = sum(Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:));
-            Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)  = Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) ./ TotPop;
+            Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:) = Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) ./ TotPop;
         end
         
         

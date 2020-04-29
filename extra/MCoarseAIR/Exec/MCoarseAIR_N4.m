@@ -46,7 +46,7 @@ Input.Kin.Proc.DissInelFlg  = 1
 Input.Kin.Proc.InelFlg      = 1
 Input.Kin.Proc.ExchFlg1     = 1
 Input.Kin.Proc.ExchFlg2     = 0
-Input.Kin.RateSource        = 'CoarseAIR' % CoarseAIR / HDF5 / PLATO
+Input.Kin.RateSource        = 'HDF5' % CoarseAIR / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint'
 Input.ReLoad                = 1
 

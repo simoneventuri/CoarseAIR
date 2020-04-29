@@ -47,17 +47,25 @@ function Read_EeV_and_Q_CG()
 %         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = tbl.EnergyeV + Syst.Molecule(iMol).EeVRef;
 %         clear opts tbl 
 
+
         %% Read Compute Group Energy and Part Function
-        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* ( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
+        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* exp( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
         
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
         for iLevel = 1:Syst.Molecule(iMol).NLevels
-            iBin                                              = Syst.Molecule(iMol).LevelToBin(iLevel);
-            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
-            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel) * Syst.Molecule(iMol).LevelEeV(iLevel);
+            iBin = Syst.Molecule(iMol).LevelToBin(iLevel);
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)     = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin)   = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel) * Syst.Molecule(iMol).LevelEeV(iLevel);          
         end
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q;
+        
+        if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.g = Syst.Molecule(iMol).Levelg;
+        else
+            Syst.Molecule(iMol).T(Temp.iT).GroupsIn.g = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin);
+        end
+        
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot   = sum(Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q);
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QRatio = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
         

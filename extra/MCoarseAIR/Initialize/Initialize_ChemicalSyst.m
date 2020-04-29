@@ -30,7 +30,9 @@ function Initialize_ChemicalSyst()
     if strcmp(Input.SystNameLong, 'CO2_NASA')
         
         %%% System
-        Syst.Name = 'CO2'
+        Syst.Name  = 'CO2'
+        
+        Syst.NProc = 4 %(Diss+Inel+Exch+Exch)
         
         
         %%% Atoms
@@ -124,13 +126,15 @@ function Initialize_ChemicalSyst()
         Syst.CFDComp(3).RxLxIdx =  1;
         Syst.CFDComp(4).RxLxIdx =  0;
         
-        
-        %% Exchange Properties
         Syst.MolToCFDComp       = [3, 4];
 
+        
+        %% Exchange Properties
         Syst.ExchToMol          = [1; 2];
         Syst.ExchToAtom         = [3; 1];
 
+        Syst.PairToExch         = [1; 2];
+        
         Syst.ColPartToComp      = 0; 
         
 
@@ -618,6 +622,8 @@ function Initialize_ChemicalSyst()
 
         %%% System
         Syst.Name = 'N4'
+        
+        Syst.NProc = 3 %(Diss+Inel+Exch)
         
         
         %%% Atoms

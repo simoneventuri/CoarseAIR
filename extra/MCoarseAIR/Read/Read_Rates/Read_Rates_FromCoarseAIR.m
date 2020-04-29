@@ -29,25 +29,111 @@ function Read_Rates_FromCoarseAIR()
     global Input Rates Syst Temp Param  
     
     
+    RatesFile = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates');
+
+        
     if (Syst.NAtoms == 3)
         
-        iMol    = Syst.Pair(1).ToMol;
-        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
-    
+        if isfile(strcat(RatesFile,'.mat'))
         
+           if size(Syst.ExchToMol,1) == 1
+                load(strcat(RatesFile,'.mat'), 'Diss', 'Inel', 'Exch1')
+                Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
+            elseif size(Syst.ExchToMol,1) == 2
+                load(strcat(RatesFile,'.mat'), 'Diss', 'Inel', 'Exch1', 'Exch2')
+                Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
+                Rates.T(Temp.iT).ExchType(2).Exch = Exch2;
+            end
+            Rates.T(Temp.iT).Diss     = Diss;
+            Rates.T(Temp.iT).Inel     = Inel;
+
+        else
+            
+            iMol    = Syst.Pair(1).ToMol;
+            iNBins  = Syst.Molecule(iMol).EqNStatesIn;
+    
+            iProc = 1
+            for iBin = 1:iNBins
+                fprintf('i = %i\n', iBin)
+
+                opts = delimitedTextImportOptions("NumVariables", 3);
+                opts.DataLines = [6, Inf];
+                opts.Delimiter = ",";
+                opts.VariableNames = ["jProc", "RateTemp", "Var3"];
+                opts.SelectedVariableNames = ["jProc", "RateTemp"];
+                opts.VariableTypes = ["double", "double", "string"];
+                opts.ExtraColumnsRule = "ignore";
+                opts.EmptyLineRule = "read";
+                opts = setvaropts(opts, "Var3", "WhitespaceRule", "preserve");
+                opts = setvaropts(opts, "Var3", "EmptyFieldRule", "auto");
+                tbl = readtable(strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Proc', num2str(iProc), '.csv'), opts)
+                jProc    = tbl.jProc;
+                RateTemp = tbl.RateTemp;
+                clear opts tbl
+                RatesVec = zeros(Syst.NTotProc,1);
+                if jProc(1) > 0
+                    for ii=1:length(jProc)
+                        RatesVec(jProc(ii)) = RateTemp(ii);
+                    end
+                else
+                    fprintf('  First Process Disregarded\n')
+                end    
+                clear jProc RateTemp
+                pp = 1;
+                for iP = 1:3   
+                    jMol    = Syst.Pair(iP).ToMol;
+                    jNBins  = Syst.Molecule(jMol).EqNStatesIn;
+                    for jBin = 1:jNBins+1
+                        pp       = pp + 1;
+                        TempRate = RatesVec(pp);
+                        if (TempRate > 0.0)
+                            if (jBin==1)
+                                Rates.T(Temp.iT).Diss(iBin,1)                          = Rates.T(Temp.iT).Diss(iBin,1)                      + RatesVec(pp); 
+                                Rates.T(Temp.iT).Diss(iBin,1+iP)                       = Rates.T(Temp.iT).Diss(iBin,1+iP)                   + RatesVec(pp); 
+                           else
+                                if (iP==1)
+                                    Rates.T(Temp.iT).Inel(iBin,jBin-1)                 = Rates.T(Temp.iT).Inel(iBin,jBin-1)                 + RatesVec(pp); 
+                                else
+                                    iExch = Syst.PairToExch(iP-1);
+                                    Rates.T(Temp.iT).ExchType(iExch).Exch(iBin,jBin-1) = Rates.T(Temp.iT).ExchType(iExch).Exch(iBin,jBin-1) + RatesVec(pp);
+                                end
+                            end
+                        end
+                    end
+
+                    iProc=iProc+1;
+                end
+            end    
+
+        end
+        
+        Diss      = Rates.T(Temp.iT).Diss;
+        Inel      = Rates.T(Temp.iT).Inel;
+        if size(Syst.ExchToMol,1) == 1
+            Exch1      = Rates.T(Temp.iT).ExchType(1).Exch;
+            save(RatesFile,'Diss', 'Inel', 'Exch1', '-v7.3');
+        elseif size(Syst.ExchToMol,1) == 2
+            Exch1      = Rates.T(Temp.iT).ExchType(1).Exch;
+            Exch2      = Rates.T(Temp.iT).ExchType(2).Exch;
+            save(RatesFile,'Diss', 'Inel', 'Exch1', 'Exch2', '-v7.3');
+        end
         
         
     else
-        RatesFile = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates');
 
         if isfile(strcat(RatesFile,'.mat'))
-        
-            load(strcat(RatesFile,'.mat'), 'Diss', 'DissInel', 'Inel', 'Exch')
             
+            if size(Syst.ExchToMol,1) == 1
+                load(strcat(RatesFile,'.mat'), 'Diss', 'DissInel', 'Inel', 'Exch1')
+                Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
+            elseif size(Syst.ExchToMol,1) == 2
+                load(strcat(RatesFile,'.mat'), 'Diss', 'DissInel', 'Inel', 'Exch1', 'Exch2')
+                Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
+                Rates.T(Temp.iT).ExchType(2).Exch = Exch2;
+            end
             Rates.T(Temp.iT).Diss     = Diss;
             Rates.T(Temp.iT).DissInel = DissInel;
             Rates.T(Temp.iT).Inel     = Inel;
-            Rates.T(Temp.iT).Exch     = Exch;
 
         else
             
@@ -112,7 +198,8 @@ function Read_Rates_FromCoarseAIR()
                                             if (iP==1)
                                                 Rates.T(Temp.iT).Inel(iBin,jBin,kBin-1,lBin-1) = Rates.T(Temp.iT).Inel(iBin,jBin,kBin-1,lBin-1)       + RatesVec(pp); 
                                             else
-                                                Rates.T(Temp.iT).Exch(iBin,jBin,kBin-1,lBin-1) = Rates.T(Temp.iT).Exch(iBin,jBin,kBin-1,lBin-1)       + RatesVec(pp);
+                                                iExch = 1;
+                                                Rates.T(Temp.iT).ExchType(iExch).Exch(iBin,jBin,kBin-1,lBin-1) = Rates.T(Temp.iT).ExchType(iExch).Exch(iBin,jBin,kBin-1,lBin-1)       + RatesVec(pp);
                                             end
                                         end
                                     end
@@ -130,9 +217,14 @@ function Read_Rates_FromCoarseAIR()
         Diss      = Rates.T(Temp.iT).Diss;
         DissInel  = Rates.T(Temp.iT).DissInel;
         Inel      = Rates.T(Temp.iT).Inel;
-        Exch      = Rates.T(Temp.iT).Exch;
-
-        save(RatesFile,'Diss', 'DissInel', 'Inel','Exch','-v7.3');
+        if size(Syst.ExchToMol,1) == 1
+            Exch1      = Rates.T(Temp.iT).ExchType(1).Exch;
+            save(RatesFile,'Diss', 'DissInel', 'Inel', 'Exch1', '-v7.3');
+        elseif size(Syst.ExchToMol,1) == 2
+            Exch1      = Rates.T(Temp.iT).ExchType(1).Exch;
+            Exch2      = Rates.T(Temp.iT).ExchType(1).Exch;
+            save(RatesFile,'Diss', 'DissInel', 'Inel', 'Exch1', 'Exch2', '-v7.3');
+        end
     
     end
      

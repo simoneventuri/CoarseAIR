@@ -1,6 +1,6 @@
 %% The Function plots the Mole Fractions of the Chemical System's Components 
 %
-function PlotMoleFracs(Controls)    
+function Plot_GlobalRates(Controls)    
     
     %%==============================================================================================================
     % 
@@ -30,12 +30,15 @@ function PlotMoleFracs(Controls)
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
-
+    
+    
     CompNames = [];
-    for iComp = Controls.CompStart:Controls.CompEnd
-      semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
-      hold on
-      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
+    loglog(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
+    hold on
+    for iExch = 1:Syst.NProc-2
+        loglog(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(iExch), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
+        hold on
+        CompNames = [CompNames, Syst.CFDComp(iComp).Name];
     end
     hold on
 
@@ -53,7 +56,7 @@ function PlotMoleFracs(Controls)
     xlab.Interpreter = 'latex';
     %xlim(XLimPlot);
 
-    str_y = ['Mole Fraction'];
+    str_y = ['$\bar{K}$~$[cm^3/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
@@ -62,14 +65,17 @@ function PlotMoleFracs(Controls)
 
 
     if Input.SaveFigsFlgInt > 0
-        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
-        FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
+        Input.Paths.FigFldr  = strcat('./CoarseAIR-',Syst.NameLong,'-Figures/');
+        if Input.SaveFigsFlgInt > 0
+          [status,msg,msgID] = mkdir(Input.Paths.FigFldr)
+        end   
+        FolderPath = strcat(Input.Paths.FigFldr, '/FlowQuantities/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'MoleFractions');
+            FileName   = strcat(FolderPath, 'GlobalRates');
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'MoleFractions.fig');
+            FileName   = strcat(FolderPath, 'GlobalRates.fig');
             savefig(FileName)
         end
         close

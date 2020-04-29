@@ -48,8 +48,6 @@ function Initialize_Parameters
     Param.iFigure  = 1;
     Param.SaveFigs = 0;
   
-    Param.linS     = {'-',':','-.','--'};
-
     if strcmp(Input.FigureFormat, 'PrePrint')
         Param.LineWidth  = 2;
 
@@ -88,16 +86,22 @@ function Initialize_Parameters
         
     end
 
-    Param.RCVec = [255  50  20] ./ 255;
-    Param.BCVec = [  0  70 200] ./ 255;
-    Param.GCVec = [  0 140  50] ./ 255;
     Param.KCVec = [  0   0   0] ./ 255;
+    Param.RCVec = [235, 70, 50] ./ 255;
+    Param.BCVec = [55, 80, 165] ./ 255;
+    Param.PCVec = [190 140 140] ./ 255;
+    Param.GCVec = [65, 140, 70] ./ 255;
+    Param.MCVec = [105  65 155] ./ 255;
+    Param.YCVec = [245 165  50] ./ 255;
     Param.OCVec = [255 105  45] ./ 255;
-    Param.PCVec = [155  45 175] ./ 255;
-    Param.WCVec = [  1   1   1] ./ 255;
     Param.JCVec = [100 100 100] ./ 255;
-    Param.YCVec = [255 255   0] ./ 255;
     Param.CCVec = [205 205 205] ./ 255;
-    Param.MCVec = [100  25  15] ./ 255;
-  
+    
+    Param.CMat  = [Param.KCVec; Param.RCVec; Param.BCVec; 
+                   Param.PCVec; Param.GCVec; Param.MCVec; 
+                   Param.YCVec; Param.OCVec; Param.JCVec; 
+                   Param.CCVec]; 
+
+    Param.linS  = {'-',':','-.','--'};
+
 end

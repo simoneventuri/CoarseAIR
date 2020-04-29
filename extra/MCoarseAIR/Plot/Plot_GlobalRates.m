@@ -1,6 +1,6 @@
 %% The Function plots the Mole Fractions of the Chemical System's Components 
 %
-function PlotMoleFracs(Controls)    
+function Plot_GlobalRates(Controls)    
     
     %%==============================================================================================================
     % 
@@ -23,19 +23,22 @@ function PlotMoleFracs(Controls)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp
+    global Input Kin Param Syst Temp Rates
 
     figure(Input.iFig)
     fig = gcf;
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
-
-    CompNames = [];
-    for iComp = Controls.CompStart:Controls.CompEnd
-      semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
-      hold on
-      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
+    
+    
+    ProcNames = [];
+    loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+    ProcNames = {'$\bar{K}^D$'};
+    hold on
+    for iExch = 1:Syst.NProc-2
+        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(:,iExch), 'Color', Param.CMat(iExch+1,:), 'linestyle', char(Param.linS(iExch+1)), 'LineWidth', Param.LineWidth)
+        ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
     end
     hold on
 
@@ -44,7 +47,7 @@ function PlotMoleFracs(Controls)
     yt = get(gca, 'YTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-    clab             = legend(CompNames, 'Location', 'Best');
+    clab             = legend(ProcNames, 'Location', 'Best');
     clab.Interpreter = 'latex';
     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
 
@@ -53,7 +56,7 @@ function PlotMoleFracs(Controls)
     xlab.Interpreter = 'latex';
     %xlim(XLimPlot);
 
-    str_y = ['Mole Fraction'];
+    str_y = ['$\bar{K}$~$[cm^3/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
@@ -66,10 +69,10 @@ function PlotMoleFracs(Controls)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'MoleFractions');
+            FileName   = strcat(FolderPath, 'GlobalRates');
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'MoleFractions.fig');
+            FileName   = strcat(FolderPath, 'GlobalRates.fig');
             savefig(FileName)
         end
         close

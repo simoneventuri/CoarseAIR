@@ -29,16 +29,45 @@ function Read_Rates_FromHDF5()
     global Rates Syst Temp
   
     
-    DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Diss/');
-    h5disp(Syst.HDF5_File, DissChar)
-    RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
-    Rates.T(Temp.iT).Diss     = permute(RatesTemp, [3,2,1]);
     
+    if (Syst.NAtoms == 3)
+       
+        DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Diss/');
+        h5disp(Syst.HDF5_File, DissChar)
+        RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
+        Rates.T(Temp.iT).Diss     = permute(RatesTemp, [2,1]);
+        
+        InelChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Inel/');
+        h5disp(Syst.HDF5_File, InelChar)
+        RatesTemp                 = h5read(Syst.HDF5_File, InelChar);
+        Rates.T(Temp.iT).Inel     = permute(RatesTemp, [2,1]);
+        
+        ExchChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Exch_1/');
+        h5disp(Syst.HDF5_File, ExchChar)
+        RatesTemp                         = h5read(Syst.HDF5_File, ExchChar);
+        Rates.T(Temp.iT).ExchType(1).Exch = permute(RatesTemp, [2,1]);
+        
+        if size(Syst.ExchToMol,1) == 2
+            ExchChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Exch_2/');
+            h5disp(Syst.HDF5_File, ExchChar)
+            RatesTemp                         = h5read(Syst.HDF5_File, ExchChar);
+            Rates.T(Temp.iT).ExchType(2).Exch = permute(RatesTemp, [2,1]);
+        end
+
+    else
     
-    DissCharInel   = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/DissInel/');
-    h5disp(Syst.HDF5_File, DissCharInel)
-    RatesTemp                 = h5read(Syst.HDF5_File, DissCharInel);
-    Rates.T(Temp.iT).DissInel = permute(RatesTemp, [4,3,2,1]);
+        DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Diss/');
+        h5disp(Syst.HDF5_File, DissChar)
+        RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
+        Rates.T(Temp.iT).Diss     = permute(RatesTemp, [3,2,1]);
 
 
+        DissCharInel   = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/DissInel/');
+        h5disp(Syst.HDF5_File, DissCharInel)
+        RatesTemp                 = h5read(Syst.HDF5_File, DissCharInel);
+        Rates.T(Temp.iT).DissInel = permute(RatesTemp, [4,3,2,1]);
+
+    end
+    
+    
 end

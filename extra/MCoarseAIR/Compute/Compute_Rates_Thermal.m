@@ -26,15 +26,42 @@ function Compute_Rates_Thermal()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Rates Syst Temp Kin
+    global Rates Syst Temp
     
     
     if (Syst.NAtoms == 3)
     
         
+        iMol   = Syst.Pair(1).ToMol;
+        iNBins = Syst.Molecule(iMol).EqNStatesIn;
+        iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
+
+        ExchTot = zeros(iNBins, Syst.NProc-2);
+        for iExch = 1:Syst.NProc-2
+            ExchTot(:,iExch) = sum(Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+        end
+        
+        Rates.T(Temp.iT).DissTh = 0.0;
+        Rates.T(Temp.iT).ExchTh = zeros(1,Syst.NProc-2);
+        for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
+            Rates.T(Temp.iT).DissTh              = sum( Rates.T(Temp.iT).Diss(:,1) .* iQTemp(:) ); 
+            for iExch = 1:Syst.NProc-2
+                Rates.T(Temp.iT).ExchTh(1,iExch) = sum( ExchTot(:,iExch)           .* iQTemp(:) ); 
+            end
+        end
+        
+        fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
+        fprintf('====================================================\n')
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
+        for iExch = 1:Syst.NProc-2
+            fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
+        end
+        fprintf('====================================================\n\n')
+        
         
     else 
 
+        
         iMol   = Syst.Pair(1).ToMol;
         jMol   = Syst.Pair(6).ToMol;
 
@@ -59,7 +86,16 @@ function Compute_Rates_Thermal()
         
         Rates.T(Temp.iT).DissTh = Rates.T(Temp.iT).DissTh_Diss + Rates.T(Temp.iT).DissTh_DissInel;
         
-        Rates.T(Temp.iT).DissTh
+        fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
+        fprintf('====================================================\n')
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
+%         for iExch = 1:Syst.NProc-2
+%             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
+%         end
+        fprintf('====================================================\n\n')        
+        
+        
     end
 
+    
 end
