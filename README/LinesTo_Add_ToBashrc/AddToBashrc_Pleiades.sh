@@ -30,33 +30,33 @@ export DYLD_LIBRARY_PATH=$BLAS_LIBS:$DYLD_LIBRARY_PATH
 ########################################################## COMPILERS #############################################################
 #INTEL
 function LOAD_INTEL {
-export FORTRAN_COMPILER=ifort
-export COMPILER_VER=$INTEL_VER
-export FC=ifort
-export F77=ifort
-export CMAKE_Fortran_COMPILER=ifort
-export CC=icc
-export CXX=icc
+	export FORTRAN_COMPILER=ifort
+	export COMPILER_VER=$INTEL_VER
+	export FC=ifort
+	export F77=ifort
+	export CMAKE_Fortran_COMPILER=ifort
+	export CC=icc
+	export CXX=icc
 }
 
 function INTEL_NEW_LOAD {
-#module purge
-#module load texlive/2016
-#module load comp-intel/2016.2.181
-module load comp-intel/2018.3.222
-#module load python3/Intel_Python_3.6_2018.3.222
-export OMP_NUM_THREADS=10
-#export INTEL_VER='intel-16.0.2'
-export INTEL_VER='intel-18.0.3'
-LOAD_INTEL
+	#module purge
+	#module load texlive/2016
+	#module load comp-intel/2016.2.181
+	module load comp-intel/2018.3.222
+	#module load python3/Intel_Python_3.6_2018.3.222
+	export OMP_NUM_THREADS=10
+	#export INTEL_VER='intel-16.0.2'
+	export INTEL_VER='intel-18.0.3'
+	LOAD_INTEL
 }
 ##################################################################################################################################
 
 
-################################################################ CoarseAIR ##############################################################
+################################################################ CoarseAIR #######################################################
 function COARSEAIR_UPDATE {
 INTEL_NEW_LOAD
 cd $WORKSPACE_PATH/CoarseAIR/coarseair/
 source ./scripts/building/BuildingInstalling.sh
 }
-###################################################################################################################################
+##################################################################################################################################
