@@ -5,9 +5,9 @@
 ###########################################################################################
 
    Generating Energy Levels? = no
-   Preprocessing Energy Levels List? = no
-   Running Trajectories? = no
-   Postprocessing Trajectories? = yes
+   Preprocessing Energy Levels List? = yes
+   Running Trajectories? = yes
+   Postprocessing Trajectories? = no
    Generating Derivated Quantities? = no 
    
 ###########################################################################################
@@ -38,7 +38,7 @@
      Atom 4 = Nd
        Mass [a.u.] of Atom 4 = 25526.04298d0
    
-   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
@@ -61,12 +61,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 2 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 3 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 4 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 5 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 6 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 1 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 2 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 3 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 4 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 5 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 6 = MyLeroy_FromRobyn.inp
 
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
@@ -102,57 +102,45 @@
    #  Final    Level, Molecule 1 = 7115
 
    # Molecule 1: sampled from a Boltzmann distribution (include all levels) - NaNb
-   #Sorting Method, Molecule 1 = RoVib-CG                                    
-   #  File with Bins Energy Minima, Molecule 1 = E_low.dat
-   #  Nb of Bins, Molecule 1 = 10
-   #  Starting Bin, Molecule 1 = 1
-   #  Final    Bin, Molecule 1 = 10
-   Sorting Method, Molecule 1 = RoVib-CG 
-      File with Bins Energy Minima, Molecule 1 = E_low.dat
-      Nb of Bins, Molecule 1 = 1
-      Starting Bin, Molecule 1 = 1
-      Final    Bin, Molecule 1 = 1
+   Sorting Method, Molecule 1 = RoVib-CG                                    
+     File with Bins Energy Minima, Molecule 1 = E_low.dat
+     Nb of Bins, Molecule 1 = 1
+     Starting Bin, Molecule 1 = 1
+     Final    Bin, Molecule 1 = 1
+   #Sorting Method, Molecule 1 = Vib-Specific                             
+   #   Starting vqn, Molecule 1 = 1
+   #   Final    vqn, Molecule 1 = 61
 
    # Molecule 2: sampled from a Boltzmann distribution (include all levels) - NcNd
-   #Sorting Method, Molecule 2 = RoVib-CG                                    
-   #  File with Bins Energy Minima, Molecule 2 = E_low.dat
-   #  Nb of Bins, Molecule 2 = 10
-   #  Starting Bin, Molecule 2 = 0
-   #  Final    Bin, Molecule 2 = 10
-   Sorting Method, Molecule 2 = RoVib-CG   
-      File with Bins Energy Minima, Molecule 2 = E_low.dat                       
-      Nb of Bins, Molecule 2 = 1
-      Starting Bin, Molecule 2 = 1
-      Final    Bin, Molecule 2 = 1
+   Sorting Method, Molecule 2 = RoVib-CG                                    
+     File with Bins Energy Minima, Molecule 2 = E_low.dat
+     Nb of Bins, Molecule 2 = 1
+     Starting Bin, Molecule 2 = 1
+     Final    Bin, Molecule 2 = 1
+   #Sorting Method, Molecule 2 = Vib-Specific                             
+   #   Starting vqn, Molecule 2 = 0
+   #   Final    vqn, Molecule 2 = 61
 
    # Molecule 3, 4, 5 and 6: Vib-Specific          
-   #Sorting Method, Molecule 3 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 3 = E_low.dat
-   #  Nb of Bins, Molecule 3 = 10
-   Nb of Bins, Molecule 3 = 1
-   Sorting Method, Molecule 3 = RoVib-CG                          
-      File with Bins Energy Minima, Molecule 3 = E_low.dat
+   Sorting Method, Molecule 3 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 3 = E_low.dat
+     Nb of Bins, Molecule 3 = 1
+   #Sorting Method, Molecule 3 = Vib-Specific                             
 
-   #Sorting Method, Molecule 4 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 4 = E_low.dat
-   #  Nb of Bins, Molecule 4 = 10
-   Nb of Bins, Molecule 4 = 1
-   Sorting Method, Molecule 4 = RoVib-CG     
-      File with Bins Energy Minima, Molecule 4 = E_low.dat
+   Sorting Method, Molecule 4 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 4 = E_low.dat
+     Nb of Bins, Molecule 4 = 1
+   #Sorting Method, Molecule 4 = Vib-Specific    
 
-   #Sorting Method, Molecule 5 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 5 = E_low.dat
-   #  Nb of Bins, Molecule 5 = 10
-   Nb of Bins, Molecule 5 = 1
-   Sorting Method, Molecule 5 = RoVib-CG     
-      File with Bins Energy Minima, Molecule 5 = E_low.dat
+   Sorting Method, Molecule 5 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 5 = E_low.dat
+     Nb of Bins, Molecule 5 = 1
+   #Sorting Method, Molecule 5 = Vib-Specific    
 
-   #Sorting Method, Molecule 6 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 6 = E_low.dat
-   #  Nb of Bins, Molecule 6 = 10
-   Nb of Bins, Molecule 6 = 1
-   Sorting Method, Molecule 6 = RoVib-CG  
-      File with Bins Energy Minima, Molecule 6 = E_low.dat
+   Sorting Method, Molecule 6 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 6 = E_low.dat
+     Nb of Bins, Molecule 6 = 1
+   Sorting Method, Molecule 6 = Vib-Specific 
  
 
 
@@ -163,7 +151,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 500
+   Nb of Trajectories per Level / Bin = 1000000
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
@@ -246,7 +234,7 @@
    Write the PaQ Solution File?                   = no
    Write the PaQ Evolution File?                  = no
    Write the Spatial Coordinates Evolution File?  = no
-   Write the Spatial Coordinates Evolution in a Single File?  =no
+   Write the Spatial Coordinates Evolution in a Single File? = no
    Write the PES Evolution File?                  = no
    Write the Energy Evolution File?               = no
   
@@ -281,20 +269,18 @@
    ### Nb of Trajectory Conditions = 5  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 2 Molecules)
    Nb of Final Conditions on the Trajectories = 5
      Iskip for Condition 1 = 1
-     Preserving Even / Oddness of Condition 1 = yes
+     Preserving Even / Oddness of Condition 1 = no
      Iskip for Condition 2 = 1
      Preserving Even / Oddness of Condition 2 = no
      Iskip for Condition 3 = 1
-     Preserving Even / Oddness of Condition 3 = yes
+     Preserving Even / Oddness of Condition 3 = no
      Iskip for Condition 4 = 1
      Preserving Even / Oddness of Condition 4 = no
      Iskip for Condition 5 = 1
      Preserving Even / Oddness of Condition 5 = no
 
-   Identical Diatoms? = no
-   # Diatoms must be treated as if they are in different in the present case
-   #Identical Diatoms? = yes  
-   # Invesigate this #
+   Identical Diatoms? = yes
+
    
    ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram

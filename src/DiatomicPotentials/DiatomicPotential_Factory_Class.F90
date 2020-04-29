@@ -105,7 +105,6 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
           case ('N2', 'NNa', 'NNb', 'NNc', 'NNd', 'NaNb','NcNd','NbNc','NaNd','NaNc','NbNd' )
             if (Input%Diatomic_Model(iMol) == 'LeRoy') then
               allocate( N2_LeRoy_DiatomicPotential_Type :: DiatPot )
-            
             elseif (Input%Diatomic_Model(iMol) == 'UMN_ForN4') then
               allocate( N2_UMN_ForN4_DiatomicPotential_Type :: DiatPot )   
             elseif (Input%Diatomic_Model(iMol) == 'UMN_ForN2O2') then

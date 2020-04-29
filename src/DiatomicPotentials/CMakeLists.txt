@@ -4,7 +4,7 @@ add_sources (
   Null_DiatomicPotential_Class.F90
   DiatomicPotential_Factory_Class.F90
   Morse_DiatomicPotential_Class.F90
-  N2_LeRoy_DiatomicPotential_Class.F90
+  N2_MyLeRoy_DiatomicPotential_Class.F90
   O2_UMN_DiatomicPotential_Class.F90
   O2_NASA_DiatomicPotential_Class.F90
   O2_Varandas_DiatomicPotential_Class.F90

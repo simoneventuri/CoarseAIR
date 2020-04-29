@@ -38,7 +38,7 @@
      Atom 4 = Nd
        Mass [a.u.] of Atom 4 = 25526.04298d0
    
-   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
@@ -61,12 +61,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 2 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 3 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 4 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 5 = MyLeroy_FromDavid.inp
-   Levels File Name, Molecule 6 = MyLeroy_FromDavid.inp
+   Levels File Name, Molecule 1 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 2 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 3 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 4 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 5 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 6 = MyLeroy_FromRobyn.inp
 
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
@@ -109,7 +109,7 @@
    #  Final    Bin, Molecule 1 = 10
    Sorting Method, Molecule 1 = Vib-Specific                             
       Starting vqn, Molecule 1 = 1
-      Final    vqn, Molecule 1 = 54
+      Final    vqn, Molecule 1 = 61
 
    # Molecule 2: sampled from a Boltzmann distribution (include all levels) - NcNd
    #Sorting Method, Molecule 2 = RoVib-CG                                    
@@ -119,7 +119,7 @@
    #  Final    Bin, Molecule 2 = 10
    Sorting Method, Molecule 2 = Vib-Specific                             
       Starting vqn, Molecule 2 = 0
-      Final    vqn, Molecule 2 = 54
+      Final    vqn, Molecule 2 = 61
 
    # Molecule 3, 4, 5 and 6: Vib-Specific          
    #Sorting Method, Molecule 3 = RoVib-CG   
@@ -151,7 +151,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 500000
+   Nb of Trajectories per Level / Bin = 10000
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
@@ -234,7 +234,7 @@
    Write the PaQ Solution File?                   = no
    Write the PaQ Evolution File?                  = no
    Write the Spatial Coordinates Evolution File?  = no
-   Write the Spatial Coordinates Evolution in a Single File?  =no
+   Write the Spatial Coordinates Evolution in a Single File? = no
    Write the PES Evolution File?                  = no
    Write the Energy Evolution File?               = no
   
@@ -269,11 +269,11 @@
    ### Nb of Trajectory Conditions = 5  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 2 Molecules)
    Nb of Final Conditions on the Trajectories = 5
      Iskip for Condition 1 = 1
-     Preserving Even / Oddness of Condition 1 = yes
+     Preserving Even / Oddness of Condition 1 = no
      Iskip for Condition 2 = 1
      Preserving Even / Oddness of Condition 2 = no
      Iskip for Condition 3 = 1
-     Preserving Even / Oddness of Condition 3 = yes
+     Preserving Even / Oddness of Condition 3 = no
      Iskip for Condition 4 = 1
      Preserving Even / Oddness of Condition 4 = no
      Iskip for Condition 5 = 1
