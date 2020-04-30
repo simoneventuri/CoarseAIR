@@ -117,10 +117,10 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'MoleFractions');
+            FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates');
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'MoleFractions.fig');
+            FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates.fig');
             savefig(FileName)
         end
         close

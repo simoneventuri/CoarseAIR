@@ -116,8 +116,8 @@ function ComputeTrajsPBS {
       if [ ${MaxProcessInNode} -gt ${MaxProcessAll} ]; then 
         MaxProcessInNode=${MaxProcessAll}
       fi
-      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be read from file is the "${MinProcessInNode}"-th in the List"
-      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be read from file is the "${MaxProcessInNode}"-th in the List"
+      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the first Process to be Computed is the "${MinProcessInNode}"-th"
+      echo "  [ComputeTrajsPBS]: For Node "${iNode}", the last  Process to be Computed is the "${MaxProcessInNode}"-th"
 
       echo "  [ComputeTrajsPBS]: -> iNode = "${iNode}"; MinProcessInNode = "${MinProcessInNode}"; MaxProcessInNode = "${MaxProcessInNode}
               

@@ -63,18 +63,11 @@ function ReadLevelInfo()
         Syst.Molecule(iMol).LevelEeV0 = Syst.Molecule(iMol).LevelEeV - min(Syst.Molecule(iMol).LevelEeV(1));
         Syst.Molecule(iMol).Nvqn      = max(Syst.Molecule(iMol).Levelvqn) + 1;
         Syst.Molecule(iMol).Njqn      = max(Syst.Molecule(iMol).Leveljqn) + 1;
-    
-        
-        vToLevel = zeros(Syst.Molecule(iMol).Nvqn,1);
-        for iLevels = 1:Syst.Molecule(iMol).NLevels
-            if (Syst.Molecule(iMol).Leveljqn(iLevels) == 0) 
-                vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1,1)                   = iLevels; 
-                Syst.Molecule(iMol).vEeVVib0(Syst.Molecule(iMol).Levelvqn(iLevels)+1) = Syst.Molecule(iMol).LevelEeV0(iLevels);         
-            end
-            Syst.Molecule(iMol).LevelEeVVib0(iLevels) = Syst.Molecule(iMol).LevelEeV0(vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1));
-            Syst.Molecule(iMol).LevelEeVRot(iLevels)  = Syst.Molecule(iMol).LevelEeV0(iLevels) - Syst.Molecule(iMol).LevelEeVVib0(iLevels);
-        end
-        
+
+        Syst.Molecule(iMol).LevelEeVVib0 = Syst.Molecule(iMol).LevelEeV0
+        Syst.Molecule(iMol).LevelEeVRot  = Syst.Molecule(iMol).LevelEeV0(iLevels) - 
+              LevelEeVVib0(iLevels,iBinnedMol) = LevelEeV0(vToLevel(Levelvqn(iLevels,iBinnedMol)+1,iBinnedMol),iBinnedMol);
+      LevelEeVRot(iLevels,iBinnedMol)  = LevelEeV0(iLevels,iBinnedMol) - LevelEeVVib0(iLevels,iBinnedMol);      
         
         %% Computing Equivalent Number of States = Levels/Groups
         if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')

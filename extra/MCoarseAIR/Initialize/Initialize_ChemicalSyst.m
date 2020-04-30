@@ -135,7 +135,7 @@ function Initialize_ChemicalSyst()
 
         Syst.PairToExch         = [1; 2];
         
-        Syst.ColPartToComp      = 0; 
+        Syst.ColPartToComp      = 2; 
         
 
 %     elseif strcmp(Input.SystNameLong, 'O2C')
@@ -714,7 +714,7 @@ function Initialize_ChemicalSyst()
         Syst.ExchToMol          = [1,1];
         Syst.ExchToAtom         = [0,0];
 
-        Syst.ColPartToComp      = 0; 
+        Syst.ColPartToComp      = 1; 
         
    
 %     elseif strcmp(Input.SystNameLong, 'N4_UMN')

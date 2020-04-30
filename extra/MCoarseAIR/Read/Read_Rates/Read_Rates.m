@@ -63,6 +63,8 @@ function Read_Rates()
     end
     
     
+    
+    
     if strcmp(Input.Kin.RateSource, 'HDF5')
         
         Read_Rates_FromHDF5();
@@ -80,6 +82,24 @@ function Read_Rates()
         Read_Rates_FromCoarseAIR() 
    
     end
+    
+    
+    
+    
+    if (Syst.NAtoms == 3)
+       
+        Rates.T(Temp.iT).Overall(:,1)           =      Rates.T(Temp.iT).Diss(:,1);
+        Rates.T(Temp.iT).Overall(:,2)           = sum( Rates.T(Temp.iT).Inel(:,1),           2);
+        for iExch = 1:size(Syst.ExchToMol,1)
+            Rates.T(Temp.iT).Overall(:,2+iExch) = sum( Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+        end
+        
+    else
+        
+        
+        
+    end
+    
     
 
 end

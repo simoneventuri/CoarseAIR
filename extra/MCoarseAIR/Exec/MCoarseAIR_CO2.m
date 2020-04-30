@@ -63,16 +63,29 @@ Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/CO+O/'
 
 %% Tasks Inputs
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                       = true
-Input.Tasks.Plot_MoleFracs.CompStart                 = 1
-Input.Tasks.Plot_MoleFracs.CompEnd                   = 4
+Input.Tasks.Plot_MoleFracs.Flg                         = true
+Input.Tasks.Plot_MoleFracs.CompStart                   = 1
+Input.Tasks.Plot_MoleFracs.CompEnd                     = 4
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg                     = true
+Input.Tasks.Plot_GlobalRates.Flg                       = true
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg       = true
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart = 1
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd   = 4
-
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4
+% Plotting RVS Populations
+Input.Tasks.Plot_Populations.Flg                       = true
+Input.Tasks.Plot_Populations.MoleculesOI               = [1]
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6]
+Input.Tasks.Plot_Populations.GroupColors               = 2
+% Plotting Energies
+Input.Tasks.Plot_Energies.Flg                          = true
+Input.Tasks.Plot_Energies.MoleculesOI                  = [1]
+Input.Tasks.Plot_Energies.LTFlag                       = true
+% Plotting Energy Depletions
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true
+Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1]
+Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1]
+Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
@@ -132,8 +145,14 @@ for iT = 1:length(Temp.TranVec)
         %% Computing Thermal Rates
         Compute_Rates_Global()   
         
-        %% C 
+        %% Computing Rate Values and Initial-Final Times for QSS 
         Compute_QSS()
+        
+        %% Computing Energies
+        ComputeEnergies()
+        
+        %% Computing Energy Depletions
+        Compute_EnergyDepletions(Input.Tasks.Plot_EnergyDepletions)
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -154,9 +173,26 @@ for iT = 1:length(Temp.TranVec)
         Plot_GlobalRates(Input.Tasks.Plot_GlobalRates)    
     end
     
+    %% Plotting Global Rates (Dissociation and Exchange) on top of Mole Fractions
     if (Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg)
         Plot_MoleFracs_and_GlobalRates(Input.Tasks.Plot_MoleFracs_and_GlobalRates)
     end
+    
+    %% Plotting RVS Populations
+    if (Input.Tasks.Plot_Populations.Flg)
+       Plot_Populations(Input.Tasks.Plot_Populations) 
+    end
+    
+    %% Plotting Energies
+    if (Input.Tasks.Plot_Energies.Flg)
+        Plot_Energies(Input.Tasks.Plot_Energies)
+    end
+    
+    %% Plotting Energy Depletions
+    if (Input.Tasks.Plot_EnergyDepletions.Flg)
+        Plot_EnergyDepletions(Input.Tasks.Plot_EnergyDepletions)
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     

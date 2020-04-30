@@ -94,19 +94,19 @@ function Plot_Populations(Controls)
 
             
             xt = get(gca, 'XTick');
-            set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+            set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out','TickLabelInterpreter', 'latex');
             yt = get(gca, 'YTick');
-            set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+            set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out','TickLabelInterpreter', 'latex');
 
-            str_x = ['$\epsilon_i$ [eV]'];
+            str_x = ['Energy[eV]'];
             xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
             xlab.Interpreter = 'latex';
-            %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
+            xlim([max(min(LevelEeV(:,iMol)),MinEvPlot(iMol)), min(max(LevelEeV(:,iMol)),MaxEvPlot(iMol))]);
 
-            str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
+            str_y = ['$N_{i} / g_{i}$~$[m^{-3}]$'];
             ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
             ylab.Interpreter = 'latex';
-            %ylim([1.d5, 1.d23]);
+            ylim([1.d5, 1.d23]);
             set(gca, 'YScale', 'log')
 
             
