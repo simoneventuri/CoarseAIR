@@ -1,6 +1,6 @@
-%% The Function plots the Mole Fractions of the Chemical System's Components 
+%% The Function plots the Ro-Vibrational Populations at Given Time Steps
 %
-function Plot_GlobalRates(Controls)    
+function Plot_Populations(Controls)    
     
     %%==============================================================================================================
     % 
@@ -62,12 +62,7 @@ function Plot_GlobalRates(Controls)
     %ylim(YLimPlot);
 
 
-    
-    semilogx([Kin.T(Temp.iT).QSS.tStart, Kin.T(Temp.iT).QSS.tStart],   [0, 1], ':k', 'LineWidth',2)
-    semilogx([Kin.T(Temp.iT).QSS.tEnd,   Kin.T(Temp.iT).QSS.tEnd],   [0, 1], ':k', 'LineWidth',2)
-
-    
-    
+  
     pbaspect([1 1 1])
     
     if Input.SaveFigsFlgInt > 0

@@ -1,6 +1,7 @@
 %% The Function plots the Mole Fractions of the Chemical System's Components 
+%%    on Top of The Global Rates (Dissociation and Exchanges)
 %
-function Plot_GlobalRates(Controls)    
+function Plot_MoleFracs_and_GlobalRates(Controls)    
     
     %%==============================================================================================================
     % 
@@ -25,13 +26,21 @@ function Plot_GlobalRates(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+    
+    
     figure(Input.iFig)
     fig = gcf;
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
+    left_color  = Syst.CFDComp(Controls.CompStart).Color;
+    right_color = Param.KCVec;
+    set(fig,'defaultAxesColorOrder',[left_color; right_color]);
+        
     
     
+    yyaxis right
+
     ProcNames = [];
     loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
     ProcNames = {'$\bar{K}^D$'};
@@ -41,7 +50,7 @@ function Plot_GlobalRates(Controls)
         ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
     end
     hold on
-
+    
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
     yt = get(gca, 'YTick');
@@ -60,29 +69,63 @@ function Plot_GlobalRates(Controls)
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
-
-
     
-    semilogx([Kin.T(Temp.iT).QSS.tStart, Kin.T(Temp.iT).QSS.tStart],   [0, 1], ':k', 'LineWidth',2)
-    semilogx([Kin.T(Temp.iT).QSS.tEnd,   Kin.T(Temp.iT).QSS.tEnd],   [0, 1], ':k', 'LineWidth',2)
+    set(0,'DefaultLegendAutoUpdate','off')
+    
+    
+    
+    yyaxis left
+    
+    CompNames = [];
+    for iComp = Controls.CompStart:Controls.CompEnd
+      semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
+      hold on
+      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
+    end
+    hold on
+    
+    xt = get(gca, 'XTick');
+    set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+    yt = get(gca, 'YTick');
+    set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
+%     clab             = legend(CompNames, 'Location', 'Best');
+%     clab.Interpreter = 'latex';
+%     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+
+    str_x = ['t [s]'];
+    xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+    xlab.Interpreter = 'latex';
+    %xlim(XLimPlot);
+
+    str_y = ['Mole Fraction'];
+    ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+    ylab.Interpreter = 'latex';
+    %ylim(YLimPlot);
+    
+    
+    
+    semilogx([Kin.T(Temp.iT).QSS.tStart, Kin.T(Temp.iT).QSS.tStart], [0, 1], ':k', 'LineWidth',2)
+    semilogx([Kin.T(Temp.iT).QSS.tEnd,   Kin.T(Temp.iT).QSS.tEnd],   [0, 1], ':k', 'LineWidth',2)
+    
     
     
     pbaspect([1 1 1])
-    
+
     if Input.SaveFigsFlgInt > 0
         [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'GlobalRates');
+            FileName   = strcat(FolderPath, 'MoleFractions');
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'GlobalRates.fig');
+            FileName   = strcat(FolderPath, 'MoleFractions.fig');
             savefig(FileName)
         end
         close
     end
     Input.iFig = Input.iFig + 1;
 
+    
 end

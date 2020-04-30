@@ -1,4 +1,4 @@
-%% The Function plots the Mole Fractions of the Chemical System's Components 
+%% The Function plots the Global Rates (Dissociation and Exchanges)
 %
 function Plot_GlobalRates(Controls)    
     
@@ -61,9 +61,10 @@ function Plot_GlobalRates(Controls)
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
 
+
+  
     pbaspect([1 1 1])
-
-
+    
     if Input.SaveFigsFlgInt > 0
         [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');

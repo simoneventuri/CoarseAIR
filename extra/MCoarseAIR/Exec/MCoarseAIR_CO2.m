@@ -63,12 +63,15 @@ Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/CO+O/'
 
 %% Tasks Inputs
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg       = true
-Input.Tasks.Plot_MoleFracs.CompStart = 3
-Input.Tasks.Plot_MoleFracs.CompEnd   = 3
+Input.Tasks.Plot_MoleFracs.Flg                       = true
+Input.Tasks.Plot_MoleFracs.CompStart                 = 1
+Input.Tasks.Plot_MoleFracs.CompEnd                   = 4
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg     = true
-
+Input.Tasks.Plot_GlobalRates.Flg                     = true
+% Plotting Mole Fractions and Global Rates
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg       = true
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart = 1
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd   = 4
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,6 +132,9 @@ for iT = 1:length(Temp.TranVec)
         %% Computing Thermal Rates
         Compute_Rates_Global()   
         
+        %% C 
+        Compute_QSS()
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         
@@ -148,6 +154,9 @@ for iT = 1:length(Temp.TranVec)
         Plot_GlobalRates(Input.Tasks.Plot_GlobalRates)    
     end
     
+    if (Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg)
+        Plot_MoleFracs_and_GlobalRates(Input.Tasks.Plot_MoleFracs_and_GlobalRates)
+    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     
