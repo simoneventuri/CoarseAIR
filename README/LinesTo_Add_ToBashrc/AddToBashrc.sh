@@ -1,4 +1,4 @@
-export WORKSPACE_PATH='path_to_workspace'
+export WORKSPACE_PATH=path_to_workspace
 
 
 ############################################################## CoarseAIR ############################################################
