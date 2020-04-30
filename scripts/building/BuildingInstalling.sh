@@ -39,7 +39,8 @@ if [ ${FC} == "gfortran" ]; then
   export NB_PROC=4
 elif [ ${FC} == "ifort" ]; then
   export COMPILER_CGQCT="intel"
-  export COMPILER_CGQCT_VER=18.0.3 #$COMPILER_VERSION_MICRO
+  #export COMPILER_CGQCT_VER=18.0.3 #$COMPILER_VERSION_MICRO
+  export COMPILER_CGQCT_VER=19.1.1 #$COMPILER_VERSION_MICRO
   export USE_OPENBLAS_FLAG="NO"
   export NB_PROC=4
 fi
