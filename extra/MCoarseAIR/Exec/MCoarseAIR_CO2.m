@@ -35,17 +35,17 @@ global Input Syst Temp Param Kin Rates
 Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/';
 Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
 Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [10000];
+Input.TranVec               = [20000];
 Input.SystNameLong          = 'CO2_NASA';
 Input.Kin.MolResolutionIn   = ['StS'; 'StS'];
 Input.Kin.MinStateIn        = [    1,     1];
 Input.Kin.MaxStateIn        = [13521,  6078];
 Input.Kin.NGroupsIn         = [    0,     0];
-Input.Kin.Proc.DissFlg      = 1;
-Input.Kin.DissCorrFactor    = 1.0;;
+Input.Kin.Proc.DissFlg      = 0;
+Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 1;
+Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint';
@@ -66,23 +66,23 @@ Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/CO+O/';
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0; 1.5, 6.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
 % Plotting Overall Rate Coefficients (Dissociation and Exchange)
-Input.Tasks.Plot_OverallRates.Flg                      = true;
+Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
-Input.Tasks.Plot_DifferentDissRates.Flg                = true;
+Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = true;
+Input.Tasks.Plot_MoleFracs.Flg                         = false;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg                       = true;
+Input.Tasks.Plot_GlobalRates.Flg                       = false;
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
 % Plotting RVS Populations

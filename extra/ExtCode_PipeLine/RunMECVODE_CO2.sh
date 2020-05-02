@@ -50,8 +50,8 @@ export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
 export DissFlg=0
 export InelFlg=1
-export ExchFlg1=1
-export ExchFlg2=1
+export ExchFlg1=0
+export ExchFlg2=0
 
 export NBins=0
 
@@ -98,13 +98,13 @@ function Call_MeCvode() {
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
 
-  # if [ $DissFlg -eq 0 ]; then
-  #   export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_NoDiss'
-  # elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
-  #   export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_OnlyDiss'
-  # else
+  if [ $DissFlg -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_NoDiss'
+  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_OnlyDiss'
+  else
     export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K'
-  # fi  
+  fi  
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
   
