@@ -28,9 +28,16 @@ function Read_KONIGBox()
     
     global Input Syst Temp Kin
   
+    BoxFile = strcat(Input.Paths.ToKinRunFldr, '/box.dat');
+    
+    fprintf('= Read_KONIGBox ======================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    fprintf('Reading Thermodynamic Results from KONIG\n' )
+    fprintf(['Reading From File: ' BoxFile '\n'] )
+
     
     %% Reading Simulation Time
-    filename = strcat(Input.Paths.ToKinRunFldr,'/box.dat')
+    filename = BoxFile;
     startRow = 1;
     formatSpec = '%14f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -38,6 +45,8 @@ function Read_KONIGBox()
     fclose(fileID);
     Kin.T(Temp.iT).t = dataArray{:, 1};
     clearvars startRow formatSpec fileID dataArray ans;
+    fprintf(['Number of Time Steps = ' num2str(length(Kin.T(Temp.iT).t)) '\n' ])
+    fprintf(['Final Time Step      = ' num2str(Kin.T(Temp.iT).t(end)) 's \n'])
 
 
     %% Reading Mole Fractions
@@ -69,5 +78,7 @@ function Read_KONIGBox()
     Kin.T(Temp.iT).nd     = dataArray{:, 4};
     Kin.T(Temp.iT).E      = dataArray{:, 5};
 
+       
+    fprintf('====================================================\n\n')
 
 end

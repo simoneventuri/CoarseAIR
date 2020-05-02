@@ -29,14 +29,21 @@ function Read_Rates_FromCoarseAIR()
     global Input Rates Syst Temp Param  
     
     
-    RatesFile = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates');
+    fprintf('  = Read_Rates_FromCoarseAIR ============= T = %i K\n', Temp.TNow)
+    fprintf('  ====================================================\n')
+    fprintf('  Reading Rates in CoarseAIR Format \n' )
 
-        
+    
+    RatesFile = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates');
+    fprintf(['  Checking if .mat File is Already Present: ' RatesFile '.mat \n'] )
+    
+    
     if (Syst.NAtoms == 3)
         
         if isfile(strcat(RatesFile,'.mat'))
-        
-           if size(Syst.ExchToMol,1) == 1
+            fprintf(['  Reading From File: ' RatesFile '.mat \n'] )
+
+            if size(Syst.ExchToMol,1) == 1
                 load(strcat(RatesFile,'.mat'), 'Diss', 'Inel', 'Exch1')
                 Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
             elseif size(Syst.ExchToMol,1) == 2
@@ -48,7 +55,8 @@ function Read_Rates_FromCoarseAIR()
             Rates.T(Temp.iT).Inel     = Inel;
 
         else
-            
+            RatesFldr = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar);
+            fprintf(['  Reading From Folder: ' RatesFldr '\n'] )
             iMol    = Syst.Pair(1).ToMol;
             iNBins  = Syst.Molecule(iMol).EqNStatesIn;
     
@@ -66,7 +74,7 @@ function Read_Rates_FromCoarseAIR()
                 opts.EmptyLineRule = "read";
                 opts = setvaropts(opts, "Var3", "WhitespaceRule", "preserve");
                 opts = setvaropts(opts, "Var3", "EmptyFieldRule", "auto");
-                tbl = readtable(strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Proc', num2str(iProc), '.csv'), opts)
+                tbl = readtable(strcat(RatesFldr, '/Proc', num2str(iProc), '.csv'), opts)
                 jProc    = tbl.jProc;
                 RateTemp = tbl.RateTemp;
                 clear opts tbl
@@ -106,7 +114,9 @@ function Read_Rates_FromCoarseAIR()
             end    
 
         end
+
         
+        fprintf(['  Saving Rates in .mat File: ' RatesFile '.mat \n'] )
         Diss      = Rates.T(Temp.iT).Diss;
         Inel      = Rates.T(Temp.iT).Inel;
         if size(Syst.ExchToMol,1) == 1
@@ -122,7 +132,8 @@ function Read_Rates_FromCoarseAIR()
     else
 
         if isfile(strcat(RatesFile,'.mat'))
-            
+            fprintf(['  Reading From File: ' RatesFile '.mat \n'] )
+
             if size(Syst.ExchToMol,1) == 1
                 load(strcat(RatesFile,'.mat'), 'Diss', 'DissInel', 'Inel', 'Exch1')
                 Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
@@ -136,6 +147,8 @@ function Read_Rates_FromCoarseAIR()
             Rates.T(Temp.iT).Inel     = Inel;
 
         else
+            RatesFldr = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar);
+            fprintf(['  Reading From Folder: ' RatesFldr '\n'] )
             
             NMol    = Syst.NMolecules;
             iMol    = Syst.Pair(1).ToMol;
@@ -159,7 +172,7 @@ function Read_Rates_FromCoarseAIR()
                         opts.EmptyLineRule = "read";
                         opts = setvaropts(opts, "Var3", "WhitespaceRule", "preserve");
                         opts = setvaropts(opts, "Var3", "EmptyFieldRule", "auto");
-                        tbl = readtable(strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Proc', num2str(iProc), '.csv'), opts);
+                        tbl = readtable(strcat(RatesFldr, '/Proc', num2str(iProc), '.csv'), opts);
                         jProc    = tbl.jProc;
                         RateTemp = tbl.RateTemp;
                         clear opts tbl
@@ -213,7 +226,9 @@ function Read_Rates_FromCoarseAIR()
             end    
 
         end
-
+        
+        
+        fprintf(['  Saving Rates in .mat File: ' RatesFile '.mat \n'] )
         Diss      = Rates.T(Temp.iT).Diss;
         DissInel  = Rates.T(Temp.iT).DissInel;
         Inel      = Rates.T(Temp.iT).Inel;
@@ -227,6 +242,9 @@ function Read_Rates_FromCoarseAIR()
         end
     
     end
-     
+    
+    
+    fprintf('  ====================================================\n\n')
+
     
 end

@@ -3,7 +3,7 @@
 %  Input Global Var: - Temp.TNowChar
 %                    - Syst.HDF5_File
 %
-function Read_Rates_FromCoarseAIR()    
+function Read_Rates_FromCGQCT()    
 
     %%==============================================================================================================
     % 
@@ -29,14 +29,21 @@ function Read_Rates_FromCoarseAIR()
     global Input Rates Syst Temp Param  
     
     
+    fprintf('  = Read_Rates_FromCGQCT ================= T = %i K\n', Temp.TNow)
+    fprintf('  ====================================================\n')
+    fprintf('  Reading Rates in CG-QCT Format \n' )
+
+    
     RatesFile = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates');
+    fprintf(['  Checking if .mat File is Already Present: ' RatesFile '.mat \n'] )
 
         
     if (Syst.NAtoms == 3)
         
         if isfile(strcat(RatesFile,'.mat'))
-        
-           if size(Syst.ExchToMol,1) == 1
+            fprintf(['  Reading From File: ' RatesFile '.mat \n'] )
+           
+            if size(Syst.ExchToMol,1) == 1
                 load(strcat(RatesFile,'.mat'), 'Diss', 'Inel', 'Exch1')
                 Rates.T(Temp.iT).ExchType(1).Exch = Exch1;
             elseif size(Syst.ExchToMol,1) == 2
@@ -48,7 +55,8 @@ function Read_Rates_FromCoarseAIR()
             Rates.T(Temp.iT).Inel     = Inel;
 
         else
-            
+            RatesFldr = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar);
+            fprintf(['  Reading From Folder: ' RatesFldr '\n'] )
             iMol    = Syst.Pair(1).ToMol;
             iNBins  = Syst.Molecule(iMol).EqNStatesIn;
     
@@ -56,7 +64,7 @@ function Read_Rates_FromCoarseAIR()
             for iBin = 1:iNBins
                 fprintf('i = %i\n', iBin)
                 
-                filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/Rates/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Proc', num2str(iProc), '.csv');
+                filename = strcat(RatesFldr, '/Proc', num2str(iProc), '.csv');
                 startRow = 6;
                 formatSpec = '%*24s%16f%20f%21f%[^\n\r]';
                 fileID = fopen(filename,'r');
@@ -98,6 +106,8 @@ function Read_Rates_FromCoarseAIR()
 
         end
         
+        
+        fprintf(['  Saving Rates in .mat File: ' RatesFile '.mat \n'] )
         Diss      = Rates.T(Temp.iT).Diss;
         Inel      = Rates.T(Temp.iT).Inel;
         if size(Syst.ExchToMol,1) == 1
@@ -113,6 +123,9 @@ function Read_Rates_FromCoarseAIR()
     else
 
     end
-     
     
+    
+    fprintf('  ====================================================\n\n')
+
+
 end

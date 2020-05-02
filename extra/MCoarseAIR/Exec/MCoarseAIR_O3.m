@@ -27,78 +27,65 @@ clc
 global Input Syst Temp Param Kin Rates
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/';
-Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
-Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [10000];
-Input.SystNameLong          = 'CO2_NASA';
-Input.Kin.MolResolutionIn   = ['StS'; 'StS'];
-Input.Kin.MinStateIn        = [    1,     1];
-Input.Kin.MaxStateIn        = [13521,  6078];
-Input.Kin.NGroupsIn         = [    0,     0];
-Input.Kin.Proc.DissFlg      = 1;
-Input.Kin.DissCorrFactor    = 1.0;;
-Input.Kin.Proc.DissInelFlg  = 0;
-Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 1;
-Input.Kin.Proc.ExchFlg2     = 0;
-Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.FigureFormat          = 'PrePrint';
-Input.ReLoad                = 1;
+Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/O3_ALL/Test/'
+Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/'
+Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/'
+Input.TranVec               = [10000]
+Input.SystNameLong          = 'O3_UMN'
+Input.Kin.MolResolutionIn   = ['StS'] 
+Input.Kin.MinStateIn        = [    1]
+Input.Kin.MaxStateIn        = [ 6115]
+Input.Kin.NGroupsIn         = [    0]
+Input.Kin.Proc.DissFlg      = 2
+Input.Kin.DissCorrFactor    = 16.0/3.0;
+Input.Kin.Proc.DissInelFlg  = 0
+Input.Kin.Proc.InelFlg      = 1
+Input.Kin.Proc.ExchFlg1     = 1
+Input.Kin.Proc.ExchFlg2     = 1
+Input.Kin.RateSource        = 'HDF5'      % CoarseAIR / CG-QCT / HDF5 / PLATO
+Input.FigureFormat          = 'PrePrint'  %
+Input.ReLoad                = 1
 
 
 %% Inputs for Plotting
-Input.iFig               = 1;
-Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CO2_Paper/Figures/Temp/CO+O/';
+Input.iFig               = 1
+Input.SaveFigsFlgInt     = 0
+Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/O3_Paper/Figures/Temp/O3/'
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/CO+O/';
+Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/O3_Paper/Data/Temp/O3/'
 
 
 %% Tasks Inputs
-
-%% CoarseAIR
-% Plotting Diatomic Potential
-Plot_DiatPot
-% Plotting Overall Rate Coefficients (Dissociation and Exchange)
-Input.Tasks.Plot_OverallRates.Flg                      = true;
-% Plotting Pair Contributions to Dissociation Rate Coefficients
-Input.Tasks.Plot_DifferentDissRates.Flg                = true;
-
-%% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = true;
-Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
-Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
+Input.Tasks.Plot_MoleFracs.Flg                         = true
+Input.Tasks.Plot_MoleFracs.CompStart                   = 1
+Input.Tasks.Plot_MoleFracs.CompEnd                     = 2
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg                       = true;
+Input.Tasks.Plot_GlobalRates.Flg                       = true
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = true;
-Input.Tasks.Plot_Populations.MoleculesOI               = [1];
-Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
-Input.Tasks.Plot_Populations.GroupColors               = 2;
+Input.Tasks.Plot_Populations.Flg                       = true
+Input.Tasks.Plot_Populations.MoleculesOI               = [1]
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6]
+Input.Tasks.Plot_Populations.GroupColors               = 2
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
-Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
-Input.Tasks.Plot_Energies.LTFlag                       = true;
+Input.Tasks.Plot_Energies.Flg                          = true
+Input.Tasks.Plot_Energies.MoleculesOI                  = [1]
+Input.Tasks.Plot_Energies.LTFlag                       = true
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
-Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
-Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
-Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
-
-
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true
+Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1]
+Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1]
+Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [1,2]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
@@ -135,10 +122,10 @@ for iT = 1:length(Temp.TranVec)
         %%
         
         %% Reading Group Energies and Part Funcs
-        Read_EeV_and_Q_CG() 
+        Read_EeV_and_Q_CG(); 
         
         %% Reading Rates
-        Read_Rates()
+        Read_Rates();
         
         %% Reading Thermodynamics Variables Outputted by KONIG
         Read_KONIGBox() 
@@ -169,24 +156,13 @@ for iT = 1:length(Temp.TranVec)
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
+        
     end
     
     
     %%%% Plotting Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%   
+    %%    
     
-        Plot_DiatPot()
-    
-    %% Plotting Overall Rate Coefficients (Dissociation and Exchange)
-    if (Input.Tasks.Plot_OverallRates.Flg)
-        Plot_OverallRates()    
-    end
-    
-    %% Plotting Pair Contributions to Dissociation Rate Coefficients
-    if (Input.Tasks.Plot_DifferentDissRates.Flg)
-        Plot_DifferentDissRates()
-    end
-
     %% Plotting Mole Fractions
     if (Input.Tasks.Plot_MoleFracs.Flg)
         Plot_MoleFracs(Input.Tasks.Plot_MoleFracs)

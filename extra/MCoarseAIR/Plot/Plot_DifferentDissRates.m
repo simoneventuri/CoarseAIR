@@ -1,6 +1,6 @@
-%% The Function plots the Global Rates (Dissociation and Exchanges)
+%% The Function plots the Contributions to the Dissociation Rate Coefficients from the Different Pairs
 %
-function Plot_GlobalRates(Controls)    
+function Plot_DifferentDissRates()    
     
     %%==============================================================================================================
     % 
@@ -25,8 +25,13 @@ function Plot_GlobalRates(Controls)
 
     global Input Kin Param Syst Temp Rates
 
-    fprintf('= Plot_GlobalRates ===================== T = %i K\n', Temp.TNow)
+    fprintf('= Plot_DifferentDissRates ============== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
+
+    iMol       = 1;
+    LevelToBin = Syst.Molecule(iMol).LevelToBin;
+    Levelvqn   = Syst.Molecule(iMol).Levelvqn;
+    LevelEeV   = Syst.Molecule(iMol).LevelEeV;
     
     
     figure(Input.iFig)
@@ -35,49 +40,47 @@ function Plot_GlobalRates(Controls)
     %fig.Position = screensize;
     %fig.Color='None';
     
-    
-    ProcNames = [];
-    loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
-    ProcNames = {'$\bar{K}^D$'};
-    hold on
-    for iExch = 1:Syst.NProc-2
-        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(:,iExch), 'Color', Param.CMat(iExch+1,:), 'linestyle', char(Param.linS(iExch+1)), 'LineWidth', Param.LineWidth)
-        ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
+    ProcNames = {};
+    for iP = 1:3
+        scatter(LevelEeV, Rates.T(Temp.iT).Diss(:,iP+1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iP,:));
+        hold on
+        ProcNames = [ProcNames, strcat('Pair 1,{ }', Syst.Molecule(Syst.Pair(iP).ToMol).Name)];
     end
-    hold on
+    
+
+    clab             = legend(ProcNames, 'Location', 'Best');
+    clab.Interpreter = 'latex';
+    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');    
 
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
     yt = get(gca, 'YTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-    clab             = legend(ProcNames, 'Location', 'Best');
-    clab.Interpreter = 'latex';
-    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
-
-    str_x = ['t [s]'];
+    str_x = ['$\epsilon_i$ [eV]'];
     xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     xlab.Interpreter = 'latex';
-    %xlim(XLimPlot);
+    %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
 
-    str_y = ['$\bar{K}$~$[cm^3/s]$'];
+    str_y = ['$k_i^D$ $[cm^{3}/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
-    %ylim(YLimPlot);
+    %ylim([1.d5, 1.d23]);
+    set(gca, 'YScale', 'log')
 
 
-  
     pbaspect([1 1 1])
-    
+
     if Input.SaveFigsFlgInt > 0
         [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
+        FileName = strcat('Pops_t', num2str(tStep), 's');
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'GlobalRates');
+            FileName   = strcat(FolderPath, FileName);
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'GlobalRates.fig');
+            FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
             savefig(FileName)
         end
         close

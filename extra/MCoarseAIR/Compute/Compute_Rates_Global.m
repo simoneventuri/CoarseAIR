@@ -28,7 +28,10 @@ function Compute_Rates_Global()
     
     global Rates Syst Temp Kin
     
-    
+    fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+
+        
     if (Syst.NAtoms == 3)
         
         
@@ -50,13 +53,11 @@ function Compute_Rates_Global()
             end
         end
         
-        fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
-        fprintf('====================================================\n')
+
         fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
         for iExch = 1:Syst.NProc-2
             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
         end
-        fprintf('====================================================\n\n')
 
         
     else
@@ -87,16 +88,16 @@ function Compute_Rates_Global()
 
         end
         
-        fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
-        fprintf('====================================================\n')
+
         fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
 %         for iExch = 1:Syst.NProc-2
 %             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
 %         end
-        fprintf('====================================================\n\n')
         
         
     end
     
+    
+    fprintf('====================================================\n\n')
     
 end

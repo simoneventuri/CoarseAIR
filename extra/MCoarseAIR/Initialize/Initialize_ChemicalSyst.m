@@ -1,6 +1,4 @@
-%% The Function Loads the Parameters of the Chemical System
-%
-%  Required Variables: - Input.SystNameLong
+%% The Function Loads the Variables of the Chemical System
 %                       
 function Initialize_ChemicalSyst()
 
@@ -27,12 +25,18 @@ function Initialize_ChemicalSyst()
   
     global Syst Input
 
+    
+    fprintf('= Initialize_ChemicalSyst ==========================\n')
+    fprintf('====================================================\n')
+    fprintf(['Loading Variables for Chemical System:' ' ' Input.SystNameLong '\n'])
+    
+    
     if strcmp(Input.SystNameLong, 'CO2_NASA')
         
         %%% System
-        Syst.Name  = 'CO2'
+        Syst.Name  = 'CO2';
         
-        Syst.NProc = 4 %(Diss+Inel+Exch+Exch)
+        Syst.NProc = 4; %(Diss+Inel+Exch+Exch)
         
         
         %%% Atoms
@@ -56,7 +60,7 @@ function Initialize_ChemicalSyst()
         
         
         %%% Molecules
-        Syst.NMolecules                   = 2
+        Syst.NMolecules                   = 2;
         
         Syst.Molecule(1).Name             = 'CO';
         Syst.Molecule(2).Name             = 'O2';
@@ -72,16 +76,22 @@ function Initialize_ChemicalSyst()
 
         Syst.Molecule(1).NLevelsOrig      = 13521;
         Syst.Molecule(2).NLevelsOrig      = 6078;
-
+    
+        Syst.Molecule(1).ToAtoms          = [1,2];
+        Syst.Molecule(2).ToAtoms          = [2,3];
+        
+        Syst.Molecule(1).DiatPot          = 'CO_NASA';
+        Syst.Molecule(2).DiatPot          = 'O2_NASA';
+        
         
         %%% Pairs
         Syst.Pair(1).Name  = 'CO';
         Syst.Pair(2).Name  = 'CO';
         Syst.Pair(3).Name  = 'O2';
 
-        Syst.Pair(1).ToMol = 1
-        Syst.Pair(2).ToMol = 1
-        Syst.Pair(3).ToMol = 2
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 1;
+        Syst.Pair(3).ToMol = 2;
 
         Syst.Pair(1).Color = [17, 17, 17] ./ 256;
         Syst.Pair(2).Color = [17, 17, 17] ./ 256;
@@ -89,7 +99,7 @@ function Initialize_ChemicalSyst()
 
         
         %% CFD Components (For PLATO and KONIG)
-        Syst.NComp             =  4
+        Syst.NComp             =  4;
         
         Syst.CFDComp(1).Name   = 'C';
         Syst.CFDComp(2).Name   = 'O';
@@ -324,50 +334,102 @@ function Initialize_ChemicalSyst()
 % 
 %       RxLxIdx          = [-1, 1];
 % 
-%     elseif strcmp(Input.SystNameLong, 'O3')
-% 
-%       NTint  = length(T0_Vec);
-% 
-%       Syst.NAtoms     = 3;
-%       AtomsName  = [    'O',     'O',    'O'];
-%       AtomColor  = [0    0.2745    0.7843; 0    0.2745    0.7843; 0    0.2745    0.7843];
-%       AtomSize   = [    150,     150,     150];
-%       AtomMass   = [  29148.94559d0, 29148.94559d0, 29148.94559d0]
-% 
-%       MoleculesName    = ['O2'];
-%       MoleculedDissEn  = [5.2112618288711969];
-%       NMolecules       = size(MoleculesName,1);
-%       DegeneracyFactor = (2);
-%       MoleculeMu       = [31.9988d-3];
-% 
-%       AllMoleculesName = ['O2'; 'O2'; 'O2'];
-% 
-%       PairColor = [0 0 256; 0 256 0; 256 0 0]./256;
-% 
-%       BinnedMolName   = ['O2'];
-%       NBinnedMol      = size(BinnedMolName,1);
-%       BinnedMolToComp = [   2];
-% 
-%       NComp = 2;
-%         CompNames=['  ';'  '];
-%         CompNames(1,:) = ' O';
-%         CompNames(2,:) = 'O2';
-% 
-%         ComponentMass = [AtomMass(1), 2.d0.*AtomMass(1)];
-%         ComponentDeg  = [          9,                 1]
-% 
-% 
-%       ColPartToComp = 1;
-% 
-%         CompColor(1,:) = [ 102, 102, 102];
-%         CompColor(2,:) = [ 204,   0,   0];
-%         CompColor      = CompColor ./ 256;
-% 
-%         ColorVec = [CompColor; [0,   204,   0]./ 256; [0,   0,   204]./ 256];
-% 
-%       RxLxIdx          = [-1, 1];
-%       
-%       
+    elseif strcmp(Input.SystNameLong, 'O3_UMN')
+        
+        %%% System
+        Syst.Name  = 'O3';
+        
+        Syst.NProc = 3; %(Diss+Inel+Exch)
+        
+        
+        %%% Atoms
+        Syst.NAtoms        = 3;
+        
+        Syst.Atom(1).Name  = 'O';
+        Syst.Atom(2).Name  = 'O';
+        Syst.Atom(3).Name  = 'O';
+
+        Syst.Atom(1).Color = [0, 0, 1];
+        Syst.Atom(2).Color = [0, 0, 1];
+        Syst.Atom(3).Color = [0, 0, 1];
+
+        Syst.Atom(1).Size  = 200;
+        Syst.Atom(2).Size  = 200;
+        Syst.Atom(3).Size  = 200;
+
+        Syst.Atom(1).Mass  = 29148.94559;
+        Syst.Atom(2).Mass  = 29148.94559;
+        Syst.Atom(3).Mass  = 29148.94559;
+        
+        
+        %%% Molecules
+        Syst.NMolecules                   = 1;
+        
+        Syst.Molecule(1).Name             = 'O2';
+
+        Syst.Molecule(1).DissEn           = 5.2112618288711969;
+
+        Syst.Molecule(1).DegeneracyFactor = 3;
+
+        Syst.Molecule(1).Mu               = 31.9988e-3;
+
+        Syst.Molecule(1).NLevelsOrig      = 6115;
+
+        Syst.Molecule(1).ToAtoms          = [1,2];
+
+        Syst.Molecule(1).DiatPot          = 'O2_UMN';
+
+        
+        %%% Pairs
+        Syst.Pair(1).Name  = 'O2';
+        Syst.Pair(2).Name  = 'O2';
+        Syst.Pair(3).Name  = 'O2';
+
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 1;
+        Syst.Pair(3).ToMol = 1;
+
+        Syst.Pair(1).Color = [0, 0, 256]  ./ 256;
+        Syst.Pair(2).Color = [0, 0, 256]  ./ 256;
+        Syst.Pair(3).Color = [0, 0, 256]  ./ 256;
+
+        
+        %% CFD Components (For PLATO and KONIG)
+        Syst.NComp             =  2;
+        
+        Syst.CFDComp(1).Name   = 'O';
+        Syst.CFDComp(2).Name   = 'O2';
+
+        Syst.CFDComp(1).ToMol   = 0;
+        Syst.CFDComp(2).ToMol   = 1;
+
+        Syst.CFDComp(1).Mass    = Syst.Atom(1).Mass;
+        Syst.CFDComp(2).Mass    = Syst.Atom(1).Mass + Syst.Atom(2).Mass;
+
+        Syst.CFDComp(1).Deg     = 9;
+        Syst.CFDComp(2).Deg     = 3;
+
+        Syst.CFDComp(1).Color   = [   0,   0,   0] ./ 256;
+        Syst.CFDComp(2).Color   = [   0,   0, 234] ./ 256;
+
+        Syst.CFDComp(1).LineStyle = ':';
+        Syst.CFDComp(2).LineStyle = '-';
+
+        Syst.CFDComp(1).RxLxIdx = -1;
+        Syst.CFDComp(2).RxLxIdx =  1;
+        
+        Syst.MolToCFDComp       = [2];
+
+        
+        %% Exchange Properties
+        Syst.ExchToMol          = [1];
+        Syst.ExchToAtom         = [3];
+
+        Syst.PairToExch         = [1; 1];
+        
+        Syst.ColPartToComp      = 2; 
+
+      
 %     elseif strcmp(Input.SystNameLong, 'HNC')
 %       
 %       NTint  = length(T0_Vec);
@@ -621,9 +683,9 @@ function Initialize_ChemicalSyst()
     elseif strcmp(Input.SystNameLong, 'N4_NASA')
 
         %%% System
-        Syst.Name = 'N4'
+        Syst.Name = 'N4';
         
-        Syst.NProc = 3 %(Diss+Inel+Exch)
+        Syst.NProc = 3; %(Diss+Inel+Exch)
         
         
         %%% Atoms
@@ -651,14 +713,22 @@ function Initialize_ChemicalSyst()
 
 
         %%% Molecules
-        Syst.NMolecules                   = 1
+        Syst.NMolecules                   = 1;
         
         Syst.Molecule(1).Name             = 'N2';
+        
         Syst.Molecule(1).DissEn           = 0.0;
+        
         Syst.Molecule(1).DegeneracyFactor = 1;
+        
         Syst.Molecule(1).Mu               = 28.0134d-3;
+        
         Syst.Molecule(1).NLevelsOrig      = 9390;
-
+        
+        Syst.Molecule(1).ToAtoms          = [1,2];
+        
+        Syst.Molecule(1).DiatPot          = 'N2_NASA';
+        
         
         %%% Pairs
         Syst.Pair(1).Name  = 'N2';
@@ -668,12 +738,12 @@ function Initialize_ChemicalSyst()
         Syst.Pair(5).Name  = 'N2';
         Syst.Pair(6).Name  = 'N2';
         
-        Syst.Pair(1).ToMol = 1
-        Syst.Pair(2).ToMol = 1
-        Syst.Pair(3).ToMol = 1
-        Syst.Pair(4).ToMol = 1
-        Syst.Pair(5).ToMol = 1
-        Syst.Pair(6).ToMol = 1
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 1;
+        Syst.Pair(3).ToMol = 1;
+        Syst.Pair(4).ToMol = 1;
+        Syst.Pair(5).ToMol = 1;
+        Syst.Pair(6).ToMol = 1;
         
         Syst.Pair(1).Color = [17, 17, 17] ./ 256;
         Syst.Pair(2).Color = [17, 17, 17] ./ 256;
@@ -684,7 +754,7 @@ function Initialize_ChemicalSyst()
         
         
         %% CFD Components (For PLATO and KONIG)
-        Syst.NComp             =  2
+        Syst.NComp             =  2;
         
         Syst.CFDComp(1).Name   = 'N';
         Syst.CFDComp(2).Name   = 'N2';
@@ -763,5 +833,9 @@ function Initialize_ChemicalSyst()
 %       RxLxIdx          = [-1, 1];
 
     end
+    
+    
+    Syst
+    fprintf('====================================================\n\n')  
 
 end

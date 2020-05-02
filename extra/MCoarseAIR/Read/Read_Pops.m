@@ -28,23 +28,34 @@ function Read_Pops()
 
     global Input Syst Kin Temp
     
+    fprintf('= Read_Pops ============================ T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    fprintf('Reading Level/Group Populations from KONIG\n' )
+    
     
     for iMol=1:Syst.NMolecules        
+        fprintf(['Reading For Molecule Nb: ' num2str(iMol) '\n'] )
         iNBins = Syst.Molecule(iMol).EqNStatesIn;
         
         
-        PopFile = strcat(Input.Paths.ToKinRunFldr, '/Pop_', Syst.Molecule(iMol).Name);
-        if isfile(strcat(PopFile,'.mat'))
+        PopFileMat = strcat(Input.Paths.ToKinRunFldr, '/Pop_', Syst.Molecule(iMol).Name);
+        fprintf(['Checking if .mat File is Already Present: ' PopFileMat '.mat \n'] )
+
         
-            load(strcat(PopFile,'.mat'), 'NSteps', 'PopOverg' )
+        if isfile(strcat(PopFileMat,'.mat'))
+            fprintf(['Reading From File: ' PopFileMat '.mat \n'] )
+
+            load(strcat(PopFileMat,'.mat'), 'NSteps', 'PopOverg' )
             Kin.T(Temp.iT).NSteps                  = NSteps;
             Kin.T(Temp.iT).Molecule(iMol).PopOverg = PopOverg; 
             
         else
-        
-
+            PopFile = strcat(Input.Paths.ToKinRunFldr, '/pop_', Syst.Molecule(iMol).Name, '.dat');
+            fprintf(['Reading From File: ' PopFile '\n'] )
+    
+            
             %% Reading Molecules' Level/Group Populations
-            filename = strcat(Input.Paths.ToKinRunFldr, '/pop_', Syst.Molecule(iMol).Name, '.dat')
+            filename = PopFile;
             delimiter = ' ';
             startRow = 3;
             formatSpec = '%*s%f%*s%*s%[^\n\r]';
@@ -71,9 +82,11 @@ function Read_Pops()
             Kin.T(Temp.iT).NSteps = iStep-1;
             fprintf('Found %i Steps in the 0-D Solution', Kin.T(Temp.iT).NSteps) 
             
+            
+            fprintf(['Saving Population in .mat File: ' PopFileMat '.mat \n'] )
             NSteps   = Kin.T(Temp.iT).NSteps;
             PopOverg = Kin.T(Temp.iT).Molecule(iMol).PopOverg; 
-            save(PopFile, 'NSteps', 'PopOverg', '-v7.3');
+            save(PopFileMat, 'NSteps', 'PopOverg', '-v7.3');
             
             
         end
@@ -89,4 +102,7 @@ function Read_Pops()
         
     end
     
+    
+    fprintf('====================================================\n\n')
+
 end

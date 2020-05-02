@@ -1,8 +1,6 @@
 %% The Function Reads the Molecules' Level Info from the list used for QCT
-%
-%  Required Variables: - Input.SystNameLong
 %        
-function ReadLevelInfo()
+function Read_LevelInfo()
       
     % -- MATLAB --
     %%==============================================================================================================
@@ -27,14 +25,21 @@ function ReadLevelInfo()
     %%==============================================================================================================
 
     
-    global Input Syst Param
-  
+    global Input Param Syst
+
+    fprintf('= Read_LevelInfo ===================================\n')
+    fprintf('====================================================\n')
+    
     
     for iMol = 1:Syst.NMolecules       
-    
+
         
         %% Reading levels_cut.inp
-        filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/levels_cut.inp')
+        filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/levels_cut.inp');
+
+        fprintf('Reading Level Quantities for Molecule Nb %i \n',  iMol )
+        fprintf(strcat('File: ', filename, ' \n'))  
+        
         startRow = 16;
         formatSpec = '%6f%5f%15f%15f%15f%15f%15f%15f%15f%15f%f%[^\n\r]';
         fileID = fopen(filename,'r');
@@ -57,13 +62,15 @@ function ReadLevelInfo()
 
         Syst.Molecule(iMol).NLevels   = length(Syst.Molecule(iMol).LevelEEh);
         Syst.Molecule(iMol).LevelEeV  = Syst.Molecule(iMol).LevelEEh * Param.EhToeV;
-        Syst.Molecule(iMol).EEhRef    = min(Syst.Molecule(iMol).LevelEEh(1))
-        Syst.Molecule(iMol).EeVRef    = min(Syst.Molecule(iMol).LevelEeV(1))
+        Syst.Molecule(iMol).EEhRef    = min(Syst.Molecule(iMol).LevelEEh(1));
+        Syst.Molecule(iMol).EeVRef    = min(Syst.Molecule(iMol).LevelEeV(1));
         Syst.Molecule(iMol).LevelEEh0 = Syst.Molecule(iMol).LevelEEh - min(Syst.Molecule(iMol).LevelEEh(1));
         Syst.Molecule(iMol).LevelEeV0 = Syst.Molecule(iMol).LevelEeV - min(Syst.Molecule(iMol).LevelEeV(1));
         Syst.Molecule(iMol).Nvqn      = max(Syst.Molecule(iMol).Levelvqn) + 1;
         Syst.Molecule(iMol).Njqn      = max(Syst.Molecule(iMol).Leveljqn) + 1;
-    
+        
+        Syst.Molecule(iMol).LevelECB  = Syst.Molecule(iMol).LevelVMax - Syst.Molecule(iMol).LevelEeV; 
+
         
         vToLevel = zeros(Syst.Molecule(iMol).Nvqn,1);
         for iLevels = 1:Syst.Molecule(iMol).NLevels
@@ -120,5 +127,8 @@ function ReadLevelInfo()
         clear opts tbl
         
     end
+    
+    
+    fprintf('====================================================\n\n')  
     
 end

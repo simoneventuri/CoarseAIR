@@ -1,6 +1,6 @@
 %% The Function plots the Mole Fractions of the Chemical System's Components 
 %
-function PlotMoleFracs(Controls)    
+function Plot_MoleFracs(Controls)    
     
     %%==============================================================================================================
     % 
@@ -25,17 +25,19 @@ function PlotMoleFracs(Controls)
 
     global Input Kin Param Syst Temp
 
+    fprintf('= Plot_MoleFracs ======================= T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
+    
     figure(Input.iFig)
     fig = gcf;
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
 
-    CompNames = [];
     for iComp = Controls.CompStart:Controls.CompEnd
       semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
       hold on
-      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
     end
     hold on
 
@@ -44,7 +46,7 @@ function PlotMoleFracs(Controls)
     yt = get(gca, 'YTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-    clab             = legend(CompNames, 'Location', 'Best');
+    clab             = legend(Syst.CFDComp(Controls.CompStart:Controls.CompEnd).Name, 'Location', 'Best');
     clab.Interpreter = 'latex';
     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
 
@@ -75,5 +77,8 @@ function PlotMoleFracs(Controls)
         close
     end
     Input.iFig = Input.iFig + 1;
+
+    
+    fprintf('====================================================\n\n')
 
 end

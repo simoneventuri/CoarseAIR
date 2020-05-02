@@ -29,6 +29,12 @@ function Initialize_Input()
     global Input Syst Temp
 
     
+    fprintf('= Initialize_Input =================================\n')
+    fprintf('====================================================\n')
+    fprintf('Initializing Syst and Temp Objects based on Input Object\n' )
+    fprintf('====================================================\n\n')  
+    
+    
     Syst.NameLong   = Input.SystNameLong;
     
     for iMol = 1:size(Input.Kin.MolResolutionIn,1)

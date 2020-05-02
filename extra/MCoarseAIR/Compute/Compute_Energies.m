@@ -1,6 +1,6 @@
 %% Computing the Energy Stored in each of the Internal Modes
 %
-function ComputeEnergies()    
+function Compute_Energies(Controls)    
 
     %%==============================================================================================================
     % 
@@ -25,11 +25,17 @@ function ComputeEnergies()
     
     global Input Kin Param Syst Temp Rates
 
+    
+    fprintf('= Compute_Energies ===================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
 
     Pressure = Kin.T(Temp.iT).MolFracs(end, Syst.ColPartToComp) * Kin.T(Temp.iT).P(end) / 101325.0;
     
     
     for iMol = Controls.MoleculesOI
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+        
         LevelToBin  = Syst.Molecule(iMol).LevelToBin;
         Levelvqn    = Syst.Molecule(iMol).Levelvqn;
         LevelEeV    = Syst.Molecule(iMol).LevelEeV;
@@ -111,6 +117,10 @@ function ComputeEnergies()
         Kin.T(Temp.iT).Molecule(iMol).tauRotP = Kin.T(Temp.iT).Molecule(iMol).tauRot * Pressure;
         Kin.T(Temp.iT).Molecule(iMol).tauVibP = Kin.T(Temp.iT).Molecule(iMol).tauVib * Pressure;
         
+        fprintf('P*tau_Int = %e [Pa*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauIntP );
+        fprintf('P*tau_Rot = %e [Pa*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauRotP );
+        fprintf('P*tau_Vib = %e [Pa*s]\n\n', Kin.T(Temp.iT).Molecule(iMol).tauVibP );
+
 
        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
         FileName          = strcat(Input.Paths.SaveDataFldr, '/Taus_', Syst.Molecule(iMol).Name, '_', Input.Kin.Proc.OverallFlg, '.csv');
@@ -126,6 +136,8 @@ function ComputeEnergies()
         
         
     end
-  
+
+    fprintf('====================================================\n\n')        
+
     
 end

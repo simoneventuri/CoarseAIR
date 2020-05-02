@@ -1,6 +1,6 @@
 %% The Function plots the Ro-Vibrational Populations at Given Time Steps
 %
-function Plot_Energies(Controls)    
+function Plot_DiatPot(Controls)    
     
     %%==============================================================================================================
     % 
@@ -25,42 +25,40 @@ function Plot_Energies(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+    fprintf('= Plot_DiatPot =====================================\n')
+    fprintf('====================================================\n')
     
-    for iMol = Controls.MoleculesOI
-        LevelToBin = Syst.Molecule(iMol).LevelToBin;
-        Levelvqn   = Syst.Molecule(iMol).Levelvqn;
-        LevelEeV   = Syst.Molecule(iMol).LevelEeV;
+    
+    for iMol = 1:Syst.NMolecules
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+
+               
+        figure(Input.iFig)
+        fig = gcf;
+        screensize   = get( groot, 'Screensize' );
+        %fig.Position = screensize;
+        %fig.Color='None';
         
         
-        h1=semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eInt, '-', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
-        hold on
-        h2=semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eRot, '-', 'Color', Param.RCVec, 'LineWidth', Param.LineWidth);
-        h3=semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eVib, '-', 'Color', Param.GCVec, 'LineWidth', Param.LineWidth);
-
-        Kin.T(Temp.iT).Molecule(iMol).eIntLT = Kin.T(Temp.iT).Molecule(iMol).eInt(end) - (Kin.T(Temp.iT).Molecule(iMol).eInt(end)- Kin.T(Temp.iT).Molecule(iMol).eInt(1) .* exp( -t ./ Kin.T(Temp.iT).Molecule(iMol).tauInt ) );
-        Kin.T(Temp.iT).Molecule(iMol).eRotLT = Kin.T(Temp.iT).Molecule(iMol).eRot(end) - (Kin.T(Temp.iT).Molecule(iMol).eRot(end)- Kin.T(Temp.iT).Molecule(iMol).eRot(1) .* exp( -t ./ Kin.T(Temp.iT).Molecule(iMol).tauRot ) );
-        Kin.T(Temp.iT).Molecule(iMol).eVibLT = Kin.T(Temp.iT).Molecule(iMol).eVib(end) - (Kin.T(Temp.iT).Molecule(iMol).eVib(end)- Kin.T(Temp.iT).Molecule(iMol).eVib(1) .* exp( -t ./ Kin.T(Temp.iT).Molecule(iMol).tauVib ) );
-
-
-        h4 = semilogx(t(Steps), Kin.T(Temp.iT).Molecule(iMol).eIntLT, ':', 'Color', KCVec,'LineWidth',3);
-        h5 = semilogx(t(Steps), Kin.T(Temp.iT).Molecule(iMol).eRotLT, ':', 'Color',RCVec,'LineWidth',3);
-        h6 = semilogx(t(Steps), Kin.T(Temp.iT).Molecule(iMol).eVibLT, ':', 'Color',GCVec,'LineWidth',3);
-
+        rVec = linspace(Controls.Extremes(iMol,1), Controls.Extremes(iMol,2), 3000);
         
-        if Controls.LTFlag
-            clab = legend([h1,h4,h2,h5,h3,h6],'Internal Energy from Master Equation','Internal Energy from Landau Teller','Rotational Energy from Master Equation','Rotational Energy from Landau Teller','Vibrational Energy from Master Equation','Vibrational Energy from Landau Teller', 'Location', 'Best');
-        else
-            clab = legend([h1,h2,h3],'Internal Energy', 'Rotational Energy', 'Vibrational Energy', 'Location', 'Best');
+        ij = 0;
+        for jqn = Controls.jqnVec
+            ij = ij + 1;
+            
+            [Ve, dVe] = DiatPot(rVec, jqn, iMol);
+            
+            plot(rVec, Ve, '-', 'Color', Param.CMat(ij,:), 'LineWidth', Param.LineWidth);
+            hold on
         end
-        clab.Interpreter = 'latex';
-        set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+            
 
         xt = get(gca, 'XTick');
         set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
         yt = get(gca, 'YTick');
         set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-        str_x = ['t [s]'];
+        str_x = ['r [$a_0$]'];
         xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         xlab.Interpreter = 'latex';
         %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
@@ -92,6 +90,8 @@ function Plot_Energies(Controls)
         
         
     end
-
+    
+    
+    fprintf('====================================================\n\n')
     
 end

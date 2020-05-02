@@ -25,12 +25,17 @@ function Compute_EnergyDepletions(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+
+    fprintf('= Compute_EnergyDepletions ============= T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
     
     iProj = Controls.ProjTarg(1);
     iTarg = Controls.ProjTarg(2);
     
-    
+
     for iMol = Controls.MoleculesOI
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+
         LevelToBin   = Syst.Molecule(iMol).LevelToBin;
         Levelvqn     = Syst.Molecule(iMol).Levelvqn;
         LevelEeV     = Syst.Molecule(iMol).LevelEeV;
@@ -82,11 +87,20 @@ function Compute_EnergyDepletions(Controls)
         CDIntEq  = Kin.T(Temp.iT).Molecule(iMol).CDInt(end);
         CDRotEq  = Kin.T(Temp.iT).Molecule(iMol).CDRot(end);
         CDVibEq  = Kin.T(Temp.iT).Molecule(iMol).CDVib(end);
+
+        fprintf('At Eq., Int. Energy Depletion Coefficient = %e \n',          CDIntEq );
+        fprintf('At Eq., Rot. Energy Depletion Coefficient = %e (%e%%) \n',   CDRotEq, CDRotEq/CDIntEq*100 );
+        fprintf('At Eq., Vib. Energy Depletion Coefficient = %e (%e%%) \n\n', CDVibEq, CDVibEq/CDIntEq*100 );
+        
         
         CDIntQSS = Kin.T(Temp.iT).Molecule(iMol).CDInt(Kin.T(Temp.iT).QSS.i);
         CDRotQSS = Kin.T(Temp.iT).Molecule(iMol).CDRot(Kin.T(Temp.iT).QSS.i);
         CDVibQSS = Kin.T(Temp.iT).Molecule(iMol).CDVib(Kin.T(Temp.iT).QSS.i);
-        
+
+        fprintf('At QSS, Int. Energy Depletion Coefficient = %e \n',          CDIntQSS );
+        fprintf('At QSS, Rot. Energy Depletion Coefficient = %e (%e%%) \n',   CDRotQSS, CDRotQSS/CDIntEq*100 );
+        fprintf('At QSS, Vib. Energy Depletion Coefficient = %e (%e%%) \n\n', CDVibQSS, CDVibQSS/CDIntEq*100 );
+
         
         [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
         FileName          = strcat(Input.Paths.SaveDataFldr, '/EDCoeffs_', Syst.Molecule(iMol).Name, '_', Input.Kin.Proc.OverallFlg, '.csv');
@@ -103,5 +117,8 @@ function Compute_EnergyDepletions(Controls)
         
     end
 
+    fprintf('====================================================\n\n')        
+
+    
 
 end

@@ -140,7 +140,7 @@
    Sorting Method, Molecule 6 = RoVib-CG   
      File with Bins Energy Minima, Molecule 6 = E_low.dat
      Nb of Bins, Molecule 6 = 1
-   Sorting Method, Molecule 6 = Vib-Specific 
+   #Sorting Method, Molecule 6 = Vib-Specific 
  
 
 

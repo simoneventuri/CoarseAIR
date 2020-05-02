@@ -25,8 +25,19 @@ function Plot_EnergyDepletions(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+    fprintf('= Plot_EnergyDepletions ================ T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
     
     for iMol = Controls.MoleculesOI
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+
+        
+        figure(Input.iFig)
+        fig = gcf;
+        screensize   = get( groot, 'Screensize' );
+        %fig.Position = screensize;
+        %fig.Color='None';
         
         
         h1 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDInt, '-', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
@@ -78,5 +89,7 @@ function Plot_EnergyDepletions(Controls)
         
     end
 
-    
+
+    fprintf('====================================================\n\n')
+
 end

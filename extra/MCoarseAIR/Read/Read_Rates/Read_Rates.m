@@ -29,6 +29,11 @@ function Read_Rates()
     global Input Rates Syst Temp
   
     
+    fprintf('= Read_Rates =========================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    fprintf('Reading Rates \n\n' )
+    
+    
     if (Syst.NAtoms == 3)
         
         iMol    = Syst.Pair(1).ToMol;
@@ -61,9 +66,7 @@ function Read_Rates()
         end
         
     end
-    
-    
-    
+
     
     if strcmp(Input.Kin.RateSource, 'HDF5')
         
@@ -84,8 +87,13 @@ function Read_Rates()
     end
     
     
+    if (Input.Kin.DissCorrFactor ~= 1)
+        fprintf(['Correcting Dissociation Rate by a Factor: ' str(Input.Kin.DissCorrFactor) '\n'] )
+        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
+    end
     
     
+    fprintf(strcat('Computing Overall Rates \n') )
     if (Syst.NAtoms == 3)
        
         Rates.T(Temp.iT).Overall(:,1)           =      Rates.T(Temp.iT).Diss(:,1);
@@ -96,10 +104,10 @@ function Read_Rates()
         
     else
         
-        
-        
     end
-    
-    
+        
+        
+    fprintf('====================================================\n\n')  
+
 
 end

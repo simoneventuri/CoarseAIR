@@ -48,10 +48,10 @@ export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=1
+export DissFlg=0
 export InelFlg=1
 export ExchFlg1=1
-export ExchFlg2=2
+export ExchFlg2=1
 
 export NBins=0
 
@@ -98,13 +98,13 @@ function Call_MeCvode() {
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
 
-  if [ $DissFlg -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_NoDiss'
-  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_OnlyDiss'
-  else
+  # if [ $DissFlg -eq 0 ]; then
+  #   export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_NoDiss'
+  # elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
+  #   export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_OnlyDiss'
+  # else
     export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K'
-  fi  
+  # fi  
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
   

@@ -1,7 +1,5 @@
 %% The Function Reads the Grouped Molecules' Partion Functions and Energies
 %
-%  Initializing Input Global Var: - Syst.Paths.ToReadFldr: The path to the output folder (e.g.: .../CoarseAIR/run_O3/Test/ )
-%
 function Read_EeV_and_Q_CG()     
 
     % -- MATLAB --
@@ -26,11 +24,16 @@ function Read_EeV_and_Q_CG()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Syst Input Temp Kin Param
-
+    global Temp Param Syst
+    %global Input
  
-    for iMol = 1:Syst.NMolecules        
-
+    fprintf('= Read_EeV_and_Q_CG ==================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
+    
+    for iMol = 1:Syst.NMolecules      
+        
+        fprintf('Computing Grouped Quantities for Molecule Nb %i \n',  iMol )
         
 %         %% Read T5000.csv
 %         filename = strcat(Input.Paths.ToQCTFldr, '/', Syst.Name, '/', Syst.Molecule(iMol).Name, '/Bins_', num2str(Syst.Molecule(iMol).EqNStatesIn), '/T', Temp.TNowChar, '.csv')
@@ -46,9 +49,9 @@ function Read_EeV_and_Q_CG()
 %         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q      = tbl.PartFunc;
 %         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV    = tbl.EnergyeV + Syst.Molecule(iMol).EeVRef;
 %         clear opts tbl 
+   
 
-
-        %% Read Compute Group Energy and Part Function
+        %% Compute Group Energy and Part Function
         Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* exp( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
         
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
@@ -72,4 +75,7 @@ function Read_EeV_and_Q_CG()
         
     end
     
+    
+    fprintf('====================================================\n\n')
+
 end

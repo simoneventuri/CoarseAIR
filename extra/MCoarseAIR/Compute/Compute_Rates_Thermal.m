@@ -28,6 +28,10 @@ function Compute_Rates_Thermal()
     
     global Rates Syst Temp
     
+
+    fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')    
+
     
     if (Syst.NAtoms == 3)
     
@@ -50,13 +54,11 @@ function Compute_Rates_Thermal()
             end
         end
         
-        fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
-        fprintf('====================================================\n')
+        
         fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
         for iExch = 1:Syst.NProc-2
             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
         end
-        fprintf('====================================================\n\n')
         
         
     else 
@@ -86,16 +88,16 @@ function Compute_Rates_Thermal()
         
         Rates.T(Temp.iT).DissTh = Rates.T(Temp.iT).DissTh_Diss + Rates.T(Temp.iT).DissTh_DissInel;
         
-        fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
-        fprintf('====================================================\n')
+        
         fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
 %         for iExch = 1:Syst.NProc-2
 %             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
 %         end
-        fprintf('====================================================\n\n')        
         
         
     end
-
     
+    
+    fprintf('====================================================\n\n')        
+
 end

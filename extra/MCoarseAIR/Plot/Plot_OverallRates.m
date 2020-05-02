@@ -1,7 +1,6 @@
-%% The Function plots the Mole Fractions of the Chemical System's Components 
-%%    on Top of The Global Rates (Dissociation and Exchanges)
+%% The Function plots the Overall Dissociation and Exchange Rate Coefficients
 %
-function Plot_MoleFracs_and_GlobalRates(Controls)    
+function Plot_OverallRates()    
     
     %%==============================================================================================================
     % 
@@ -26,8 +25,13 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
 
     global Input Kin Param Syst Temp Rates
 
-    fprintf('= Plot_MoleFracs_and_GlobalRates ======= T = %i K\n', Temp.TNow)
+    fprintf('= Plot_OverallRates ==================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
+
+    iMol       = 1;
+    LevelToBin = Syst.Molecule(iMol).LevelToBin;
+    Levelvqn   = Syst.Molecule(iMol).Levelvqn;
+    LevelEeV   = Syst.Molecule(iMol).LevelEeV;
     
     
     figure(Input.iFig)
@@ -35,101 +39,58 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
-    left_color  = Syst.CFDComp(Controls.CompStart).Color;
-    right_color = Param.KCVec;
-    set(fig,'defaultAxesColorOrder',[left_color; right_color]);
-        
     
     
-    yyaxis right
-
-    ProcNames = [];
-    loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+    scatter(LevelEeV, Rates.T(Temp.iT).Overall(:,1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(1,:)  );
     ProcNames = {'$\bar{K}^D$'};
+    
     hold on
-    for iExch = 1:Syst.NProc-2
-        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(:,iExch), 'Color', Param.CMat(iExch+1,:), 'linestyle', char(Param.linS(iExch+1)), 'LineWidth', Param.LineWidth)
+    for iExch = 1:size(Syst.ExchToMol,1)
+        scatter(LevelEeV, Rates.T(Temp.iT).Overall(:,2+iExch), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iExch+1,:));
         ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
     end
-    hold on
     
-    xt = get(gca, 'XTick');
-    set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
-    yt = get(gca, 'YTick');
-    set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
     clab             = legend(ProcNames, 'Location', 'Best');
     clab.Interpreter = 'latex';
-    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');    
 
-    str_x = ['t [s]'];
-    xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
-    xlab.Interpreter = 'latex';
-    %xlim(XLimPlot);
-
-    str_y = ['$\bar{K}$~$[cm^3/s]$'];
-    ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
-    ylab.Interpreter = 'latex';
-    %ylim(YLimPlot);
-    
-    set(0,'DefaultLegendAutoUpdate','off')
-    
-    
-    
-    yyaxis left
-    
-    CompNames = [];
-    for iComp = Controls.CompStart:Controls.CompEnd
-      semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
-      hold on
-      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
-    end
-    hold on
-    
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
     yt = get(gca, 'YTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-%     clab             = legend(CompNames, 'Location', 'Best');
-%     clab.Interpreter = 'latex';
-%     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
-
-    str_x = ['t [s]'];
+    str_x = ['$\epsilon_i$ [eV]'];
     xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     xlab.Interpreter = 'latex';
-    %xlim(XLimPlot);
+    %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
 
-    str_y = ['Mole Fraction'];
+    str_y = ['$k_i$ $[cm^{3}/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
-    %ylim(YLimPlot);
-    
-    
-    
-    semilogx([Kin.T(Temp.iT).QSS.tStart, Kin.T(Temp.iT).QSS.tStart], [0, 1], ':k', 'LineWidth',2)
-    semilogx([Kin.T(Temp.iT).QSS.tEnd,   Kin.T(Temp.iT).QSS.tEnd],   [0, 1], ':k', 'LineWidth',2)
-    
-    
-    
+    %ylim([1.d5, 1.d23]);
+    set(gca, 'YScale', 'log')
+
+
     pbaspect([1 1 1])
 
     if Input.SaveFigsFlgInt > 0
         [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
+        FileName = strcat('Pops_t', num2str(tStep), 's');
         if Input.SaveFigsFlgInt == 1
-            FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates');
+            FileName   = strcat(FolderPath, FileName);
             export_fig(FileName, '-pdf')
         elseif Input.SaveFigsFlgInt == 2
-            FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates.fig');
+            FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
             savefig(FileName)
         end
         close
     end
     Input.iFig = Input.iFig + 1;
 
-
-    fprintf('====================================================\n\n')
     
+    fprintf('====================================================\n\n')
+
 end

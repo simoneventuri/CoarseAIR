@@ -25,8 +25,13 @@ function Plot_Populations(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+    fprintf('= Plot_Populations ===================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
     
     for iMol = Controls.MoleculesOI
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+
         LevelToBin = Syst.Molecule(iMol).LevelToBin;
         Levelvqn   = Syst.Molecule(iMol).Levelvqn;
         LevelEeV   = Syst.Molecule(iMol).LevelEeV;
@@ -37,6 +42,7 @@ function Plot_Populations(Controls)
             while Kin.T(Temp.iT).t(iStep) < tStep
                 iStep = iStep + 1;
             end     
+            fprintf(['Plotting Time Step Nb ' num2str(iStep) ', t = ' num2str(Kin.T(Temp.iT).t(iStep)) ' s (' num2str(tStep) ' s)\n'] );
 
 
             if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
@@ -134,5 +140,7 @@ function Plot_Populations(Controls)
         
     end
 
-    
+
+    fprintf('====================================================\n\n')
+
 end

@@ -25,11 +25,23 @@ function Plot_Energies(Controls)
 
     global Input Kin Param Syst Temp Rates
 
+    fprintf('= Plot_Energies ======================== T = %i K\n', Temp.TNow)
+    fprintf('====================================================\n')
+    
     
     for iMol = Controls.MoleculesOI
+        fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+
         LevelToBin = Syst.Molecule(iMol).LevelToBin;
         Levelvqn   = Syst.Molecule(iMol).Levelvqn;
         LevelEeV   = Syst.Molecule(iMol).LevelEeV;
+        
+        
+        figure(Input.iFig)
+        fig = gcf;
+        screensize   = get( groot, 'Screensize' );
+        %fig.Position = screensize;
+        %fig.Color='None';
         
         
         h1=semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eInt, '-', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
@@ -93,6 +105,8 @@ function Plot_Energies(Controls)
         
         
     end
-
+    
+    
+    fprintf('====================================================\n\n')
     
 end
