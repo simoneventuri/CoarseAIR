@@ -341,7 +341,7 @@ function RunTrajectoriesAtNode {
   elif [[ ${NProc} -eq 32 ]]; then
     parallel --xapply -j 32 "sh ${COARSEAIR_SH_DIR}/RunTrajectoriesAtProc.sh '${System}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} ${TranFlg} ${Tran} ${Tint} ${iLevel1} ${iLevel2} " ::: {1..32} 
   elif [[ ${NProc} -eq 48 ]]; then
-    parallel --xapply -j 48 "sh ${COARSEAIR_SH_DIR}/RunTrajectoriesAtProc.sh '${System}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} ${TranFlg} ${Tran} ${Tint} ${iLevel1} ${iLevel2} " ::: {1..32} 
+    parallel --xapply -j 48 "sh ${COARSEAIR_SH_DIR}/RunTrajectoriesAtProc.sh '${System}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} ${TranFlg} ${Tran} ${Tint} ${iLevel1} ${iLevel2} " ::: {1..48} 
   elif [[ ${NProc} -eq 64 ]]; then
     parallel --xapply -j 64 "sh ${COARSEAIR_SH_DIR}/RunTrajectoriesAtProc.sh '${System}' '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} ${TranFlg} ${Tran} ${Tint} ${iLevel1} ${iLevel2} " ::: {1..64} 
   elif [[ ${NProc} -eq 128 ]]; then
