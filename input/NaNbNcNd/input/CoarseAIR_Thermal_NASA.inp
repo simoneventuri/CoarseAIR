@@ -108,8 +108,8 @@
    #  Starting Bin, Molecule 1 = 1
    #  Final    Bin, Molecule 1 = 10
    Sorting Method, Molecule 1 = RoVib-CG 
-      File with Bins Energy Minima, Molecule 1 = E_low.dat
       Nb of Bins, Molecule 1 = 1
+      File with Bins Energy Minima, Molecule 1 = E_low.dat
       Starting Bin, Molecule 1 = 1
       Final    Bin, Molecule 1 = 1
 
@@ -119,9 +119,9 @@
    #  Nb of Bins, Molecule 2 = 10
    #  Starting Bin, Molecule 2 = 0
    #  Final    Bin, Molecule 2 = 10
-   Sorting Method, Molecule 2 = RoVib-CG   
-      File with Bins Energy Minima, Molecule 2 = E_low.dat                       
+   Sorting Method, Molecule 2 = RoVib-CG                
       Nb of Bins, Molecule 2 = 1
+      File with Bins Energy Minima, Molecule 2 = E_low.dat          
       Starting Bin, Molecule 2 = 1
       Final    Bin, Molecule 2 = 1
 
@@ -129,29 +129,29 @@
    #Sorting Method, Molecule 3 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 3 = E_low.dat
    #  Nb of Bins, Molecule 3 = 10
-   Nb of Bins, Molecule 3 = 1
-   Sorting Method, Molecule 3 = RoVib-CG                          
+   Sorting Method, Molecule 3 = RoVib-CG
+      Nb of Bins, Molecule 3 = 1                          
       File with Bins Energy Minima, Molecule 3 = E_low.dat
 
    #Sorting Method, Molecule 4 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 4 = E_low.dat
    #  Nb of Bins, Molecule 4 = 10
-   Nb of Bins, Molecule 4 = 1
    Sorting Method, Molecule 4 = RoVib-CG     
+      Nb of Bins, Molecule 4 = 1
       File with Bins Energy Minima, Molecule 4 = E_low.dat
 
    #Sorting Method, Molecule 5 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 5 = E_low.dat
    #  Nb of Bins, Molecule 5 = 10
-   Nb of Bins, Molecule 5 = 1
-   Sorting Method, Molecule 5 = RoVib-CG     
+   Sorting Method, Molecule 5 = RoVib-CG
+      Nb of Bins, Molecule 5 = 1     
       File with Bins Energy Minima, Molecule 5 = E_low.dat
 
    #Sorting Method, Molecule 6 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 6 = E_low.dat
    #  Nb of Bins, Molecule 6 = 10
-   Nb of Bins, Molecule 6 = 1
-   Sorting Method, Molecule 6 = RoVib-CG  
+   Sorting Method, Molecule 6 = RoVib-CG
+      Nb of Bins, Molecule 6 = 1  
       File with Bins Energy Minima, Molecule 6 = E_low.dat
  
 
@@ -220,15 +220,13 @@
    #    Impact Parameter for Range 2 = -14.d0
        
        
-   ### Method for Initial Vibrational Quantum Nb (Fixed / Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
-   ###   Fixed                    ->   Initial Vibrational Quantum Nb = 
-   ###   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
-   #Method for Initial Rotational Quantum Nb = Fixed
-   Method for Initial Vibrational Quantum Nb = Boltzmann 
-   
-   ### Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)   
-   ###   Fixed                    ->   Initial Rotational Quantum Nb = 
+   # Method for Sampling RoVibrational Levels (Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
+   #   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
+   Method for Sampling RoVibrational Levels = Boltzmann
+   # Method for Initial Vibrational Quantum Nb = Boltzmann
+   # Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)
    All / Only Even / Only Odd values for Rotational Quantum Nb = All
+
    
    Nb of Quadrature Pts for Action Integral = 50
    Lower Bound for Position of Centrifugal Barrier Max = 1.0d0

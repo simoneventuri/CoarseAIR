@@ -559,7 +559,7 @@ Subroutine SetLevelsData( This, i_Debug )
       if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) selected from a Uniform Distribution")
       
       if (i_Debug_Loc) call Logger%Write( "-> Calling This%SetUniformDistribution" )
-      call This%SetUniformDistribution( iState )
+      call This%SetUniformDistribution( iState, i_Debug=i_Debug_Loc )
     
     elseif ( ( trim(adjustl(This%vInMethod)) .eq. "Boltzmann" ) .or. ( trim(adjustl(This%vInMethod)) .eq. "MostProbable" ) ) then
       if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) selected from a Boltzmann Distribution @ T [K] = ", This%Tint )
@@ -567,8 +567,8 @@ Subroutine SetLevelsData( This, i_Debug )
       Beta =   Factor / abs(This%Tint)
       
       if (i_Debug_Loc) call Logger%Write( "-> Calling This%SetBoltmannDistribution" )
-      call This%SetBoltmannDistribution( Beta, iState )
-      
+      call This%SetBoltmannDistribution( Beta, iState, i_Debug=i_Debug_Loc )
+
       if ( trim(adjustl(This%vInMethod)) .eq. "MostProbable" ) then
         if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) fixed to the most probable state of the Boltzmann Distribution @ T [K] = ", This%Tint )
         
@@ -619,7 +619,7 @@ Subroutine SetUniformDistribution( This, iState, i_Debug )
 
   do i = 1,This%NStates
     associate( State => This%States(i) )
-      State%rlim  =   real(2*State%jqn+1,kind=rkp)
+      State%rlim  =   State%g  ! real(2*State%jqn+1,kind=rkp)
       Qtot        =   Qtot + State%rlim
       if ( State%rlim > Smax ) then
         iState    =   i
@@ -676,7 +676,7 @@ Subroutine SetBoltmannDistribution( This, Beta, iState, i_Debug)
 
   do i = 1,This%NStates
     associate( State => This%States(i) )
-      State%rlim  =   real(2*State%jqn+1,kind=rkp) * exp( - Beta * State%eint )
+      State%rlim  =   State%g * exp( - Beta * State%eint ) !real(2*State%jqn+1,kind=rkp) * exp( - Beta * State%eint )
       Qtot        =   Qtot + State%rlim
       if ( State%rlim > Smax ) then
         iState    =   i
@@ -697,6 +697,7 @@ Subroutine SetBoltmannDistribution( This, Beta, iState, i_Debug)
   end do
   do i = 2,This%NStates
     This%States(i)%rlim =   This%States(i-1)%rlim + This%States(i)%rlim                                           
+    if (i_Debug_Loc) call Logger%Write(" This%States(", i, ")%rlim = ", This%States(i)%rlim)
   end do
 
   if (i_Debug_Loc) call Logger%Exiting( Writing=.False. )

@@ -208,15 +208,13 @@
    #    Impact Parameter for Range 2 = -14.d0
        
        
-   ### Method for Initial Vibrational Quantum Nb (Fixed / Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
-   ###   Fixed                    ->   Initial Vibrational Quantum Nb = 
-   ###   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
-   #Method for Initial Rotational Quantum Nb = Fixed
-   Method for Initial Vibrational Quantum Nb = Boltzmann 
-   
-   ### Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)   
-   ###   Fixed                    ->   Initial Rotational Quantum Nb = 
+   # Method for Sampling RoVibrational Levels (Uniform / Boltzmann / MostProbable / ArbitratyDistribution)
+   #   ArbitratyDistribution    ->   Unit for the Arbitraty Distribution = 31
+   Method for Sampling RoVibrational Levels = Boltzmann
+   # Method for Initial Vibrational Quantum Nb = Boltzmann
+   # Method for Rotational Quantum Nb (Fixed only if Vibrational Fixed)
    All / Only Even / Only Odd values for Rotational Quantum Nb = All
+   
    
    Nb of Quadrature Pts for Action Integral = 50
    Lower Bound for Position of Centrifugal Barrier Max = 1.0d0

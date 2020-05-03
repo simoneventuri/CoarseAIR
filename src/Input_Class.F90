@@ -204,6 +204,7 @@ Module Input_Class
 ! =================================
     integer                                   ::    jIn         =   0
     integer                                   ::    vIn         =   0
+    integer                                   ::    jvIn        =   0
     integer                                   ::    iodd
     character(:)               ,allocatable   ::    ioddChar
     character(:)               ,allocatable   ::    jInMethod
@@ -998,6 +999,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "-> Allocating This%ntring to This%nring = ", This%nring )
 
 
+          case("Method for Sampling RoVibrational Levels")
+            This%vInMethod = trim(line_input(i_eq+2:150))
+            if (i_Debug_Loc) call Logger%Write( "Method for Sampling RoVibrational Levels:       This%vInMethod  = ", This%vInMethod )
+
           case("Method for Initial Vibrational Quantum Nb")
             This%vInMethod = trim(line_input(i_eq+2:150))
             if (i_Debug_Loc) call Logger%Write( "Method for Initial Vibrational Quantum Nb:      This%vInMethod  = ", This%vInMethod )
@@ -1018,6 +1023,12 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             end if
             if (i_Debug_Loc) call Logger%Write( "All / Only Even / Only Odd values for Rotational Quantum Nb:      This%iodd  = ", This%iodd )
 
+          
+          case("Initial RoVibrational Level Nb")
+            line_input = line_input(i_eq+2:150)
+            READ(line_input, '(I20)') This%jvIn
+            if (i_Debug_Loc) call Logger%Write( "Initial RoVibrational Level Nb:      This%jvIn = ", This%jvIn )
+
           case("Initial Vibrational Quantum Nb")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(I20)') This%vIn
@@ -1026,7 +1037,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
           case("Initial Rotational Quantum Nb")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(I20)') This%jIn
-            if (i_Debug_Loc) call Logger%Write( "Initial Rotational Quantum Nb:      This%jIn  = ", This%jIn )
+            if (i_Debug_Loc) call Logger%Write( "Initial Rotational Quantum Nb:       This%jIn  = ", This%jIn )
 
           case("Unit for the Arbitraty Distribution")
             line_input = line_input(i_eq+2:150)
