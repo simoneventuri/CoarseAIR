@@ -25,8 +25,8 @@ clear all
 clc
 
 
-FileOrig = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/NaNb/LeRoy/MyLeroy_FromRobyn.inp';
-FileNew  = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/NaNb/LeRoy/MyLeroy_FromRobyn_.inp';
+FileOrig = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/N2/LeRoy/MyLeroy_FromRobyn_Orig.inp';
+FileNew  = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/N2/LeRoy/MyLeroy_FromRobyn_NotSorted_.inp';
 
 
 startRow = 16;
@@ -89,8 +89,8 @@ clearvars filename startRow formatSpec fileID dataArray ans raw col numericData 
 aa=(Var2  > 0.d0) + (Var2 < 1.d-100);
 Var2(aa==2) = 1.d-103;  
 
-[En, ToNew] = sort(Var1);
-
+%[En, ToNew] = sort(Var1);
+ToNew       = [1:length(vqn)];
 
 fileID = fopen(FileNew,'w');
 for iLevels = 1:NLevels
