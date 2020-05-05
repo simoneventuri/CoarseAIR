@@ -25,8 +25,8 @@ clear all
 clc
 
 
-FileOrig = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/N2/LeRoy/MyLeroy_FromRobyn_Orig.inp';
-FileNew  = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/N2/LeRoy/MyLeroy_FromRobyn_NotSorted_.inp';
+FileOrig = '/home/venturi/WORKSPACE/output.dat';
+FileNew  = '/home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb/Molecules/N2/LeRoy/MyLeroy_FromRobyn_Cut.inp';
 
 
 startRow = 16;
