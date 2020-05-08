@@ -71,6 +71,8 @@ Module Collision_Class
     real(rkp)                                             ::    Ttra                         ! Translational temperature [K] or initial relative translational energy [hartree]
     real(rkp)                                             ::    Etot                         ! Total energy for trajectories
     real(rkp)                                             ::    Erel                         ! Fixed relative translational kinetic energy [hartree]
+    real(rkp)                                             ::    EMu                          ! Mean Energy
+    real(rkp)                                             ::    ESD                          ! Energy Standard Deviation
     real(rkp)                                             ::    TotalAngularMomentum         ! Imposed total angular momentum. Read from input only if 'bstart=2345432'. Old name: xjtot
     real(rkp)                                             ::    Dinit                        ! Initial separation of the the target and projectile
     real(rkp)                                             ::    RedMass                      ! Reduced mass of the target/projectile
@@ -100,6 +102,9 @@ Module Collision_Class
 !   ********************************************
     real(rkp)                                             ::    EqVelocity
     class(MoleculesContainer_Type) ,dimension(:) ,allocatable  ::    MoleculesContainer
+
+    integer                                               ::    NTrajOverall
+    integer                                               ::    iProc
 
     procedure(SetterInitialState)       ,pointer  ,nopass ::    SetInitialState
     procedure(ComputePairDistance)      ,pointer  ,nopass ::    Compute_Rp_CartCoord
@@ -138,7 +143,7 @@ Module Collision_Class
   End Type
 
   Abstract Interface
-    Subroutine SetterInitialState( Species, Qijk, dQijk, iTraj, iPES, i_Debug, i_Debug_Deep )
+    Subroutine SetterInitialState( Species, Qijk, dQijk, iTraj, iPES, NTrajOverall, iProc, i_Debug, i_Debug_Deep )
       use Species_Class         ,only:  Species_Type
       use Parameters_Module     ,only:  rkp
       type(Species_Type)  ,dimension(:)     ,intent(in)   ::    Species         !< Species objects which always have 2 elements [Target,Projectile]. Dim=(NSpecies)=(2)
@@ -147,6 +152,8 @@ Module Collision_Class
       real(rkp)           ,dimension(:,:,:) ,intent(out)  ::    dQijk           !< Time derivatives of the coordinates for each spatial direction (dim-1), for each atom in the species (dim-2) and for each species (dim-3: 1=target, 2:projectile).                   !     Dim=(NSpace,NAtoMaxSpe,NSpecies)=(3,2,2)
       integer                               ,intent(in)   ::    iTraj
       integer                               ,intent(in)   ::    iPES
+      integer                               ,intent(in)   ::    NTrajOverall
+      integer                               ,intent(in)   ::    iProc
       logical                     ,optional ,intent(in)   ::    i_Debug
       logical                     ,optional ,intent(in)   ::    i_Debug_Deep
     End Subroutine
@@ -518,6 +525,13 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
       !end if
       call This%InitializeImpactParameter( Input, iPES, NTrajPES, i_Debug=i_Debug_Loc )
     end do
+    
+    Input%NTrajOverall = NTrajTemp
+    This%NTrajOverall  = Input%NTrajOverall
+    This%iProc         = Input%iProc
+    if (i_Debug_Loc) call Logger%Write( "-> This%NTrajOverall = ", This%NTrajOverall )
+    if (i_Debug_Loc) call Logger%Write( "-> This%iProc        = ", This%iProc )
+
     if (i_Debug_Loc) call Logger%Write( "-> Done with InitializeImpactParameter" )
     ! ==============================================================================================================
 
@@ -558,6 +572,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     This%Erel                         =       Input%Erel
     
     if ( This%TtraModel .eq. "Boltzmann" ) then
+
       if (i_Debug_Loc) call Logger%Write( "-> Temperature of the Boltzmann distribution for the initial relative translation energy: T [K] = ", This%Ttra, Fr = "es15.8" )
       Vp         =   sqrt( Two * This%Ttra * Kelvin_To_Hartree / xmu )
       Va         =   Two / sqrt(Pi) * Vp
@@ -576,13 +591,24 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
       if (Status/=0) call Error( "Error opening file: " // FileName )                   
         write(Unit,'(d20.10)') This%EqVelocity
       close(Unit) 
+
+    elseif ( This%TtraModel .eq. "Gaussian" ) then
+      if (i_Debug_Loc) call Logger%Write( "-> Initial relative translational kinetic energy Normally Distributed " )
+
+      This%EMu = Input%EMu
+      This%ESD = Input%ESD
+      if (i_Debug_Loc) call Logger%Write( "-> Mean [Eh] = ", This%EMu, "; SD [Eh] = ", This%ESD )
+
     elseif ( This%TtraModel .eq. "FixedTotEn" ) then
       if (i_Debug_Loc) call Logger%Write( "-> Initial relative translational kinetic energy from total energy: Etot [Eh] = ", This%Etot, Fr="es15.8" )
+  
     elseif (  This%TtraModel .eq. "Uniform" ) then
       if (i_Debug_Loc) call Logger%Write( "-> Fixed relative translational kinetic energy: Erel [Eh] = ", This%Erel, Fr="es15.8" )
+  
     else
       call Logger%Write( "WARNING: No Relative Translational Energy Model Selected" )
     end if
+
     ! ==============================================================================================================
   end if
 
@@ -863,13 +889,24 @@ Subroutine InitializeImpactParameter( This, Input, iPES, NTrajPES, i_Debug )
   This%Etot                         =       Input%Etot
   This%Erel                         =       Input%Erel
   if (i_Debug_Loc) then
+    
     if ( This%TtraModel .eq. "Boltzmann" ) then
       call Logger%Write( "-> Relative translational kinetic energy from Maxwell-Boltzmann distribution at translational temperature: T [K] = ",This%Ttra, Fr="es15.8" )
+    
+    elseif ( This%TtraModel .eq. "Gaussian" ) then
+      if (i_Debug_Loc) call Logger%Write( "-> Initial relative translational kinetic energy Normally Distributed " )
+
+      This%EMu = Input%EMu
+      This%ESD = Input%ESD
+      if (i_Debug_Loc) call Logger%Write( "-> Mean [Eh] = ", This%EMu, "; SD [Eh] = ", This%ESD )
+
     elseif (  This%TtraModel .eq. "FixedTotEn" ) then
       call Logger%Write( "-> Relative translational kinetic energy from total energy: Etot [Eh] = ", This%Etot, Fr="es15.8" )
+    
     elseif (  This%TtraModel .eq. "Uniform" ) then
       call Logger%Write( "-> Fixed relative translational kinetic energy: Erel [Eh] = ", This%Erel, Fr="es15.8" )
       !This%Ttra = This%Erel
+    
     else
       call Logger%Write( "WARNING: No Model Selected for the Relative Translational Energy!" )
     end if
@@ -1075,7 +1112,7 @@ Subroutine SetIniCondForward( This, iTraj, Input, Traj, i_Debug, i_Debug_Deep )
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Setting the PES Index for the current Trajectory" )
   call This%SetPESIndx( Input, iTraj, Traj, i_Debug=i_Debug_Loc )
-  if (i_Debug_Loc) call Logger%Write( "Done with This%SetInitialState" )
+  if (i_Debug_Loc) call Logger%Write( "Done with This%SetPESIndx" )
 ! ==============================================================================================================
 
 
@@ -1083,7 +1120,7 @@ Subroutine SetIniCondForward( This, iTraj, Input, Traj, i_Debug, i_Debug_Deep )
 !     COMPUTING ATOMS (SPECIES COMPONENTS) INITIAL POSITIONS AND VELOCITIES (Qijk and dQijk)
 ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Computing initial position and velocity. Calling This%SetInitialState" )
-  call This%SetInitialState( This%Species, Qijk, dQijk, iTraj, Traj%iPES(iTraj), i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )
+  call This%SetInitialState( This%Species, Qijk, dQijk, iTraj, Traj%iPES(iTraj), This%NTrajOverall, This%iProc, i_Debug=i_Debug_Loc, i_Debug_Deep=i_Debug_Deep )
   if (i_Debug_Loc) call Logger%Write( "Done with This%SetInitialState" )
 ! ==============================================================================================================
 
@@ -1200,16 +1237,25 @@ Subroutine CoordVeloc_FreeTotAngMom( This, Input, iTraj, Traj, Q, dQdt, i_Debug 
   if ( This%TtraModel .eq. "Boltzmann" ) then
     RandNum = RanddwsVec(Traj%iPES(iTraj))
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Boltzmann Distribution at T=",This%Ttra,"K. Calling RelativeTranslationEnergy for Generating Random Energy."  )
-    call RelativeTranslationEnergy( This%Ttra, Er, RandNum )
+    call RelativeTranslationEnergy_FromBoltzmann( This%Ttra, Er, RandNum )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
+  elseif ( This%TtraModel .eq. "Gaussian" ) then
+      RandNum = RanddwsVec(Traj%iPES(iTraj))
+      if (i_Debug_Loc) call Logger%Write( "-> Initial relative translational kinetic energy Normally Distributed " )
+      call RelativeTranslationEnergy_FromGaussian( This%EMu, This%ESD, Er, RandNum )
+      if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+
   elseif ( This%TtraModel .eq. "FixedTotEn" ) then
     Er = This%Etot                                                                                                                ! Original version: Er = This%Etot - Ein where Ein is undefined !!!
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Fixed Total Energy" )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
   elseif (  This%TtraModel .eq. "Uniform" ) then
     Er = This%Erel
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Fixed Relative Translational Energy" )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
   else
     if (i_Debug_Loc) call Logger%Write( "WARNING: No Relative Translational Energy Model Selected" )
   end if
@@ -1337,16 +1383,25 @@ Subroutine CoordVeloc_ImpTotAngMom( This, Input, Qijk, dQijk, iPES, Q, dQdt, b, 
   if ( This%TtraModel .eq. "Boltzmann" ) then
     RandNumA = RanddwsVec(iPES)
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Boltzmann Distribution at T=",This%Ttra,"K. Calling RelativeTranslationEnergy for Generating Random Energy."  )
-    call RelativeTranslationEnergy( This%Ttra, Er, RandNumA )
+    call RelativeTranslationEnergy_FromBoltzmann( This%Ttra, Er, RandNumA )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
+  elseif ( This%TtraModel .eq. "Gaussian" ) then
+    RandNumA = RanddwsVec(iPES)
+    if (i_Debug_Loc) call Logger%Write( "-> Initial relative translational kinetic energy Normally Distributed " )
+    call RelativeTranslationEnergy_FromGaussian( This%EMu, This%ESD, Er, RandNumA )
+    if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+
   elseif ( This%TtraModel .eq. "FixedTotEn" ) then
     Er = This%Etot                                                                                                                ! Original version: Er = This%Etot - Ein where Ein is undefined !!!
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Fixed Total Energy" )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
   elseif (  This%TtraModel .eq. "Uniform" ) then
     Er = This%Erel
     if (i_Debug_Loc) call Logger%Write( "Translational Energy from Fixed Relative Translational Energy" )
     if (i_Debug_Loc) call Logger%Write( "-> Translational Energy: Er [Eh] = ", Er, Fr="es15.8" )
+  
   else
     if (i_Debug_Loc) call Logger%Write( "WARNING: No Relative Translational Energy Model Selected" )
   end if
@@ -1424,7 +1479,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine RelativeTranslationEnergy( Ttra, Er, RandNum )
+Subroutine RelativeTranslationEnergy_FromBoltzmann( Ttra, Er, RandNum )
 ! This procedure computes the relative translational energy from Boltzmann distribution.
 
   use Parameters_Module     ,only:  Zero, One, Kelvin_To_Hartree, Pi
@@ -1467,7 +1522,7 @@ Subroutine RelativeTranslationEnergy( Ttra, Er, RandNum )
     iter   =   iter + 1
     
     do k = 1,4
-      Er   =   ( One + Er*(One+Er) + RandNum*exp(Er) ) / Er                               !!! ??? WHAT IS HE DOING ???
+      Er   =   ( One + Er*(One+Er) + RandNum*exp(Er) ) / Er                              
     end do
 
     err    =   Zero
@@ -1481,6 +1536,25 @@ Subroutine RelativeTranslationEnergy( Ttra, Er, RandNum )
 
   Er       =   betai * Er
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine RelativeTranslationEnergy_FromGaussian( EMu, ESD, Er, RandNum )
+! This procedure computes the relative translational energy from Boltzmann distribution.
+
+  use Parameters_Module     ,only:  Zero, One, Kelvin_To_Hartree, Pi
+
+  real(rkp)                         ,intent(in)     ::    EMu                           !< Mean Energy [Eh]
+  real(rkp)                         ,intent(in)     ::    ESD                           !< Energy Standard Deviation [Eh]
+  real(rkp)                         ,intent(out)    ::    Er                            !< Relative translational energy [?]
+  real(rkp)                         ,intent(inout)  ::    RandNum                       !< Random number
+
+  real(rkp) ,parameter                              ::    Tolerence =   1.0E-5_rkp
+
+  Er = EMu
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

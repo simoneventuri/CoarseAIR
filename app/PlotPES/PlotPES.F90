@@ -110,75 +110,84 @@ Program PlotPES_Program
 ! ==============================================================================================================
 !   COMPUTING AND PLOTTING PES
 ! =============================================================================================================
-  if (Input%PlotPES_ReadPntsFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling ReadPoints", NewLine=.True. )
-    call PlotPES%ReadPoints( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with ReadPoints", NewLine=.True. )
-    
-!    if (i_Debug_PP) call Logger%Write( "Calling EvaluatePoints", NewLine=.True. )
-!    call EvaluatePoints( Input, Collision, i_Debug=i_Debug_PP )
-!    if (i_Debug_PP) call Logger%Write( "Done with EvaluatePoints", NewLine=.True. )
-    
-!    if (i_Debug_PP) call Logger%Write( "Calling ComputeCuts", NewLine=.True. )
-!    call ComputeCuts( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-!    if (i_Debug_PP) call Logger%Write( "Done with ComputeCuts", NewLine=.True. )
-  end if
+  if (trim(adjustl(Input%PESOrDiatFlg)) .eq. 'Diatomic') then
 
-  if (Input%PlotPES_GridFlg) then
-    if (Input%StochPESFlg) then
-      if (i_Debug_PP) call Logger%Write( "Calling GridForStochPES", NewLine=.True. )
-      call PlotPES%GridForStochPES( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-      if (i_Debug_PP) call Logger%Write( "Done with GridForStochPES", NewLine=.True. )
-    else
-      if (i_Debug_PP) call Logger%Write( "Calling Grid", NewLine=.True. )
-      call PlotPES%Grid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-      if (i_Debug_PP) call Logger%Write( "Done with Grid", NewLine=.True. )
+    if (i_Debug_PP) call Logger%Write( "Calling DiatPot", NewLine=.True. )
+    call PlotPES%DiatPot( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+    if (i_Debug_PP) call Logger%Write( "Done with DiatPot", NewLine=.True. ) 
+  
+  elseif (trim(adjustl(Input%PESOrDiatFlg)) .eq. 'PES') then
+
+    if (Input%PlotPES_ReadPntsFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling ReadPoints", NewLine=.True. )
+      call PlotPES%ReadPoints( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with ReadPoints", NewLine=.True. )
+      
+  !    if (i_Debug_PP) call Logger%Write( "Calling EvaluatePoints", NewLine=.True. )
+  !    call EvaluatePoints( Input, Collision, i_Debug=i_Debug_PP )
+  !    if (i_Debug_PP) call Logger%Write( "Done with EvaluatePoints", NewLine=.True. )
+      
+  !    if (i_Debug_PP) call Logger%Write( "Calling ComputeCuts", NewLine=.True. )
+  !    call ComputeCuts( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+  !    if (i_Debug_PP) call Logger%Write( "Done with ComputeCuts", NewLine=.True. )
     end if
-  end if
-  
-  if (Input%PlotPES_DoubleGridFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling DoubleGrid", NewLine=.True. )
-    call PlotPES%DoubleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with DoubleGrid", NewLine=.True. )
-  end if
-  
-  if (Input%PlotPES_TripleGridFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling TripleGrid", NewLine=.True. )
-    call PlotPES%TripleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with TripleGrid", NewLine=.True. )
-  end if
-  
-  if (Input%PlotPES_GridForScatterFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling GridForScatter", NewLine=.True. )
-    call PlotPES%GridForScatter( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with GridForScatter", NewLine=.True. )
-  end if
-  
-  if (Input%PlotPES_StatsFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling StochPESStats", NewLine=.True. )
-    call PlotPES%StochPESStats( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with StochPESStats", NewLine=.True. )
-  end if
-  
-  if (Input%PlotPES_VargasPaperFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling PlotsVargasPaper", NewLine=.True. )
-    call PlotPES%PlotsVargasPaper( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with PlotsVargasPaper", NewLine=.True. )
-  end if
 
-  if (Input%PlotPES_Rot3rdFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling PlotPES_Rot3rd", NewLine=.True. )
-    call PlotPES%Rot3rd( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with PlotPES_Rot3rd", NewLine=.True. )
-  end if
+    if (Input%PlotPES_GridFlg) then
+      if (Input%StochPESFlg) then
+        if (i_Debug_PP) call Logger%Write( "Calling GridForStochPES", NewLine=.True. )
+        call PlotPES%GridForStochPES( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+        if (i_Debug_PP) call Logger%Write( "Done with GridForStochPES", NewLine=.True. )
+      else
+        if (i_Debug_PP) call Logger%Write( "Calling Grid", NewLine=.True. )
+        call PlotPES%Grid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+        if (i_Debug_PP) call Logger%Write( "Done with Grid", NewLine=.True. )
+      end if
+    end if
+    
+    if (Input%PlotPES_DoubleGridFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling DoubleGrid", NewLine=.True. )
+      call PlotPES%DoubleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with DoubleGrid", NewLine=.True. )
+    end if
+    
+    if (Input%PlotPES_TripleGridFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling TripleGrid", NewLine=.True. )
+      call PlotPES%TripleGrid( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with TripleGrid", NewLine=.True. )
+    end if
+    
+    if (Input%PlotPES_GridForScatterFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling GridForScatter", NewLine=.True. )
+      call PlotPES%GridForScatter( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with GridForScatter", NewLine=.True. )
+    end if
+    
+    if (Input%PlotPES_StatsFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling StochPESStats", NewLine=.True. )
+      call PlotPES%StochPESStats( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with StochPESStats", NewLine=.True. )
+    end if
+    
+    if (Input%PlotPES_VargasPaperFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling PlotsVargasPaper", NewLine=.True. )
+      call PlotPES%PlotsVargasPaper( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with PlotsVargasPaper", NewLine=.True. )
+    end if
 
-  if (Input%PlotPES_IsoTriFlg) then
-    if (i_Debug_PP) call Logger%Write( "Calling PlotPES_IsoTri", NewLine=.True. )
-    call PlotPES%IsoTri( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
-    if (i_Debug_PP) call Logger%Write( "Done with PlotPES_IsoTri", NewLine=.True. )
-  end if
+    if (Input%PlotPES_Rot3rdFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling PlotPES_Rot3rd", NewLine=.True. )
+      call PlotPES%Rot3rd( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with PlotPES_Rot3rd", NewLine=.True. )
+    end if
 
-  
+    if (Input%PlotPES_IsoTriFlg) then
+      if (i_Debug_PP) call Logger%Write( "Calling PlotPES_IsoTri", NewLine=.True. )
+      call PlotPES%IsoTri( Input, Collision, Collision%NPairs, Collision%NAtoms, i_Debug=i_Debug_PP )
+      if (i_Debug_PP) call Logger%Write( "Done with PlotPES_IsoTri", NewLine=.True. )
+    end if
+
+  end if ! PES/DIAT
+
   if (i_Debug_PP) call Logger%Write( "Done Plotting PES" )
 ! ==============================================================================================================]
   

@@ -151,7 +151,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
-          case ('O2', 'OOa', 'OOb', 'OOc', 'OOd', 'OaOb','OaOc','OaOd','ObOc','ObOd','OcOd')
+          case ('O2', 'OOa', 'OOb', 'OOc', 'OOd', 'OaOb','OaOc','OaOd','ObOc','ObOd','OcOd','O16O16','O18O18','O16O18','O18O16')
             if (Input%Diatomic_Model(iMol) == 'NASA') then
               allocate( O2_NASA_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'UMN') then
@@ -229,7 +229,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Pure Function GetSpeciesName( Atom1, Atom2 ) result(SpeciesName)
+Function GetSpeciesName( Atom1, Atom2 ) result(SpeciesName)
   use Atom_Class                  ,only:  Atom_Type
   type(Atom_Type)                               ,intent(in)     ::    Atom1
   type(Atom_Type)                               ,intent(in)     ::    Atom2
@@ -247,7 +247,7 @@ Pure Function GetSpeciesName( Atom1, Atom2 ) result(SpeciesName)
 
   SpeciesName     =     ''
 
-  if ( trim(Atoms(1)%Name) == trim(Atoms(2)%Name) ) then
+  if ( (len(Atoms(1)%Name) == 1) .and. ( trim(Atoms(1)%Name) == trim(Atoms(2)%Name) ) ) then
     SpeciesName1 = trim(Atoms(1)%Name) // '2'
     SpeciesName2 = SpeciesName1
   else

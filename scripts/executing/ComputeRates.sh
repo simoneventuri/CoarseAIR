@@ -293,8 +293,13 @@ function ComputeTrajsHERE {
   
   if [ ${TranFlg} -eq 0 ]; then 
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-  else
+  elif [ ${TranFlg} -eq 1 ]; then 
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+  elif [ ${TranFlg} -eq 2 ]; then 
+    COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"EMu/Bins_"${iLevel1}"_"${iLevel2}
+  else 
+    echo "    [ComputeTrajsHERE]: ERROR! Wrong Model for the Tranlational Energy! "
+    stop
   fi
       
   echo "    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode"
@@ -406,22 +411,26 @@ function MergeTrajectories {
     while [ $iProc -le ${NProc} ]; do  
       echo "    [MergeTrajectories]: Merging for iProc = "${iProc}
       
-      if [ -f ./Node_$iNode/Proc_$iProc/trajectories.csv ]; then
+      if [ -f ./Node_$iNode/Proc_$iProc/trajectories.out ]; then
       
         if [ -f ./trajectories.csv ]; then
       
-          tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.csv >> ./trajectories.csv
-          if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-            tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSOl.out >> ./PaQSOl.out
-            rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
+          tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories.out >> ./trajectories.csv
+          if [ -f ./Node_$iNode/Proc_$iProc/PaQSol.out ]; then
+            tail -n+2 ./Node_$iNode/Proc_$iProc/PaQSol.out >> ./PaQSol.csv
+          fi
+          if [ -f ./Node_$iNode/Proc_$iProc/Params.out ]; then
+            tail -n+2 ./Node_$iNode/Proc_$iProc/Params.out >> ./Params.csv
           fi
           
         else
         
-          cat ./Node_${iNode}/Proc_${iProc}/trajectories.csv > ./trajectories.csv
-          if [ -f ./Node_$iNode/Proc_$iProc/PaQSOl.out ]; then
-            cat ./Node_$iNode/Proc_$iProc/PaQSOl.out > ./PaQSOl.out
-            rm -rf ./Node_$iNode/Proc_$iProc/PaQSOl.out
+          cat ./Node_${iNode}/Proc_${iProc}/trajectories.out > ./trajectories.csv
+          if [ -f ./Node_$iNode/Proc_$iProc/PaQSol.out ]; then
+            cat ./Node_$iNode/Proc_$iProc/PaQSol.out > ./PaQSol.csv
+          fi
+          if [ -f ./Node_$iNode/Proc_$iProc/Params.out ]; then
+            cat ./Node_$iNode/Proc_$iProc/Params.out > ./Params.csv
           fi
           
         fi
@@ -820,17 +829,17 @@ function PostTrajectoriesAtNode {
 
 #             if [ -f ../trajectories-Tot.csv ]; then  
 #               tail -n+2 ./trajectories.csv >> ../trajectories-Tot.csv
-#               if [ -f ./PaQSOl.out ]; then
-#                 echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
-#                 tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
-#                 rm -rf ./PaQSOl.out
+#               if [ -f ./PaQSol.out ]; then
+#                 echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSol-Tot.out
+#                 tail -n+2 ./PaQSol.out >> ../PaQSol-Tot.out
+#                 rm -rf ./PaQSol.out
 #               fi
 #             else
 #               cat ./trajectories.csv > ../trajectories-Tot.csv
-#               if [ -f ./PaQSOl.out ]; then
-#                 echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSOl-Tot.out
-#                 tail -n+2 ./PaQSOl.out >> ../PaQSOl-Tot.out
-#                 rm -rf ./PaQSOl.out
+#               if [ -f ./PaQSol.out ]; then
+#                 echo "### Molecule 1, Level / Bin Nb "$iLevel1"; Molecule 2, Level / Bin Nb "$iLevel2 >> ../PaQSol-Tot.out
+#                 tail -n+2 ./PaQSol.out >> ../PaQSol-Tot.out
+#                 rm -rf ./PaQSol.out
 #               fi
 #             fi
             

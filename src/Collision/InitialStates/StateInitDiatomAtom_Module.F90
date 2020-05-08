@@ -87,7 +87,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debug, i_Debug_Deep )
+Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, NTrajOverall, iProc, i_Debug, i_Debug_Deep )
 ! @TODO: Remove The Traj,iTraj argument since it is not used
 ! This procedure sets the initial states.
 ! The procedure was initially called 'setis'.
@@ -108,6 +108,8 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
                                                                                 !    (dim-3: 1=target, 2:projectile). Dim=(NSpace,NAtoMaxSpe,NSpecies)=(3,2,2)
   integer                                   ,intent(in)     ::    iTraj
   integer                                   ,intent(in)     ::    iPES
+  integer                                   ,intent(in)     ::    NTrajOverall
+  integer                                   ,intent(in)     ::    iProc
   logical                         ,optional ,intent(in)     ::    i_Debug
   logical                         ,optional ,intent(in)     ::    i_Debug_Deep
 
@@ -130,9 +132,9 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
 ! ======================================================================================================================
 !     SELECTING THE INTERNAL STATE (Traj_iState, Traj_jqn and Traj_vqn) AND COMPUTING THE CENTRIFUGAL POTENTIAL (Vc_R2)
 ! ======================================================================================================================
-  if ( .not. (    ( ( trim(adjustl(Species(1)%ListStates%vInMethod)) .eq. "Fixed"        ) .and. ( trim(adjustl(Species(1)%ListStates%jInMethod)) .eq. "Fixed" ) ) &
-               .or. ( trim(adjustl(Species(1)%ListStates%vInMethod)) .eq. "MostProbable" )                                                                         ) ) then     ! Case of sampled initial internal states
-    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Using a Thermal Distribution for Choosing Initial State')")
+  if ( .not. ( trim(adjustl(Species(1)%BSortMethod)) .eq. "State-Specific" ) ) then
+    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Selected a NON-State-Specific Initial Target')")
+    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Sampling the Initial internal Level of the Target')")
 
     RandNum = RanddwsVec(iPES)
     if (i_Debug_Loc) call Logger%Write("RAND_DA: ", RandNum)
@@ -140,15 +142,23 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
       if ( Species(1)%ListStates%States(i)%rlim >= RandNum ) exit
     end do
     Traj_iState   =   i
-    Traj_jqn      =   Species(1)%ListStates%States(i)%jqn
+
   else     
-    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Either Fixed State or State that Maximizes Boltzmann Distribution')")
-    Traj_iState   =   Species(1)%ListStates%StateIn
-    Traj_jqn      =   Species(1)%ListStates%jIn
+    if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Selected a State-Specific Initial Target')")
+
+    Traj_iState   =   1
+
   end if
-  Traj_vqn        =   Species(1)%ListStates%States(i)%vqn
+
+  Traj_jqn        =   Species(1)%ListStates%States(Traj_iState)%jqn
+  Traj_vqn        =   Species(1)%ListStates%States(Traj_iState)%vqn
+  if (i_Debug_Loc) call Logger%Write( "Indx of the Selected Level: ", Traj_iState )
+  if (i_Debug_Loc) call Logger%Write( "jqn  of the Selected Level: ", Traj_jqn    )
+  if (i_Debug_Loc) call Logger%Write( "vqn  of the Selected Level: ", Traj_vqn    )
+
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Species(1)%DiatPot%xmui2 = ',es15.8,'; Traj_jqn = ',g0)") Species(1)%DiatPot%xmui2, Traj_jqn
   Vc_R2           =   Species(1)%DiatPot%xmui2 * ( Traj_jqn + Half )**2
+  
   associate( S => Species(1)%ListStates%States(Traj_iState) )
     State%rmin    =   S%rmin
     State%tau     =   S%tau
@@ -200,7 +210,7 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, i_Debu
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: -> Angular velocity: Omega = ',d20.10)")  Omega
                                                                                         
   if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Calling Compute_Coordinates_Velocities')")
-  call Compute_Coordinates_Velocities( Species(1)%GetAtomsMass(), BL, dBL, Omega, Qijk(:,:,1), dQijk(:,:,1), iTraj, iPES, i_Debug=i_Debug_Loc )! Computing the coordinates of the target
+  call Compute_Coordinates_Velocities( Species(1)%GetAtomsMass(), BL, dBL, Omega, Qijk(:,:,1), dQijk(:,:,1), iTraj, iPES, NTrajOverall, iProc, i_Debug=i_Debug_Loc )! Computing the coordinates of the target
   Qijk( :,:,2) = Zero                                                                                                             ! Setting the coordinates of the projectile to zero
   dQijk(:,:,2) = Zero                                                                                                             ! Setting the coordinates of the projectile to zero
   if (i_Debug_Loc) then
@@ -720,7 +730,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj, iPES, i_Debug )
+Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj, iPES, NTrajOverall, iProc, i_Debug )
 ! This procedure computes the initial coordinates and velocities for a diatomic molecule.
 ! The coordinates are cartesian with the center of mass at the origin.
 ! This procedure was initially called 'inid'.
@@ -736,6 +746,8 @@ Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj,
   real(rkp) ,dimension(3,2)                 ,intent(out)    ::    qdot          !> Velocities stored in the order x,y,z for atom a, x,y,z for atom b.
   integer                                   ,intent(in)     ::    iTraj
   integer                                   ,intent(in)     ::    iPES
+  integer                                   ,intent(in)     ::    NTrajOverall
+  integer                                   ,intent(in)     ::    iProc
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   logical                                                   ::    i_Debug_Loc
@@ -743,11 +755,18 @@ Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj,
   real(rkp)                                                 ::    fa, fb
   real(rkp)                                                 ::    gam, alp, bet
   real(rkp)                                                 ::    EkinVerify
+  integer                                                   ::    IdxOverall
   real(rkp)                                                 ::    RandNumA, RandNumB, RandNumC
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "Compute_Coordinates_Velocities")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
+
+
+  if (i_Debug_Loc) then
+    write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: NTrajOverall = ',i10)") NTrajOverall
+    write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: iProc        = ',i10)") iProc
+  end if
 
   ma  =   Masses(1)
   mb  =   Masses(2)
@@ -772,7 +791,8 @@ Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj,
     write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: -> Rotational Phase:   gamma = ',es15.8,' = ',es15.8)") gam, gam * 180.d0 / (TwoPi/Two)
   end if
   
-  Params(1)   = real(iTraj,8)
+  IdxOverall  = (NTrajOverall) * (iProc-1) + iTraj
+  Params(1)   = real(IdxOverall,8)
   Params(3:5) = [alp * 180.d0 / (TwoPi/Two), bet * 180.d0 / (TwoPi/Two), gam * 180.d0 / (TwoPi/Two)]
 
 

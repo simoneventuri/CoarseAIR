@@ -66,7 +66,7 @@ function ReadBashInput {
     done
     echo "  [ReadBashInput]:  Tran_vec = "${Tran_vec[@]}
     
-  else
+  elif [ ${TranFlg} -eq 1 ]; then 
     echo "  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!"
     
     iLine=$((iLine+1))
@@ -82,6 +82,24 @@ function ReadBashInput {
       iTtra=$((iTtra+1))
     done
     echo "  [ReadBashInput]:  Tran_vec = "${Tran_vec[@]}
+
+  elif [ ${TranFlg} -eq 2 ]; then 
+    echo "  [ReadBashInput]:  Translational Energy Sampled From Gaussian Distribution!"
+    
+    iLine=$((iLine+1))
+    NTran=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
+    NTran=$(echo $NTran | tr -d " ")
+    echo "  [ReadBashInput]:  NTran = "${NTran}
+    iTtra=1
+    while [ ${iTtra} -le ${NTran} ]; do
+      iLine=$((iLine+1))
+      xTemp=$(sed -n ${iLine}'p' ${COARSEAIR_OUTPUT_DIR}/'InputForBash.inp')
+      xTemp=$(echo $xTemp | tr -d " ")
+      Tran_vec[${iTtra}]=${xTemp}
+      iTtra=$((iTtra+1))
+    done
+    echo "  [ReadBashInput]:  Tran_vec = "${Tran_vec[@]}
+
   fi
   
 

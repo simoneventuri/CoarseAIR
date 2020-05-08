@@ -37,7 +37,7 @@ function Read_KONIGBox()
 
     
     %% Reading Simulation Time
-    filename = BoxFile;
+    filename = BoxFile
     startRow = 1;
     formatSpec = '%14f%[^\n\r]';
     fileID = fopen(filename,'r');

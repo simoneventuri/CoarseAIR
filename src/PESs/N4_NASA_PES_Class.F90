@@ -142,7 +142,7 @@ Subroutine Initialize_N4_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   This%Name         =   Name_PES
   This%Initialized  =   .True.
   This%CartCoordFlg =   .True.
-  This%NPairs       =   3               ! Setting the number of atom-atom pairs
+  This%NPairs       =   6               ! Setting the number of atom-atom pairs
 
   iA(1,:) = [1, 2]
   iA(2,:) = [1, 3]
@@ -156,25 +156,22 @@ Subroutine Initialize_N4_NASA_PES( This, Input, Atoms, iPES, i_Debug )
     allocate( N2_LeRoy_DiatomicPotential_Type :: This%Pairs(iP)%Vd  )
   end do
 
-  call diatccsdd(re, veccsd, Temp, 1)              
-!#ifdef N4_PES_VERBOSE  
-  !write(6,*) ' * Initialize_N4_NASA_PES * ccsd potential at "re": ', veccsd 
-!#endif
+  call diatccsdd(re, veccsd, Temp, 1)    
+  if (i_Debug_Loc) call Logger%Write( " ccsd potential at re:     veccsd = ", veccsd )
 
-  call This%Pairs(1)%Vd%Compute_Vd_dVd( re, veuse, Temp )                                   
-!#ifdef N4_PES_VERBOSE
-  !write(6,*) ' * Initialize_N4_NASA_PES * diatomic potential at "re": ',veuse  
-!#endif
+  call This%Pairs(1)%Vd%Compute_Vd_dVd( re, veuse, Temp )       
+  if (i_Debug_Loc) call Logger%Write( " diatomic potential at re: veuse  = ", veuse )
 
-  This%shiftof0 = Two * (veccsd - veuse)                                            
-!#ifdef N4_PES_VERBOSE
-  !write(6,*) ' * Initialize_N4_NASA_PES * shift of diatomic zero of energy: ', This%shiftof0/Two, '; shift of VTd: ', This%shiftof0
-!#endif
+  This%shiftof0 = Two * (veccsd - veuse)
+  if (i_Debug_Loc) call Logger%Write( " shift of diatomic zero of energy = ", This%shiftof0/Two, "; shift of VTd = ", This%shiftof0 )                                        
 
   if (i_Debug_Loc) call Logger%Exiting()
 
 End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
 
+
+!________________________________________________________________________________________________________________________________!
 Subroutine Output_N4_NASA_PES( This, Unit )
 
   class(N4_NASA_PES_Type)                 ,intent(in)     ::    This
@@ -200,12 +197,7 @@ Function N4_NASA_Potential_From_R( This, R, Q ) result( V )
 
   real(rkp) ,dimension(12)                                   ::    dVdQin
   real(rkp)                                                  ::    t1, t2
-
-!#ifdef N4_PES_VERBOSE  
-  !write(*,*) 'Inside N4_NASA_Potential_From_R'
-  !write(*,*) 'Q = ', Q
-!#endif
-
+  
   call n4fitd(This%shiftof0, Q(1:3), Q(4:6), Q(7:9), Q(10:12), V, dVdQin)
 
 End Function
@@ -246,9 +238,6 @@ Subroutine Compute_N4_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp), dimension(3)                                    ::    dVdR4
 
   dVdR = Zero
-!#ifdef N4_PES_VERBOSE
-  !write(*,*) 'Inside Compute_N4_NASA_PES_1d'
-!#endif
   
   call n4fitd(This%shiftof0, Q(1:3), Q(4:6), Q(7:9), Q(10:12), V, dVdQin)
 
@@ -304,40 +293,42 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
 
   vmat  = 1.d-5
   dpart = Zero
+                                              
+  cart(:,1) = xyz1(:)                                                
+  cart(:,2) = xyz2(:)                                                
+  cart(:,3) = xyz3(:)                                                
+  cart(:,4) = xyz4(:)                                                
 
-  do i=1,3                                                          
-    cart(i,1) = xyz1(i)                                                
-    cart(i,2) = xyz2(i)                                                
-    cart(i,3) = xyz3(i)                                                
-    cart(i,4) = xyz4(i)                                                
-  end do  
+  !write(*,*) 'Atom1, ', cart(:,1), '; Atom2, ', cart(:,2), '; Atom3, ', cart(:,3), '; Atom4, ', cart(:,4)
+
+
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '** n4fitd **** cart(:,1) = ', cart(:,1)
-  !write(6,*) '** n4fitd **** cart(:,2) = ', cart(:,2)
-  !write(6,*) '** n4fitd **** cart(:,3) = ', cart(:,3)
-  !write(6,*) '** n4fitd **** cart(:,4) = ', cart(:,4)
+  !write(*,*) '** n4fitd **** cart(:,1) = ', cart(:,1)
+  !write(*,*) '** n4fitd **** cart(:,2) = ', cart(:,2)
+  !write(*,*) '** n4fitd **** cart(:,3) = ', cart(:,3)
+  !write(*,*) '** n4fitd **** cart(:,4) = ', cart(:,4)
 
-  !write(6,*) '** n4fitd **** Entering vtdd'
+  !write(*,*) '** n4fitd **** Entering vtdd'
 !#endif
   !call vtdd(  xyz1, xyz2, xyz3, xyz4, vmat(1,1), dpart)
   call vtdd(  xyz1, xyz2, xyz3, xyz4, vmat(1,1), dpart(:,1))  
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Done with vtdd'
-  !write(6,*) '** n4fitd **** Entering vn2n2d for the 1st time'
+  !write(*,*) '** n4fitd **** Done with vtdd'
+  !write(*,*) '** n4fitd **** Entering vn2n2d for the 1st time'
 !#endif
   call vn2n2d(xyz1, xyz2, xyz3, xyz4, vmat(2,2), dpart(:,2), 0)  
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Done with vn2n2d'
-  !write(6,*) '** n4fitd **** Entering vn2n2d for the 2nd time'
+  !write(*,*) '** n4fitd **** Done with vn2n2d'
+  !write(*,*) '** n4fitd **** Entering vn2n2d for the 2nd time'
 !#endif
   call vn2n2d(xyz1, xyz3, xyz2, xyz4, vmat(3,3), dpart(:,3), 0)  
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Done with vn2n2d'
-  !write(6,*) '** n4fitd **** Entering vn2n2d for the 3rd time'
+  !write(*,*) '** n4fitd **** Done with vn2n2d'
+  !write(*,*) '** n4fitd **** Entering vn2n2d for the 3rd time'
 !#endif
   call vn2n2d(xyz1, xyz4, xyz2, xyz3, vmat(4,4), dpart(:,4), 0)  
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Done with vn2n2d'
+  !write(*,*) '** n4fitd **** Done with vn2n2d'
 !#endif
 
   do i=1,3
@@ -350,7 +341,7 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     dpart(i+9,4) = sv
   end do
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '** n4fitd **** dpart = ', dpart
+  !write(*,*) '** n4fitd **** dpart = ', dpart
 !#endif
   !stop
   vmat(1,1) = vmat(1,1) - shiftof0                                      
@@ -359,7 +350,7 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     vmat(i,1) = 6.0847866d-02
   end do
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** vmat = ', vmat
+  !write(*,*) '** n4fitd **** vmat = ', vmat
 !#endif   
   do i=1,4
     do j=1,4
@@ -367,7 +358,7 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     end do
   end do
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** vmatc = ', vmatc
+  !write(*,*) '** n4fitd **** vmatc = ', vmatc
 !#endif  
   !     
   ! Call to MKL (Find the eigenvalues and eigenvectors)
@@ -377,47 +368,47 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
   ! LAPACK  dsyevx (JOBZ, RANGE, UPLO, N, A, LDA, VL, VU, IL, IU, ABSTOL, M, W, Z, LDZ, WORK, LWORK, IWORK, IFAIL, INFO)      
   ! ---------------------------------------------------------------
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Entering dsyevx'
+  !write(*,*) '** n4fitd **** Entering dsyevx'
 !#endif
   call dsyevx('V', 'I', 'L', 4, vmat, 4, vl, ul, 1, 1, Zero, neig, eig, vec, 4, work, lwork, iwork, ifail, info)
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** Done with dsyevx '
+  !write(*,*) '** n4fitd **** Done with dsyevx '
 !#endif
 
   do i=1,4
     vec(i) = vec(i)**2
   end do
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '** n4fitd **** vec = ', vec
+  !write(*,*) '** n4fitd **** vec = ', vec
 !#endif
 
   if (info .ne. 0) then
-    !write(6,*) '** n4fitd **** info = ', info, '; STOPPING!'
+    !write(*,*) '** n4fitd **** info = ', info, '; STOPPING!'
     stop
   end if
 
   fit = eig(1)
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '** n4fitd **** fit = ', fit
+  !write(*,*) '** n4fitd **** fit = ', fit
 !#endif
 
   do i=1,12
 
     dfit(i) = dpart(i,1)*vec(1) + dpart(i,2)*vec(2) + dpart(i,3)*vec(3) + dpart(i,4)*vec(4)
 !#ifdef N4_PES_VERBOSE
-    !write(6,*) '** n4fitd **** dfit(i) = ', dfit(i), ' for i=', i
+    !write(*,*) '** n4fitd **** dfit(i) = ', dfit(i), ' for i=', i
 !#endif
 
     if ( (dfit(i) .ne. dfit(i)) .or. (dfit(i) .gt. 1.d20) .or. (dfit(i) .lt. -1.d20) ) then
       
 !#ifdef N4_PES_VERBOSE
-      !write(6,*) '** n4fitd **** got nan for dfit ', i
-      !write(6,*) '** n4fitd **** dparts ', dpart(i,1), dpart(i,2), dpart(i,3), dpart(i,4)
-      !write(6,*) '** n4fitd **** vecs ', vec(1), vec(2), vec(3), vec(4)
-      !write(6,*) '** n4fitd **** vmat: '
+      !write(*,*) '** n4fitd **** got nan for dfit ', i
+      !write(*,*) '** n4fitd **** dparts ', dpart(i,1), dpart(i,2), dpart(i,3), dpart(i,4)
+      !write(*,*) '** n4fitd **** vecs ', vec(1), vec(2), vec(3), vec(4)
+      !write(*,*) '** n4fitd **** vmat: '
 
       do k=1,4
-        !write(6,*) (vmat(k,j), j=1,4)
+        !write(*,*) (vmat(k,j), j=1,4)
       end do
 !#endif
 
@@ -441,20 +432,20 @@ Subroutine n4fitd(shiftof0, xyz1, xyz2, xyz3, xyz4, fit, dfit)
     if (dfit(1) .lt. Zero) then
       iok = 1
     else
-      !write(6,*) '** n4fitd **** have not a number for first der: '
+      !write(*,*) '** n4fitd **** have not a number for first der: '
       do i=1,4
-        !write(6,*) '** n4fitd **** i = ', i, '; vec(i) = ', vec(i), '; dpart(1,i)', dpart(1,i)
+        !write(*,*) '** n4fitd **** i = ', i, '; vec(i) = ', vec(i), '; dpart(1,i)', dpart(1,i)
         if ( (dpart(1,i) .le. Zero) .or. (dpart(1,i) .gt. Zero) )then
           iok=iok+1
         else
           if      (i .eq. 2) then
-            !write(6,*) '** n4fitd **** i=2; Entering vn2n2d'
+            !write(*,*) '** n4fitd **** i=2; Entering vn2n2d'
             call vn2n2d(xyz1, xyz2, xyz3, xyz4, vmat(2,2), dpart(1,2), 1)
           else if (i .eq. 3) then
-            !write(6,*) '** n4fitd **** i=3; Entering vn2n2d'
+            !write(*,*) '** n4fitd **** i=3; Entering vn2n2d'
             call vn2n2d(xyz1, xyz3, xyz2, xyz4, vmat(3,3), dpart(1,3), 1)
           else if (i .eq. 4) then
-            !write(6,*) '** n4fitd **** i=4; Entering vn2n2d'
+            !write(*,*) '** n4fitd **** i=4; Entering vn2n2d'
             call vn2n2d(xyz1, xyz4, xyz2, xyz3, vmat(4,4), dpart(1,4), 1)
           end if
         end if
@@ -519,7 +510,7 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
   r24 = sqrt(r24)
   r34 = sqrt(r34)
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '**** vtdd **** r12 = ', r12, '; r13 = ', r13, '; r14 = ', r14, '; r23 = ', r23, '; r24 = ', r24, '; r34 = ', r34
+  !write(*,*) '**** vtdd **** r12 = ', r12, '; r13 = ', r13, '; r14 = ', r14, '; r23 = ', r23, '; r24 = ', r24, '; r34 = ', r34
 !#endif
 
   do i=1,3
@@ -537,7 +528,7 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
     dr34(i+9) = -dr34(i+6)
   end do
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '**** vtdd **** dr12 = ', dr12, '; dr13 = ', dr13, '; dr14 = ', dr14, '; dr23 = ', dr23, '; dr24 = ', dr24, '; dr34 = ', dr34
+  !write(*,*) '**** vtdd **** dr12 = ', dr12, '; dr13 = ', dr13, '; dr14 = ', dr14, '; dr23 = ', dr23, '; dr24 = ', dr24, '; dr34 = ', dr34
 !#endif
 
   ex12 = exp( -betatd * (r12 - retd) )
@@ -554,7 +545,7 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
   vx34 = (ex34 - One)**2 * detd
   fit  = vx12 + vx13 + vx14 + vx23 + vx24 + vx34 - 218.47601249d0 + 0.10d0 ! from my ccsd(t) caln and empirical shift to get X peak height about right
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '**** vtdd **** fit = ', fit
+  !write(*,*) '**** vtdd **** fit = ', fit
 !#endif
 
 ! compute derivatives wrt atomic cartesian coordinates
@@ -584,7 +575,7 @@ Subroutine vtdd(x1, x2, x3, x4, fit, dfit)
     dfit(i) = dvx12(i) + dvx13(i) + dvx14(i) + dvx23(i) + dvx24(i) + dvx34(i)
   end do     
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '**** vtdd **** dfit = ', dfit
+  !write(*,*) '**** vtdd **** dfit = ', dfit
 !#endif
 
   return
@@ -664,6 +655,10 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   real(rkp)                                               :: bot
   real(rkp)                                               :: r1, r2, r3, r4, r5, r6
 
+
+  !write(*,*) "**** vn2n2d *********************************************************************************************************"
+
+
   dr1 = Zero 
   dr2 = Zero 
   dr3 = Zero 
@@ -687,9 +682,9 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   dxb  = Zero 
 
   if (iprt .ne. 0) then
-    !write(6,*) 'input carts: '
+    !write(*,*) 'input carts: '
     do i=1,3
-      write(6,'(1p6e26.18)') x1(i), x2(i), x3(i), x4(i)
+      !write(*,*) x1(i), x2(i), x3(i), x4(i)
     end do
   end if
 
@@ -721,7 +716,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   r4 = sqrt(r4)
   r2 = sqrt(r2)
 !#ifdef N4_PES_VERBOSE  
-  !write(6,*) '**** vn2n2d ** r1 = ', r1, '; r2 = ', r2, '; r3 = ', r3, '; r4 = ', r4, '; r5 = ', r5, '; r6 = ', r6 
+   !write(*,*) '**** vn2n2d ** r1 = ', r1, '; r2 = ', r2, '; r3 = ', r3, '; r4 = ', r4, '; r5 = ', r5, '; r6 = ', r6 
 !#endif
 
   dot1 = Zero
@@ -739,8 +734,8 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   end do
   rbig = sqrt(rbig)
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '**** vn2n2d ** dot1 = ', dot1, '; dot2 = ', dot2
-  !write(6,*) '**** vn2n2d ** rbig = ', rbig
+  !write(*,*) '**** vn2n2d ** dot1 = ', dot1, '; dot2 = ', dot2
+  !write(*,*) '**** vn2n2d ** rbig = ', rbig
 !#endif
 
   theta1arg = dot1 / (r1 * rbig)                                          
@@ -752,12 +747,12 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
     end if                                                           
   end if    
 !#ifdef N4_PES_VERBOSE
-  !write(6,*) '**** vn2n2d ** theta1arg = ', theta1arg
+  !write(*,*) '**** vn2n2d ** theta1arg = ', theta1arg
 !#endif
 
   theta1 = acos(theta1arg)                                            
   if (theta1 .ne. theta1) then
-    !write(6,*) '**** vn2n2d ** theta1 nan ', dot1, r1, rbig, theta1arg
+    !write(*,*) '**** vn2n2d ** theta1 nan ', dot1, r1, rbig, theta1arg
   end if
   theta2arg = dot2 / (r2 * rbig)                                          
   if ( abs(theta2arg) .gt. One ) then                                     
@@ -769,6 +764,9 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   end if  
   theta2 = acos(theta2arg)  
 
+  !write(*,*) "**** vn2n2d ** rv  = ", rv
+  !write(*,*) "**** vn2n2d ** xcm = ", xcm
+
   xa1    = rv(2,1) * xcm(3) - rv(3,1) * xcm(2)
   xa2    = rv(3,1) * xcm(1) - rv(1,1) * xcm(3)
   xa3    = rv(1,1) * xcm(2) - rv(2,1) * xcm(1)
@@ -779,6 +777,9 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   xb     = sqrt(xb1**2 + xb2**2 + xb3**2)
   rxaxb  = One / (xa * xb)
   
+  !write(*,*) "**** vn2n2d ** xa = ", xa
+  !write(*,*) "**** vn2n2d ** xb = ", xb
+
   if ( (abs(xa) .le. 1.d-6) .or. (abs(xb) .le. 1.d-6) ) then
     phi  = Zero
     tphi = Zero
@@ -787,8 +788,8 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
     dot3 = ( xa1 * xb1 + xa2 * xb2 + xa3 * xb3 ) * rxaxb
     tphi = One / ( sqrt( abs(One - dot3**2) ) + 1.d-14)                         
     if (iprt .ne. 0) then
-      !write(6,*) '**** vn2n2d ** dot3 = ',   dot3, xa1, xb1, xa2, xb2, xa3, xb3, rxaxb
-      !write(6,*) '**** vn2n2d ** dot3-1d0 ', dot3-One, abs(abs(dot3)-One)
+      !write(*,*) '**** vn2n2d ** dot3 = ',   dot3, xa1, xb1, xa2, xb2, xa3, xb3, rxaxb
+      !write(*,*) '**** vn2n2d ** dot3-1d0 ', dot3-One, abs(abs(dot3)-One)
     end if
     ipst = 0
     if ( abs(abs(dot3) - One) .lt. 1.d-10) then                              
@@ -804,7 +805,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
       ipst = 3
     end if                                                           
     if (iprt .gt. 0) then
-      !write(6,*) '**** vn2n2d ** phi, ipst ', phi, ipst, pi
+      !write(*,*) '**** vn2n2d ** phi, ipst ', phi, ipst, pi
     end if
   end if
 
@@ -842,15 +843,15 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   dws2  = -One  / sqrt(abs(r2 * r2 * rbig * rbig - dot2 * dot2) + 1.d-14)         
 
   if (iprt .ne. 0)then
-    !write(6,*) '**** vn2n2d ** dws1, dws2 ', dws1, dws2
-    !write(6,*) '**** vn2n2d ** sqrt arg ',   r1*r1*rbig*rbig, dot1*dot1, r1*r1*rbig*rbig-dot1*dot1
-    !write(6,*) '**** vn2n2d ** r1,rbig ',    r1, r2, rbig
-    !write(6,*) '**** vn2n2d ** dot1 ',  dot1
-    !write(6,*) '**** vn2n2d ** rab ',   rab
-    !write(6,*) '**** vn2n2d ** rcd ',   rcd
-    !write(6,*) '**** vn2n2d ** x12 ',   x12
-    !write(6,*) '**** vn2n2d ** dr1 ',   dr1
-    !write(6,*) '**** vn2n2d ** drbig ', drbig
+    !write(*,*) '**** vn2n2d ** dws1, dws2 ', dws1, dws2
+    !write(*,*) '**** vn2n2d ** sqrt arg ',   r1*r1*rbig*rbig, dot1*dot1, r1*r1*rbig*rbig-dot1*dot1
+    !write(*,*) '**** vn2n2d ** r1,rbig ',    r1, r2, rbig
+    !write(*,*) '**** vn2n2d ** dot1 ',  dot1
+    !write(*,*) '**** vn2n2d ** rab ',   rab
+    !write(*,*) '**** vn2n2d ** rcd ',   rcd
+    !write(*,*) '**** vn2n2d ** x12 ',   x12
+    !write(*,*) '**** vn2n2d ** dr1 ',   dr1
+    !write(*,*) '**** vn2n2d ** drbig ', drbig
   end if
 
   do i=1,3
@@ -948,27 +949,30 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   dxb(9)  = rxb1*dxb1(9)  + rxb2*dxb2(9)
   dxb(12) = rxb1*dxb1(12) + rxb2*dxb2(12)
 
+  !write(*,*) "**** vn2n2d ** dxa = ", dxa
+  !write(*,*) "**** vn2n2d ** dxb = ", dxb
+
   do i=1,12
     ddot3(i) = (xa1 * dxb1(i) + xb1 * dxa1(i) + xa2 * dxb2(i) + xb2 * dxa2(i) + xa3 * dxb3(i) + xb3 * dxa3(i)) * rxaxb - dot3 * rxaxb * (xa * dxb(i) + xb * dxa(i))
     dphi(i)  = -tphi * ddot3(i)                                          
   end do
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** tphi = ', tphi
+    !write(*,*) '**** vn2n2d ** tphi = ', tphi
     do i=1,12
-      write(6,'("**** vn2n2d ** ddot3 = ", 1p6e26.18)') ddot3(i)
+      !write(*,*) ddot3(i)
     end do
   end if
   
   ! get diatomic potential curves
   if (iprt .ne. 0) then                                                 
-    write(6,"('**** vn2n2d ** jacobis: ', 6f10.5)") r1, r2, rbig, theta1, theta2, phi                          
-    !write(6,*)('**** vn2n2d **  jacobi ders ')
+    !write(*,*) r1, r2, rbig, theta1, theta2, phi                          
+    !write(*,*)('**** vn2n2d **  jacobi ders ')
     do i=1,12
-      write(6,'(1p6e26.18)') dr1(i), dr2(i), drbig(i), dtheta1(i), dtheta2(i), dphi(i)
+      !write(*,*) dr1(i), dr2(i), drbig(i), dtheta1(i), dtheta2(i), dphi(i)
     end do
-    !write(6,*)('**** vn2n2d ** other rij ders ')
+    !write(*,*)('**** vn2n2d ** other rij ders ')
     do i=1,12
-      write(6,'(1p6e26.18)') dr3(i), dr4(i), dr5(i), dr6(i)
+      !write(*,*) dr3(i), dr4(i), dr5(i), dr6(i)
     end do
   end if                                                            
 
@@ -1040,7 +1044,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   qq = preqq * (Half * p2a * p2b -(p21a * p21b / Nine) * cph + (p22a * p22b / 72d0) * cp) * q12
   
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** q1,q2 ', qq, dq1dr1, dq2dr2, q1, q2
+    !write(*,*) '**** vn2n2d ** q1,q2 ', qq, dq1dr1, dq2dr2, q1, q2
   end if
 
   if (qq .ne. Zero) then                                                 
@@ -1074,11 +1078,11 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
      dswth=Zero                                                        
   end if                                                            
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** dswth ', swth, bswth, sargtyp
+    !write(*,*) '**** vn2n2d ** dswth ', swth, bswth, sargtyp
   end if
   dswthab = dswth / (rbig + eps)                                          
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** dswthab ', dswthab, dswth, rbig, eps
+    !write(*,*) '**** vn2n2d ** dswthab ', dswthab, dswth, rbig, eps
   end if
   swth1    = bswth * swth * (One - swth)
   dswthc   = -dswthab * (r1 + r2) / (rbig + eps)                                
@@ -1094,8 +1098,8 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   dvlrdt2 = swth * (dc6000t2 * denom1 + dc8000t2 * denom2 + dqqdt2 * denom3)
   dvlrdrb = vlro * dswthc - swth * (Six * c6000 * (denom1**2) * (rbig**5) + Eight * c8000 * denom2 * denom2a * (rbig**3) + Five * qq * (denom3**2) * (rbig**4))
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** dvlrdr1 ', dvlrdr1, swth, dqqdr1, denom3
-    !write(6,*) '**** vn2n2d ** dvlrdr2 ', dvlrdr2, dqqdr2, dc6000r2, denom1, dc8000r2, denom2
+    !write(*,*) '**** vn2n2d ** dvlrdr1 ', dvlrdr1, swth, dqqdr1, denom3
+    !write(*,*) '**** vn2n2d ** dvlrdr2 ', dvlrdr2, dqqdr2, dc6000r2, denom1, dc8000r2, denom2
   end if
   dvlrdr1 = dvlrdr1 + swth * (dqqdr1 * denom3 + dc6000r1 * denom1 + dc8000r1 * denom2)                                            
   dvlrdr2 = dvlrdr2 + swth * (dqqdr2 * denom3 + dc6000r2 * denom1 + dc8000r2 * denom2)                                            
@@ -1113,7 +1117,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   bra = pairwise * swth
   brb = bra * rbig
   if (iprt .ne. 0) then
-    !write(6,*) '**** vn2n2d ** pairwise, bra, brb ', pairwise, bra, brb
+    !write(*,*) '**** vn2n2d ** pairwise, bra, brb ', pairwise, bra, brb
   end if
 
   dpairdr3 = beta70 * exp(beta * r3)
@@ -1144,7 +1148,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
 
   fit    = bra * func1 + brb * func2 + pairwise + vlr + (v12 + v34) + coef(20)
   if (iprt .gt. 0) then
-    !write(6,*) '**** vn2n2d ** fit: ', fit, bra, func1, func2, pairwise, vlr, v12, v34, coef(20)
+    !write(*,*) '**** vn2n2d ** fit: ', fit, bra, func1, func2, pairwise, vlr, v12, v34, coef(20)
   end if
 
   dfunc1dr1 = func1a * re2 * r1re2
@@ -1169,16 +1173,16 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   dfitph = bra * dfunc1dph + brb * dfunc2dph + dvlrph  
   dfitrb = dvlrdrb + pairwise * dswthc * (func1 + rbig * func2) + bra * func2 
   if (iprt .gt. 0) then
-    !write(6,*) '**** vn2n2d ** dfitr1: ', dfitr1, dbradr1, func1, bra, dfunc1dr1, dbrbdr1, func2, brb, dfunc2dr1, dvlrdr1, dv12dr1
-    !write(6,*) '**** vn2n2d ** dfitr2: ', dfitr2, dbradr2, func1, bra, dfunc1dr2, dbrbdr2, func2, brb, dfunc2dr2, dvlrdr2, dv34dr2
-    !write(6,*) '**** vn2n2d ** dfitt1: ', dfitt1
-    !write(6,*) '**** vn2n2d ** dfitt2: ', dfitt2
-    !write(6,*) '**** vn2n2d ** dfitph: ', dfitph
-    !write(6,*) '**** vn2n2d ** dfitrb: ', dfitrb
-    !write(6,*) '**** vn2n2d ** dfitr3: ', dfitr3
-    !write(6,*) '**** vn2n2d ** dfitr4: ', dfitr4
-    !write(6,*) '**** vn2n2d ** dfitr5: ', dfitr5
-    !write(6,*) '**** vn2n2d ** dfitr6: ', dfitr6
+    !write(*,*) '**** vn2n2d ** dfitr1: ', dfitr1, dbradr1, func1, bra, dfunc1dr1, dbrbdr1, func2, brb, dfunc2dr1, dvlrdr1, dv12dr1
+    !write(*,*) '**** vn2n2d ** dfitr2: ', dfitr2, dbradr2, func1, bra, dfunc1dr2, dbrbdr2, func2, brb, dfunc2dr2, dvlrdr2, dv34dr2
+    !write(*,*) '**** vn2n2d ** dfitt1: ', dfitt1
+    !write(*,*) '**** vn2n2d ** dfitt2: ', dfitt2
+    !write(*,*) '**** vn2n2d ** dfitph: ', dfitph
+    !write(*,*) '**** vn2n2d ** dfitrb: ', dfitrb
+    !write(*,*) '**** vn2n2d ** dfitr3: ', dfitr3
+    !write(*,*) '**** vn2n2d ** dfitr4: ', dfitr4
+    !write(*,*) '**** vn2n2d ** dfitr5: ', dfitr5
+    !write(*,*) '**** vn2n2d ** dfitr6: ', dfitr6
   end if
   
   do i=1,12
@@ -1197,6 +1201,7 @@ Subroutine vn2n2d(x1, x2, x3, x4, fit, dfit, iprt)
   return
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
+
 
 !________________________________________________________________________________________________________________________________!
 Subroutine diatccsdd(r, ans, dansdr, iwant)
@@ -1286,7 +1291,7 @@ Subroutine diatccsdd(r, ans, dansdr, iwant)
     dansdr = ex * r * dsum + sum * ex - a3 * r * ex * sum      
 
   else
-    !write(6,*) '**** diatccsdd * unknown iwant: ', iwant
+    !write(*,*) '**** diatccsdd * unknown iwant: ', iwant
     stop
   end if
 

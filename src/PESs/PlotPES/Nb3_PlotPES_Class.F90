@@ -90,7 +90,7 @@ Subroutine Nb3_PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Deb
 
 
   if (trim(adjustl(Input%UnitDist)) .eq. 'Angstrom') then           
-    RConverter  = One              / B_To_Ang
+    RConverter  = One         / B_To_Ang
     dVConverter = dVConverter / B_To_Ang
   end if
   
@@ -112,6 +112,7 @@ Subroutine Nb3_PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Deb
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
+
 
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
@@ -156,246 +157,182 @@ Subroutine Nb3_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
   if (i_Debug_Loc) call Logger%Entering( "Nb3_PlotPES_Grid" )
   !i_Debug_Loc   =     Logger%On()
 
+
+  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/Info.dat'
+  open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName )  
+    write(Unit,'(A)')        "#       Nb Points R1        Nb Points R2"
+    write(Unit,'(2I20)')     Input%NGridPlot(:)
+    write(Unit,'(A)')        "#             Min R1              Min R2"
+    write(Unit,'(2d20.10)')  Input%MinGridPlot(:)
+    write(Unit,'(A)')        "#             Max R1              Max R2"
+    write(Unit,'(2d20.10)') Input%MaxGridPlot(:)
+  close(Unit)  
   
-  if (trim(adjustl(Input%PESOrDiatFlg)) .eq. 'PES') then
-  
-    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/Info.dat'
-    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
-      if (Status/=0) call Error( "Error opening file: " // FileName )  
-      write(Unit,'(A)')        "#       Nb Points R1        Nb Points R2"
-      write(Unit,'(2I20)')     Input%NGridPlot(:)
-      write(Unit,'(A)')        "#             Min R1              Min R2"
-      write(Unit,'(2d20.10)')  Input%MinGridPlot(:)
-      write(Unit,'(A)')        "#             Max R1              Max R2"
-      write(Unit,'(2d20.10)') Input%MaxGridPlot(:)
-    close(Unit)  
-    
-    hGrid = (Input%MaxGridPlot - Input%MinGridPlot) / (Input%NGridPlot - 1)  
-     
-  
-    do iPES = 1,Input%NPESs
-      write(iPESChar,'(I4)') iPES
-      FolderName = 'PES_' // trim(adjustl(iPESChar))
-      call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)))
-  
-  
-      if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
-        RpInf = 1000.d0
-        if (Input%PlotPES_OnlyTriatFlg) then 
-          call R_to_X(RpInf, QpInf)
-          VInf  = Collision%PESsContainer(iPES)%PES%TriatPotential( RpInf, QpInf )
-        else
-          VInf  = Collision%PESsContainer(iPES)%PES%Potential( RpInf, QpInf )
-        end if
-      end if
-      !VInf  = Zero
-      write(*,*) 'VInf = ', VInf*VConverter, ' eV'
-      
-      
-      if (Input%PESZeroRefIntFlg == 0) then
-        VRef  = 0.0d0
+  hGrid = (Input%MaxGridPlot - Input%MinGridPlot) / (Input%NGridPlot - 1)  
+   
+
+  do iPES = 1,Input%NPESs
+    write(iPESChar,'(I4)') iPES
+    FolderName = 'PES_' // trim(adjustl(iPESChar))
+    call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)))
+
+
+    if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+      RpInf = 1000.d0
+      if (Input%PlotPES_OnlyTriatFlg) then 
+        call R_to_X(RpInf, QpInf)
+        VInf  = Collision%PESsContainer(iPES)%PES%TriatPotential( RpInf, QpInf )
       else
-        if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
-          Rp(1)   = rVMin_Min
-          Rp(3)   = 1000.0
-          VRef    = 1.d10
-          do while(Rp(1) < rVMin_Max)
-            Rp(2) = dsqrt(  Rp(1)**Two + Rp(3)**Two - Two * Rp(1) * Rp(3) * dcos( 120.d0 / 180.d0 * pi ) )
-            call R_to_X(Rp, Qp, Theta=120.d0)
-            if (Input%PlotPES_OnlyTriatFlg) then 
-              VRef  = min(Collision%PESsContainer(iPES)%PES%TriatPotential( Rp, Qp ), VRef)
-            else
-              VRef  = min(Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp ), VRef)
-            end if
-            Rp(1) = Rp(1) + 1.d-4
-          end do
-          VRef  = VRef !- VInf
-        end if
+        VInf  = Collision%PESsContainer(iPES)%PES%Potential( RpInf, QpInf )
       end if
-      write(*,*) 'VRef = ', VRef*VConverter, ' eV'
-  
-  
-      if (trim(adjustl(Input%yAxisVar)) .eq. 'Distance') then 
+    end if
+    !VInf  = Zero
+    write(*,*) 'VInf = ', VInf*VConverter, ' eV'
+    
+    
+    if (Input%PESZeroRefIntFlg == 0) then
+      VRef  = 0.0d0
+    else
+      if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+        Rp(1)   = rVMin_Min
+        Rp(3)   = 1000.0
+        VRef    = 1.d10
+        do while(Rp(1) < rVMin_Max)
+          Rp(2) = dsqrt(  Rp(1)**Two + Rp(3)**Two - Two * Rp(1) * Rp(3) * dcos( 120.d0 / 180.d0 * pi ) )
+          call R_to_X(Rp, Qp, Theta=120.d0)
+          if (Input%PlotPES_OnlyTriatFlg) then 
+            VRef  = min(Collision%PESsContainer(iPES)%PES%TriatPotential( Rp, Qp ), VRef)
+          else
+            VRef  = min(Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp ), VRef)
+          end if
+          Rp(1) = Rp(1) + 1.d-4
+        end do
+        VRef  = VRef !- VInf
+      end if
+    end if
+    write(*,*) 'VRef = ', VRef*VConverter, ' eV'
 
-        do iA = 1,size(Input%AnglesPlot,1)
-        
-          call cpu_time ( t1 )
-            
-          FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESFromGrid.csv.' // trim(adjustl(Input%AnglesPlotChar(iA)))
-          open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
-            if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
-              write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "E"'
-            else
-              write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "E", "dEdR1", "dEdR2", "dEdR3"'
-            end if
-            if (Status/=0) call Error( "Error opening file: " // FileName )
-            
-            
-            iTot = 1
-            do i = 1,Input%NGridPlot(1)
-              
-              Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
 
+    if (trim(adjustl(Input%yAxisVar)) .eq. 'Distance') then 
 
-              do j = 1,Input%NGridPlot(2)
-                
-                Rp(3)   = ( Input%MinGridPlot(2) + hGrid(2) * (j-1) )     
-                Theta2  = Input%AnglesPlot(iA) / 180.d0 * Pi
-                Rp(2)   = sqrt( Rp(1)**2 + Rp(3)**2 - 2.d0 * Rp(1) * Rp(3) * dcos(Theta2) ) 
-                call R_to_X(Rp, Qp, Theta=Theta2)
-                if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
-
-                  if (Input%PlotPES_OnlyTriatFlg) then 
-                    !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * RConverter )
-                    V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp )
-                  else
-                    V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
-                  end if
-                  !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
-                  if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
-                    write(Unit,'(es17.6E3,3(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
-                  end if
-                  
-                elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
-                  
-                  call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Zero*Rp, V, dVdR, dVdQ )     
-                  if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
-                    write(Unit,'(es15.6,6(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
-                  end if
-                  
-                end if  
-              
-                iTot = iTot + 1
-                  
-              end do
-              
-            end do
-            
-          close(Unit)   
-          
-          call cpu_time ( t2 )
-          write(*,*) 'Time for PES Calculations = ', t2-t1
-          
-        end do      
-          
-        
-      elseif (trim(adjustl(Input%yAxisVar)) .eq. 'Angle') then  
+      do iA = 1,size(Input%AnglesPlot,1)
       
-        FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESDistVsAngles.csv'
+        call cpu_time ( t1 )
+          
+        FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESFromGrid.csv.' // trim(adjustl(Input%AnglesPlotChar(iA)))
         open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
           if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
-            write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "Angle", "E"'
+            write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "E"'
           else
-            write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "Angle", "E", "dEdR1", "dEdR2", "dEdR3"'
+            write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "E", "dEdR1", "dEdR2", "dEdR3"'
           end if
           if (Status/=0) call Error( "Error opening file: " // FileName )
           
-          iTot = 1
-          do i = 1,Input%NGridPlot(1)!radiuses (constrained to be equal)
-            !this case r1=r2 and angle is varying
-
-            Rp(1) = 1.4d0!( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
-            Rp(3) = 1.7d0!Rp(1)
           
-            do j = 1,Input%NGridPlot(2)!angle
+          iTot = 1
+          do i = 1,Input%NGridPlot(1)
             
-              Angle = Input%MinGridPlot(2) + hGrid(2) * (j-1)
-              Rp(2) = sqrt( Rp(1)**2 + Rp(3)**2 - 2.d0 * Rp(1) * Rp(3) * dcos(Angle/ 180.d0 * Pi) ) 
-                
-              call R_to_X(Rp, Qp, Theta=Angle)
+            Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
+
+
+            do j = 1,Input%NGridPlot(2)
+              
+              Rp(3)   = ( Input%MinGridPlot(2) + hGrid(2) * (j-1) )     
+              Theta2  = Input%AnglesPlot(iA) / 180.d0 * Pi
+              Rp(2)   = sqrt( Rp(1)**2 + Rp(3)**2 - 2.d0 * Rp(1) * Rp(3) * dcos(Theta2) ) 
+              call R_to_X(Rp, Qp, Theta=Theta2)
               if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
 
                 if (Input%PlotPES_OnlyTriatFlg) then 
+                  !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * RConverter )
                   V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp )
                 else
                   V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
                 end if
-                !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
-                  write(Unit,'(es15.6,4(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter
-                !end if
+                !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
+                if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
+                  write(Unit,'(es17.6E3,3(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
+                end if
                 
               elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
                 
-                call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Qp, V, dVdR, dVdQ )    
-                !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                       
-                  write(Unit,'(es15.6,7(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
-                !end if
-              
+                call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Zero*Rp, V, dVdR, dVdQ )     
+                if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
+                  write(Unit,'(es15.6,6(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
+                end if
+                
               end if  
-             
+            
               iTot = iTot + 1
+                
             end do
-          
+            
           end do
-        
+          
         close(Unit)   
         
-          
-      end if ! Distance/Angle
-    
-    end do
-
-
-  elseif (trim(adjustl(Input%PESOrDiatFlg)) .eq. 'Diatomic') then
-    
-    !if (i_Debug_Loc) call Logger%Write( "Write the Velocity Scaling Factor" )  
-    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/Info.dat'
-    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
-      if (Status/=0) call Error( "Error opening file: " // FileName )  
-      write(Unit,'(A)')        "#       Nb Points R1        Nb Points R2"
-      write(Unit,'(2I20)')     Input%NGridPlot(:)
-      write(Unit,'(A)')        "#             Min R1              Min R2"
-      write(Unit,'(2d20.10)')  Input%MinGridPlot(:)
-      write(Unit,'(A)')        "#             Max R1              Max R2"
-      write(Unit,'(2d20.10)') Input%MaxGridPlot(:)
-    close(Unit)
-    
-    hGrid = (Input%MaxGridPlot - Input%MinGridPlot) / (Input%NGridPlot - 1)
-    write(*,*) Input%NGridPlot
-
-  
-    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/DiatomicPotential.csv'
-    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
-      if (Status/=0) call Error( "Error opening file: " // FileName )
-      if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then    
-        write(Unit,'(A)') 'Variables = "r1", "V"'
-      elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then 
-        write(Unit,'(A)') 'Variables = "r1", "V", "dV"'
-      end if
-    
-      
-      iTot = 1
-      do i = 1,Input%NGridPlot(1)
+        call cpu_time ( t2 )
+        write(*,*) 'Time for PES Calculations = ', t2-t1
         
-        Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
+      end do      
+        
+      
+    elseif (trim(adjustl(Input%yAxisVar)) .eq. 'Angle') then  
+    
+      FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESDistVsAngles.csv'
+      open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+        if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
+          write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "Angle", "E"'
+        else
+          write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "Angle", "E", "dEdR1", "dEdR2", "dEdR3"'
+        end if
+        if (Status/=0) call Error( "Error opening file: " // FileName )
+        
+        iTot = 1
+        do i = 1,Input%NGridPlot(1)!radiuses (constrained to be equal)
+          !this case r1=r2 and angle is varying
 
-        do j = 1,1!,2                          !  Input%NGridPlot(2) is not needed
+          Rp(1) = 1.4d0!( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
+          Rp(3) = 1.7d0!Rp(1)
+        
+          do j = 1,Input%NGridPlot(2)!angle
           
-          Rp(3) = ( Input%MinGridPlot(2) + hGrid(2) * (j-1) )
-          
-          Rp(2) = sqrt( Rp(1)**2 + Rp(3)**2 - 2.d0 * Rp(1) * Rp(3) * 0.0000001_rkp ) 
-          
-          if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then    
-               
-            V = Collision%Species(1)%DiatPot%DiatomicPotential( Rp(1) * RConverter )  
-            write(Unit,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
-       
-          elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then 
-          
-            call Collision%Species(1)%DiatPot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
-            write(Unit,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
-                         
-          end if     
+            Angle = Input%MinGridPlot(2) + hGrid(2) * (j-1)
+            Rp(2) = sqrt( Rp(1)**2 + Rp(3)**2 - 2.d0 * Rp(1) * Rp(3) * dcos(Angle/ 180.d0 * Pi) ) 
               
-          iTot = iTot + 1
+            call R_to_X(Rp, Qp, Theta=Angle)
+            if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
+
+              if (Input%PlotPES_OnlyTriatFlg) then 
+                V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp )
+              else
+                V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
+              end if
+              !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
+                write(Unit,'(es15.6,4(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter
+              !end if
+              
+            elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
+              
+              call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Qp, V, dVdR, dVdQ )    
+              !if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                       
+                write(Unit,'(es15.6,7(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Angle, ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
+              !end if
+            
+            end if  
+           
+            iTot = iTot + 1
+          end do
+        
         end do
       
-      end do
+      close(Unit)   
       
-    close(Unit)   
-    
-    
-  end if ! PES/DIAT
+        
+    end if ! Distance/Angle
+  
+  end do
 
   
   if (i_Debug_Loc) call Logger%Exiting

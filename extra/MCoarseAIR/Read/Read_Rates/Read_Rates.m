@@ -88,7 +88,7 @@ function Read_Rates()
     
     
     if (Input.Kin.DissCorrFactor ~= 1)
-        fprintf(['Correcting Dissociation Rate by a Factor: ' str(Input.Kin.DissCorrFactor) '\n'] )
+        fprintf(['Correcting Dissociation Rate by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
         Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
     end
     

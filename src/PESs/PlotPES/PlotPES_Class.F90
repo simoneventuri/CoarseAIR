@@ -42,6 +42,7 @@ Module PlotPES_Class
   contains
     private
     procedure              ,public                          ::    Initialize             =>    PlotPES_Initialize
+    procedure              ,public                          ::    DiatPot                =>    PlotPES_DiatPot
     procedure              ,public                          ::    IsoTri                 =>    PlotPES_IsoTri
     procedure              ,public                          ::    Rot3rd                 =>    PlotPES_Rot3rd
     procedure              ,public                          ::    ComputeCuts            =>    PlotPES_ComputeCuts
@@ -63,6 +64,10 @@ Module PlotPES_Class
   real(rkp)               ::    MostProbEr                            
   real(rkp)               ::    rVMin_Min      = 2.0d0
   real(rkp)               ::    rVMin_Max      = 2.5d0
+
+  real(rkp) ,save         ::    RConverter     = One
+  real(rkp) ,save         ::    VConverter     = One
+  real(rkp) ,save         ::    dVConverter    = One
   
   logical   ,parameter    ::    i_Debug_Global = .False.
   
@@ -84,6 +89,179 @@ Subroutine PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Debug )
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "PlotPES_Initialize" )
   !i_Debug_Loc   =     Logger%On()
+
+  if (i_Debug_Loc) call Logger%Exiting
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
+
+  class(PlotPES_Type)                       ,intent(out)    ::    This
+  type(Input_Type)                          ,intent(in)     ::    Input
+  type(Collision_Type)                      ,intent(in)     ::    Collision
+  integer                                   ,intent(in)     ::    NPairs
+  integer                                   ,intent(in)     ::    NAtoms
+  logical                         ,optional ,intent(in)     ::    i_Debug
+
+  real(rkp)                                                 ::    ang
+  real(rkp)                                                 ::    beta
+  real(rkp)                                                 ::    dist
+  real(rkp)                                                 ::    V
+  real(rkp)                                                 ::    dV
+  real(rkp)                                                 ::    Angle
+  real(rkp)    ,dimension(NPairs)                           ::    Rp
+  real(rkp)    ,dimension(NAtoms*3)                         ::    Qp
+  real(rkp)    ,dimension(NPairs)                           ::    RpInf
+  real(rkp)    ,dimension(NPairs)                           ::    dVdR
+  real(rkp)    ,dimension(NAtoms*3)                         ::    dVdQ
+  real(rkp)                                                 ::    VInf
+  real(rkp)                                                 ::    VRef
+  real(rkp)    ,dimension(2)                                ::    hGrid
+  real(rkp)                                                 ::    Temp
+  integer                                                   ::    i, j
+  integer                                                   ::    iTot
+  integer                                                   ::    iA, iP
+  integer                                                   ::    iPES
+  character(4)                                              ::    iPESChar
+  character(:)                 ,allocatable                 ::    FileName  
+  integer                                                   ::    Unit, Unit1, Unit2
+  integer                                                   ::    Status
+  character(:)                 ,allocatable                 ::    FolderName
+  real(rkp)                                                 ::    t2, t1
+  character(4)                                              ::    iAngChar
+  character(4)                                              ::    iPChar
+  real(rkp)                                                 ::    iAng, RpLong
+  logical                                                   ::    i_Debug_Loc
+  
+  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+  if (i_Debug_Loc) call Logger%Entering( "PlotPES_DiatPot" )
+
+
+  RpLong = 1000.d0
+
+
+  if (trim(adjustl(Input%UnitDist)) .eq. 'Angstrom') then           
+    RConverter  = One         / B_To_Ang
+    dVConverter = dVConverter / B_To_Ang
+  end if
+  
+  if (trim(adjustl(Input%UnitPot)) .eq. 'KcalMol') then                                                                           
+    VConverter  = One              / Kcm_To_Hartree
+    dVConverter = dVConverter / Kcm_To_Hartree
+  elseif (trim(adjustl(Input%UnitPot)) .eq. 'ElectronVolt') then                                                                
+    VConverter  = One              * Hartree_To_eV
+    dVConverter = dVConverter * Hartree_To_eV
+  end if
+  if (i_Debug_Loc) call Logger%Write( "RConverter  = ", RConverter )
+  if (i_Debug_Loc) call Logger%Write( "VConverter  = ", VConverter )
+  if (i_Debug_Loc) call Logger%Write( "dVConverter = ", dVConverter )
+  
+  call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES' )
+  if (i_Debug_Loc) call Logger%Write( "Created PlotPES Output Folder" )
+
+  VRef  = 0.0d0
+  write(*,*) 'VRef = ', VRef*VConverter, ' eV'
+
+
+  !if (i_Debug_Loc) call Logger%Write( "Write the Velocity Scaling Factor" )  
+  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/Info.dat'
+  open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName )  
+    write(Unit,'(A)')        "#       Nb Points R1        Nb Points R2"
+    write(Unit,'(2I20)')     Input%NGridPlot(:)
+    write(Unit,'(A)')        "#             Min R1              Min R2"
+    write(Unit,'(2d20.10)')  Input%MinGridPlot(:)
+    write(Unit,'(A)')        "#             Max R1              Max R2"
+    write(Unit,'(2d20.10)') Input%MaxGridPlot(:)
+  close(Unit)
+  
+  hGrid = (Input%MaxGridPlot - Input%MinGridPlot) / (Input%NGridPlot - 1)
+  write(*,*) Input%NGridPlot
+
+
+  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/VDiat_From_VDiat.csv'
+  open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
+  if (Status/=0) call Error( "Error opening file: " // FileName )
+  write(Unit1,'(A)') 'Variables = "r1", "V"'
+
+  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/dVDiat_From_VDiat.csv'
+  open( File=FileName, NewUnit=Unit2, status='REPLACE', iostat=Status )
+  if (Status/=0) call Error( "Error opening file: " // FileName )
+  write(Unit2,'(A)') 'Variables = "r1", "V", "dV"'
+    
+      
+    Rp = RpLong
+    do i = 1,Input%NGridPlot(1)
+      
+      Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
+    
+      V = Collision%Species(1)%DiatPot%DiatomicPotential( Rp(1) * RConverter )  
+      write(Unit1,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
+
+      call Collision%Species(1)%DiatPot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
+      write(Unit2,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
+          
+    end do
+
+    
+  close(Unit1)   
+
+  close(Unit2)   
+
+
+  do iP = 1,6
+    write(iPChar,'(I1)') iP
+
+    do iPES = 1,Input%NPESs
+      write(iPESChar,'(I4)') iPES
+
+
+      FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/VDiat_From_PES' // trim(adjustl(iPESChar)) // '.csv.' // trim(adjustl(iPChar))
+      open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
+      if (Status/=0) call Error( "Error opening file: " // FileName )
+      write(Unit1,'(A)') 'Variables = "r1", "V"'
+
+        Rp     = RpLong
+        do i = 1,Input%NGridPlot(1)
+          V    = Zero
+          
+          Rp(iP) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
+          
+          if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+            select case(iP)
+              case(1)
+                Qp = [Zero, Zero, Zero, Rp(iP), Zero, Zero, RpLong, RpLong, Zero, Zero, RpLong, Zero] * RConverter
+              case(2)
+                Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, Rp(iP)/sqrt(Two), Rp(iP)/sqrt(Two), Zero, Zero, RpLong, Zero] * RConverter
+              case(3)
+                Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, RpLong, RpLong, Zero, Zero, Rp(iP), Zero] * RConverter
+              case(4)
+                Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, RpLong, Rp(iP), Zero, Zero, RpLong, Zero] * RConverter
+              case(5)
+                Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, RpLong-Rp(iP)/sqrt(Two), Rp(iP)/sqrt(Two), Zero, Zero, RpLong, Zero] * RConverter
+              case(6)
+                Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, Rp(iP), RpLong, Zero, Zero, RpLong, Zero] * RConverter
+            end select
+          end if
+
+
+          !V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
+          write(Unit1,'(f15.6,(A,f15.6))') Rp(iP), ',', (V - VRef) * VConverter   
+              
+        end do
+
+        
+      close(Unit1)   
+
+
+    end do
+
+  end do
+
 
   if (i_Debug_Loc) call Logger%Exiting
 

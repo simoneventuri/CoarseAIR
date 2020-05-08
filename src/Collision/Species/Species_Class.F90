@@ -34,16 +34,18 @@ Module Species_Class
   public    ::    Species_Type
 
   Type      ::    Species_Type
-    integer                                         ::    Idx       =   0           ! Index of species in the list of all Species
-    character(:)  ,allocatable                      ::    Name                      ! Name of species
-    real(rkp)                                       ::    Mass      =   Zero        ! Mass of the species [a.u.]
-    real(rkp)                                       ::    RedMass   =   Zero        ! Reduced mass of the species [a.u.]
-    integer                                         ::    NAtoms    =   0           ! Number of atomss contained in the species
-    integer         ,dimension(:)   ,allocatable    ::    To_Atoms                  ! Index mapping from current Species to the Atoms its contains in the list of all atoms. 
-                                                                                    ! This list corresponds to the variable Collision%Atoms(1:NAtoms), where NAtoms is the total number of atoms, 
-                                                                                    ! including atoms from both the target and projectile species.
-    type(Atom_Type) ,dimension(:)   ,allocatable    ::    Atoms                     ! List of Atoms object, each one corresponds to a given atom of the current species. Dim=(NAtoms)
-    class(DiatomicPotential_Type)   ,allocatable    ::    DiatPot                    ! Intra-molecular diatomic potenitla object
+    integer                                         ::    Idx         =   0           ! Index of species in the list of all Species
+    character(:)  ,allocatable                      ::    Name                        ! Name of species
+    character(:)  ,allocatable                      ::    BSortMethod                 ! 
+    real(rkp)                                       ::    Mass        =   Zero        ! Mass of the species [a.u.]
+    real(rkp)                                       ::    RedMass     =   Zero        ! Reduced mass of the species [a.u.]
+    integer                                         ::    NAtoms      =   0           ! Number of atomss contained in the species
+    integer                                         ::    To_Molecule =   0
+    integer         ,dimension(:)   ,allocatable    ::    To_Atoms                    ! Index mapping from current Species to the Atoms its contains in the list of all atoms. 
+                                                                                      ! This list corresponds to the variable Collision%Atoms(1:NAtoms), where NAtoms is the total number of atoms, 
+                                                                                      ! including atoms from both the target and projectile species.
+    type(Atom_Type) ,dimension(:)   ,allocatable    ::    Atoms                       ! List of Atoms object, each one corresponds to a given atom of the current species. Dim=(NAtoms)
+    class(DiatomicPotential_Type)   ,allocatable    ::    DiatPot                     ! Intra-molecular diatomic potenitla object
     type(LevelsContainer_Type)                      ::    ListStates
   contains
     private
@@ -75,7 +77,8 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
 
   logical                                                   ::    i_Debug_Loc
   integer                                                   ::    iA, jA            ! Index of atoms
-  type(DiatomicPotential_Factory_Type)                       ::    DiatPotFactory
+  integer                                                   ::    iMol
+  type(DiatomicPotential_Factory_Type)                      ::    DiatPotFactory
   real(rkp)                                                 ::    SumMass
   real(rkp)                                                 ::    ProMass
 
@@ -96,6 +99,12 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
     This%To_Atoms(iA) =   Atoms(jA)%Idx                                                                         ! Setting the index mapping from current species to the total list of atoms
   end do
 
+  if (This%NAtoms == 2) then
+    do iMol = 1,Input%NMolecules
+      if ( trim(adjustl(Input%Molecules_Name(iMol))) == trim(adjustl(This%Name)) ) This%To_Molecule = iMol
+    end do
+    allocate( This%BSortMethod, source = trim(adjustl(Input%BSortMethod(This%To_Molecule))) )
+  end if
 
   SumMass             =   sum(     This%Atoms(:)%Mass )                                                         ! Computing the sum of the atoms mass
   ProMass             =   product( This%Atoms(:)%Mass )                                                         ! Computing the product of the atoms mass
@@ -111,13 +120,17 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
   if (i_Debug_Loc) call Logger%Write( "-> Done constructing the diatomic potential" )
 ! ==============================================================================================================
 
+
   if (i_Debug_Loc) then
     call Logger%Write( "This%Idx          = ", This%Idx           )
     call Logger%Write( "This%Name         = ", This%Name          )
-    call Logger%Write( "This%DiatPot%Name  = ", This%DiatPot%Name   )
+    call Logger%Write( "This%DiatPot%Name = ", This%DiatPot%Name  )
     call Logger%Write( "This%NAtoms       = ", This%NAtoms        )
     call Logger%Write( "This%Mass         = ", This%Mass    , Fr="es15.8" )
     call Logger%Write( "This%RedMass      = ", This%RedMass , Fr="es15.8" )
+    call Logger%Write( "This%To_Molecule  = ", This%To_Molecule   )
+    call Logger%Write( "This%To_Atoms     = ", This%To_Atoms      )
+    call Logger%Write( "This%BSortMethod  = ", This%BSortMethod   )
     do iA = 1,This%NAtoms
     associate( Ato => This%Atoms(iA) )
       call Logger%Write( "-> Ato%Idx = ", Ato%Idx, "Ato%Name = ", Ato%Name, "Ato%Mass = ", Ato%Mass, F2="i1", F4="a5", Fr=",s15.8" )

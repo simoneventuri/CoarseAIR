@@ -25,7 +25,7 @@ ParNodes=0                                                                      
 ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
 Queue='low'                                                                                       # Only for Clusters; 'devel'/'debug'/'low'/'medium'/'long'
 WallTime=4                                                                                        # Only for Clusters; WallTime in hours (e.g., 120)
-NProc=1                                                                                           # Nb of Processors
+NProc=4                                                                                           # Nb of Processors
 SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
 MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
 RmTrajFlg=0                                                                                       # =1 -> Removing Traj Files from Single Processors
@@ -207,13 +207,17 @@ for Tran in "${Tran_vec[@]}"; do :
     echo "[CoarseAIR]: ===   Translational Energy           = " ${Tran} " ============================ "
     #for Tint in "${Tint_Vec[@]}"; do :
     Tint=0.0
-  else
+  elif [ ${TranFlg} -eq 1 ]; then 
     echo "[CoarseAIR]: ===   Translational Temperature      = " ${Tran} " ============================ "
     #for Tint in "${Tint_Vec[@]}"; do :
     Tint=${Tran}
+  elif [ ${TranFlg} -eq 2 ]; then 
+    echo "[CoarseAIR]: ===   Mean Translational Temperature = " ${Tran} " ============================ "
+    #for Tint in "${Tint_Vec[@]}"; do :
+    Tint=${Tran}
   fi
-    echo "[CoarseAIR]: ===== Internal Temperature           = " ${Tint} " ======================== "
-    echo '[CoarseAIR] '     
+    # echo "[CoarseAIR]: ===== Internal Temperature           = " ${Tint} " ======================== "
+    # echo '[CoarseAIR] '     
       
       
     # --- Preprocessing Levels ------------------------------------------------------------------ #
@@ -226,8 +230,10 @@ for Tran in "${Tran_vec[@]}"; do :
 
     if [ ${TranFlg} -eq 0 ]; then 
       mkdir -p ${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}
-    else
+    elif [ ${TranFlg} -eq 1 ]; then 
       mkdir -p ${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}
+    elif [ ${TranFlg} -eq 2 ]; then 
+      mkdir -p ${COARSEAIR_OUTPUT_DIR}/"EMu"
     fi
 
 

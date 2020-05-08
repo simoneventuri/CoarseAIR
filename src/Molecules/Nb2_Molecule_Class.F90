@@ -105,7 +105,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
      AtB_Name = Pairs(iP)%Name(pos_m + 1:pos_e)
  
      ! Homonuclear molecule (e.g., N2, O2)
-     if (AtA_Name .eq. AtB_Name) then 
+     if ( (len(AtA_Name) == 1) .and. (AtA_Name .eq. AtB_Name) ) then 
 
         MolA_Name = AtA_Name//'2'
         

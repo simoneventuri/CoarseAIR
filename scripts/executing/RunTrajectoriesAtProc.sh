@@ -51,8 +51,8 @@ NProcTot=${NProc}
 
 echo "      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = "${COARSEAIR_OUTPUT_DIR}
 echo "      [RunTrajectoriesAtProc.sh]: iNode                = "${iNode}
-echo "      [RunTrajectoriesAtProc.sh]: iProc                = "${iProc}
 echo "      [RunTrajectoriesAtProc.sh]: NProcTot             = "${NProcTot}
+echo "      [RunTrajectoriesAtProc.sh]: iProc                = "${iProc}
 echo "      [RunTrajectoriesAtProc.sh]: TranFlg              = "${TranFlg}
 echo "      [RunTrajectoriesAtProc.sh]: Tran                 = "${Tran}
 echo "      [RunTrajectoriesAtProc.sh]: Tint                 = "${Tint}
@@ -62,10 +62,16 @@ echo "      [RunTrajectoriesAtProc.sh]: iLevels2             = "${iLevels2}
 RunTrajectoriesCommand="coarseair-runtrajectories.x"
 
 if [ ${TranFlg} -eq 0 ]; then 
-  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tran%.*}/"Bins_"${iLevels1}"_"${iLevels2}
-else
-  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tran%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+elif [ ${TranFlg} -eq 1 ]; then 
+  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevels1}"_"${iLevels2}
+elif [ ${TranFlg} -eq 2 ]; then 
+  COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"EMu/Bins_"${iLevels1}"_"${iLevels2}
+else 
+  echo "      [RunTrajectoriesAtProc.sh]: ERROR! Wrong Model for the Tranlational Energy! "
+  stop
 fi
+echo "      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = "${COARSEAIR_BIN_OUTPUT_DIR}
 
 mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}
 cd ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}/Proc_${iProc}

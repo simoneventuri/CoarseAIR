@@ -1,0 +1,16 @@
+# LEPS Parameters (re, De1, De3, Alpha, Beta, S)
+
+# Computing Diatomic Component? = yes / no
+Computing Diatomic Component? = yes
+
+re = 1.20d0
+
+DeB = 120.d0
+
+DeA = 60.d0
+
+Alpha = 2.689d0
+
+Beta = 2.689d0
+
+S = 1.d-1

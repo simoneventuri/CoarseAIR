@@ -110,7 +110,7 @@ Module Input_Class
     character(150)                            ::    DtbPath                             !< Database Folder Path
     character(:)               ,allocatable   ::    System                              !< Chemical System of Interest
     integer                                   ::    NMolecules                          !< Nb of Molecules in the System
-    character(5) ,dimension(:) ,allocatable   ::    Molecules_Name                      !< Molecules Names
+    character(10),dimension(:) ,allocatable   ::    Molecules_Name                      !< Molecules Names
     integer      ,dimension(:) ,allocatable   ::    Molecule_NAtoms                     !< Nbs of Atoms in each of the Molecules
     character(150),dimension(:) ,allocatable  ::    LevelsFileName                      !< Names of the Molecules Energy Levels File
     real(rkp)    ,dimension(:) ,allocatable   ::    Ecut                                !< Minum Energy required for considering Level [Eh]
@@ -139,6 +139,7 @@ Module Input_Class
     character(150),dimension(:) ,allocatable  ::    FileForAtomMass                     !< Where to Read atom masses
     character(:)               ,allocatable   ::    ProportionalAllocation              !< Flag for using Proportional Allocation for Stratified Sampling when Sampling into the Bins
     integer                                   ::    NTraj       =   0                   !< Nb of trajectories
+    integer                                   ::    NTrajOverall=   0                   !< Nb of trajectories
     character(10)                             ::    NTraj_char  =   ''
     integer                                   ::    NTrajBatch  =   0
     character(10)                             ::    NTrajNTrajBatch_char =   ''
@@ -167,6 +168,8 @@ Module Input_Class
     character(:)               ,allocatable   ::    TtraModel                           !< Model for Translational Mode
     real(rkp)                                 ::    Ttra        =   Zero                !< Translational Temperature [K] 
     character(10)                             ::    Ttra_char
+    real(rkp)                                 ::    EMu         =   Zero                !< Mean of Translational Energy [Eh]
+    real(rkp)                                 ::    ESD         =   Zero                !< Standard Deviation of Translational Energy [Eh]
     real(rkp)                                 ::    Erel        =   Zero                !< Translational Energy [Eh]
     character(10)                             ::    Erel_char
     character(:)               ,allocatable   ::    TintModel                           !< Model for Internal Modes
@@ -952,6 +955,16 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%Etot
             if (i_Debug_Loc) call Logger%Write( "Fixed Total Energy [Eh]:       This%Etot = ", This%Etot )
+
+          case("Average Translational Energy [Eh]")
+            line_input = line_input(i_eq+2:150)
+            READ(line_input, '(d20.10)') This%EMu
+            if (i_Debug_Loc) call Logger%Write( "Average Translational Energy [Eh]:       This%EMu = ", This%EMu )
+
+          case("Translational Energy SD      [Eh]")
+            line_input = line_input(i_eq+2:150)
+            READ(line_input, '(d20.10)') This%ESD
+            if (i_Debug_Loc) call Logger%Write( "Translational Energy SD      [Eh]:       This%ESD = ", This%ESD )
             
             
           case("Initial Impact Parameter Model")
@@ -1642,6 +1655,8 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
     if (i_Debug_Loc) call Logger%Write( "Relative Translational Energy Model Selected: ", This%TtraModel, " and the related Fixed Relative Translational Energy [Eh] has been defined: This%Ttra = ", This%Erel )
   elseif ( trim(This%TtraModel) .eq. "Boltzmann" ) then
     if (i_Debug_Loc) call Logger%Write( "Relative Translational Energy Model Selected: ", This%TtraModel, " and the related Initial Translational Temperature [K] has been defined: This%Ttra = ", This%Ttra )
+  elseif ( trim(This%TtraModel) .eq. "Gaussian" ) then
+    if (i_Debug_Loc) call Logger%Write( "Relative Translational Energy Model Selected: ", This%TtraModel, "; related Mean: This%EMu = ", This%EMu, "; related SD: This%ESD = ", This%ESD )
   elseif ( trim(This%TtraModel) .eq. "FixedTotEn" ) then
     if (i_Debug_Loc) call Logger%Write( "Relative Translational Energy Model Selected: ", This%TtraModel, " and the related Fixed Total Energy [Eh] has been defined: This%Ttra = ", This%Etot )
   else
@@ -1729,6 +1744,10 @@ Subroutine WriteBashInputVariables( This )
       do iTtra = 1,This%NTtra
         write(Unit,'(f20.1)') This%TtraVec(iTtra)
       end do
+    elseif ( trim(This%TtraModel) .eq. "Gaussian" ) then
+      write(Unit,'(I20)') 2
+      write(Unit,'(I20)') 1
+      write(Unit,'(f20.1)') This%EMu
     end if
     
     write(Unit,'(I20)') This%NTint

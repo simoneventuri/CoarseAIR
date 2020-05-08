@@ -86,9 +86,16 @@ function PostTrajectoriesHERE
   ##
   if [ ${TranFlg} -eq 0 ]; then 
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"E_"${Tran%.*}"_T_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
-  else
+  elif [ ${TranFlg} -eq 1 ]; then 
     COARSEAIR_BIN_OUTPUT_DIR=${COARSEAIR_OUTPUT_DIR}/"T_"${Tran%.*}"_"${Tint%.*}/"Bins_"${iLevel1}"_"${iLevel2}
+  elif [ ${TranFlg} -eq 2 ]; then 
+    echo "    [PostTrajectoriesHERE]: ERROR! Postprocessing for Gaussian Translational Energy NOT IMPLEMENTED YET! "
+    stop
+  else 
+    echo "    [PostTrajectoriesHERE]: ERROR! Wrong Model for the Tranlational Energy! "
+    stop
   fi
+
    
 
   ###########################################################################################################

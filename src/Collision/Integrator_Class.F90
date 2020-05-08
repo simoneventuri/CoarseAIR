@@ -70,7 +70,9 @@ Module Integrator_Class
     type(File_Type)                            ::    PaQSolFile
     type(File_Type) ,dimension(:) ,allocatable ::    PaQEvoFile
     type(File_Type) ,dimension(:) ,allocatable ::    XXEvoFile
-    
+    integer                                    ::    NTrajOverall
+    integer                                    ::    iProc
+
   contains
     private
     procedure ,public   ::    Initialize            =>  InitializeIntegrator
@@ -161,7 +163,7 @@ Subroutine InitializeIntegrator( This, Input, i_Debug )
   if (i_Debug_Loc) call Logger%Write( "Initializing the analysis output file: AnalysisOutputFile" )
   associate( File => This%AnalysisOutputFile )
     if (i_Debug_Loc) call Logger%Write( "-> Calling File%Open" )
-    FileName = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/trajectories.csv'
+    FileName = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/trajectories.out'
     if (i_Debug_Loc) call Logger%Write( " File%Name = ", FileName )
     call File%Open( FileName )
     if (i_Debug_Loc) call Logger%Write( "-> File%Status = ", File%Status )
@@ -242,6 +244,7 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
   integer                                                   ::    NTrajTot
   integer                                                   ::    NTrajTot_Converged      
   integer                                                   ::    NTrajTot_Remaining
+  integer                                                   ::    IdxOverall
 
   logical                                                   ::    i_Debug_Loc
   
@@ -256,7 +259,6 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
   if (i_Debug_Loc) call Logger%Write( "Total Nb of Trajectories per Mini-Batch: NTrajBatch = ", NTrajBatch )
   NBatch     = Input%NBatch
   if (i_Debug_Loc) call Logger%Write( "Nb of Mini-Batches:                      NBatch     = ", NBatch )
-  
 
   ! ==============================================================================================================
   !     INITIALIZING THE TRAJECTORIES OBJECT
@@ -327,6 +329,12 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
     NTrajTot      =   max(NTrajTot,1)
   end if
   ! ==============================================================================================================
+
+
+  This%iProc        = Input%iProc
+  if (i_Debug_Loc) call Logger%Write( "Processor Idx:                           This%iProc        = ", This%iProc )  
+  This%NTrajOverall = Input%NTrajOverall
+  if (i_Debug_Loc) call Logger%Write( "Nb of Overall Trahectories in this Node: This%NTrajOverall = ", This%NTrajOverall )
 
 
   ! ==============================================================================================================                
@@ -431,7 +439,8 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
         
         Traj%PaQ(:,iTraj) = Collision%ApplyTransformation( iTraj, Traj )
         !if ( Input%BwrdIntegrationFlg ) call Traj%DoBackwardStuff( iTraj, PaQ(:), itemp )
-        !if (Input%PaQSolFlg) write(This%PaQSolFile%Unit,This%PaQSolFile%Format) Traj%Idx(iTraj), Traj%t(iTraj), Traj%H0(iTraj), Traj%PaQ0(:,iTraj), Traj%H(iTraj), Traj%PaQ(:,iTraj)
+        IdxOverall = (This%NTrajOverall) * (This%iProc-1) + Traj%Idx(iTraj)
+        if (Input%PaQSolFlg) write(This%PaQSolFile%Unit,This%PaQSolFile%Format) IdxOverall, Traj%t(iTraj), Traj%H0(iTraj), Traj%PaQ0(:,iTraj), Traj%H(iTraj), Traj%PaQ(:,iTraj)
         
         call This%UpdateStatistics( iTraj, Traj )
         
@@ -676,6 +685,7 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
   real(rkp), dimension(2)                                   ::    iTypeFin
   real(rkp)                                                 ::    bmin
   real(rkp)                                                 ::    bmax       
+  integer                                                   ::    IdxOverall
   character(*)                                  ,parameter  ::    Format = "( i8,3x,i4,3x,3(es11.5,3x),2(4(i3,3x)),2(es14.8,3x),i9 )"
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) ) i_Debug_Loc = i_Debug
@@ -816,10 +826,11 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
     ! -> for 4 ATOMS one writes 16*iPair + p1 + 4*p2, with p1 and p2 refer to the first and second molecule 
     !    and may have the sames values as 'p' in the 3 ATOMS case 
     ! (convention taken from David Schwenke's QCT code)
+    IdxOverall = (This%NTrajOverall) * (This%iProc-1) + Traj%Idx(iTraj)
     if ( Collision%NAtoms == 3 ) then
 
       write(This%AnalysisOutputFile%Unit, 1)                                                                        &
-                                              iTrajStart+Traj%Idx(iTraj),                                       ',',&
+                                              IdxOverall,                                                       ',',&
                                               Traj%iPES(iTraj),                                                 ',',&
                                               bmax,                                                             ',',& 
                                               This%TrajIni%b,                                                   ',',& 
@@ -834,7 +845,7 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
     else
 
       write(This%AnalysisOutputFile%Unit, 1)                                                                                            & 
-                                              iTrajStart+Traj%Idx(iTraj),                                                           ',',&
+                                              IdxOverall,                                                                           ',',&
                                               Traj%iPES(iTraj),                                                                     ',',& 
                                               bmax,                                                                                 ',',& 
                                               This%TrajIni%b,                                                                       ',',& 
@@ -911,10 +922,8 @@ Subroutine InitializePrinting( This, Input, Collision, Traj, NTrajBatch, i_Debug
     if (i_Debug_Loc) call Logger%Write( "Initial Parameters file: ", ParamsFile%Name )
     open( NewUnit=ParamsFile%Unit, File=ParamsFile%Name, Action="WRITE", iostat=ParamsFile%Status )
     if (ParamsFile%Status /= 0) call Error( "Error opening file: " // ParamsFile%Name )
-    ParamsFile%Format = "(I8,3x,I4,*(2x,es15.8:))"
-    write(ParamsFile%Unit,'(A)') "#  iTraj   iPES         Angle(1)         Angle(2)         Angle(3)            ETran             Ekin " // &
-                                 "          r Bond        rdot Bond                b     TarAngMom(1)     TarAngMom(2)     TarAngMom(3)" // &
-                                 "     ProAngMom(1)     ProAngMom(2)     ProAngMom(3)     TotAngMom(1)     TotAngMom(2)     TotAngMom(3)"
+    ParamsFile%Format = "(i7,',',i4,*(',',es15.8:))"
+    write(ParamsFile%Unit,'(A)') "# iTraj, iPES, Angle(1), Angle(2), Angle(3), ETran, Ekin, rBond, rdotBond, b, TarAngMom(1), TarAngMom(2), TarAngMom(3), ProAngMom(1), ProAngMom(2), ProAngMom(3), TotAngMom(1), TotAngMom(2), TotAngMom(3)"
   end if
   ! ==============================================================================================================
   
@@ -943,8 +952,8 @@ Subroutine InitializePrinting( This, Input, Collision, Traj, NTrajBatch, i_Debug
     This%PaQSolFile%Name = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/PaQSol.out'
     open( NewUnit=This%PaQSolFile%Unit, File=This%PaQSolFile%Name, Action="WRITE", iostat=This%PaQSolFile%Status )
     if (This%PaQSolFile%Status /= 0) call Error( "Error opening file: " // This%PaQSolFile%Name )
-    This%PaQSolFile%Format = "(2x,i15,*(3x,es15.8:))"
-    write(This%PaQSolFile%Unit,"('#',1x,*(3x,a15:))") [ character(15) :: "Traj. index", "t_fin", "H_ini", ("PaQ_ini("//Convert_To_String(i)//")",i=1,Collision%NEqtTot), "H_fin", ("PaQ_fin("//Convert_To_String(i)//")",i=1,Collision%NEqtTot) ]
+    This%PaQSolFile%Format = "(2x,i7,*(',',es15.8:))"
+    write(This%PaQSolFile%Unit,"('# Traj. index, t_fin', *(',',A) )") [ character(12) :: "H_ini", ("PaQ_ini("//Convert_To_String(i)//")",i=1,Collision%NEqtTot), "H_fin", ("PaQ_fin("//Convert_To_String(i)//")",i=1,Collision%NEqtTot) ]
   end if
   ! ==============================================================================================================
   
