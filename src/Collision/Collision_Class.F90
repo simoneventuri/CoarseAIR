@@ -2158,12 +2158,16 @@ PURITY Subroutine Compute_PES_1d( This, iPES, Q, mdVdQ, V, Rpi )
 
   do iTraj = 1,size(V,1)
     if ( .not. This%PESsContainer(iPES(iTraj))%PES%CartCoordFlg ) then
-      mdVdQ(1,iTraj)  =   -dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) - dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*This%mMiMn(1)
-      mdVdQ(2,iTraj)  =   -dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) - dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*This%mMiMn(1)
-      mdVdQ(3,iTraj)  =   -dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) - dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*This%mMiMn(1)
-      mdVdQ(4,iTraj)  =    dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) + dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*(one-This%mMiMn(2))
-      mdVdQ(5,iTraj)  =    dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) + dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*(one-This%mMiMn(2))
-      mdVdQ(6,iTraj)  =    dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) + dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*(one-This%mMiMn(2))
+      if ( This%NAtoms == 3 ) then
+        mdVdQ(1,iTraj)  =   -dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) - dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*This%mMiMn(1)
+        mdVdQ(2,iTraj)  =   -dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) - dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*This%mMiMn(1)
+        mdVdQ(3,iTraj)  =   -dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) - dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*This%mMiMn(1)
+        mdVdQ(4,iTraj)  =    dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) + dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*(one-This%mMiMn(2))
+        mdVdQ(5,iTraj)  =    dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) + dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*(one-This%mMiMn(2))
+        mdVdQ(6,iTraj)  =    dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) + dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*(one-This%mMiMn(2))
+      else
+        write(*,*) 'Subroutine Compute_PES_1d from Collision_Class.F90. dV/dR -> dV/dQ still to be Implemented for 4 Atoms Systems!'
+      end if
     end if
   end do
 

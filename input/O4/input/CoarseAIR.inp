@@ -7,7 +7,7 @@
    Generating Energy Levels? = no
    Preprocessing Energy Levels List? = yes
    Running Trajectories? = yes
-   Postprocessing Trajectories? = no
+   Postprocessing Trajectories? = yes
    Generating Derivated Quantities? = no 
    
 ###########################################################################################
@@ -38,7 +38,7 @@
      Atom 4 = Od
        Mass [a.u.] of Atom 4 = 29148.94559d0
    
-   Database Path = /home1/sventuri/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
@@ -48,7 +48,7 @@
    Relative Translational Energy Model = Boltzmann
    
    Nb of Translational Temperatures = 1
-     Translational Temperature [K] 1 = 20000.d0
+     Translational Temperature [K] 1 = 10000.d0
    #Nb of Internal Temperatures = 1
    # Internal Temperature [K] 1 = 10000.d0
    
@@ -96,51 +96,52 @@
    #*                                                                      <- Uncomment from #: to #* for Running State Specific QCT
    #                                                                         <- If Starting Level==0 for all the initial molecules, CoarseAIR reads the levels/bins to run from the "ProcessesToRunList.inp" in the input folder
    #                                                                         <- If Final    Level==0, CoarseAIR runs until the molecule's last level/bin
-   # Molecule 1: StS treatment (include all levels) - NaNb
+   # Molecule 1: StS treatment (include all levels) - OaOb
    #Sorting Method, Molecule 1 = State-Specific
    #  Starting Level, Molecule 1 = 7115                                 
    #  Final    Level, Molecule 1 = 7115
 
-   # Molecule 1: sampled from a Boltzmann distribution (include all levels) - NaNb
-   #Sorting Method, Molecule 1 = RoVib-CG                                    
-   #  File with Bins Energy Minima, Molecule 1 = E_low.dat
-   #  Nb of Bins, Molecule 1 = 10
-   #  Starting Bin, Molecule 1 = 1
-   #  Final    Bin, Molecule 1 = 10
-   Sorting Method, Molecule 1 = Vib-Specific                             
-      Starting vqn, Molecule 1 = 1
-      Final    vqn, Molecule 1 = 0
+   # Molecule 1: sampled from a Boltzmann distribution (include all levels) - OaOb
+   Sorting Method, Molecule 1 = RoVib-CG                                    
+     File with Bins Energy Minima, Molecule 1 = E_low.dat
+     Nb of Bins, Molecule 1 = 1
+     Starting Bin, Molecule 1 = 1
+     Final    Bin, Molecule 1 = 1
+   #Sorting Method, Molecule 1 = Vib-Specific                             
+   #   Starting vqn, Molecule 1 = 1
+   #   Final    vqn, Molecule 1 = 61
 
-   # Molecule 2: sampled from a Boltzmann distribution (include all levels) - NcNd
-   #Sorting Method, Molecule 2 = RoVib-CG                                    
-   #  File with Bins Energy Minima, Molecule 2 = E_low.dat
-   #  Nb of Bins, Molecule 2 = 10
-   #  Starting Bin, Molecule 2 = 0
-   #  Final    Bin, Molecule 2 = 10
-   Sorting Method, Molecule 2 = Vib-Specific                             
-      Starting vqn, Molecule 2 = 1
-      Final    vqn, Molecule 2 = 0
+   # Molecule 2: sampled from a Boltzmann distribution (include all levels) - OcOd
+   Sorting Method, Molecule 2 = RoVib-CG                                    
+     File with Bins Energy Minima, Molecule 2 = E_low.dat
+     Nb of Bins, Molecule 2 = 1
+     Starting Bin, Molecule 2 = 1
+     Final    Bin, Molecule 2 = 1
+   #Sorting Method, Molecule 2 = Vib-Specific                             
+   #   Starting vqn, Molecule 2 = 0
+   #   Final    vqn, Molecule 2 = 61
 
    # Molecule 3, 4, 5 and 6: Vib-Specific          
-   #Sorting Method, Molecule 3 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 3 = E_low.dat
-   #  Nb of Bins, Molecule 3 = 10
-   Sorting Method, Molecule 3 = Vib-Specific                             
+   Sorting Method, Molecule 3 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 3 = E_low.dat
+     Nb of Bins, Molecule 3 = 1
+   #Sorting Method, Molecule 3 = Vib-Specific                             
 
-   #Sorting Method, Molecule 4 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 4 = E_low.dat
-   #  Nb of Bins, Molecule 4 = 10
-   Sorting Method, Molecule 4 = Vib-Specific    
+   Sorting Method, Molecule 4 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 4 = E_low.dat
+     Nb of Bins, Molecule 4 = 1
+   #Sorting Method, Molecule 4 = Vib-Specific    
 
-   #Sorting Method, Molecule 5 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 5 = E_low.dat
-   #  Nb of Bins, Molecule 5 = 10
-   Sorting Method, Molecule 5 = Vib-Specific    
+   Sorting Method, Molecule 5 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 5 = E_low.dat
+     Nb of Bins, Molecule 5 = 1
+   #Sorting Method, Molecule 5 = Vib-Specific    
 
-   #Sorting Method, Molecule 6 = RoVib-CG   
-   #  File with Bins Energy Minima, Molecule 6 = E_low.dat
-   #  Nb of Bins, Molecule 6 = 10
-   Sorting Method, Molecule 6 = Vib-Specific    
+   Sorting Method, Molecule 6 = RoVib-CG   
+     File with Bins Energy Minima, Molecule 6 = E_low.dat
+     Nb of Bins, Molecule 6 = 1
+   #Sorting Method, Molecule 6 = Vib-Specific 
+ 
 
 
 ###########################################################################################
@@ -150,14 +151,14 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 200000
+   Nb of Trajectories per Level / Bin = 1
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
 
-   Initial Distance between Target and Projectile = 25.d0
+   Initial Distance between Target and Projectile = 40.d0
    
-    Nb of PESs = 3
+   Nb of PESs = 1
      Model, PES 1 = UMN_Singlet
      Degeneracy, PES 1 = 1.0
      Model, PES 2 = UMN_Triplet
@@ -171,9 +172,9 @@
      ###                                                                      <- Specify here the input for Bayesian Neural Nerwork PES
      # Nb of PESs Samples = 1
      # Randomize PES Initial Conditions? = no
+     # Sample Parameters for Stochastic PES? = no
      # Initial Random Nb Seed for PES Parameters Sampling = 0
      
-
    Diatomic Potential Model, Molecule 1 = UMN
    Diatomic Potential Model, Molecule 2 = UMN
    Diatomic Potential Model, Molecule 3 = UMN
@@ -195,13 +196,13 @@
        Nb of Trajectories in Range 3 = 1
        Impact Parameter for Range 3 = -1.d0
        Nb of Trajectories in Range 4 = 1
-       Impact Parameter for Range 4 = -2.5d0
+       Impact Parameter for Range 4 = -3.d0
        Nb of Trajectories in Range 5 = 1
-       Impact Parameter for Range 5 = -4.d0
+       Impact Parameter for Range 5 = -5.d0
        Nb of Trajectories in Range 6 = 1
-       Impact Parameter for Range 6 = -7.d0
+       Impact Parameter for Range 6 = -8.d0
        Nb of Trajectories in Range 7 = 1
-       Impact Parameter for Range 7 = -12.d0
+       Impact Parameter for Range 7 = -14.d0
 
    #  Strata Type = Rings
    #  Nb of Stratified Sampling Ranges = 2
@@ -237,7 +238,7 @@
    Write the PaQ Solution File?                   = no
    Write the PaQ Evolution File?                  = no
    Write the Spatial Coordinates Evolution File?  = no
-   Write the Spatial Coordinates Evolution in a Single File?  =no
+   Write the Spatial Coordinates Evolution in a Single File? = no
    Write the PES Evolution File?                  = no
    Write the Energy Evolution File?               = no
   
@@ -252,16 +253,15 @@
    #  ODE Parameters
    ###########################################################################################
   
-   # Backward Integrating? = no
-   # Backward Integration Frequency = 10
-
+   ### If "Try to increase stepsize?" = no, the stepsize will be constant during the integration (e.g.: for plotting trajectories)
+   Try to increase stepsize? = yes
    Initial time step = 5.00d0
    Error control parameter = 0.0000000100d0
    Stepsize increase damping factor = 0.5d0
-   Nb of extrapolation steps = 3
-   Nb of integration between end checking = 10
-   Max distance between atom pair [bohr] = 30.d0
-   Max trajectory time [a.u.] = 600000.d0
+   Nb of extrapolation steps = 3  
+   Nb of integration between end checking = 10   
+   Max distance between atom pair [bohr] = 45.d0
+   Max trajectory time [a.u.] = 3000000.d0
 
 
 ###########################################################################################
@@ -282,9 +282,7 @@
      Preserving Even / Oddness of Condition 5 = no
 
    Identical Diatoms? = no
-   # Diatoms must be treated as if they are in different in the present case
-   #Identical Diatoms? = yes  
-   # Invesigate this #
+
    
    ### Final States Assigment Mthd = Histogram / QSS
    Final States Assigment Mthd = Histogram
