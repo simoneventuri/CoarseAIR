@@ -40,10 +40,11 @@ function Plot_DiatPot(Controls)
         %fig.Color='None';
         
         
-        rVec = linspace(Controls.Extremes(iMol,1), Controls.Extremes(iMol,2), 3000);
+        rVec = linspace(Controls.Extremes(iMol,1), Controls.Extremes(iMol,2), 10000);
         
         ij = 0;
         for jqn = Controls.jqnVec
+            jqn
             ij = ij + 1;
             
             [Ve, dVe] = DiatPot(rVec, jqn, iMol);

@@ -52,9 +52,9 @@ function Plot_Energies(Controls)
         
         if Controls.LTFlag
             
-            Kin.T(Temp.iT).Molecule(iMol).eIntLT = Kin.T(Temp.iT).Molecule(iMol).eInt(end) - (Kin.T(Temp.iT).Molecule(iMol).eInt(end)- Kin.T(Temp.iT).Molecule(iMol).eInt(1) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauInt ) );
-            Kin.T(Temp.iT).Molecule(iMol).eRotLT = Kin.T(Temp.iT).Molecule(iMol).eRot(end) - (Kin.T(Temp.iT).Molecule(iMol).eRot(end)- Kin.T(Temp.iT).Molecule(iMol).eRot(1) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauRot ) );
-            Kin.T(Temp.iT).Molecule(iMol).eVibLT = Kin.T(Temp.iT).Molecule(iMol).eVib(end) - (Kin.T(Temp.iT).Molecule(iMol).eVib(end)- Kin.T(Temp.iT).Molecule(iMol).eVib(1) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauVib ) );
+            Kin.T(Temp.iT).Molecule(iMol).eIntLT = Kin.T(Temp.iT).Molecule(iMol).eInt(end) - (Kin.T(Temp.iT).Molecule(iMol).eInt(end)- Kin.T(Temp.iT).Molecule(iMol).eInt(1)) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauInt );
+            Kin.T(Temp.iT).Molecule(iMol).eRotLT = Kin.T(Temp.iT).Molecule(iMol).eRot(end) - (Kin.T(Temp.iT).Molecule(iMol).eRot(end)- Kin.T(Temp.iT).Molecule(iMol).eRot(1)) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauRot );
+            Kin.T(Temp.iT).Molecule(iMol).eVibLT = Kin.T(Temp.iT).Molecule(iMol).eVib(end) - (Kin.T(Temp.iT).Molecule(iMol).eVib(end)- Kin.T(Temp.iT).Molecule(iMol).eVib(1)) .* exp( -Kin.T(Temp.iT).t ./ Kin.T(Temp.iT).Molecule(iMol).tauVib );
             
             h4 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eIntLT, ':', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
             h5 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eRotLT, ':', 'Color', Param.RCVec, 'LineWidth', Param.LineWidth);

@@ -60,7 +60,16 @@ function Initialize_Input()
     end
     
     
-    Syst.HDF5_File = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong, '.hdf5');
+    Syst.iPES = ''
+    if (Input.iPES > 0)
+        Syst.iPES = strcat('_PES', num2str(Input.iPES));
+    end
+    Syst.HDF5_File = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong, Syst.iPES, '.hdf5');
+    
+    
+    Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Syst.iPES, '/');
+
+    Input.Paths.SaveDataFldr = strcat(Input.Paths.SaveDataFldr, '/', Syst.NameLong, Syst.iPES, '/');
 
     
 %     filename = strcat(Input.Paths.ToQCTFldr,'/InputForBash.inp');

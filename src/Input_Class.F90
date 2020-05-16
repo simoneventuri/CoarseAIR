@@ -905,15 +905,22 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             This%StochPESFlg = .True.
             if (i_Debug_Loc) call Logger%Write( "Found a Stochastic PES! This%StochPESFlg set to .TRUE.!" )
             if (i_Debug_Loc) call Logger%Write( "Nb of Samples from the Stochastic PES:       This%NPES = ", This%NPESs )        
-            deallocate( This%PES_Degeneracy )
-            allocate( This%PES_Degeneracy(This%NPESs), stat=Status )
-            if (Status/=0) call Error( "Error allocating This%PES_Degeneracy" )
-            This%PES_Degeneracy = One
             PES_Model_Temp = This%PES_Model(1)
             deallocate( This%PES_Model )
             allocate( This%PES_Model(This%NPESs), stat=Status )
             if (Status/=0) call Error( "Error re-allocating This%PES_Model" )
             This%PES_Model = PES_Model_Temp
+            deallocate( This%PES_Degeneracy )
+            allocate( This%PES_Degeneracy(This%NPESs), stat=Status )
+            if (Status/=0) call Error( "Error allocating This%PES_Degeneracy" )
+            This%PES_Degeneracy = One
+            deallocate( This%PES_DegeneracyINT )
+            allocate( This%PES_DegeneracyINT(This%NPESs), stat=Status )
+            if (Status/=0) call Error( "Error allocating This%PES_DegeneracyINT" )
+            This%PES_DegeneracyINT = 1
+            deallocate( This%PES_Degeneracy_Vec )
+            allocate( This%PES_Degeneracy_Vec(This%NPESs), stat=Status )
+            if (Status/=0) call Error( "Error allocating This%PES_Degeneracy_Vec" )
             
             
           case("Randomize PES Initial Conditions?")

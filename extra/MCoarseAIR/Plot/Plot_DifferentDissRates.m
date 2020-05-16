@@ -42,9 +42,9 @@ function Plot_DifferentDissRates()
     
     ProcNames = {};
     for iP = 1:3
-        scatter(LevelEeV, Rates.T(Temp.iT).Diss(:,iP+1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iP,:));
+        scatter(LevelEeV, Rates.T(Temp.iT).Diss(:,iP+1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iP,:) );
         hold on
-        ProcNames = [ProcNames, strcat('Pair 1,{ }', Syst.Molecule(Syst.Pair(iP).ToMol).Name)];
+        ProcNames = [ProcNames, strcat('Pair', '{ }', num2str(iP), ',{ }', Syst.Molecule(Syst.Pair(iP).ToMol).Name)];
     end
     
 

@@ -33,7 +33,7 @@ function [Ve, dVe] = DiatPot(r, jqn, iMol)
     [Vc, dVc]   = CentPot(r, jqn, iMol);
 
 
-    Ve  = (Vv  + Vc  * Param.EhToeV);
-    dVe = (dVv + dVc * Param.EhToeV);
+    Ve  = (Vv  + Vc  * Param.EhToeV) ./Param.EhToeV;
+    dVe = (dVv + dVc * Param.EhToeV) ./Param.EhToeV;
 
 end

@@ -84,24 +84,26 @@ End Subroutine
 
 Pure Elemental Function Compute_O2_Degeneracy_State( jqn ) result(g)
 
-  use Parameters_Module       ,only:  rkp, Zero, One, Two, Three, Six
+  use Parameters_Module       ,only:  rkp, Zero, Half, One, Two, Three, Six
 
   integer                                 ,intent(in)     ::    jqn
   
   real(rkp)                                               ::    g
  
-  ! Calculate the degeneracy accounting for the spin
-  if ( mod( int(jqn) , 2 ) .ne. 0 ) then
-    ! ODD CASE
+  ! ! Calculate the degeneracy accounting for the spin
+  ! if ( mod( int(jqn) , 2 ) .ne. 0 ) then
+  !   ! ODD CASE
     
-    g = One * (Two * jqn + One)
+  !   g = One * (Two * jqn + One)
        
-  else
-    ! EVEN CASE
+  ! else
+  !   ! EVEN CASE
     
-    g = Two * (Two * jqn + One)
+  !   g = Two * (Two * jqn + One)
        
-  end if
+  ! end if
+
+  g = Half * (Two * jqn + One)
   
 End Function
 

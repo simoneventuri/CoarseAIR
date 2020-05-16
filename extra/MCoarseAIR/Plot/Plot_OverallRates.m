@@ -46,7 +46,7 @@ function Plot_OverallRates()
     
     hold on
     for iExch = 1:size(Syst.ExchToMol,1)
-        scatter(LevelEeV, Rates.T(Temp.iT).Overall(:,2+iExch), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iExch+1,:));
+        scatter(LevelEeV, Rates.T(Temp.iT).Overall(:,2+iExch), 20, 'Filled', 'MarkerFaceColor', Param.CMat(iExch+1,:) );
         ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
     end
     
