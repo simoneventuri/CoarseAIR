@@ -41,14 +41,14 @@ PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule_vec=('O2')
-export FldrName=''
-export Tran_vec=(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000) 
-export T0=10000
+export FldrName='_PES9_Varga'
+export Tran_vec=(2500) 
+export T0=1400
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
-export PathToDtbFldr=$WORKSPACE_PATH/O3Diss_Database/Run_0D/database/
-export PathToRunFldr=$WORKSPACE_PATH/O3Diss_Database/Run_0D/
+export PathToDtbFldr=$WORKSPACE_PATH/BNNPaper_Database/Run_0D/database/
+export PathToRunFldr=$WORKSPACE_PATH/BNNPaper_Database/Run_0D/
 
-export DissFlg=2
+export DissFlg=1
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0
@@ -99,11 +99,11 @@ function Call_MeCvode() {
   cd ./${OutputFldr} 
 
   if [ $DissFlg -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_NoDiss'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'BNNPaper_T'${TTran}'K_NoDiss'
   elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_OnlyDiss'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'BNNPaper_T'${TTran}'K_OnlyDiss'
   else
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil'
+    export ExFldr=${PathToMECVODEFldr}/${System}/'BNNPaper_T'${TTran}'K'
   fi  
   echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./

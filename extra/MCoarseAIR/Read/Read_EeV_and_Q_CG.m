@@ -57,7 +57,7 @@ function Read_EeV_and_Q_CG()
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
         for iLevel = 1:Syst.Molecule(iMol).NLevels
-            iBin = Syst.Molecule(iMol).LevelToBin(iLevel);
+            iBin = Syst.Molecule(iMol).LevelToGroupIn(iLevel);
             Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)     = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iBin)   + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
             Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin)   = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iBin) + Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel) * Syst.Molecule(iMol).LevelEeV(iLevel);          
         end

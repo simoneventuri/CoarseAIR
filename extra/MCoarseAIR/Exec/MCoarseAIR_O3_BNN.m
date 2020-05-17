@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates
@@ -32,21 +32,22 @@ global Input Syst Temp Param Kin Rates
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/';
-Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
-Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [2500, 5000, 7500, 10000, 125000, 15000, 20000];
-Input.SystNameLong          = 'CO2_NASA';
+Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/O3_ALL/Test/';
+Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/BNNPaper_Database/Run_0D';
+Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/BNNPaper_Database/HDF5_Database/';
+Input.TranVec               = [2500];
+Input.SystNameLong          = 'O3_UMN';
 Input.iPES                  = 0;
-Input.Kin.MolResolutionIn   = ['StS'; 'StS'];
+Input.Suffix                = '_PES9_Varga'
+Input.Kin.MolResolutionIn   = ['StS'];
 Input.Kin.MinStateIn        = [    1,     1];
-Input.Kin.MaxStateIn        = [13521,  6078];
+Input.Kin.MaxStateIn        = [6115];
 Input.Kin.NGroupsIn         = [    0,     0];
-Input.Kin.Proc.DissFlg      = 0;
+Input.Kin.Proc.DissFlg      = 1;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 0;
+Input.Kin.Proc.ExchFlg1     = 1;
 Input.Kin.Proc.ExchFlg2     = 0;
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint';
@@ -54,13 +55,13 @@ Input.ReLoad                = 1;
 
 
 %% Inputs for Plotting
-Input.iFig               = 201;
+Input.iFig               = 1;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CO2_Paper/Figures/';
+Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/BNNPaper/Figures/Temp/O2+O/';
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/';
+Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/BNNPaper/Data/Temp/O2+O/';
 
 
 %% Tasks Inputs
@@ -80,26 +81,26 @@ Input.Tasks.Write_RatesParaview.Flg                    = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = false;
+Input.Tasks.Plot_MoleFracs.Flg                         = true;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
-Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
+Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 % Plotting Mole Fractions and Global Rates
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2;
 % Plotting RVS Populations
 Input.Tasks.Plot_Populations.Flg                       = false;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
+Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
@@ -131,7 +132,7 @@ for iT = 1:length(Temp.TranVec)
     Temp.TNow     = Temp.TranVec(iT);
     Temp.TNowChar = num2str(Temp.TranVec(iT));
   
-    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
+    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, Input.Suffix, Syst.iPES, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
 
 
     if Input.ReLoad > 0 
@@ -185,12 +186,10 @@ for iT = 1:length(Temp.TranVec)
         %%
         
         %% Computing Thermal Rates
-        Compute_Rates_Thermal()   
+        %Compute_Rates_Thermal()   
         
         if (Input.Tasks.Plot_GlobalRates.Flg               || ...
-            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
-            Input.Tasks.Plot_Energies.Flg                  || ...
-            Input.Tasks.Plot_EnergyDepletions.Flg)
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg)
 
             %% Computing Thermal Rates
             Compute_Rates_Global()   
@@ -199,7 +198,7 @@ for iT = 1:length(Temp.TranVec)
         
         if (Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
-                        Input.Tasks.Plot_EnergyDepletions.Flg)
+            Input.Tasks.Plot_EnergyDepletions.Flg)
 
             %% Computing Rate Values and Initial-Final Times for QSS 
             Compute_QSS()
@@ -282,4 +281,5 @@ for iT = 1:length(Temp.TranVec)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     
+    clear Rates Kin
 end

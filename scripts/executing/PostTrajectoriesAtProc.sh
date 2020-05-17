@@ -406,32 +406,54 @@ else
   ###########################################################################################################
   ## Going in Increasing Order (Paying Attention to System Symmetries e.g., AB_i + AB_j is the same as AB_j + AB_i) and Deciding if the Current Process is OK for this Processor
   ##
-  iProcessesTot=0
-  for iLevel1 in `seq 1 ${NLevels1}`; do
-  #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do    
-    iLevel2Start=0
-    MinLevel2Temp=0
-    if [ ${NMolecules} -eq 2 ]; then 
-      iLevel2Start=1
-      MinLevel2Temp=1
-    fi
-    if [ ${SymmFlg} -eq 1 ]; then
-      iLevel2Start=${iLevel1}
-      MinLevel2Temp=${MinLevel1}
-    fi
-    for iLevel2 in `seq ${iLevel2Start} ${NLevels2}`; do
-    #for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-      iProcessesTot=$(( ${iProcessesTot} + 1 ))
-      if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
+  # iProcessesTot=0
+  # for iLevel1 in `seq 1 ${NLevels1}`; do
+  # #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do    
+  #   iLevel2Start=0
+  #   MinLevel2Temp=0
+  #   if [ ${NMolecules} -eq 2 ]; then 
+  #     iLevel2Start=1
+  #     MinLevel2Temp=1
+  #   fi
+  #   if [ ${SymmFlg} -eq 1 ]; then
+  #     iLevel2Start=${iLevel1}
+  #     MinLevel2Temp=${MinLevel1}
+  #   fi
+  #   for iLevel2 in `seq ${iLevel2Start} ${NLevels2}`; do
+  #   #for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+  #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
+  #     if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
 
-        ############################################################################################################################################################################## <= PostTrajectoriesHERE
-        PostTrajectoriesHERE
-        ############################################################################################################################################################################## <= PostTrajectoriesHERE
+  #       ############################################################################################################################################################################## <= PostTrajectoriesHERE
+  #       PostTrajectoriesHERE
+  #       ############################################################################################################################################################################## <= PostTrajectoriesHERE
 
-      fi
-    done
-  done
+  #     fi
+  #   done
+  # done
   
+  for (( iProcessesTot=${MinProcessInProc}; iProcessesTot<=${MaxProcessInProc}; iProcessesTot++ )); do
+    if [ ${NMolecules} -eq 1 ]; then 
+      iLevel1=${iProcessesTot}
+      iLevel2=0
+    else
+      if [ ${SymmFlg} -eq 1 ]; then
+        echo "TO IMPLEMENT SymmFlg=1"
+        stop
+      else
+        iLevel1=$( printf "%.0f" $((${iProcessesTot} / ${NLevels2} )) )
+        iLevel1=$((${iLevel1} + 1))
+        Temp=$(( $((${iLevel1} - 1)) * ${NLevels2} ))
+        iLevel2=$((${iProcessesTot} - ${Temp}))
+      fi
+    fi
+
+    ############################################################################################################################################################################## <= PostTrajectoriesHERE
+    PostTrajectoriesHERE
+    ############################################################################################################################################################################## <= PostTrajectoriesHERE
+
+  done
+
 
 fi
 

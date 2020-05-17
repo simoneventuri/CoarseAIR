@@ -38,7 +38,7 @@
      Atom 4 = Nd
        Mass [a.u.] of Atom 4 = 25526.04298d0
    
-   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
+   Database Path = /home/mpanesi/WORKSPACE/CoarseAIR/coarseair/dtb   
    
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
@@ -61,12 +61,12 @@
 #  CUTTING LEVELS for each of the Molecules   
 ###########################################################################################
 
-   Levels File Name, Molecule 1 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 2 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 3 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 4 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 5 = n2.leroy.Sort.dat
-   Levels File Name, Molecule 6 = n2.leroy.Sort.dat
+   Levels File Name, Molecule 1 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 2 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 3 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 4 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 5 = MyLeroy_FromRobyn.inp
+   Levels File Name, Molecule 6 = MyLeroy_FromRobyn.inp
 
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
    Min Time   for Cutting Levels, Molecule 1 = -10000.d0
@@ -97,9 +97,19 @@
    #                                                                         <- If Starting Level==0 for all the initial molecules, CoarseAIR reads the levels/bins to run from the "ProcessesToRunList.inp" in the input folder
    #                                                                         <- If Final    Level==0, CoarseAIR runs until the molecule's last level/bin
    # Molecule 1: StS treatment (include all levels) - NaNb
-   #Sorting Method, Molecule 1 = State-Specific
-   #  Starting Level, Molecule 1 = 7115                                 
-   #  Final    Level, Molecule 1 = 7115
+   Sorting Method, Molecule 1 = State-Specific
+     Starting Level, Molecule 1 = 7115                                 
+     Final    Level, Molecule 1 = 7115
+
+   Sorting Method, Molecule 2 = State-Specific
+     Starting Level, Molecule 2 = 7115                                 
+     Final    Level, Molecule 2 = 7115
+
+   Sorting Method, Molecule 3 = State-Specific
+   Sorting Method, Molecule 4 = State-Specific
+   Sorting Method, Molecule 5 = State-Specific
+   Sorting Method, Molecule 6 = State-Specific
+
 
    # Molecule 1: sampled from a Boltzmann distribution (include all levels) - NaNb
    #Sorting Method, Molecule 1 = RoVib-CG                                    
@@ -107,11 +117,11 @@
    #  Nb of Bins, Molecule 1 = 10
    #  Starting Bin, Molecule 1 = 1
    #  Final    Bin, Molecule 1 = 10
-   Sorting Method, Molecule 1 = RoVib-CG 
-      Nb of Bins, Molecule 1 = 1
-      File with Bins Energy Minima, Molecule 1 = E_low.dat
-      Starting Bin, Molecule 1 = 1
-      Final    Bin, Molecule 1 = 1
+   #Sorting Method, Molecule 1 = RoVib-CG 
+   #   Nb of Bins, Molecule 1 = 1
+   #   File with Bins Energy Minima, Molecule 1 = E_low.dat
+   #   Starting Bin, Molecule 1 = 1
+   #   Final    Bin, Molecule 1 = 1
 
    # Molecule 2: sampled from a Boltzmann distribution (include all levels) - NcNd
    #Sorting Method, Molecule 2 = RoVib-CG                                    
@@ -119,40 +129,40 @@
    #  Nb of Bins, Molecule 2 = 10
    #  Starting Bin, Molecule 2 = 0
    #  Final    Bin, Molecule 2 = 10
-   Sorting Method, Molecule 2 = RoVib-CG                
-      Nb of Bins, Molecule 2 = 1
-      File with Bins Energy Minima, Molecule 2 = E_low.dat          
-      Starting Bin, Molecule 2 = 1
-      Final    Bin, Molecule 2 = 1
+   #Sorting Method, Molecule 2 = RoVib-CG                
+   #   Nb of Bins, Molecule 2 = 1
+   #   File with Bins Energy Minima, Molecule 2 = E_low.dat          
+   #   Starting Bin, Molecule 2 = 1
+   #   Final    Bin, Molecule 2 = 1
 
    # Molecule 3, 4, 5 and 6: Vib-Specific          
    #Sorting Method, Molecule 3 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 3 = E_low.dat
    #  Nb of Bins, Molecule 3 = 10
-   Sorting Method, Molecule 3 = RoVib-CG
-      Nb of Bins, Molecule 3 = 1                          
-      File with Bins Energy Minima, Molecule 3 = E_low.dat
+   #Sorting Method, Molecule 3 = RoVib-CG
+   #   Nb of Bins, Molecule 3 = 1                          
+   #   File with Bins Energy Minima, Molecule 3 = E_low.dat
 
    #Sorting Method, Molecule 4 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 4 = E_low.dat
    #  Nb of Bins, Molecule 4 = 10
-   Sorting Method, Molecule 4 = RoVib-CG     
-      Nb of Bins, Molecule 4 = 1
-      File with Bins Energy Minima, Molecule 4 = E_low.dat
+   #Sorting Method, Molecule 4 = RoVib-CG     
+   #   Nb of Bins, Molecule 4 = 1
+   #   File with Bins Energy Minima, Molecule 4 = E_low.dat
 
    #Sorting Method, Molecule 5 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 5 = E_low.dat
    #  Nb of Bins, Molecule 5 = 10
-   Sorting Method, Molecule 5 = RoVib-CG
-      Nb of Bins, Molecule 5 = 1     
-      File with Bins Energy Minima, Molecule 5 = E_low.dat
+   #Sorting Method, Molecule 5 = RoVib-CG
+   #   Nb of Bins, Molecule 5 = 1     
+   #   File with Bins Energy Minima, Molecule 5 = E_low.dat
 
    #Sorting Method, Molecule 6 = RoVib-CG   
    #  File with Bins Energy Minima, Molecule 6 = E_low.dat
    #  Nb of Bins, Molecule 6 = 10
-   Sorting Method, Molecule 6 = RoVib-CG
-      Nb of Bins, Molecule 6 = 1  
-      File with Bins Energy Minima, Molecule 6 = E_low.dat
+   #Sorting Method, Molecule 6 = RoVib-CG
+   #   Nb of Bins, Molecule 6 = 1  
+   #   File with Bins Energy Minima, Molecule 6 = E_low.dat
  
 
 

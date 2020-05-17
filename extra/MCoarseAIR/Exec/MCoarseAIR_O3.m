@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates
@@ -35,9 +35,10 @@ global Input Syst Temp Param Kin Rates
 Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/O3_ALL/Test/';
 Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/O3Diss_Database/Run_0D';
 Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/O3Diss_Database/HDF5_Database/';
-Input.TranVec               = [10000];
+Input.TranVec               = [2500];
 Input.SystNameLong          = 'O3_UMN';
 Input.iPES                  = 0;
+Input.Suffix                = ''
 Input.Kin.MolResolutionIn   = ['StS'];
 Input.Kin.MinStateIn        = [    1,     1];
 Input.Kin.MaxStateIn        = [6115];

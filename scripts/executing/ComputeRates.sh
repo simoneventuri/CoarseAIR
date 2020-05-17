@@ -73,28 +73,40 @@ function ComputeTrajsPBS {
     ###########################################################################################################
     ## Selecting the Processes to Run in Increasing Order
     ## 
-    iProcessesTot=0
-    for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      iLevel2Start=0
-      MinLevel2Temp=0
-      if [ ${NMolecules} -eq 2 ]; then 
-        iLevel2Start=1
-        MinLevel2Temp=1
-      fi
+    # iProcessesTot=0
+    # for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    #   iLevel2Start=0
+    #   MinLevel2Temp=0
+    #   if [ ${NMolecules} -eq 2 ]; then 
+    #     iLevel2Start=1
+    #     MinLevel2Temp=1
+    #   fi
+    #   if [ ${SymmFlg} -eq 1 ]; then
+    #     iLevel2Start=${iLevel1}
+    #     MinLevel2Temp=${MinLevel1}
+    #   fi
+    #   for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+    #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
+    #     if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+    #       MinProcessAll=${iProcessesTot}
+    #     fi
+    #     if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+    #       MaxProcessAll=${iProcessesTot}
+    #     fi
+    #   done
+    # done
+    if [ ${NMolecules} -eq 1 ]; then 
+        MinProcessAll=${MinLevel1}
+        MaxProcessAll=${MaxLevel1}
+    else
       if [ ${SymmFlg} -eq 1 ]; then
-        iLevel2Start=${iLevel1}
-        MinLevel2Temp=${MinLevel1}
+        echo "TO IMPLEMENT SymmFlg=1"
+        stop
+      else
+        MinProcessAll=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
+        MaxProcessAll=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
       fi
-      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        iProcessesTot=$(( ${iProcessesTot} + 1 ))
-        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-          MinProcessAll=${iProcessesTot}
-        fi
-        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          MaxProcessAll=${iProcessesTot}
-        fi
-      done
-    done
+    fi
     NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
     echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
@@ -230,28 +242,40 @@ function ComputeTrajs {
 
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
-      iProcessesTot=0
-      for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        iLevel2Start=0
-        MinLevel2Temp=0
-        if [ ${NMolecules} -eq 2 ]; then 
-          iLevel2Start=1
-          MinLevel2Temp=1
-        fi
+      # iProcessesTot=0
+      # for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+      #   iLevel2Start=0
+      #   MinLevel2Temp=0
+      #   if [ ${NMolecules} -eq 2 ]; then 
+      #     iLevel2Start=1
+      #     MinLevel2Temp=1
+      #   fi
+      #   if [ ${SymmFlg} -eq 1 ]; then
+      #     iLevel2Start=${iLevel1}
+      #     MinLevel2Temp=${MinLevel1}
+      #   fi
+      #   for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
+      #     if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+      #       MinProcessInNode=${iProcessesTot}
+      #     fi
+      #     if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+      #       MaxProcessInNode=${iProcessesTot}
+      #     fi
+      #   done
+      # done
+      if [ ${NMolecules} -eq 1 ]; then 
+        MinProcessInNode=${MinLevel1}
+        MaxProcessInNode=${MaxLevel1}
+      else
         if [ ${SymmFlg} -eq 1 ]; then
-          iLevel2Start=${iLevel1}
-          MinLevel2Temp=${MinLevel1}
+          echo "TO IMPLEMENT SymmFlg=1"
+          stop
+        else
+          MinProcessInNode=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
+          MaxProcessInNode=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
         fi
-        for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          iProcessesTot=$(( ${iProcessesTot} + 1 ))
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-            MinProcessInNode=${iProcessesTot}
-          fi
-          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            MaxProcessInNode=${iProcessesTot}
-          fi
-        done
-      done
+      fi
       NProcessesAll=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesAll}
     fi
@@ -259,23 +283,43 @@ function ComputeTrajs {
     echo "  [ComputeTrajs]: For Node "${iNode}", the last  Process to be computed is the "${MaxProcessInNode}"-th"
 
 
-    iProcessesTot=0
-    for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      iLevel2Start=0
-      if [ ${NMolecules} -eq 2 ]; then 
-        iLevel2Start=1
-      fi
-      if [ ${SymmFlg} -eq 1 ]; then
-        iLevel2Start=${iLevel1}
-      fi
-      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        iProcessesTot=$((iProcessesTot+1))
+    # iProcessesTot=0
+    # for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    #   iLevel2Start=0
+    #   if [ ${NMolecules} -eq 2 ]; then 
+    #     iLevel2Start=1
+    #   fi
+    #   if [ ${SymmFlg} -eq 1 ]; then
+    #     iLevel2Start=${iLevel1}
+    #   fi
+    #   for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+    #     iProcessesTot=$((iProcessesTot+1))
 
-        if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
-          ComputeTrajsHERE
+    #     if [ ${iProcessesTot} -ge ${MinProcessInNode} ] && [ ${iProcessesTot} -le ${MaxProcessInNode} ]; then
+    #       ComputeTrajsHERE
+    #     fi
+
+    #   done
+    # done
+
+    for (( iProcessesTot=${MinProcessInNode}; iProcessesTot<=${MaxProcessInNode}; iProcessesTot++ )); do
+      if [ ${NMolecules} -eq 1 ]; then 
+        iLevel1=${iProcessesTot}
+        iLevel2=0
+      else
+        if [ ${SymmFlg} -eq 1 ]; then
+          echo "TO IMPLEMENT SymmFlg=1"
+          stop
+        else
+          iLevel1=$( printf "%.0f" $((${iProcessesTot} / ${NLevels2} )) )
+          iLevel1=$((${iLevel1} + 1))
+          Temp=$(( $((${iLevel1} - 1)) * ${NLevels2} ))
+          iLevel2=$((${iProcessesTot} - ${Temp}))
         fi
+      fi
 
-      done
+      ComputeTrajsHERE
+
     done
 
   
@@ -283,6 +327,7 @@ function ComputeTrajs {
       
 }
 #================================================================================================================================#
+
 
 
 # -------------------------------------------------------------------------------------------------------- RunTrajectoriesAtNode #
@@ -559,28 +604,40 @@ function PostTrajectoriesPBS {
     ## Selecting the Processes to Run in Increasing Order
     ## 
 
-    iProcessesTot=0
-    for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-      iLevel2Start=0
-      MinLevel2Temp=0
-      if [ ${NMolecules} -eq 2 ]; then 
-        iLevel2Start=1
-        MinLevel2Temp=1
-      fi
+    # iProcessesTot=0
+    # for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+    #   iLevel2Start=0
+    #   MinLevel2Temp=0
+    #   if [ ${NMolecules} -eq 2 ]; then 
+    #     iLevel2Start=1
+    #     MinLevel2Temp=1
+    #   fi
+    #   if [ ${SymmFlg} -eq 1 ]; then
+    #     iLevel2Start=${iLevel1}
+    #     MinLevel2Temp=${MinLevel1}
+    #   fi
+    #   for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+    #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
+    #     if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+    #       MinProcessAll=${iProcessesTot}
+    #     fi
+    #     if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+    #       MaxProcessAll=${iProcessesTot}
+    #     fi
+    #   done
+    # done
+    if [ ${NMolecules} -eq 1 ]; then 
+        MinProcessAll=${MinLevel1}
+        MaxProcessAll=${MaxLevel1}
+    else
       if [ ${SymmFlg} -eq 1 ]; then
-        iLevel2Start=${iLevel1}
-        MinLevel2Temp=${MinLevel1}
+        echo "TO IMPLEMENT SymmFlg=1"
+        stop
+      else
+        MinProcessAll=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
+        MaxProcessAll=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
       fi
-      for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-        iProcessesTot=$(( ${iProcessesTot} + 1 ))
-        if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-          MinProcessAll=${iProcessesTot}
-        fi
-        if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-          MaxProcessAll=${iProcessesTot}
-        fi
-      done
-    done
+    fi
     NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
     echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
@@ -712,28 +769,40 @@ function PostTrajectoriesAtNode {
 
     if [ ${ParNodes} -eq 0 ]; then
       iNode=1
-      iProcessesTot=0
-      for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
-        iLevel2Start=0
-        MinLevel2Temp=0
-        if [ ${NMolecules} -eq 2 ]; then 
-          iLevel2Start=1
-          MinLevel2Temp=1
-        fi
+      # iProcessesTot=0
+      # for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do
+      #   iLevel2Start=0
+      #   MinLevel2Temp=0
+      #   if [ ${NMolecules} -eq 2 ]; then 
+      #     iLevel2Start=1
+      #     MinLevel2Temp=1
+      #   fi
+      #   if [ ${SymmFlg} -eq 1 ]; then
+      #     iLevel2Start=${iLevel1}
+      #     MinLevel2Temp=${MinLevel1}
+      #   fi
+      #   for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
+      #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
+      #     if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
+      #       MinProcessInNode=${iProcessesTot}
+      #     fi
+      #     if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
+      #       MaxProcessInNode=${iProcessesTot}
+      #     fi
+      #   done
+      # done
+      if [ ${NMolecules} -eq 1 ]; then 
+        MinProcessInNode=${MinLevel1}
+        MaxProcessInNode=${MaxLevel1}
+      else
         if [ ${SymmFlg} -eq 1 ]; then
-          iLevel2Start=${iLevel1}
-          MinLevel2Temp=${MinLevel1}
+          echo "TO IMPLEMENT SymmFlg=1"
+          stop
+        else
+          MinProcessInNode=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
+          MaxProcessInNode=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
         fi
-        for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-          iProcessesTot=$(( ${iProcessesTot} + 1 ))
-          if [ ${iLevel1} -eq ${MinLevel1} ] && [ ${iLevel2} -eq ${MinLevel2Temp} ]; then
-            MinProcessInNode=${iProcessesTot}
-          fi
-          if [ ${iLevel1} -eq ${MaxLevel1} ] && [ ${iLevel2} -eq ${MaxLevel2} ]; then
-            MaxProcessInNode=${iProcessesTot}
-          fi
-        done
-      done
+      fi
     fi
 
     NProcessesPerNode=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
