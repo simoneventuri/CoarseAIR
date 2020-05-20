@@ -29,7 +29,7 @@ function Plot_OverallRates()
     fprintf('====================================================\n')
 
     iMol       = 1;
-    LevelToBin = Syst.Molecule(iMol).LevelToBin;
+    LevelToBin = Syst.Molecule(iMol).LevelToGroupIn;
     Levelvqn   = Syst.Molecule(iMol).Levelvqn;
     LevelEeV   = Syst.Molecule(iMol).LevelEeV;
     

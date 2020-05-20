@@ -52,11 +52,15 @@ function Initialize_Input()
 
     Temp.IntVec  = Input.TranVec;    
     Temp.NInt    = length(Temp.TranVec);
-
+    
+    TempStr = '';
+    if (Input.Kin.NBinsSuffix > 0)
+        TempStr = strcat('_', num2str(Input.Kin.NBinsSuffix), 'Bins');
+    end
     if (Syst.NAtoms == 3)
-        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2));
+        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2), TempStr);
     else
-        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.DissInelFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2));
+        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.DissInelFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2), TempStr);
     end
     
     

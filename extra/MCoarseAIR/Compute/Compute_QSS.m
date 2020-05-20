@@ -59,7 +59,7 @@ function Compute_QSS()
     Kin.T(Temp.iT).QSS.t = Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.i);
     
     iStart = 1;
-    while (yy(iStart) < yy(iQSS)/6)
+    while (yy(iStart) < yy(iQSS)/5)
         iStart = iStart + 1;
     end
     iEnd = size(yy,1);%iQSS;
@@ -82,12 +82,13 @@ function Compute_QSS()
     end
     Kin.T(Temp.iT).QSS.iStart = it - 1;    
     
-%     figure(1234)
-%     h1 = plot( fitresult, xData, yData );
-%     hold on
-%     h2 = semilogx(x0,                        fitresult(x0),                        'ro', 'MarkerSize', 10 );
-%     h3 = semilogx(Kin.T(Temp.iT).QSS.tStart, fitresult(Kin.T(Temp.iT).QSS.tStart), 'ko', 'MarkerSize', 10 );
-%     set(gca, 'XScale', 'log')
+    
+    figure(1234)
+    h1 = plot( fitresult, xData, yData );
+    hold on
+    h2 = semilogx(x0,                        fitresult(x0),                        'ro', 'MarkerSize', 10 );
+    h3 = semilogx(Kin.T(Temp.iT).QSS.tStart, fitresult(Kin.T(Temp.iT).QSS.tStart), 'ko', 'MarkerSize', 10 );
+    set(gca, 'XScale', 'log')
 
     
     clear fitresult yyy xData yData
@@ -95,7 +96,11 @@ function Compute_QSS()
     [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(iStart:iEnd), yyy(iStart:iEnd) );
     ft = 'splineinterp';
     [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
-    x0 = Kin.T(Temp.iT).t(iQSS)*5;
+    it = iQSS;
+    while yy(it) < yy(iQSS)*(1.0+InpPerc)
+        it = it + 1;
+    end
+    x0 = Kin.T(Temp.iT).t(it);
     Kin.T(Temp.iT).QSS.tEnd   = fzero(fitresult, x0);
 
     it = 1;
@@ -104,12 +109,12 @@ function Compute_QSS()
     end       
     Kin.T(Temp.iT).QSS.iEnd   = it;
 
-%     figure(1234)
-%     h1 = plot( fitresult, xData, yData );
-%     hold on
-%     h2 = semilogx(x0,                        fitresult(x0),                    'ro', 'MarkerSize', 10 );
-%     h3 = semilogx(Kin.T(Temp.iT).QSS.tEnd, fitresult(Kin.T(Temp.iT).QSS.tEnd), 'ko', 'MarkerSize', 10 );
-%     set(gca, 'XScale', 'log')
+    figure(1234)
+    h1 = plot( fitresult, xData, yData );
+    hold on
+    h2 = semilogx(x0,                        fitresult(x0),                    'ro', 'MarkerSize', 10 );
+    h3 = semilogx(Kin.T(Temp.iT).QSS.tEnd, fitresult(Kin.T(Temp.iT).QSS.tEnd), 'ko', 'MarkerSize', 10 );
+    set(gca, 'XScale', 'log')
     
     fprintf('QSS Start Time       = %e s\n', Kin.T(Temp.iT).QSS.tStart );
     fprintf('QSS Start Time Step  = %i \n',  Kin.T(Temp.iT).QSS.iStart );

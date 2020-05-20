@@ -35,14 +35,18 @@ global Input Syst Temp Param Kin Rates
 Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/';
 Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
 Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [12500 15000 20000];
+Input.TranVec               = [20000];
 Input.SystNameLong          = 'CO2_NASA';
 Input.iPES                  = 0;
+Input.Suffix                = ''
 Input.Kin.MolResolutionIn   = ['StS'; 'StS'];
 Input.Kin.MinStateIn        = [    1,     1];
 Input.Kin.MaxStateIn        = [13521,  6078];
 Input.Kin.NGroupsIn         = [    0,     0];
+Input.Kin.MolResolutionOut  = ['StS'; 'StS'];
+Input.Kin.PathToMappingOut  = [''];
 Input.Kin.Proc.DissFlg      = 0;
+Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
@@ -52,22 +56,24 @@ Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint';
 Input.ReLoad                = 1;
 
+Input.RunSuffix = '';
+
 
 %% Inputs for Plotting
-Input.iFig               = 201;
+Input.iFig               = 101;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CO2_Paper/Figures/';
+Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/Mars_Paper/Figures/';
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/';
+Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Mars_Paper/Data/';
 
 
 %% Tasks Inputs
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 10.0; 1.5, 10.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [44];
 % Plotting Overall Rate Coefficients (Dissociation and Exchange)
@@ -89,8 +95,12 @@ Input.Tasks.Plot_GlobalRates.Flg                       = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
+% Plotting Vib. Distribution Function
+Input.Tasks.Plot_VDF.Flg                               = false;
+Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
+Input.Tasks.Plot_VDF.tSteps                            = [7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = false;
+Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
@@ -103,6 +113,16 @@ Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
+
+Input.Tasks.ReadRates          = true;
+Input.Tasks.ReadInelasticRates = false;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Initializing
+Initialize_ChemicalSyst()
+Initialize_Input()
+Initialize_Parameters()
 
 
 
@@ -124,16 +144,17 @@ if Input.ReLoad > 0
 end
 
 
-
+iFigStart = Input.iFig;
 %% Looping On Translational Temperatures
 for iT = 1:length(Temp.TranVec)
     Temp.iT       = iT;
     Temp.TNow     = Temp.TranVec(iT);
     Temp.TNowChar = num2str(Temp.TranVec(iT));
-  
-    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
-
-
+    Input.iFig    = iFigStart;
+    close all
+    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, Input.RunSuffix);
+    
+    
     if Input.ReLoad > 0 
         
         
@@ -149,7 +170,8 @@ for iT = 1:length(Temp.TranVec)
             Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
-            Input.Tasks.Plot_EnergyDepletions.Flg)
+            Input.Tasks.Plot_EnergyDepletions.Flg          || ...
+            Input.Tasks.ReadRates)
         
             %% Reading Rates
             Read_Rates()
@@ -159,6 +181,7 @@ for iT = 1:length(Temp.TranVec)
         if (Input.Tasks.Plot_MoleFracs.Flg                 || ...
             Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_VDF.Flg                       || ...
             Input.Tasks.Plot_Populations.Flg               || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
@@ -170,6 +193,7 @@ for iT = 1:length(Temp.TranVec)
         
         if (Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_VDF.Flg                       || ...
             Input.Tasks.Plot_Populations.Flg               || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
@@ -185,7 +209,7 @@ for iT = 1:length(Temp.TranVec)
         %%
         
         %% Computing Thermal Rates
-        Compute_Rates_Thermal()   
+        %Compute_Rates_Thermal()   
         
         if (Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg)
@@ -262,6 +286,11 @@ for iT = 1:length(Temp.TranVec)
         Plot_MoleFracs_and_GlobalRates(Input.Tasks.Plot_MoleFracs_and_GlobalRates)
     end
     
+    %% Plotting Vib. Distr. Function
+    if (Input.Tasks.Plot_VDF.Flg)
+       Plot_VDF(Input.Tasks.Plot_VDF) 
+    end
+        
     %% Plotting RVS Populations
     if (Input.Tasks.Plot_Populations.Flg)
        Plot_Populations(Input.Tasks.Plot_Populations) 

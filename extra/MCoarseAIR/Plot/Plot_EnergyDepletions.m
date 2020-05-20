@@ -31,6 +31,7 @@ function Plot_EnergyDepletions(Controls)
     
     for iMol = Controls.MoleculesOI
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
+        LevelToBin  = Syst.Molecule(iMol).LevelToGroupIn;
 
         
         figure(Input.iFig)
@@ -39,12 +40,17 @@ function Plot_EnergyDepletions(Controls)
         %fig.Position = screensize;
         %fig.Color='None';
         
+        iQSS = Kin.T(Temp.iT).QSS.i;
         
-        h1 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDInt, '-', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
-        hold on 
-        h2 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDRot, '-', 'Color', Param.RCVec, 'LineWidth', Param.LineWidth);
-        h3 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDVib, '-', 'Color', Param.GCVec, 'LineWidth', Param.LineWidth);
-            
+        h1 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDInt,             '-', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
+        hold on
+        h4 = semilogx(Kin.T(Temp.iT).t(iQSS), Kin.T(Temp.iT).Molecule(iMol).CDInt(iQSS), 'o', 'Color', Param.KCVec, 'LineWidth', Param.LineWidth);
+        
+        h2 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDRot,             '-', 'Color', Param.RCVec, 'LineWidth', Param.LineWidth);
+        h5 = semilogx(Kin.T(Temp.iT).t(iQSS), Kin.T(Temp.iT).Molecule(iMol).CDRot(iQSS), 'o', 'Color', Param.RCVec, 'LineWidth', Param.LineWidth);
+
+        h3 = semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).CDVib,             '-', 'Color', Param.GCVec, 'LineWidth', Param.LineWidth);
+        h6 = semilogx(Kin.T(Temp.iT).t(iQSS), Kin.T(Temp.iT).Molecule(iMol).CDVib(iQSS), 'o', 'Color', Param.GCVec, 'LineWidth', Param.LineWidth);
         
         clab = legend([h1,h2,h3],'Internal Energy', 'Rotational Energy', 'Vibrational Energy', 'Location', 'Best');
         clab.Interpreter = 'latex';

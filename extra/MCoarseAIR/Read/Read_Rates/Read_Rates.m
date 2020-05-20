@@ -93,6 +93,36 @@ function Read_Rates()
     end
     
     
+    
+    
+%     TempBins = Input.Kin.NGroupsOut(1); 
+%     opts = delimitedTextImportOptions("NumVariables", 7);
+%     opts.DataLines = [1, Inf];
+%     opts.Delimiter = ["(", ")", ",", ":"];
+%     opts.VariableNames = ["Var1", "VarName2", "Var3", "E12", "Var5", "Var6", "Var7"];
+%     opts.SelectedVariableNames = ["VarName2", "E12"];
+%     opts.VariableTypes = ["string", "double", "string", "double", "string", "string", "string"];
+%     opts = setvaropts(opts, [1, 3, 5, 6, 7], "WhitespaceRule", "preserve");
+%     opts = setvaropts(opts, [1, 3, 5, 6, 7], "EmptyFieldRule", "auto");
+%     opts.ExtraColumnsRule = "ignore";
+%     opts.EmptyLineRule = "read";
+%     if Input.Kin.Proc.DissFlg == 2 || Input.Kin.Proc.DissFlg == 6
+%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Corrected.dat"), opts);
+%     elseif Input.Kin.Proc.DissFlg == 3
+%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_VS.dat"), opts);
+%     elseif Input.Kin.Proc.DissFlg == 4
+%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Phys_",num2str(TempBins),"Bins.dat"), opts);
+%     elseif Input.Kin.Proc.DissFlg == 5
+%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Phys_Fitted_",num2str(TempBins),"Bins.dat"), opts);
+%     end 
+%     Idx      = tbl.VarName2;
+%     DissTemp = tbl.E12;
+%     clear opts tbl
+%     Rates.T(Temp.iT).Diss(Idx(:),1) = DissTemp(:);
+    
+    
+    
+
     fprintf(strcat('Computing Overall Rates \n') )
     if (Syst.NAtoms == 3)
        

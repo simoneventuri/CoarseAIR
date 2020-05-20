@@ -45,6 +45,7 @@ function Read_LevelInfo()
             VarChar                        = strcat('/', Syst.Molecule(iMol).Name, '/LevelVMax');
             TempVar                        = h5read(Syst.HDF5_File, VarChar);
             Syst.Molecule(iMol).EEhDiss    = min(TempVar);
+            
             VarChar                        = strcat('/', Syst.Molecule(iMol).Name, '/Levelvqn');
             Syst.Molecule(iMol).Levelvqn   = h5read(Syst.HDF5_File, VarChar);            
             VarChar                        = strcat('/', Syst.Molecule(iMol).Name, '/Leveljqn');

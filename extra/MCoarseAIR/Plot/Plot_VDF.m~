@@ -1,6 +1,6 @@
-%% The Function plots the Ro-Vibrational Populations at Given Time Steps
+%% The Function plots the Vibrational Distribution Function
 %
-function Plot_Populations(Controls)    
+function Plot_VDF(Controls)    
     
     %%==============================================================================================================
     % 
@@ -25,7 +25,7 @@ function Plot_Populations(Controls)
 
     global Input Kin Param Syst Temp Rates
 
-    fprintf('= Plot_Populations ===================== T = %i K\n', Temp.TNow)
+    fprintf('= Plot_VDF ============================= T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
     
     
@@ -58,6 +58,26 @@ function Plot_Populations(Controls)
             %fig.Position = screensize;
             %fig.Color='None';
 
+            
+            qq = zeros(Syst.Molecule(iMol).Nvqn + 1,1);
+            e0 = zeros(Syst.Molecule(iMol).Nvqn + 1,1); 
+            for iLevel = 1:NLevels(iMol)
+              qq(Syst.Molecule(iMol).Levelvqn(iLevel)+1) = qq(Syst.Molecule(iMol).Levelvqn(iLevel)+1) + Syst.Molecule(iMol).T(Temp.iT).Levelq;
+              if Leveljqn(iLevel,iMol) == 0
+                e0(Syst.Molecule(iMol).Levelvqn(iLevel)+1) = Syst.Molecule(iMol).LevelEeV(iLevel);
+              end
+            end
+            ff = zeros(Syst.Molecule(iMol).Nvqn + 1,1);
+            ee = zeros(Syst.Molecule(iMol).Nvqn + 1,1);
+            for iLevel = 1:Syst.Molecule(iMol).NLevels
+              ff(Syst.Molecule(iMol).Levelvqn(iLevel)+1) = ff(Syst.Molecule(iMol).Levelvqn(iLevel)+1) + LevelPop(o:;
+              ee(Syst.Molecule(iMol).Levelvqn(iLevel)+1) = ee(Syst.Molecule(iMol).Levelvqn(iLevel)+1) + LevelEeV(iLevel,iMol) * Levelg(iLevel,iMol) * exp( - LevelEeV0(iLevel,iMol) .* Ue ./ (T0_Vec(1) .* UKb) ) / qq(Levelvqn(iLevel,iMol)+1);
+            end
+            ff = ff / sum(Pop(iSteps,:,1));
+
+            plot(e0,ff,'o')
+            hold on
+            
 
             if Controls.GroupColors == 0
 

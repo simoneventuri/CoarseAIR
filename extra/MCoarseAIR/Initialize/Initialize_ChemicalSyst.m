@@ -69,7 +69,7 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(2).DissEn           = 0.0;
 
         Syst.Molecule(1).DegeneracyFactor = 1;
-        Syst.Molecule(2).DegeneracyFactor = 6;
+        Syst.Molecule(2).DegeneracyFactor = 3;
 
         Syst.Molecule(1).Mu               = 28.0104e-3;
         Syst.Molecule(2).Mu               = 31.9988e-3;
@@ -146,6 +146,123 @@ function Initialize_ChemicalSyst()
         Syst.PairToExch         = [1; 2];
         
         Syst.ColPartToComp      = 2; 
+        
+        
+    elseif strcmp(Input.SystNameLong, 'O2C_NASA')
+        
+        %%% System
+        Syst.Name  = 'O2C';
+        
+        Syst.NProc = 3; %(Diss+Inel+Exch)
+        
+        
+        %%% Atoms
+        Syst.NAtoms        = 3;
+        
+        Syst.Atom(1).Name  = 'O';
+        Syst.Atom(2).Name  = 'O';
+        Syst.Atom(3).Name  = 'C';
+
+        Syst.Atom(1).Color = [0, 0, 1];
+        Syst.Atom(2).Color = [0, 0, 1];
+        Syst.Atom(3).Color = [0, 0, 0];
+
+        Syst.Atom(1).Size  = 200;
+        Syst.Atom(2).Size  = 200;
+        Syst.Atom(3).Size  = 100;
+
+        Syst.Atom(1).Mass  = 29148.94559;
+        Syst.Atom(2).Mass  = 29148.94559;
+        Syst.Atom(3).Mass  = 21868.661757;
+        
+        
+        %%% Molecules
+        Syst.NMolecules                   = 2;
+        
+        Syst.Molecule(1).Name             = 'O2';
+        Syst.Molecule(2).Name             = 'CO';
+
+        Syst.Molecule(1).DissEn           = 0.0;
+        Syst.Molecule(2).DissEn           = 0.0;
+
+        Syst.Molecule(1).DegeneracyFactor = 3;
+        Syst.Molecule(2).DegeneracyFactor = 1;
+
+        Syst.Molecule(1).Mu               = 31.9988e-3;
+        Syst.Molecule(2).Mu               = 28.0104e-3;
+
+        Syst.Molecule(1).NLevelsOrig      = 6078;
+        Syst.Molecule(2).NLevelsOrig      = 13521;
+    
+        Syst.Molecule(1).ToAtoms          = [1,2];
+        Syst.Molecule(2).ToAtoms          = [2,3];
+        
+        Syst.Molecule(1).DiatPot          = 'O2_NASA';
+        Syst.Molecule(2).DiatPot          = 'CO_NASA';
+        
+        
+        %%% Pairs
+        Syst.Pair(1).Name  = 'O2';
+        Syst.Pair(2).Name  = 'CO';
+        Syst.Pair(3).Name  = 'CO';
+
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 2;
+        Syst.Pair(3).ToMol = 2;
+
+        Syst.Pair(1).Color = [0, 0, 256]  ./ 256;
+        Syst.Pair(2).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(3).Color = [17, 17, 17] ./ 256;
+
+        
+        %% CFD Components (For PLATO and KONIG)
+        Syst.NComp             =  4;
+        
+        Syst.CFDComp(1).Name   = 'C';
+        Syst.CFDComp(2).Name   = 'O';
+        Syst.CFDComp(3).Name   = 'CO';
+        Syst.CFDComp(4).Name   = 'O2';
+
+        Syst.CFDComp(1).ToMol   = 0;
+        Syst.CFDComp(2).ToMol   = 0;
+        Syst.CFDComp(3).ToMol   = 2;
+        Syst.CFDComp(4).ToMol   = 1;
+
+        Syst.CFDComp(1).Mass    = Syst.Atom(1).Mass;
+        Syst.CFDComp(2).Mass    = Syst.Atom(2).Mass;
+        Syst.CFDComp(3).Mass    = Syst.Atom(1).Mass + Syst.Atom(3).Mass;
+        Syst.CFDComp(4).Mass    = 2.0 * Syst.Atom(1).Mass;
+
+        Syst.CFDComp(1).Deg     = 1;
+        Syst.CFDComp(2).Deg     = 9;
+        Syst.CFDComp(3).Deg     = 1;
+        Syst.CFDComp(4).Deg     = 3;
+
+        Syst.CFDComp(1).Color   = [ 102, 102, 102] ./ 256;
+        Syst.CFDComp(2).Color   = [   0,   0,   0] ./ 256;
+        Syst.CFDComp(3).Color   = [ 204,   0,   0] ./ 256;
+        Syst.CFDComp(4).Color   = [   0,   0, 234] ./ 256;
+
+        Syst.CFDComp(1).LineStyle = ':';
+        Syst.CFDComp(2).LineStyle = '-.';
+        Syst.CFDComp(3).LineStyle = '-';
+        Syst.CFDComp(4).LineStyle = '--';
+
+        Syst.CFDComp(1).RxLxIdx = -1;
+        Syst.CFDComp(2).RxLxIdx = -1;
+        Syst.CFDComp(3).RxLxIdx =  0;
+        Syst.CFDComp(4).RxLxIdx =  1;
+        
+        Syst.MolToCFDComp       = [4, 3];
+
+        
+        %% Exchange Properties
+        Syst.ExchToMol          = [2];
+        Syst.ExchToAtom         = [3];
+
+        Syst.PairToExch         = [2];
+        
+        Syst.ColPartToComp      = 1; 
         
 
 %     elseif strcmp(Input.SystNameLong, 'O2C')

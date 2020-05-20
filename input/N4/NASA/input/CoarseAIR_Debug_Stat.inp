@@ -289,11 +289,11 @@
    ### Nb of Trajectory Conditions = 5  -> ((Rotational q.n., Vibrational q.n. and Arrangement) for 2 Molecules)
    Nb of Final Conditions on the Trajectories = 5
      Iskip for Condition 1 = 1
-     Preserving Even / Oddness of Condition 1 = yes
+     Preserving Even / Oddness of Condition 1 = no
      Iskip for Condition 2 = 1
      Preserving Even / Oddness of Condition 2 = no
      Iskip for Condition 3 = 1
-     Preserving Even / Oddness of Condition 3 = yes
+     Preserving Even / Oddness of Condition 3 = no
      Iskip for Condition 4 = 1
      Preserving Even / Oddness of Condition 4 = no
      Iskip for Condition 5 = 1
