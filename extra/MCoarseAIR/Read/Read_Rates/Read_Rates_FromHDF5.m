@@ -56,6 +56,14 @@ function Read_Rates_FromHDF5()
                 Rates.T(Temp.iT).ExchType(iExch).Exch = permute(RatesTemp, [2,1]);
                 fprintf(['  Rates.T(' num2str(Temp.iT) ').ExchType(' num2str(iExch) ').Exch, size: (' num2str(size(Rates.T(Temp.iT).ExchType(iExch).Exch)) ') \n'])
             end
+        else
+            for iExch = Syst.NProc-2:Syst.NProc-2
+                ExchChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates/Exch_', num2str(iExch), '/');
+                %h5disp(Syst.HDF5_File, ExchChar)
+                RatesTemp                         = h5read(Syst.HDF5_File, ExchChar);
+                Rates.T(Temp.iT).ExchType(iExch).Exch = permute(RatesTemp, [2,1]);
+                fprintf(['  Rates.T(' num2str(Temp.iT) ').ExchType(' num2str(iExch) ').Exch, size: (' num2str(size(Rates.T(Temp.iT).ExchType(iExch).Exch)) ') \n'])
+            end
         end
         
     else

@@ -78,16 +78,25 @@ function Compute_Energies(Controls)
         Kin.T(Temp.iT).Molecule(iMol).eRot = eRot;
         Kin.T(Temp.iT).Molecule(iMol).eVib = eVib;
         
+%         figure
+%         semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eInt)
+%         hold on
+%         semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eRot)
+%         semilogx(Kin.T(Temp.iT).t, Kin.T(Temp.iT).Molecule(iMol).eVib)
+
         
         eIntLim = (eInt(end) - eInt(1)) * 0.632 + eInt(1);
         iInt=1;
         while eInt(iInt) < eIntLim
           iInt = iInt+1;
         end
+        %semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eInt(iInt),'o')
         tauInt = (Kin.T(Temp.iT).t(iInt) + Kin.T(Temp.iT).t(iInt-1)) / 2.d0;
-        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t, eInt - eIntLim );
+        tt = Kin.T(Temp.iT).t(2:end-1)
+        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eInt(2:end-1) - eIntLim );
         ft = 'splineinterp';
-        [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
+        semilogx(xData, yData)
+        [fitresult, gof] = fit( xData, yData, ft );
         Kin.T(Temp.iT).Molecule(iMol).tauInt = fzero(fitresult, tauInt);
         
         eRotLim = (eRot(end) - eRot(1)) * 0.632 + eRot(1);
@@ -96,9 +105,9 @@ function Compute_Energies(Controls)
           iRot = iRot+1;
         end
         tauRot = (Kin.T(Temp.iT).t(iRot) + Kin.T(Temp.iT).t(iRot-1)) / 2.d0;
-        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t, eRot - eRotLim );
+        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eRot(2:end-1) - eRotLim );
         ft = 'splineinterp';
-        [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
+        [fitresult, gof] = fit( xData, yData, ft );
         Kin.T(Temp.iT).Molecule(iMol).tauRot = fzero(fitresult, tauRot);
         
         eVibLim = (eVib(end) - eVib(1)) * 0.632 + eVib(1);
@@ -107,9 +116,9 @@ function Compute_Energies(Controls)
           iVib = iVib+1;
         end
         tauVib = (Kin.T(Temp.iT).t(iVib) + Kin.T(Temp.iT).t(iVib-1)) / 2.d0;
-        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t, eVib - eVibLim );
+        [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eVib(2:end-1) - eVibLim );
         ft = 'splineinterp';
-        [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
+        [fitresult, gof] = fit( xData, yData, ft );
         Kin.T(Temp.iT).Molecule(iMol).tauVib = fzero(fitresult, tauVib);
         
         

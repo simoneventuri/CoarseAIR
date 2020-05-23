@@ -35,7 +35,7 @@ global Input Syst Temp Param Kin Rates
 Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/O2C_ALL/Test/';
 Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
 Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [20000];
+Input.TranVec               = 20000 %[2500 5000 7500 10000 12500 15000 20000];
 Input.SystNameLong          = 'O2C_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -45,7 +45,7 @@ Input.Kin.MaxStateIn        = [ 6078; 13521];
 Input.Kin.NGroupsIn         = [    0,     0];
 Input.Kin.MolResolutionOut  = ['StS'; 'StS'];
 Input.Kin.PathToMappingOut  = [''];
-Input.Kin.Proc.DissFlg      = 0;
+Input.Kin.Proc.DissFlg      = 1;
 Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
@@ -62,11 +62,11 @@ Input.RunSuffix = '';
 %% Inputs for Plotting
 Input.iFig               = 101;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/Mars_Paper/Figures/O2+C/';
+Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/Mars_Paper/Figures/temp/';
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Mars_Paper/Data/O2+C/';
+Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Mars_Paper/Data/temp/';
 
 
 %% Tasks Inputs
@@ -92,7 +92,7 @@ Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
 % Plotting Vib. Distribution Function
@@ -102,19 +102,20 @@ Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.9
 % Plotting RVS Populations
 Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
-Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
-Input.Tasks.Plot_Populations.GroupColors               = 0;
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 8.e-7, 1.e-6];
+Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
+Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
 
-Input.Tasks.ReadRates = true;
+Input.Tasks.ReadRates          = true;
+Input.Tasks.ReadInelasticRates = false;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -307,6 +308,6 @@ for iT = 1:length(Temp.TranVec)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    
-    %clear Rates Kin
+    pause
+    clear Rates Kin
 end

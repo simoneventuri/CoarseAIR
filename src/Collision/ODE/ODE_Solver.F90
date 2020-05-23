@@ -1,4 +1,4 @@
-! -*-F90-*-
+ ! -*-F90-*-
 !===============================================================================================================
 ! 
 ! Coarse-Grained QCT for Atmospheric Mixtures (CoarseAIR) 
@@ -94,7 +94,7 @@ Subroutine Initialize_ODE_Solver( This, eps, NSteps, IncStpSzFlg, Relax, NanChec
   if (i_Debug_Loc) then
     write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: Solver parameters:')")
     write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> Relative error control parameter:           This%eps         = ',es15.8)") This%eps
-    write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> Increase Step Size Falg:                    This%IncStpSzFlg = ',l)")     This%IncStpSzFlg
+    write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> Increase Step Size Falg:                    This%IncStpSzFlg = ',l)")      This%IncStpSzFlg
     write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> Number of stepsizes to use:                 This%NSteps      = ',g0)")     This%NSteps
     write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> Relaxation parameter for stepsize increase: This%relax       = ',es15.8)") This%relax
     write(Logger%Unit,"(6x,'[Initialize_ODE_Solver]: -> NaN check indicator:                        This%NanCheck    = ',g0)")     This%NanCheck

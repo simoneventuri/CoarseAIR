@@ -243,13 +243,14 @@ Subroutine Compute_N4_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
 
   ! Extract derivatives with respect to Cartesian coordinates of fourth atom
   dVdR4 = dVdQin(10:12)
+  dVdQ  = Zero! dVdQin
 
   ! Form derivatives with respect to Cartesian coordinates of the first three atoms
   ! by applying the chain-rule and by exploiting the fact that all atoms have the 
   ! same mass. Hence dx_4/dx_i = -1, i = 1,2,3
   atom_loop : do at = 1,3 
      dir_loop : do dir = 1,3
-        dVdQ(3*(at - 1) + dir) = dVdQin(3*(at - 1) + dir) - dVdR4(dir)     
+        dVdQ(3*(at - 1) + dir) = dVdQin(3*(at - 1) + dir) - dVdR4(dir)
      enddo dir_loop
   enddo atom_loop
 

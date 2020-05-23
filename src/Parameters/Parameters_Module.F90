@@ -50,7 +50,7 @@ Module Parameters_Module
   real(rkp) ,parameter     ::     Pi                = acos( - One )
   real(rkp) ,parameter     ::     TwoPi             = Pi * Two
 
-  real(rkp) ,parameter     ::     epss              = 1.0E-4_rkp
+  real(rkp) ,parameter     ::     epss              = 1.0E-5_rkp
   
   real(rkp) ,parameter     ::     UKb               = 1.380658e-23_rkp                    !< Boltzmann's constant [J/K]
   real(rkp) ,parameter     ::     Ue                = 1.602191e-19_rkp                    !< Electron charge in [C]

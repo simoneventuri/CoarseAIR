@@ -547,11 +547,210 @@ Subroutine Nb4_PlotPES_ReadPoints( This, Input, Collision, NPairs, NAtoms, i_Deb
   integer                                   ,intent(in)     ::    NAtoms
   logical                         ,optional ,intent(in)     ::    i_Debug
 
-  logical                                                   ::    i_Debug_Loc
-  
+  real(rkp)                                                 ::    ang
+  real(rkp)                                                 ::    beta
+  real(rkp)                                                 ::    Theta2, Theta4
+  real(rkp)                                                 ::    dist
+  real(rkp)                                                 ::    V
+  real(rkp)                                                 ::    dV
+  real(rkp)    ,dimension(NPairs)                           ::    Rp
+  real(rkp)    ,dimension(NAtoms*3)                         ::    Qp
+  real(rkp)    ,dimension(NPairs)                           ::    RpInf
+  real(rkp)    ,dimension(NAtoms*3)                         ::    QpInf
+  real(rkp)    ,dimension(NPairs)                           ::    dVdR
+  real(rkp)    ,dimension(NAtoms*3)                         ::    dVdQ
+  real(rkp)                                                 ::    Angle
+  real(rkp)                                                 ::    VInf
+  real(rkp)                                                 ::    RInf
+  real(rkp)                                                 ::    VRef
+  real(rkp)    ,dimension(2)                                ::    hGrid
+  real(rkp)                                                 ::    Temp
+  integer                                                   ::    i, j
+  integer                                                   ::    iTot
+  integer                                                   ::    iA
+  integer                                                   ::    iPES
+  character(4)                                              ::    iPESChar
+  character(:)                 ,allocatable                 ::    FileName  
+  integer                                                   ::    Unit
+  integer                                                   ::    Status
+  character(:)                 ,allocatable                 ::    FolderName
+  real(rkp)                                                 ::    t2, t1
+  real(rkp)                                                 ::    TT
+  integer                                                   ::    UnitRead, StatusRead
+  logical                                                   ::    i_Debug_Loc  
+
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "Nb4_PlotPES_ReadPoints" )
   !i_Debug_Loc   =     Logger%On()
+
+
+  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/Info.dat'
+  open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName )  
+    write(Unit,'(A)')        "#       Nb Points R1        Nb Points R2"
+    write(Unit,'(2I20)')     Input%NGridPlot(:)
+    write(Unit,'(A)')        "#             Min R1              Min R2"
+    write(Unit,'(2d20.10)')  Input%MinGridPlot(:)
+    write(Unit,'(A)')        "#             Max R1              Max R2"
+    write(Unit,'(2d20.10)') Input%MaxGridPlot(:)
+  close(Unit)  
+     
+
+  do iPES = 1,Input%NPESs
+    write(iPESChar,'(I4)') iPES
+    FolderName = 'PES_' // trim(adjustl(iPESChar))
+    call system('mkdir -p ' // trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)))
+
+    RInf  = 1000.d0
+    RpInf = RInf
+
+    if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+      if (Input%PlotPES_OnlyTriatFlg) then 
+        if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+          call R_to_X(RpInf, QpInf)
+        else
+          QpInf = Zero
+        end if
+        VInf  = Collision%PESsContainer(iPES)%PES%TriatPotential( RpInf, QpInf )
+      else
+        VInf  = Collision%PESsContainer(iPES)%PES%Potential( RpInf, QpInf )
+      end if
+    end if
+    !VInf  = Zero
+    write(*,*) 'VInf = ', VInf*VConverter, ' eV'
+    
+    write(*,*) RConverter
+    write(*,*) dVConverter
+    write(*,*) dVConverter
+
+    if (Input%PESZeroRefIntFlg == 0) then
+      VRef  = 0.0d0
+    else
+      if (.not. Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+        Rp      = RpInf
+        Rp(1)   = rVMin_Min
+        VRef    = 1.d10
+        do while(Rp(1) < rVMin_Max)
+          Rp(2) = dsqrt(  Rp(1)**Two + Rp(3)**Two - Two * Rp(1) * Rp(3) * dcos( 120.d0 / 180.d0 * pi ) )
+          if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+            call R_to_X(Rp, Qp, Theta=120.d0)
+          else
+            Qp = Zero
+          end if
+          if (Input%PlotPES_OnlyTriatFlg) then 
+            VRef  = min(Collision%PESsContainer(iPES)%PES%TriatPotential( Rp, Qp ), VRef)
+          else
+            VRef  = min(Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp ), VRef)
+          end if
+          Rp(1) = Rp(1) + 1.d-4
+        end do
+        VRef  = VRef !- VInf
+      end if
+    end if
+    write(*,*) 'VRef = ', VRef*VConverter, ' eV'
+
+
+        
+    call cpu_time ( t1 )
+
+
+
+    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESFromGrid.csv'
+    open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
+      if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
+        !write(Unit,'(A)') 'Variables = "A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E"'
+        write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E"'
+      else
+        write(Unit,'(A)') '"A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E", "dA1_x", "dA1_y", "dA1_z", "dA2_x", "dA2_y", "dA2_z", "dA3_x", "dA3_y", "dA3_z", "dA4_x", "dA4_y", "dA4_z"'
+        !write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E", "dEdR1", "dEdR2", "dEdR3", "dEdR4", "dEdR5", "dEdR6"'
+      end if
+      if (Status/=0) call Error( "Error opening file: " // FileName )
+
+
+
+    if ((Input%NPESs > 1) .and. (.not. Input%StochPESFlg)) then
+      FileName = trim(adjustl(Input%OutputDir)) // '/RSampled.csv.' // trim(adjustl(iPESChar))
+    else
+      FileName = trim(adjustl(Input%OutputDir)) // '/RSampled.csv.1'
+    end if
+    write(*,*) 'Reading Points from the File: ', FileName
+    open( File=FileName, NewUnit=UnitRead, status='OLD', iostat=StatusRead ) 
+    if (StatusRead /= 0) then 
+       write(*,'(A)')"File "//trim(FileName)//" NOT found!"
+       call Error('ReadPoints: File ./RSampled.csv not Found!')
+    endif
+    read(UnitRead,*,iostat=StatusRead)
+
+    
+      do while (StatusRead==0)
+        read(UnitRead,*,iostat=StatusRead) TT, Qp      
+        if (StatusRead/=0) exit
+        write(*,*) Qp        
+        call X_to_R(Qp, Rp)
+        write(*,*) Rp        
+
+
+        if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
+
+          if (Input%PlotPES_OnlyTriatFlg) then 
+            !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * RConverter )
+            V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp, Qp )
+          else
+            V = Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp )
+          end if
+            
+          call X_to_R(Qp, Rp)
+
+          !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
+          if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
+            ! write(Unit,'(es17.6E3,12(A,es17.6E3))')  Qp(1), ',',  Qp(2), ',',  Qp(3), ',', &
+            !                                          Qp(4), ',',  Qp(5), ',',  Qp(6), ',', &
+            !                                          Qp(7), ',',  Qp(8), ',',  Qp(9), ',', &
+            !                                         Qp(10), ',', Qp(11), ',', Qp(12), ',', &
+            !                                         (V - VRef) * VConverter
+            write(Unit,'(es17.6E3,6(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
+                                                   (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
+          end if
+          
+        elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then   
+
+          write(*,*) Rp        
+          
+          call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Qp * RConverter, V, dVdR, dVdQ )  
+
+          write(*,*) V
+
+          call X_to_R(Qp, Rp)
+          !dVdQ = dVdQ * dVConverter
+          
+          if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
+            write(Unit,'(es15.6,24(A,es15.6))') Qp(1), ',',  Qp(2), ',',  Qp(3), ',',       &
+                                                Qp(4), ',',  Qp(5), ',',  Qp(6), ',',       &
+                                                Qp(7), ',',  Qp(8), ',',  Qp(9), ',',       &
+                                               Qp(10), ',', Qp(11), ',', Qp(12), ',',       &
+                                               (V - VRef) * VConverter, ',',                &
+                                                dVdQ(1), ',',  dVdQ(2), ',',  dVdQ(3), ',', &
+                                                dVdQ(4), ',',  dVdQ(5), ',',  dVdQ(6), ',', &
+                                                dVdQ(7), ',',  dVdQ(8), ',',  dVdQ(9), ',', &
+                                               dVdQ(10), ',', dVdQ(11), ',', dVdQ(12)
+            ! write(Unit,'(es15.6,12(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
+            !                                     (V - VRef) * VConverter, ',',                                           &
+            !                                     (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter, ',', (dVdR(4)) * dVConverter, ',', (dVdR(5)) * dVConverter, ',', (dVdR(6)) * dVConverter 
+          end if
+          
+        end if  
+
+        
+      end do
+      
+    close(Unit)   
+    
+    call cpu_time ( t2 )
+    write(*,*) 'Time for PES Calculations = ', t2-t1
+        
+
+  end do
+
 
   if (i_Debug_Loc) call Logger%Exiting
   

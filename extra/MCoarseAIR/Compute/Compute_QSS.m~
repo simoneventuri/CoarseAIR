@@ -70,8 +70,8 @@ function Compute_QSS()
 
     
     clear fitresult yyy
-    yyy(iStart:iEnd) = yy(iStart:iEnd) - yy(iQSS)*(1.0-InpPerc);
-    [xData, yData]   = prepareCurveData( Kin.T(Temp.iT).t(iStart:iEnd), yyy(iStart:iEnd) );
+    yyy(iStart:iEnd)  = yy(iStart:iEnd) - yy(iQSS)*(1.0-InpPerc);
+    [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(iStart:iEnd), yyy(iStart:iEnd) );
     ft = 'splineinterp';
     [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
     x0 = Kin.T(Temp.iT).t(iQSS_Start);
@@ -93,8 +93,8 @@ function Compute_QSS()
 
     
     clear fitresult yyy xData yData
-    yyy(iStart:iEnd) = yy(iStart:iEnd) - yy(iQSS)*(1.0+InpPerc);
-    [xData, yData]   = prepareCurveData( Kin.T(Temp.iT).t(iStart:iEnd), yyy(iStart:iEnd) );
+    yyy(iStart:iEnd)  = yy(iStart:iEnd) - yy(iQSS)*(1.0+InpPerc);
+    [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(iStart:iEnd), yyy(iStart:iEnd) );
     ft = 'splineinterp';
     [fitresult, gof] = fit( xData, yData, ft, 'Normalize', 'on' );
     it = iQSS;

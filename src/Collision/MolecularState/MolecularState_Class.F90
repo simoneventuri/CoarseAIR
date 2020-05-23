@@ -83,7 +83,7 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
 ! * viba:   the real vibrational quantum number
 
   use Collision_Class       ,only:  Collision_Type
-  use Parameters_Module     ,only:  Zero, One, Half, Two, onem, Pi
+  use Parameters_Module     ,only:  Zero, One, Half, Two, onem, Pi, epss
 
   class(MolecularState_Type)                ,intent(inout)  ::    This
   type(Collision_Type)                      ,intent(in)     ::    Collision
@@ -91,7 +91,6 @@ Subroutine FindState( This, Collision, ierr, i_Debug )
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   logical                                                   ::    i_Debug_Loc
-  real(rkp) ,parameter                                      ::    epss = 1.0E-04_rkp
 
   integer                                                   ::    iatom1, iatom2
   integer                                                   ::    i, imin, ivmx, itry, ipass

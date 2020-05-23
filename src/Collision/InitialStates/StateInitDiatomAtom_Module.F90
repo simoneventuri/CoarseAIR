@@ -146,6 +146,8 @@ Subroutine SetInitialState_DiatomAtom( Species, Qijk, dQijk, iTraj, iPES, NTrajO
   else     
     if (i_Debug_Loc) write(Logger%Unit,"(10x,'[SetInitialState_DiatomAtom]: Selected a State-Specific Initial Target')")
 
+    RandNum = RanddwsVec(iPES)
+    
     Traj_iState   =   1
 
   end if

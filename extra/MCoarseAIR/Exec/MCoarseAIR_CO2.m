@@ -35,7 +35,7 @@ global Input Syst Temp Param Kin Rates
 Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL/Test/';
 Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/';
 Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/';
-Input.TranVec               = [20000];
+Input.TranVec               = [2500 5000 7500 10000 12500 15000 20000];
 Input.SystNameLong          = 'CO2_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -45,12 +45,12 @@ Input.Kin.MaxStateIn        = [13521,  6078];
 Input.Kin.NGroupsIn         = [    0,     0];
 Input.Kin.MolResolutionOut  = ['StS'; 'StS'];
 Input.Kin.PathToMappingOut  = [''];
-Input.Kin.Proc.DissFlg      = 0;
+Input.Kin.Proc.DissFlg      = 1;
 Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 1;
+Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.FigureFormat          = 'PrePrint';
@@ -92,7 +92,7 @@ Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
 % Plotting Vib. Distribution Function
@@ -105,11 +105,11 @@ Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
+Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
@@ -309,5 +309,6 @@ for iT = 1:length(Temp.TranVec)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     
+    pause
     clear Rates Kin
 end

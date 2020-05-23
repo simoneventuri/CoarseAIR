@@ -1085,14 +1085,14 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             READ(line_input, '(d20.10)') This%rfact
             if (i_Debug_Loc) call Logger%Write( "Factor for q.b. Levels:      This%rfact  = ", This%rfact )
 
-          case("Time threshold for q.b. Levels [Eh]")
+          case("Time threshold for q.b. Levels [ps]")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%tthres
-            if (i_Debug_Loc) call Logger%Write( "Time threshold for q.b. Levels [Eh]:      This%tthres    = ", This%tthres )
+            if (i_Debug_Loc) call Logger%Write( "Time threshold for q.b. Levels [ps]:      This%tthres    = ", This%tthres )
             This%tthresau  =   This%tthres * 1.0E-12_rkp / autime_to_sec
             if (i_Debug_Loc) call Logger%Write( "Time threshold for q.b. Levels [au]:      This%tthresau  = ", This%tthresau )
 
-          case("Time threshold for q.b. Levels [Au]")
+          case("Time threshold for q.b. Levels [au]")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%tthresau
             if (i_Debug_Loc) call Logger%Write( "Time threshold for q.b. Levels [au]:      This%tthresau  = ", This%tthresau )

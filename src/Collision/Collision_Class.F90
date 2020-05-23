@@ -618,7 +618,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     !   11. FIND MOST PROBABLE TRANSLATIONAL ENERGY AT THE CURRENT ENERGY
     ! ==============================================================================================================
     if (i_Debug_Loc) call Logger%Write( "Finding the most probable Energy from Boltzmann Distribution at T=",This%Ttra,"K. Calling FindEnergyMaxwellianMax."  )
-    call FindEnergyMaxwellianMax( This%Ttra, MostProbEr )
+    !call FindEnergyMaxwellianMax( This%Ttra, MostProbEr )
     if (i_Debug_Loc) call Logger%Write( "Most Probable Energy from Boltzmann Distribution at T=",This%Ttra,"K is MostProbEr = ",MostProbEr )
     ! ==============================================================================================================
 
