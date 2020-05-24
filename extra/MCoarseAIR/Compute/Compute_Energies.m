@@ -92,10 +92,9 @@ function Compute_Energies(Controls)
         end
         %semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eInt(iInt),'o')
         tauInt = (Kin.T(Temp.iT).t(iInt) + Kin.T(Temp.iT).t(iInt-1)) / 2.d0;
-        tt = Kin.T(Temp.iT).t(2:end-1)
+        tt = Kin.T(Temp.iT).t(2:end-1);
         [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eInt(2:end-1) - eIntLim );
         ft = 'splineinterp';
-        semilogx(xData, yData)
         [fitresult, gof] = fit( xData, yData, ft );
         Kin.T(Temp.iT).Molecule(iMol).tauInt = fzero(fitresult, tauInt);
         

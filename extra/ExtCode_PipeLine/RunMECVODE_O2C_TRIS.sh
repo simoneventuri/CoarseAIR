@@ -39,11 +39,11 @@ COARSEAIR_release
 #PLATONORECOMB_gnu_release
 PLATO_gnu_release
 
-export System1='CO2_NASA'
-export System2='O2C_NASA'
+export System='O2C_NASA'
+export SystemBis='CO2_NASA'
 export Molecule_vec=(CO O2)
 export FldrName=''
-export Tran_vec=(2500 5000 7500 10000 12500 15000 20000) 
+export Tran_vec=(12500 15000 20000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
@@ -82,21 +82,47 @@ echo '------------------------------------------------------'
 echo ' '
 
 
+function Load_Initialize_0D() {
+  source ${ExtCode_SH_DIR}/Initialize_0D_Database_Function.sh
+  Initialize_0D_Database
+}
+
+
+function Call_MeCvode() {
+  cd ${PathToRunFldr}
+  
+  if [ ${NBins} -ge 1 ]; then
+    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}'_'${NBins}'Bins'
+  else
+    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
+  fi
+  mkdir -p ./${OutputFldr}
+  cd ./${OutputFldr} 
+
+  if [ $DissFlg -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_NoDiss'
+  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
+    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K_OnlyDiss'
+  else
+    export ExFldr=${PathToMECVODEFldr}/${System}/'CO2Paper_T'${TTran}'K'
+  fi  
+  echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
+  scp ${ExFldr}'/exec/box_' ./
+  
+  echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
+  ./box_ ${OPENBLAS_NUM_THREADS}
+}
+
 
 for TTran in "${Tran_vec[@]}"; do :
-  echo "[MergeExchanges]: Translational Temperature, TTran = "${TTran}
+  echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
 
+  echo "[RunMECVODE]: Calling Load_Initialize_0D"
+  Load_Initialize_0D
+  echo " "
 
-  echo "[MergeExchanges]:   Copying Exchange of CO+O"
-  scp $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Type1.dat"    $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat"
-
-  scp $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Type2.dat"    $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Comb_Type2.dat"
-  scp $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Type2.dat"    $PathToDtbFldr"/kinetics/"${System2}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat"
-
-
-  echo "[MergeExchanges]:   Copying Exchange of O2+C"
-  cat $PathToDtbFldr"/kinetics/"${System2}${FldrName}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr"/kinetics/"${System1}${FldrName}"/T"$TTran"K/Exch_Comb_Type2.dat"
-  cat $PathToDtbFldr"/kinetics/"${System2}${FldrName}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr"/kinetics/"${System2}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat"
-
+  echo "[RunMECCVODE]: Calling Call_MeCvode"
+  Call_MeCvode
+  echo " "
 
 done

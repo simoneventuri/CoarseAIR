@@ -40,9 +40,10 @@ COARSEAIR_release
 PLATO_gnu_release
 
 export System='O2C_NASA'
+export SystemBis='CO2_NASA'
 export Molecule_vec=(CO O2)
 export FldrName=''
-export Tran_vec=(2500 5000 7500 10000 12500 15000 20000) 
+export Tran_vec=(2500 5000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
@@ -50,7 +51,7 @@ export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
 export DissFlg=0
 export InelFlg=1
-export ExchFlg1=0
+export ExchFlg1=1
 export ExchFlg2=0
 
 export NBins=0
