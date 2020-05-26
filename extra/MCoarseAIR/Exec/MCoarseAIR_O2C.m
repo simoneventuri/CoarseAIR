@@ -61,12 +61,12 @@ Input.RunSuffix = '';
 
 %% Inputs for Plotting
 Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 0;
+Input.SaveFigsFlgInt     = 2;
 Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/Mars_Paper/Figures/temp/';
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Mars_Paper/Data/temp/';
+Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Mars_Paper/Data/';
 
 
 %% Tasks Inputs
@@ -308,6 +308,6 @@ for iT = 1:length(Temp.TranVec)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    pause
+    %pause
     clear Rates Kin
 end

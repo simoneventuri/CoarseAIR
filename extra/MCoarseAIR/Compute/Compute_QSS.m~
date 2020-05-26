@@ -38,8 +38,8 @@ function Compute_QSS()
     InpPerc  = 0.1;
 
     
-    yy       = Rates.T(Temp.iT).DissGlobal+1e-100;
-    NSteps   = size(yy,1);
+    yy       = Rates.T(Temp.iT).DissGlobal;
+    NSteps   = length(yy);
     ExitFlg  = false;
     
     figure(1234)
@@ -48,7 +48,7 @@ function Compute_QSS()
     
     it = NSteps;
     while ( abs(log10(yy(it)) - log10(yy(end)))     < 1.e-2 )
-       it = it - 1;
+       it = it - 1; 
     end
     itFinal = it;
     tFinal  = Kin.T(Temp.iT).t(itFinal);
@@ -56,6 +56,7 @@ function Compute_QSS()
     if (itFinal < 2)
        ExitFlg = true; 
     end
+    itFinal
     
     while ( abs(log10(yy(it)) - log10(yy(itFinal))) < 1.e-1 )
         it = it - 1;

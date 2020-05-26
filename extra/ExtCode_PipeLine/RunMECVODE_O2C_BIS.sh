@@ -49,11 +49,12 @@ export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=0
+export DissFlg=9
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0
 
+export DissExchFlg=1
 export NBins=0
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/extra/ExtCode_PipeLine/"
