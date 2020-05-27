@@ -308,8 +308,8 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).Mu               = 31.9988e-3;
         Syst.Molecule(2).Mu               = 30.0061e-3;
 
-        Syst.Molecule(1).NLevelsOrig      = 9093;
-        Syst.Molecule(2).NLevelsOrig      = 6793;
+        Syst.Molecule(1).NLevelsOrig      = 6078;
+        Syst.Molecule(2).NLevelsOrig      = 13521;
     
         Syst.Molecule(1).ToAtoms          = [1,2];
         Syst.Molecule(2).ToAtoms          = [2,3];
@@ -379,7 +379,7 @@ function Initialize_ChemicalSyst()
 
         Syst.PairToExch         = [2];
         
-        Syst.ColPartToComp      = 2; 
+        Syst.ColPartToComp      = 1; 
         
         
         
@@ -388,7 +388,7 @@ function Initialize_ChemicalSyst()
         %%% System
         Syst.Name  = 'NON';
         
-        Syst.NProc = 4; %(Diss+Inel+Exch+Exch)
+        Syst.NProc = 4; %(Diss+Inel+Exch)
         
         
         %%% Atoms
@@ -426,8 +426,8 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).Mu               = 30.0061e-3;
         Syst.Molecule(2).Mu               = 31.9988e-3;
 
-        Syst.Molecule(1).NLevelsOrig      = 6793;
-        Syst.Molecule(2).NLevelsOrig      = 9093;
+        Syst.Molecule(1).NLevelsOrig      = 6078;
+        Syst.Molecule(2).NLevelsOrig      = 13521;
     
         Syst.Molecule(1).ToAtoms          = [1,2];
         Syst.Molecule(2).ToAtoms          = [1,3];
@@ -497,7 +497,7 @@ function Initialize_ChemicalSyst()
 
         Syst.PairToExch         = [2, 3];
         
-        Syst.ColPartToComp      = 1; 
+        Syst.ColPartToComp      = 2; 
         
         
 %     elseif strcmp(Input.SystNameLong, 'O2C')
