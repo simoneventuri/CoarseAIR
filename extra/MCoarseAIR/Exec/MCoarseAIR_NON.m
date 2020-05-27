@@ -32,9 +32,11 @@ global Input Syst Temp Param Kin Rates
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CG-QCT/run_NON_UMN/Test/';
-Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Air_Database/Run_0D/';
-Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Air_Database/HDF5_Database/';
+Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
+
+Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CG-QCT/run_NON_UMN/Test/');
+Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
+Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
 Input.TranVec               = 10000%[2500 5000 7500 10000 12500 15000 20000];
 Input.SystNameLong          = 'NON_UMN';
 Input.iPES                  = 0;
@@ -62,11 +64,11 @@ Input.RunSuffix = '';
 %% Inputs for Plotting
 Input.iFig               = 101;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/Air_Paper/Figures/';
+Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/Air_Paper/Data/';
+Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 
 %% Tasks Inputs
