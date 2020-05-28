@@ -125,9 +125,9 @@ function Compute_Energies(Controls)
         Kin.T(Temp.iT).Molecule(iMol).tauRotP = Kin.T(Temp.iT).Molecule(iMol).tauRot * Pressure;
         Kin.T(Temp.iT).Molecule(iMol).tauVibP = Kin.T(Temp.iT).Molecule(iMol).tauVib * Pressure;
         
-        fprintf('P*tau_Int = %e [Pa*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauIntP );
-        fprintf('P*tau_Rot = %e [Pa*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauRotP );
-        fprintf('P*tau_Vib = %e [Pa*s]\n\n', Kin.T(Temp.iT).Molecule(iMol).tauVibP );
+        fprintf('P*tau_Int = %e [atm*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauIntP );
+        fprintf('P*tau_Rot = %e [atm*s]\n',   Kin.T(Temp.iT).Molecule(iMol).tauRotP );
+        fprintf('P*tau_Vib = %e [atm*s]\n\n', Kin.T(Temp.iT).Molecule(iMol).tauVibP );
 
 
        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
@@ -136,7 +136,7 @@ function Compute_Energies(Controls)
             fileID1  = fopen(FileName,'a');
         else
             fileID1  = fopen(FileName,'w');
-            HeaderStr = strcat('# T [K], P [Pa], tau_Int, tau_Rot, tau_Vib\n');
+            HeaderStr = strcat('# T [K], P [atm], tau_Int, tau_Rot, tau_Vib\n');
             fprintf(fileID1,HeaderStr);
         end
         fprintf(fileID1,'%e,%e,%e,%e,%e\n', Temp.TNow, Pressure, Kin.T(Temp.iT).Molecule(iMol).tauIntP, Kin.T(Temp.iT).Molecule(iMol).tauRotP, Kin.T(Temp.iT).Molecule(iMol).tauVibP  );

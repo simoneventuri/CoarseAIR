@@ -115,15 +115,15 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     pbaspect([1 1 1])
 
     if Input.SaveFigsFlgInt > 0
-        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
+        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
             FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates');
-            export_fig(FileName, '-pdf')
+            export_fig(FileName, '-pdf');
         elseif Input.SaveFigsFlgInt == 2
             FileName   = strcat(FolderPath, 'MoleFractionsAndGlobalRates.fig');
-            savefig(FileName)
+            savefig(FileName);
         end
         close
     end

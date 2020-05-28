@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CG-QCT/run_N2O_UMN/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [10000]%[2500 5000 7500 10000 12500 15000 20000];
+Input.TranVec               = [5000 10000 20000]%[2500 5000 7500 10000 12500 15000 20000];
 Input.SystNameLong          = 'N2O_UMN';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -54,7 +54,9 @@ Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
 Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
+Input.Kin.ReadRatesProc     = [true, false, true]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
+Input.Kin.OtherExchInHDF5   = false
 Input.FigureFormat          = 'PrePrint';
 Input.ReLoad                = 1;
 
@@ -116,24 +118,12 @@ Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
 
-Input.Tasks.ReadRates          = true;
-Input.Tasks.ReadInelasticRates = false;
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
 Initialize_ChemicalSyst()
 Initialize_Input()
 Initialize_Parameters()
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Initializing
-Initialize_ChemicalSyst()
-Initialize_Input()
-Initialize_Parameters()
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,7 +163,7 @@ for iT = 1:length(Temp.TranVec)
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg          || ...
-            Input.Tasks.ReadRates)
+            any(Input.Kin.ReadRatesProc))
         
             %% Reading Rates
             Read_Rates()

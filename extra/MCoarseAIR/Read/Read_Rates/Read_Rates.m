@@ -120,8 +120,21 @@ function Read_Rates()
 %     clear opts tbl
 %     Rates.T(Temp.iT).Diss(Idx(:),1) = DissTemp(:);
     
+
     
+%     fprintf(strcat('Computing Backward Rates \n') )
+%     
+%     Rates.T(Temp.iT).Recomb(:,1) = Compute_BckwdRates(Rates.T(Temp.iT).Diss(:,1), 1, Syst.Molecule(1).LevelEeV, Syst.Molecule(1).Levelq, 0.0, 0.0);
+%     
+%     iMol      = 1;
+%     for iExch = size(Syst.ExchToMol,1)%1:size(Syst.ExchToMol,1)
+%         jMol      = Syst.ExchToMol;
+%         TempRates = Compute_BckwdRates(Rates.T(Temp.iT).ExchType(iExch).Exch, 2+iExch, Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).Levelq, Syst.Molecule(jMol).LevelEeV, Syst.Molecule(jMol).Levelq);
+%         Rates.T(Temp.iT).ExchType(iExch).Exch = TempRates;
+%         clear TempRates;
+%     end
     
+
 
     fprintf(strcat('Computing Overall Rates \n') )
     if (Syst.NAtoms == 3)

@@ -90,7 +90,7 @@ Pure Elemental Function Compute_CO_Degeneracy_State( jqn ) result(g)
   
   real(rkp)                                               ::    g
  
-  g = Two * jqn + One
+  g = (Two * jqn + One)
   
 End Function
 

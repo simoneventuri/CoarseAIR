@@ -47,7 +47,6 @@ function Plot_Ks()
         KEQSS   = tbl.KEQSS;
         clear opts tbl
     else
-        pause
         opts = delimitedTextImportOptions("NumVariables", 5);
         opts.DataLines = [2, Inf];
         opts.Delimiter = ",";
@@ -71,10 +70,11 @@ function Plot_Ks()
     %fig.Position = screensize;
     %fig.Color='None';
 
-    h1 = semilogy(10000.0 ./ TVec, KDEq,  'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth);
+    h1 = semilogy(10000.0 ./ TVec, KDEq,      'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth);
     hold on
-    h3 = semilogy(10000.0 ./ TVec, KEEq, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
-    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{Exch}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}];
+    h3 = semilogy(10000.0 ./ TVec, KEEq,      'Color', Param.CMat(2,:), 'linestyle', char(Param.linS(2)), 'LineWidth', Param.LineWidth);
+    h4 = semilogy(10000.0 ./ TVec, KDEq+KEEq, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
+    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{E}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}, {'$k^{Dep}$'}];
 
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
@@ -118,10 +118,11 @@ function Plot_Ks()
     %fig.Position = screensize;
     %fig.Color='None';
 
-    h1 = semilogy(10000.0 ./ TVec, KDQSS,  'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth);
+    h1 = semilogy(10000.0 ./ TVec, KDQSS,       'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth);
     hold on
-    h3 = semilogy(10000.0 ./ TVec, KEQSS, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
-    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{Exch}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}];
+    h3 = semilogy(10000.0 ./ TVec, KEQSS,       'Color', Param.CMat(2,:), 'linestyle', char(Param.linS(2)), 'LineWidth', Param.LineWidth);
+    h4 = semilogy(10000.0 ./ TVec, KDQSS+KEQSS, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
+    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{E}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}, {'$k^{Dep}$'}];
 
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');

@@ -77,16 +77,16 @@ function Plot_EnergyDepletions(Controls)
         pbaspect([1 1 1])
 
         if Input.SaveFigsFlgInt > 0
-            [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
+            [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
             FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
             [status,msg,msgID] = mkdir(FolderPath);
             FileName = strcat(Syst.Molecule(iMol).Name,'_EnergyDepletions');
             if Input.SaveFigsFlgInt == 1
                 FileName   = strcat(FolderPath, FileName);
-                export_fig(FileName, '-pdf')
+                export_fig(FileName, '-pdf');
             elseif Input.SaveFigsFlgInt == 2
                 FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
-                savefig(FileName)
+                savefig(FileName);
             end
             close
         end

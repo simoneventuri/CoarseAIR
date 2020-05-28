@@ -90,7 +90,7 @@ Pure Elemental Function Compute_NO_Degeneracy_State( jqn ) result(g)
   
   real(rkp)                                               ::    g
  
-    g = Two * (Two * jqn + One)
+  g = Two * (Two * jqn + One)
   
 End Function
 

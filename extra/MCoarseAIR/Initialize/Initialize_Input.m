@@ -68,9 +68,9 @@ function Initialize_Input()
     if (Input.iPES > 0)
         Syst.iPES = strcat('_PES', num2str(Input.iPES));
     end
-    Syst.Suffix    = Input.Suffix;
-    Syst.HDF5_File = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong, Input.Suffix, Syst.iPES, '.hdf5');
-    
+    Syst.Suffix              = Input.Suffix;
+    Syst.HDF5_File           = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong,          Input.Suffix, Syst.iPES, '.hdf5');
+    Syst.HDF5_File_OtherExch = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong_Opposite, Input.Suffix, Syst.iPES, '.hdf5');
     
     Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
 

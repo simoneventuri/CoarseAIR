@@ -42,9 +42,9 @@ function Compute_QSS()
     NSteps   = size(yy,1);
     ExitFlg  = false;
     
-    figure(1234)
-    loglog(Kin.T(Temp.iT).t, yy, 'k-', 'LineWidth', 2);
-    hold on
+%     figure(1234)
+%     loglog(Kin.T(Temp.iT).t, yy, 'k-', 'LineWidth', 2);
+%     hold on
     
     it = NSteps;
     while ( abs(log10(yy(it)) - log10(yy(end)))     < 1.e-2 )
@@ -52,7 +52,7 @@ function Compute_QSS()
     end
     itFinal = it;
     tFinal  = Kin.T(Temp.iT).t(itFinal);
-    loglog(Kin.T(Temp.iT).t(itFinal), yy(itFinal),'r+', 'MarkerSize', 8);
+%     loglog(Kin.T(Temp.iT).t(itFinal), yy(itFinal),'r+', 'MarkerSize', 8);
     if (itFinal < 2)
        ExitFlg = true; 
     end
@@ -62,7 +62,7 @@ function Compute_QSS()
     end
     itEnd   = it;
     tEnd    = Kin.T(Temp.iT).t(itEnd);
-    loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
+%     loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
 
     while (it >= 1) && ( abs(log10(yy(it)) - log10(yy(it+1)))    > 1.e-4 )
         it = it - 1;
@@ -74,7 +74,7 @@ function Compute_QSS()
        itQSS = it;
     end
     tQSS  = Kin.T(Temp.iT).t(itQSS);
-    loglog(Kin.T(Temp.iT).t(itQSS), yy(itQSS),'r+', 'MarkerSize', 8);
+%     loglog(Kin.T(Temp.iT).t(itQSS), yy(itQSS),'r+', 'MarkerSize', 8);
     
     if (~ ExitFlg)
         it = itQSS;
@@ -83,7 +83,7 @@ function Compute_QSS()
         end
         itEnd = it;
         tEnd  = Kin.T(Temp.iT).t(itEnd);
-        loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
+%         loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
     end
     
     if (~ ExitFlg)
@@ -98,7 +98,7 @@ function Compute_QSS()
             itStart = it;
         end
         tStart  = Kin.T(Temp.iT).t(itStart);
-        loglog(Kin.T(Temp.iT).t(itStart), yy(itStart),'r+', 'MarkerSize', 8);
+%         loglog(Kin.T(Temp.iT).t(itStart), yy(itStart),'r+', 'MarkerSize', 8);
     end
     
     if (~ ExitFlg)
@@ -107,8 +107,12 @@ function Compute_QSS()
         end
         itIni   = it;
         tIni    = Kin.T(Temp.iT).t(itIni);
-        loglog(Kin.T(Temp.iT).t(itIni), yy(itIni),'r+', 'MarkerSize', 8);
+%         loglog(Kin.T(Temp.iT).t(itIni), yy(itIni),'r+', 'MarkerSize', 8);
+        if (itIni >= itFinal)
+            ExitFlg = true;
+        end
     end
+ 
     
     if (~ ExitFlg)
 
@@ -165,9 +169,9 @@ function Compute_QSS()
         Kin.T(Temp.iT).QSS.tEnd   = Kin.T(Temp.iT).t(NSteps);
     end
 
-    loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iStart), yy(Kin.T(Temp.iT).QSS.iStart), 'ko', 'MarkerSize', 8);
-    loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iEnd), yy(Kin.T(Temp.iT).QSS.iEnd), 'ko', 'MarkerSize', 8);
-    loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.i), yy(Kin.T(Temp.iT).QSS.i), 'ko', 'MarkerSize', 8);       fprintf('QSS Start Time       = %e s\n',  Kin.T(Temp.iT).QSS.tStart );
+%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iStart), yy(Kin.T(Temp.iT).QSS.iStart), 'ko', 'MarkerSize', 8);
+%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iEnd), yy(Kin.T(Temp.iT).QSS.iEnd), 'ko', 'MarkerSize', 8);
+%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.i), yy(Kin.T(Temp.iT).QSS.i), 'ko', 'MarkerSize', 8);       fprintf('QSS Start Time       = %e s\n',  Kin.T(Temp.iT).QSS.tStart );
     
     fprintf('QSS Start Time Step  = %i \n',   Kin.T(Temp.iT).QSS.iStart );
     fprintf('QSS       Time       = %e s\n',  Kin.T(Temp.iT).QSS.t );
@@ -177,16 +181,19 @@ function Compute_QSS()
     
  
     
-    KDissEq   = Rates.T(Temp.iT).DissGlobal(end);
+    KDissEq   = Rates.T(Temp.iT).DissTh;
+    %KDissEq   = Rates.T(Temp.iT).DissGlobal(end);
     KDissQSS  = Rates.T(Temp.iT).DissGlobal(itQSS);
     Kin.T(Temp.iT).QSS.Diss      = KDissQSS;
 
-    KExch1Eq  = Rates.T(Temp.iT).ExchGlobal(end,1);
+    KExch1Eq  = Rates.T(Temp.iT).ExchTh(1,1);
+    %KExch1Eq  = Rates.T(Temp.iT).ExchGlobal(end,1);
     KExch1QSS = Rates.T(Temp.iT).ExchGlobal(itQSS,1);
     Kin.T(Temp.iT).QSS.Exch1     = KExch1QSS;
     
     if Syst.NProc == 4
-        KExch2Eq  = Rates.T(Temp.iT).ExchGlobal(end,2);
+        KExch2Eq  = Rates.T(Temp.iT).ExchTh(1,2);
+        %KExch2Eq  = Rates.T(Temp.iT).ExchGlobal(end,2);
         KExch2QSS = Rates.T(Temp.iT).ExchGlobal(itQSS,2);
         Kin.T(Temp.iT).QSS.Exch2 = KExch2QSS;
     end

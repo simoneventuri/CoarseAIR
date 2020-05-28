@@ -53,6 +53,7 @@ Module Transformation_Class
 Subroutine Initialize_Transformation( This, Mi, i_Debug )
 ! This procedures generates the transformation from the time derivative of the generalized coordinates to the conjugate momenta.
 ! The generalized coordinates are the cartesian coordinates of the first NAtom-1 atoms.
+! (i.e.: From Velocities & Positions (PaQ) ---> Momenta & Positions)
 ! In case of 3 Atoms:
 !
 !       |                                                                                                            |
