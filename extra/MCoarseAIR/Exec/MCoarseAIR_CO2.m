@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/CO2_ALL/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Mars_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Mars_Database/HDF5_Database/');
-Input.TranVec               = 20000%[2500 5000 7500 10000 12500 15000 20000];
+Input.TranVec               = [2500 5000 7500 10000 12500 15000 20000];
 Input.SystNameLong          = 'CO2_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -155,6 +155,9 @@ for iT = 1:length(Temp.TranVec)
         
         %% Reading Group Energies and Part Funcs
         Read_EeV_and_Q_CG() 
+        
+        %% Compute Equilibrium Constants
+        Compute_EqConsts()
         
         if (Input.Tasks.Plot_OverallRates.Flg              || ...
             Input.Tasks.Plot_DifferentDissRates.Flg        || ...

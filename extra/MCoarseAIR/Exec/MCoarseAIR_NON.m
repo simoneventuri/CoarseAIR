@@ -155,6 +155,9 @@ for iT = 1:length(Temp.TranVec)
         
         %% Reading Group Energies and Part Funcs
         Read_EeV_and_Q_CG() 
+
+        %% Compute Equilibrium Constants
+        Compute_EqConsts()
         
         if (Input.Tasks.Plot_OverallRates.Flg              || ...
             Input.Tasks.Plot_DifferentDissRates.Flg        || ...
