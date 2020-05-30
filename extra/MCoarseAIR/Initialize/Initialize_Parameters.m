@@ -38,7 +38,7 @@ function Initialize_Parameters
     Param.Plnck    = 6.62607004d-34;
     Param.UKb      = 1.380658e-23;
     Param.Ue       = 1.602191e-19;
-    Param.KJK      = 1.380649e-23
+    Param.KJK      = 1.380649e-23;
     Param.KeV      = 8.617330e-05;
     Param.AvN      = 6.0221409e+23;
     Param.AMUToKg  = 1.d0/Param.AvN*1.d-3;

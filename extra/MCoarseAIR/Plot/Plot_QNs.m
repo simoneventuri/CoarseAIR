@@ -1,6 +1,6 @@
 %% The Function plots the Ro-Vibrational Populations at Given Time Steps
 %
-function Plot_DiatPot(Controls)    
+function Plot_QNs(Controls)    
     
     %%==============================================================================================================
     % 
@@ -40,31 +40,20 @@ function Plot_DiatPot(Controls)
         %fig.Color='None';
         
         
-        rVec = linspace(Controls.Extremes(iMol,1), Controls.Extremes(iMol,2), 10000);
-        
-        ij = 0;
-        for jqn = Controls.jqnVec
-            jqn
-            ij = ij + 1;
-            
-            [Ve, dVe] = DiatPot(rVec, jqn, iMol);
-            
-            plot(rVec, Ve, '-', 'Color', Param.CMat(ij,:), 'LineWidth', Param.LineWidth);
-            hold on
-        end
-            
+        scatter(Syst.Molecule(iMol).Leveljqn, Syst.Molecule(iMol).Levelvqn, '.');
+          
 
         xt = get(gca, 'XTick');
         set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
         yt = get(gca, 'YTick');
         set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-        str_x = ['r [$a_0$]'];
+        str_x = ['$J$'];
         xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         xlab.Interpreter = 'latex';
         %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
 
-        str_y = ['Energy [eV]'];
+        str_y = ['$v$'];
         ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         ylab.Interpreter = 'latex';
         %ylim([1.d5, 1.d23]);
@@ -75,9 +64,9 @@ function Plot_DiatPot(Controls)
 
         if Input.SaveFigsFlgInt > 0
             [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
-            FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
+            FolderPath = strcat(Input.Paths.SaveFigsFldr, '/');
             [status,msg,msgID] = mkdir(FolderPath);
-            FileName = strcat(Syst.Molecule(iMol).Name,'_Energies');
+            FileName = strcat(Syst.Molecule(iMol).Name,'_QNs');
             if Input.SaveFigsFlgInt == 1
                 FileName   = strcat(FolderPath, FileName);
                 export_fig(FileName, '-pdf')

@@ -109,6 +109,10 @@ function Read_Rates_FromHDF5()
                     end
 
                 end
+            
+            else
+                
+                Rates.T(Temp.iT).ExchType(iExch).Exch = 0.0;
                 
             end
             

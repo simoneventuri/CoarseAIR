@@ -26,7 +26,7 @@ function Compute_Rates_Thermal()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Rates Syst Temp
+    global Rates Syst Temp Input
     
 
     fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
@@ -59,9 +59,32 @@ function Compute_Rates_Thermal()
         for iExch = 1:Syst.NProc-2
             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
         end
+
+        
+        %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
+        %
+        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
+        FileName           = strcat(Input.Paths.SaveDataFldr, '/KEq.csv');
+        if exist(FileName, 'file')
+            fileID1  = fopen(FileName,'a');
+        else
+            fileID1  = fopen(FileName,'w');
+            if Syst.NProc == 3
+                HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq \n');
+            else
+                HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq, K_{', Syst.Molecule(Syst.ExchToMol(2)).Name, '}^E Eq \n');
+            end
+            fprintf(fileID1,HeaderStr);
+        end
+        if Syst.NProc == 3
+            fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Rates.T(Temp.iT).DissTh, Rates.T(Temp.iT).ExchTh(1,1) );
+        else
+            fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Rates.T(Temp.iT).DissTh, Rates.T(Temp.iT).ExchTh(1,1), Rates.T(Temp.iT).ExchTh(1,2) );
+        end
+        fclose(fileID1);
         
         
-    else 
+    else
 
         
         iMol   = Syst.Pair(1).ToMol;

@@ -70,15 +70,17 @@ elif [ $DissFlg -eq 8 ]; then
 elif [ $DissFlg -eq 9 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-
 	echo "  [Initialize_0D_Database]: Adding Dissociation from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
 	echo "  [Initialize_0D_Database]: Adding Ineastic from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	if [ $DissExchFlg -eq 1 ]; then
-		echo "  [Initialize_0D_Database]: Adding Exchange 1 from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-		cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	fi
+
+	# if [ $DissExchFlg -eq 1 ]; then
+	# 	echo "  [Initialize_0D_Database]: Adding Exchange 1 from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+	# 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+	# fi
+
 elif [ $DissFlg -eq 11 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	echo "  [Initialize_0D_Database]: NO CORRECTION and NO RECOMBINATION"
