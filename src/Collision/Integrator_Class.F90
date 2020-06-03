@@ -1078,8 +1078,8 @@ Subroutine InitializePrintingEvo( This, Input, Collision, Traj, TrajTemp, iTraj,
       if (i_Debug_Loc) call Logger%Write( "Evolution File for iTraj=", iTraj,": ", This%PaQEvoFile(iTraj)%Name )
       open( NewUnit=This%PaQEvoFile(iTraj)%Unit, File=This%PaQEvoFile(iTraj)%Name, Action="WRITE", iostat=This%PaQEvoFile(iTraj)%Status )
       if (This%PaQEvoFile(iTraj)%Status /= 0) call Error( "Error opening file: " // This%PaQEvoFile(iTraj)%Name )
-      This%PaQEvoFile(iTraj)%Format = "(2x,*(3x,es15.8:))"
-      write(This%PaQEvoFile(iTraj)%Unit,"('#',3x,*(3x,a15:))") [ character(15) :: "time", "H", ("PaQ("//Convert_To_String(i)//")",i=1,Collision%NEqtTot) ]
+      This%PaQEvoFile(iTraj)%Format = "(2x,*(3x,es22.15:))"
+      write(This%PaQEvoFile(iTraj)%Unit,"('#',3x,*(3x,a22:))") [ character(15) :: "time", "H", ("PaQ("//Convert_To_String(i)//")",i=1,Collision%NEqtTot) ]
       
       if (.not. This%CMFrameFlg) then
         call This%TrajTemp%SetData( Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj) )
