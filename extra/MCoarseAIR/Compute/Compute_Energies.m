@@ -35,7 +35,8 @@ function Compute_Energies(Controls)
     
     for iMol = Controls.MoleculesOI
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
-        
+
+        clear LevelToBin Levelvqn LevelEeV LevelEeV0 LevelEeVRot Nvqn NLevels LevelPop PotTot eInt eRot eVib vPop
         LevelToBin  = Syst.Molecule(iMol).LevelToGroupIn;
         Levelvqn    = Syst.Molecule(iMol).Levelvqn;
         LevelEeV    = Syst.Molecule(iMol).LevelEeV;

@@ -130,7 +130,7 @@ Subroutine Integrate_Trajectories( This, Traj, i_Debug )
   
   N = Traj%NTraj
   
-  call This%Integrate( Traj%iPES(1:N), Traj%PaQ(:,1:N), Traj%t(1:N), Traj%dt(1:N), Traj%erra(:,1:N), Traj%smax(1:N), Traj%smin(1:N), Traj%irej(1:N), Traj%iste(1:N), i_Debug=.false. )
+  call This%Integrate( Traj%iPES(1:N), Traj%PaQ(:,1:N), Traj%t(1:N), Traj%dt(1:N), Traj%erra(:,1:N), Traj%smax(1:N), Traj%smin(1:N), Traj%irej(1:N), Traj%iste(1:N), i_Debug=i_Debug_Loc )
   
   if (i_Debug_Loc) call Logger%Exiting
   
@@ -262,7 +262,7 @@ Subroutine Integrate_ODE_1d( This, iPES, y, x, h, yscal, smax, smin, irej, iste,
   real(rkp) ,dimension( size(y,1) , size(y,2) )           ::    yerr
 !   NOT DONE
   real(rkp) ,dimension(             size(y,2) , imax )    ::    errmax  ! NTraj
-  real(rkp) ,dimension( size(y,1) , size(y,2) , 7  )      ::    d
+  real(rkp) ,dimension( size(y,1) , size(y,2) , This%NSteps )      ::    d
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "Integrate_ODE_1d" )
@@ -283,7 +283,7 @@ Subroutine Integrate_ODE_1d( This, iPES, y, x, h, yscal, smax, smin, irej, iste,
   x2  =   Zero
 
   do iSteps = 1,This%NSteps
-    
+
     do iTraj=1,NTraj
       if (This%NanCheck) call CheckVariable( h(iTraj), ProcName=ProcName, VarName="h before mmidv" )
     end do
@@ -300,9 +300,11 @@ Subroutine Integrate_ODE_1d( This, iPES, y, x, h, yscal, smax, smin, irej, iste,
   end do
   
   do iSteps=1,This%NSteps-1
+    
     do iTraj = 1,NTraj
       errmax(iTraj,iSteps) = Zero
     end do
+    
     do iEqtTot=1,NEqtTot
       do iTraj=1,NTraj
       
@@ -316,12 +318,15 @@ Subroutine Integrate_ODE_1d( This, iPES, y, x, h, yscal, smax, smin, irej, iste,
          
       end do
     end do
+    
     do iEqtTot=1,NEqtTot
       do iTraj = 1,NTraj
         errmax(iTraj,iSteps) = max(errmax(iTraj,iSteps), yerr(iEqtTot,iTraj))
       end do
     end do
+  
   end do
+
 
   do iTraj = 1,NTraj
   
@@ -401,12 +406,12 @@ PURITY Subroutine mmidv( iPES, y, dydx, htot, nstep, yout, EvaluateRHS )
   !write(*,*) 'dydx(:,1) =', dydx(:,1)
   
   do k = 1,NTraj
-  do i = 1,NEqtTot,2
-    yn(i  ,k,1)   =   y(i  ,k)
-    yn(i  ,k,2)   =   y(i  ,k) + h(k) * dydx(i,k)
-    yn(i+1,k,1)   =   y(i+1,k)
-    yn(i+1,k,2)   =   y(i+1,k) + h(k) * dydx(i+1,k)
-  end do
+    do i = 1,NEqtTot,2
+      yn(i  ,k,1)   =   y(i  ,k)
+      yn(i  ,k,2)   =   y(i  ,k) + h(k) * dydx(i,k)
+      yn(i+1,k,1)   =   y(i+1,k)
+      yn(i+1,k,2)   =   y(i+1,k) + h(k) * dydx(i+1,k)
+    end do
   end do
 
   iym             =     1
@@ -425,12 +430,12 @@ PURITY Subroutine mmidv( iPES, y, dydx, htot, nstep, yout, EvaluateRHS )
   
   do n = 2,nstep
     do k = 1,NTraj
-    do i = 1,NEqtTot,2
-      yn(i  ,k,iys)   =   yn(i,  k,iym) + h2(k) * yout(i  ,k)
-      yn(i+1,k,iys)   =   yn(i+1,k,iym) + h2(k) * yout(i+1,k)
-!       if (This%NanCheck) call CheckVariable( yn(:,i,iys),   ProcName=ProcName, VarName="yn(:,i,iys)"   )
-!       if (This%NanCheck) call CheckVariable( yn(:,i+1,iys), ProcName=ProcName, VarName="yn(:,i+1,iys)" )
-    end do
+      do i = 1,NEqtTot,2
+        yn(i  ,k,iys)   =   yn(i,  k,iym) + h2(k) * yout(i  ,k)
+        yn(i+1,k,iys)   =   yn(i+1,k,iym) + h2(k) * yout(i+1,k)
+  !       if (This%NanCheck) call CheckVariable( yn(:,i,iys),   ProcName=ProcName, VarName="yn(:,i,iys)"   )
+  !       if (This%NanCheck) call CheckVariable( yn(:,i+1,iys), ProcName=ProcName, VarName="yn(:,i+1,iys)" )
+      end do
     end do
     itemp   =   iym
     iym     =   iyn
@@ -487,7 +492,7 @@ PURITY Subroutine RatPolExtrap( NSteps, iest, xest, yest, yz, imax, d, x )
 
   integer                                               ::    NEqtTot
   integer                                               ::    m1, k, j
-  real(rkp) ,dimension(size(xest) ,ncol)                ::    fx      ! Dim=(NTraj,7)
+  real(rkp) ,dimension(size(xest) ,NSteps)              ::    fx      ! Dim=(NTraj,7)
   real(rkp) ,dimension(size(xest) )                     ::    yy      ! Dim=(NTraj)
   real(rkp) ,dimension(size(xest) )                     ::    v       ! Dim=(NTraj)
   real(rkp) ,dimension(size(xest) )                     ::    c       ! Dim=(NTraj)
@@ -528,7 +533,7 @@ PURITY Subroutine RatPolExtrap( NSteps, iest, xest, yest, yz, imax, d, x )
         v(:)      =   d(j,:,k)
         d(j,:,k)  =   ddy(:)
         yy(:)     =   yy(:) + ddy(:)
-      yz(j,:)     =   yy(:)
+        yz(j,:)     =   yy(:)
       end do
     end do
   end if

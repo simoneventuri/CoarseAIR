@@ -99,7 +99,7 @@ function Plot_Energies(Controls)
                 FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
                 savefig(FileName)
             end
-            close
+            %close
         end
         Input.iFig = Input.iFig + 1;
         

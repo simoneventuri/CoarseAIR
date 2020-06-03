@@ -23,7 +23,7 @@ function Plot_Populations(Controls)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates
+    global Input Kin Param Syst Temp Rates OtherRates
 
     fprintf('= Plot_Populations ===================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
@@ -31,11 +31,12 @@ function Plot_Populations(Controls)
     
     for iMol = Controls.MoleculesOI
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
-
-        LevelToBin = Syst.Molecule(iMol).LevelToGroupIn;
+        
+        clear LevelToBin Levelvqn LevelEeV LevelPop
+        LevelToBin = Syst.Molecule(iMol).LevelToGroupOut;
         Levelvqn   = Syst.Molecule(iMol).Levelvqn;
         LevelEeV   = Syst.Molecule(iMol).LevelEeV;
-        
+        iComp      = Syst.MolToCFDComp(iMol);
         
         for tStep = Controls.tSteps
             iStep = 1;
@@ -61,7 +62,7 @@ function Plot_Populations(Controls)
 
             if Controls.GroupColors == 0
 
-                scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.KCVec, 'MarkerFaceColor', Param.KCVec, 'LineWidth', 1.5)
+                scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
                 hold on
                 
             elseif Controls.GroupColors == 1
@@ -71,9 +72,10 @@ function Plot_Populations(Controls)
                 cb=colorbar;
                 %cb.Ticks = [1, 1.5]; %Create 8 ticks from zero to 1
                 %cb.TickLabels = {'1','2'}
-                ylab = ylabel(cb, '$Group$');
+                ylab = ylabel(cb, 'Group');
                 ylab.Interpreter = 'latex';
-                set(cb,'FontSize',LegendFontSz,'FontName',LegendFontNm,'TickLabelInterpreter','latex');
+                set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
+                cb.Label.Interpreter = 'latex';
 
              elseif Controls.GroupColors == 2
 
@@ -98,12 +100,21 @@ function Plot_Populations(Controls)
                 end
                 
              elseif Controls.GroupColors == 3
-                 
-                DissRates = log10(Rates.T(Temp.iT).Diss(:,1));
-
-                scatter(LevelEeV, LevelPop, [], DissRates' )
+                
+                clear DissRates
+                DissRates = log10(Rates.T(Temp.iT).Molecule(iMol).Overall(:,Controls.ProcOI(iMol)));
+                
+                scatter(LevelEeV, LevelPop, 80, DissRates', '.' )
                 set(gca, 'YScale', 'log')
                 hold on
+
+                c = jet;
+                c = flipud(c);
+                colormap(c);
+                cb = colorbar;
+                ylabel(cb, '$log_{10}(k_i^D)$')
+                set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
+                cb.Label.Interpreter = 'latex';
 
             end
 
@@ -121,17 +132,16 @@ function Plot_Populations(Controls)
             str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
             ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
             ylab.Interpreter = 'latex';
-            %ylim([1.d5, 1.d23]);
+            ylim([1.d5, 1.d23]);
             set(gca, 'YScale', 'log')
-
-            
+                        
             pbaspect([1 1 1])
 
             if Input.SaveFigsFlgInt > 0
                 [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
                 FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
                 [status,msg,msgID] = mkdir(FolderPath);
-                FileName = strcat('Pops_t', num2str(tStep), 's');
+                FileName = strcat(Syst.Molecule(iMol).Name, '_Pops_t', num2str(tStep), 's');
                 if Input.SaveFigsFlgInt == 1
                     FileName   = strcat(FolderPath, FileName);
                     export_fig(FileName, '-pdf');
@@ -140,6 +150,9 @@ function Plot_Populations(Controls)
                     savefig(FileName);
                 end
                 close
+            else
+                str_title = [Syst.Molecule(iMol).Name, ', t = ',  num2str(Kin.T(Temp.iT).t(iStep)), ' s'];
+                title(str_title, 'interpreter', 'latex');               
             end
             Input.iFig = Input.iFig + 1;
 
@@ -164,7 +177,7 @@ function Plot_Populations(Controls)
 
         if Controls.GroupColors == 0
 
-            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.KCVec, 'MarkerFaceColor', Param.KCVec, 'LineWidth', 1.5)
+            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
             hold on
 
         elseif Controls.GroupColors == 1
@@ -174,9 +187,10 @@ function Plot_Populations(Controls)
             cb=colorbar;
             %cb.Ticks = [1, 1.5]; %Create 8 ticks from zero to 1
             %cb.TickLabels = {'1','2'}
-            ylab = ylabel(cb, '$Group$');
+            ylab = ylabel(cb, 'Group');
             ylab.Interpreter = 'latex';
-            set(cb,'FontSize',LegendFontSz,'FontName',LegendFontNm,'TickLabelInterpreter','latex');
+            set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
+            cb.Label.Interpreter = 'latex';
 
          elseif Controls.GroupColors == 2
 
@@ -202,11 +216,20 @@ function Plot_Populations(Controls)
 
          elseif Controls.GroupColors == 3
 
-            DissRates = log10(Rates.T(Temp.iT).Diss(:,1));
+            clear DissRates
+            DissRates = log10(Rates.T(Temp.iT).Molecule(iMol).Overall(:,Controls.ProcOI(iMol)));
 
-            scatter(LevelEeV, LevelPop, [], DissRates' )
+            scatter(LevelEeV, LevelPop, 80, DissRates', '.' )
             set(gca, 'YScale', 'log')
             hold on
+        
+            c = jet;
+            c = flipud(c);
+            colormap(c);
+            cb = colorbar;
+            ylabel(cb, '$log_{10}(k_i^D)$')
+            set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
+            cb.Label.Interpreter = 'latex';
 
         end
 
@@ -223,7 +246,7 @@ function Plot_Populations(Controls)
         str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
         ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         ylab.Interpreter = 'latex';
-        %ylim([1.d5, 1.d23]);
+        ylim([1.d5, 1.d23]);
         set(gca, 'YScale', 'log')
 
         pbaspect([1 1 1])
@@ -232,7 +255,7 @@ function Plot_Populations(Controls)
             [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
             FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
             [status,msg,msgID] = mkdir(FolderPath);
-            FileName = strcat('Pops_AtQSS');
+            FileName = strcat(Syst.Molecule(iMol).Name, '_Pops_AtQSS');
             if Input.SaveFigsFlgInt == 1
                 FileName   = strcat(FolderPath, FileName);
                 export_fig(FileName, '-pdf');
@@ -241,6 +264,9 @@ function Plot_Populations(Controls)
                 savefig(FileName);
             end
             close
+        else
+            str_title = [Syst.Molecule(iMol).Name, ', t = ',  num2str(Kin.T(Temp.iT).t(iStep)), ' s (@ QSS)'];
+            title(str_title, 'interpreter', 'latex'); 
         end
         Input.iFig = Input.iFig + 1;
         
@@ -264,7 +290,7 @@ function Plot_Populations(Controls)
 
         if Controls.GroupColors == 0
 
-            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.KCVec, 'MarkerFaceColor', Param.KCVec, 'LineWidth', 1.5)
+            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
             hold on
 
         elseif Controls.GroupColors == 1
@@ -274,9 +300,10 @@ function Plot_Populations(Controls)
             cb=colorbar;
             %cb.Ticks = [1, 1.5]; %Create 8 ticks from zero to 1
             %cb.TickLabels = {'1','2'}
-            ylab = ylabel(cb, '$Group$');
+            ylab = ylabel(cb, 'Group');
             ylab.Interpreter = 'latex';
-            set(cb,'FontSize',LegendFontSz,'FontName',LegendFontNm,'TickLabelInterpreter','latex');
+            set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
+            cb.Label.Interpreter = 'latex';
 
          elseif Controls.GroupColors == 2
 
@@ -302,11 +329,20 @@ function Plot_Populations(Controls)
 
          elseif Controls.GroupColors == 3
 
-            DissRates = log10(Rates.T(Temp.iT).Diss(:,1));
+            clear DissRates
+            DissRates = log10(Rates.T(Temp.iT).Molecule(iMol).Overall(:,Controls.ProcOI(iMol)));
 
-            scatter(LevelEeV, LevelPop, [], DissRates' )
+            scatter(LevelEeV, LevelPop, 80, DissRates', '.' )
             set(gca, 'YScale', 'log')
             hold on
+
+            c = jet;
+            c = flipud(c);
+            colormap(c);
+            cb = colorbar;
+            ylabel(cb, '$log_{10}(k_i^D)$')
+            set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
+            cb.Label.Interpreter = 'latex';
 
         end
 
@@ -323,8 +359,10 @@ function Plot_Populations(Controls)
         str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
         ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         ylab.Interpreter = 'latex';
-        %ylim([1.d5, 1.d23]);
+        ylim([1.d5, 1.d23]);
         set(gca, 'YScale', 'log')
+
+        
 
         pbaspect([1 1 1])
 
@@ -332,7 +370,7 @@ function Plot_Populations(Controls)
             [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
             FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
             [status,msg,msgID] = mkdir(FolderPath);
-            FileName = strcat('Pops_AtEq');
+            FileName = strcat(Syst.Molecule(iMol).Name, '_Pops_AtEq');
             if Input.SaveFigsFlgInt == 1
                 FileName   = strcat(FolderPath, FileName);
                 export_fig(FileName, '-pdf');
@@ -341,6 +379,9 @@ function Plot_Populations(Controls)
                 savefig(FileName);
             end
             close
+        else
+            str_title = [Syst.Molecule(iMol).Name, ', t = ',  num2str(Kin.T(Temp.iT).t(iStep)), ' s (@ Eq.)'];
+            title(str_title, 'interpreter', 'latex'); 
         end
         Input.iFig = Input.iFig + 1;
        

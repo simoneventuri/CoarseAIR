@@ -1,6 +1,6 @@
 %% The Function Reads the Molecules' Level Info from the list used for QCT
 %        
-function Read_LevelInfo()
+function [Syst] = Read_LevelInfo(Syst)
       
     % -- MATLAB --
     %%==============================================================================================================
@@ -25,7 +25,7 @@ function Read_LevelInfo()
     %%==============================================================================================================
 
     
-    global Input Param Syst
+    global Input Param 
 
     fprintf('= Read_LevelInfo ===================================\n')
     fprintf('====================================================\n')

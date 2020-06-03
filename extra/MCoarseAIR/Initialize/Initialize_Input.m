@@ -26,7 +26,7 @@ function Initialize_Input()
     %%==============================================================================================================
 
     
-    global Input Syst Temp
+    global Input Syst Temp OtherSyst
 
     
     fprintf('= Initialize_Input =================================\n')
@@ -53,6 +53,7 @@ function Initialize_Input()
     Temp.IntVec  = Input.TranVec;    
     Temp.NInt    = length(Temp.TranVec);
     
+    
     TempStr = '';
     if (Input.Kin.NBinsSuffix > 0)
         TempStr = strcat('_', num2str(Input.Kin.NBinsSuffix), 'Bins');
@@ -69,79 +70,26 @@ function Initialize_Input()
         Syst.iPES = strcat('_PES', num2str(Input.iPES));
     end
     Syst.Suffix              = Input.Suffix;
-    Syst.HDF5_File           = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong,          Input.Suffix, Syst.iPES, '.hdf5');
-    Syst.HDF5_File_OtherExch = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong_Opposite, Input.Suffix, Syst.iPES, '.hdf5');
-    
-    Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
 
+    Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
     Input.Paths.SaveDataFldr = strcat(Input.Paths.SaveDataFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
 
+    Syst.HDF5_File           = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong, Input.Suffix, Syst.iPES, '.hdf5');
     
-%     filename = strcat(Input.Paths.ToQCTFldr,'/InputForBash.inp');
-%     delimiter = ' ';
-%     formatSpec = '%s%[^\n\r]';
-%     fileID = fopen(filename,'r');
-%     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'MultipleDelimsAsOne', true,  'ReturnOnError', false);
-%     fclose(fileID);
-%     InputForBash = [dataArray{1:end-1}];
-%     clearvars filename delimiter formatSpec fileID dataArray ans;
-% 
-%     iTot = 1;
-%     if exist('Input.SystNameLong','var')
-%         Syst.Name = Input.SystNameLong
-%     else
-%         Syst.Name = char(InputForBash(iTot,:))
-%     end
-%     
-%     iTot = iTot + 1;
-%     Temp.TranFlg = str2num(char(InputForBash(iTot,:)))
-% 
-%     iTot = iTot + 1;
-%     Temp.NTran  = str2num(char(InputForBash(iTot,:)))
-%     for iTtra = 1: Temp.NTran
-%     iTot = iTot + 1;
-%     Temp.TranVec(iTtra) = str2num(char(InputForBash(iTot,:)))
-%     end
-% 
-%     iTot = iTot + 1;
-%     Temp.NInt = str2num(char(InputForBash(iTot,:)))
-%     if Temp.NInt > 1 
-%         for iTtra = 1:Temp.NInt
-%             iTot = iTot + 1;
-%             Temp.IntVec(iTint) = str2num(char(InputForBash(iTot,:)))
-%         end
-%     end
-% 
-%     iTot = iTot + 1;
-%     Syst.NMolecules = str2num(char(InputForBash(iTot,:)))
-%     for iMol = 1:Syst.NMolecules
-%         iTot = iTot + 1;
-%         Syst.Molecule(iMol).Name(:) = char(InputForBash(iTot,:))
-%         iTot = iTot + 1;
-%         SortMthdTemp          = char(InputForBash(iTot,:))
-%         if SortMthdTemp(1:3) == 'Sta'
-%             Syst.Molecule(iMol).MolResolutionIn(:) = 'STS'
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MinStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MaxStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%         elseif SortMthdTemp(1:3) == 'Vib'
-%             Syst.Molecule(iMol).MolResolutionIn(:) = 'VSM'
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MinStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MaxStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%         elseif sum(SortMthdTemp(1:3) == 'RoV') == 3 || sum(SortMthdTemp(1:3) == 'Fro') == 3
-%             Syst.Molecule(iMol).MolResolutionIn(:) = 'CGM'
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MinStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).MaxStateIn = str2num(char(InputForBash(iTot,:)))
-%             iTot = iTot + 1;
-%             Syst.Molecule(iMol).NGroupsIn  = str2num(char(InputForBash(iTot,:)))
-%         end
-%     end
+
+    
+    for iSyst = 1:size(Syst.OtherSyst_NameLong,1)
+        OtherSyst(iSyst).Syst.NameLong  = Syst.OtherSyst_NameLong;
+        OtherSyst(iSyst).Syst           = Initialize_ChemicalSyst(OtherSyst(iSyst).Syst);
+        OtherSyst(iSyst).Syst.HDF5_File = strcat(Input.Paths.ToHDF5Fldr, OtherSyst(iSyst).Syst.NameLong, Input.Suffix, Syst.iPES, '.hdf5');
+    
+        for iMol = 1:OtherSyst(iSyst).Syst.NMolecules
+            OtherSyst(iSyst).Syst.Molecule(iMol).KinMthdIn(:) = 'StS';
+            OtherSyst(iSyst).Syst.Molecule(iMol).MinStateIn   = 1;
+            OtherSyst(iSyst).Syst.Molecule(iMol).MaxStateIn   = 100000;
+            OtherSyst(iSyst).Syst.Molecule(iMol).NGroupsIn    = 1;
+        end
+    end
+
   
 end

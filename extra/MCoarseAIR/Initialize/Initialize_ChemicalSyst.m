@@ -1,6 +1,6 @@
 %% The Function Loads the Variables of the Chemical System
 %                       
-function Initialize_ChemicalSyst()
+function [Syst] = Initialize_ChemicalSyst(Syst)
 
     %%==============================================================================================================
     % 
@@ -22,20 +22,17 @@ function Initialize_ChemicalSyst()
     % 
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
-  
-    global Syst Input
 
     
     fprintf('= Initialize_ChemicalSyst ==========================\n')
     fprintf('====================================================\n')
-    fprintf(['Loading Variables for Chemical System:' ' ' Input.SystNameLong '\n'])
+    fprintf(['Loading Variables for Chemical System: ', Syst.NameLong, '\n'])
     
     
-    if strcmp(Input.SystNameLong, 'O3_UMN')
+    if strcmp(Syst.NameLong, 'O3_UMN')
         
         %%% System
         Syst.Name              = 'O3';
-        Syst.NameLong_Opposite = 'O3_UMN';
 
         Syst.NProc = 3; %(Diss+Inel+Exch)
         
@@ -62,21 +59,15 @@ function Initialize_ChemicalSyst()
         
         %%% Molecules
         Syst.NMolecules                   = 1;
-        
         Syst.Molecule(1).Name             = 'O2';
-
         Syst.Molecule(1).DissEn           = 0.0;
-
         Syst.Molecule(1).DegeneracyFactor = [1/2, 1/2];
-
         Syst.Molecule(1).Mu               = 31.9988e-3;
-
         Syst.Molecule(1).NLevelsOrig      = 6115;
-    
         Syst.Molecule(1).ToAtoms          = [1,2];
-        
         Syst.Molecule(1).DiatPot          = 'O2_UMN';
-                
+        Syst.MolToOtherSyst(1)            = 0;
+
         %%% Pairs
         Syst.Pair(1).Name  = 'O2';
         Syst.Pair(2).Name  = 'O2';
@@ -130,11 +121,10 @@ function Initialize_ChemicalSyst()
         Syst.ColPartToComp      = 1; 
         
     
-    elseif strcmp(Input.SystNameLong, 'CO2_NASA')
+    elseif strcmp(Syst.NameLong, 'CO2_NASA')
         
         %%% System
-        Syst.Name              = 'CO2';
-        Syst.NameLong_Opposite = 'O2C_NASA';
+        Syst.Name                 = 'CO2';
 
         Syst.NProc = 4; %(Diss+Inel+Exch+Exch)
         
@@ -155,7 +145,7 @@ function Initialize_ChemicalSyst()
         Syst.Atom(3).Size  = 200;
 
         Syst.Atom(1).Mass  = 21868.661757;
-        Syst.Atom(2).Mass  = 29148.94559;
+        Syst.Atom(2).Mass  = 29148.94559; 5.1157012 
         Syst.Atom(3).Mass  = 29148.94559;
         
         
@@ -165,8 +155,8 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).Name             = 'CO';
         Syst.Molecule(2).Name             = 'O2';
 
-        Syst.Molecule(1).DissEn           = 0.0;
-        Syst.Molecule(2).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -11.228285428314086;
+        Syst.Molecule(2).DissEn           = -5.16;%-5.062189482141;
 
         Syst.Molecule(1).DegeneracyFactor = [  1,   1];
         Syst.Molecule(2).DegeneracyFactor = [1/2, 1/2];
@@ -182,7 +172,12 @@ function Initialize_ChemicalSyst()
         
         Syst.Molecule(1).DiatPot          = 'CO_NASA';
         Syst.Molecule(2).DiatPot          = 'O2_NASA';
-                
+
+        Syst.MolToOtherSyst(1)            = 0;
+        Syst.MolToOtherSyst(2)            = 1;
+
+        Syst.OtherSyst_NameLong(1,:)      = 'O2C_NASA';
+
         %%% Pairs
         Syst.Pair(1).Name  = 'CO';
         Syst.Pair(2).Name  = 'CO';
@@ -249,11 +244,10 @@ function Initialize_ChemicalSyst()
         Syst.ColPartToComp      = 2; 
         
         
-    elseif strcmp(Input.SystNameLong, 'O2C_NASA')
+    elseif strcmp(Syst.NameLong, 'O2C_NASA')
         
         %%% System
         Syst.Name              = 'O2C';
-        Syst.NameLong_Opposite = 'CO2_NASA';
 
         Syst.NProc = 3; %(Diss+Inel+Exch)
         
@@ -284,8 +278,8 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).Name             = 'O2';
         Syst.Molecule(2).Name             = 'CO';
 
-        Syst.Molecule(1).DissEn           = 0.0;
-        Syst.Molecule(2).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -5.16;%-5.062189482141;
+        Syst.Molecule(2).DissEn           = -11.228285428314086;
 
         Syst.Molecule(1).DegeneracyFactor = [1/2, 1/2];
         Syst.Molecule(2).DegeneracyFactor = [  1,   1];
@@ -302,6 +296,10 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).DiatPot          = 'O2_NASA';
         Syst.Molecule(2).DiatPot          = 'CO_NASA';
         
+        Syst.MolToOtherSyst(1)            = 0;
+        Syst.MolToOtherSyst(2)            = 1;
+
+        Syst.OtherSyst_NameLong(1,:)      = 'CO2_NASA';
         
         %%% Pairs
         Syst.Pair(1).Name  = 'O2';
@@ -368,11 +366,10 @@ function Initialize_ChemicalSyst()
         Syst.ColPartToComp      = 1; 
         
         
-    elseif strcmp(Input.SystNameLong, 'N2O_UMN')
+    elseif strcmp(Syst.NameLong, 'N2O_UMN')
         
         %%% System
         Syst.Name              = 'N2O';
-        Syst.NameLong_Opposite = 'NON_UMN';
 
         Syst.NProc = 3; %(Diss+Inel+Exch)
         
@@ -421,6 +418,10 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).DiatPot          = 'N2_UMN';
         Syst.Molecule(2).DiatPot          = 'NO_UMN';
         
+        Syst.MolToOtherSyst(1)            = 0;
+        Syst.MolToOtherSyst(2)            = 1;
+
+        Syst.OtherSyst_NameLong(1,:)      = 'NON_UMN';
         
         %%% Pairs
         Syst.Pair(1).Name  = 'N2';
@@ -488,11 +489,10 @@ function Initialize_ChemicalSyst()
         
         
         
-    elseif strcmp(Input.SystNameLong, 'NON_UMN')
+    elseif strcmp(Syst.NameLong, 'NON_UMN')
         
         %%% System
         Syst.Name              = 'NON';
-        Syst.NameLong_Opposite = 'N2O_UMN';
         
         Syst.NProc = 4; %(Diss+Inel+Exch+Exch)
         
@@ -541,6 +541,10 @@ function Initialize_ChemicalSyst()
         Syst.Molecule(1).DiatPot          = 'NO_UMN';
         Syst.Molecule(2).DiatPot          = 'N2_UMN';
         
+        Syst.MolToOtherSyst(1)            = 0;
+        Syst.MolToOtherSyst(2)            = 1;
+
+        Syst.OtherSyst_NameLong(1,:)      = 'N2O_UMN';
         
         %%% Pairs
         Syst.Pair(1).Name  = 'NO';
@@ -608,7 +612,7 @@ function Initialize_ChemicalSyst()
         Syst.ColPartToComp      = 1; 
         
 
-    elseif strcmp(Input.SystNameLong, 'N4_NASA')
+    elseif strcmp(Syst.NameLong, 'N4_NASA')
 
         %%% System
         Syst.Name = 'N4';
@@ -642,22 +646,16 @@ function Initialize_ChemicalSyst()
 
         %%% Molecules
         Syst.NMolecules                   = 1;
-        
         Syst.Molecule(1).Name             = 'N2';
-        
         Syst.Molecule(1).DissEn           = 0.0;
-        
         Syst.Molecule(1).DegeneracyFactor = [3, 6];
-        
         Syst.Molecule(1).Mu               = 28.0134d-3;
-        
         Syst.Molecule(1).NLevelsOrig      = 9390;
-        
         Syst.Molecule(1).ToAtoms          = [1,2];
+        Syst.Molecule(1).DiatPot          = 'N2_NASA';  
+        Syst.MolToOtherSyst(1)            = 0;
         
-        Syst.Molecule(1).DiatPot          = 'N2_NASA';
-        
-        
+      
         %%% Pairs
         Syst.Pair(1).Name  = 'N2';
         Syst.Pair(2).Name  = 'N2';

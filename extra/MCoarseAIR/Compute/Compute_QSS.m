@@ -26,11 +26,13 @@ function Compute_QSS()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Input Rates Syst Temp Param Kin
+    global Input Rates Syst Temp Param Kin OtherSyst
 
     fprintf('= Compute_QSS ========================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
     
+
+    DebugFlag = false;
     
     KQSS_Eps = 1.e-9;
     EpsT     = 1.e-4;%5.e-8;
@@ -38,21 +40,25 @@ function Compute_QSS()
     InpPerc  = 0.1;
 
     
-    yy       = Rates.T(Temp.iT).DissGlobal+1e-100;
+    yy       = Rates.T(Temp.iT).Molecule(1).DissGlobal(:,1) + 1e-100;
     NSteps   = size(yy,1);
     ExitFlg  = false;
     
-%     figure(1234)
-%     loglog(Kin.T(Temp.iT).t, yy, 'k-', 'LineWidth', 2);
-%     hold on
-    
+    if (DebugFlag)
+        figure(1234)
+        loglog(Kin.T(Temp.iT).t, yy, 'k-', 'LineWidth', 2);
+        hold on
+    end
+
     it = NSteps;
     while ( abs(log10(yy(it)) - log10(yy(end)))     < 1.e-2 )
        it = it - 1;
     end
     itFinal = it;
     tFinal  = Kin.T(Temp.iT).t(itFinal);
-%     loglog(Kin.T(Temp.iT).t(itFinal), yy(itFinal),'r+', 'MarkerSize', 8);
+    if (DebugFlag)
+        h1 = loglog(Kin.T(Temp.iT).t(itFinal), yy(itFinal),'b+', 'MarkerSize', 8);
+    end
     if (itFinal < 2)
        ExitFlg = true; 
     end
@@ -62,9 +68,11 @@ function Compute_QSS()
     end
     itEnd   = it;
     tEnd    = Kin.T(Temp.iT).t(itEnd);
-%     loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
+    if (DebugFlag)
+        h2 = loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'g+', 'MarkerSize', 8);
+    end
 
-    while (it >= 1) && ( abs(log10(yy(it)) - log10(yy(it+1)))    > 1.e-4 )
+    while (it >= 1) && ( abs(log10(yy(it)) - log10(yy(it+1)))    > 5.e-4 )
         it = it - 1;
     end
     if (it < 1)
@@ -74,8 +82,10 @@ function Compute_QSS()
        itQSS = it;
     end
     tQSS  = Kin.T(Temp.iT).t(itQSS);
-%     loglog(Kin.T(Temp.iT).t(itQSS), yy(itQSS),'r+', 'MarkerSize', 8);
-    
+    if (DebugFlag)
+        h3 = loglog(Kin.T(Temp.iT).t(itQSS), yy(itQSS),'r+', 'MarkerSize', 8);
+    end
+
     if (~ ExitFlg)
         it = itQSS;
         while ( abs(log10(yy(it)) - log10(yy(itQSS)))    < 1.e-1 )
@@ -83,7 +93,9 @@ function Compute_QSS()
         end
         itEnd = it;
         tEnd  = Kin.T(Temp.iT).t(itEnd);
-%         loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'r+', 'MarkerSize', 8);
+        if (DebugFlag)
+            h4 = loglog(Kin.T(Temp.iT).t(itEnd), yy(itEnd),'y+', 'MarkerSize', 8);
+        end
     end
     
     if (~ ExitFlg)
@@ -98,7 +110,9 @@ function Compute_QSS()
             itStart = it;
         end
         tStart  = Kin.T(Temp.iT).t(itStart);
-%         loglog(Kin.T(Temp.iT).t(itStart), yy(itStart),'r+', 'MarkerSize', 8);
+        if (DebugFlag)
+            h5 = loglog(Kin.T(Temp.iT).t(itStart), yy(itStart),'c+', 'MarkerSize', 8);
+        end
     end
     
     if (~ ExitFlg)
@@ -107,7 +121,9 @@ function Compute_QSS()
         end
         itIni   = it;
         tIni    = Kin.T(Temp.iT).t(itIni);
-%         loglog(Kin.T(Temp.iT).t(itIni), yy(itIni),'r+', 'MarkerSize', 8);
+        if (DebugFlag)
+            h6 = loglog(Kin.T(Temp.iT).t(itIni), yy(itIni),'m+', 'MarkerSize', 8);
+        end
         if (itIni >= itFinal)
             ExitFlg = true;
         end
@@ -168,11 +184,14 @@ function Compute_QSS()
         Kin.T(Temp.iT).QSS.t      = Kin.T(Temp.iT).t(NSteps);
         Kin.T(Temp.iT).QSS.tEnd   = Kin.T(Temp.iT).t(NSteps);
     end
-
-%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iStart), yy(Kin.T(Temp.iT).QSS.iStart), 'ko', 'MarkerSize', 8);
-%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iEnd), yy(Kin.T(Temp.iT).QSS.iEnd), 'ko', 'MarkerSize', 8);
-%     loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.i), yy(Kin.T(Temp.iT).QSS.i), 'ko', 'MarkerSize', 8);       fprintf('QSS Start Time       = %e s\n',  Kin.T(Temp.iT).QSS.tStart );
     
+    if (DebugFlag)
+        loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iStart), yy(Kin.T(Temp.iT).QSS.iStart), 'ko', 'MarkerSize', 8);
+        loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.iEnd), yy(Kin.T(Temp.iT).QSS.iEnd), 'ko', 'MarkerSize', 8);
+        loglog(Kin.T(Temp.iT).t(Kin.T(Temp.iT).QSS.i), yy(Kin.T(Temp.iT).QSS.i), 'ko', 'MarkerSize', 8);       fprintf('QSS Start Time       = %e s\n',  Kin.T(Temp.iT).QSS.tStart );
+        legend('k^D','Final','End','QSS','End New','Start','Initial')
+    end
+
     fprintf('QSS Start Time Step  = %i \n',   Kin.T(Temp.iT).QSS.iStart );
     fprintf('QSS       Time       = %e s\n',  Kin.T(Temp.iT).QSS.t );
     fprintf('QSS       Time Step  = %i \n',   Kin.T(Temp.iT).QSS.i );
@@ -180,54 +199,66 @@ function Compute_QSS()
     fprintf('QSS End   Time Step  = %i \n\n', Kin.T(Temp.iT).QSS.iEnd );
     
  
-    
-    KDissEq   = Rates.T(Temp.iT).DissTh;
-    %KDissEq   = Rates.T(Temp.iT).DissGlobal(end);
-    KDissQSS  = Rates.T(Temp.iT).DissGlobal(itQSS);
-    Kin.T(Temp.iT).QSS.Diss      = KDissQSS;
-
-    KExch1Eq  = Rates.T(Temp.iT).ExchTh(1,1);
-    %KExch1Eq  = Rates.T(Temp.iT).ExchGlobal(end,1);
-    KExch1QSS = Rates.T(Temp.iT).ExchGlobal(itQSS,1);
-    Kin.T(Temp.iT).QSS.Exch1     = KExch1QSS;
-    
-    if Syst.NProc == 4
-        KExch2Eq  = Rates.T(Temp.iT).ExchTh(1,2);
-        %KExch2Eq  = Rates.T(Temp.iT).ExchGlobal(end,2);
-        KExch2QSS = Rates.T(Temp.iT).ExchGlobal(itQSS,2);
-        Kin.T(Temp.iT).QSS.Exch2 = KExch2QSS;
-    end
-
-    
-    fprintf('QSS KDiss            = %e [cm^3/s]\n', Kin.T(Temp.iT).QSS.Diss );
-    for iExch = 1:Syst.NProc-2
-        fprintf('QSS KExch, Exch Nb %i = %e [cm^3/s] \n', iExch,  Rates.T(Temp.iT).ExchGlobal(itQSS,iExch) );
-    end
-    fprintf('\n')
-    
-    
-    %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
-    %
-    [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
-    FileName           = strcat(Input.Paths.SaveDataFldr, '/KGlobal_', Input.Kin.Proc.OverallFlg, '.csv');
-    if exist(FileName, 'file')
-        fileID1  = fopen(FileName,'a');
-    else
-        fileID1  = fopen(FileName,'w');
-        if Syst.NProc == 3
-            HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq, K^D QSS, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name,'}^E QSS \n');
-        else
-            HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq, K_{', Syst.Molecule(Syst.ExchToMol(2)).Name, '}^E Eq, K^D QSS, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name,'}^E QSS, K_{', Syst.Molecule(Syst.ExchToMol(2)).Name, '}^E QSS \n');
+    for iMol = 1:length(Input.Kin.ReadOtherSyst)+1
+        if iMol == 1
+            ComputeFlg = true;
+            NProc      = Syst.NProc;
+        elseif (Input.Kin.ReadOtherSyst(iMol-1))
+            ComputeFlg = true;
+            NProc      = OtherSyst(iMol-1).Syst.NProc;
         end
-        fprintf(fileID1,HeaderStr);
-    end
-    if Syst.NProc == 3
-        fprintf(fileID1,'%e,%e,%e,%e,%e\n',       Temp.TNow, KDissEq, KExch1Eq, KDissQSS, KExch1QSS );
-    else
-        fprintf(fileID1,'%e,%e,%e,%e,%e,%e,%e\n', Temp.TNow, KDissEq, KExch1Eq, KExch2Eq, KDissQSS, KExch1QSS, KExch2QSS );
-    end
-    fclose(fileID1);
+        
+        if (ComputeFlg)
+            
+            KDissEq   = Rates.T(Temp.iT).Molecule(iMol).DissTh;
+            KDissQSS  = Rates.T(Temp.iT).Molecule(iMol).DissGlobal(itQSS,1);
+            Kin.T(Temp.iT).QSS.Molecule(iMol).Diss      = KDissQSS;
 
+            KExch1Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1);
+            KExch1QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,1);
+            Kin.T(Temp.iT).QSS.Molecule(iMol).Exch1     = KExch1QSS;
+
+            if NProc == 4
+                KExch2Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,2);
+                KExch2QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,2);
+                Kin.T(Temp.iT).QSS.Molecule(iMol).Exch2 = KExch2QSS;
+            end
+
+
+            fprintf('QSS KDiss            = %e [cm^3/s]\n', Kin.T(Temp.iT).QSS.Molecule(iMol).Diss );
+            for iExch = 1:NProc-2
+                fprintf('QSS KExch, Exch Nb %i = %e [cm^3/s] \n', iExch,  Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,iExch) );
+            end
+            fprintf('\n')
+
+
+            %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
+            %
+            [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
+            FileName           = strcat(Input.Paths.SaveDataFldr, '/KGlobal_', Input.Kin.Proc.OverallFlg, '_', Syst.Molecule(iMol).Name , '.csv');
+            if exist(FileName, 'file')
+                fileID1  = fopen(FileName,'a');
+            else
+                fileID1  = fopen(FileName,'w');
+                if NProc == 3
+                    HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K^D QSS, K_1^E QSS \n');
+                else
+                    HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K_2^E Eq, K^D QSS, K_1^E QSS, K_2^E QSS \n');
+                end
+                fprintf(fileID1,HeaderStr);
+            end
+            if NProc == 3
+                fprintf(fileID1,'%e,%e,%e,%e,%e\n',       Temp.TNow, KDissEq, KExch1Eq, KDissQSS, KExch1QSS );
+            else
+                fprintf(fileID1,'%e,%e,%e,%e,%e,%e,%e\n', Temp.TNow, KDissEq, KExch1Eq, KExch2Eq, KDissQSS, KExch1QSS, KExch2QSS );
+            end
+            fclose(fileID1);
+            
+        end
+        
+    end
+    
+    
     
     %% Writing Percentage of Molecule Depletion Happening During QSS
     %

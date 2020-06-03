@@ -83,7 +83,7 @@ function Compute_EnergyDepletions(Controls)
             PopA      = PopTot / Kin.T(Temp.iT).MolFracs(iStep,iTarg) * Kin.T(Temp.iT).MolFracs(iStep,iProj(1)) * Kin.T(Temp.iT).MolFracs(iStep,iProj(2));
             
             %TempVec(:,1)  = KRemoval(:,1) .* LevelPopEq(:,1) .* PopTot .* ( rhoI(:,1)./rhoIEq(:,1) - rhoA/rhoAEq .* rhoB/rhoBEq );
-            TempVec(:,1)  = KRemoval(:,1) .* LevelPop(:,1) .* PopA .* ( rhoI(:,1) - rhoA .* rhoB );
+            TempVec(:,1)  = KRemoval(:,1) .* LevelPop(:,1) .* PopTot .* ( rhoI(:,1) - rhoA .* rhoB );
             Determ        = sum( TempVec );
             
             CDInt(jStep)  = sum( TempVec .* LevelEeV0 )     ./ Determ;

@@ -39,7 +39,7 @@ Module Transformation_Class
     real(rkp) ,dimension(:,:)     ,allocatable  ::    Tpq                         ! Inverse transformation matrix (DIM=nh,nh)
   contains
     private
-    procedure     ,public   ::    Initialize  =>  Initialize_Transformation
+    procedure     ,public   ::    Initialize             =>  Initialize_Transformation
   End Type
 
   type(Transformation_Type)               ::    Transformation

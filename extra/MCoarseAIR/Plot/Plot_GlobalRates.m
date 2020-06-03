@@ -23,7 +23,7 @@ function Plot_GlobalRates(Controls)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates
+    global Input Kin Param Syst OtherSyst Temp Rates
 
     fprintf('= Plot_GlobalRates ===================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
@@ -35,14 +35,28 @@ function Plot_GlobalRates(Controls)
     %fig.Position = screensize;
     %fig.Color='None';
     
-    
+    iC        = 1;
     ProcNames = [];
-    loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
-    ProcNames = {'$\bar{K}^D$'};
-    hold on
-    for iExch = 1:Syst.NProc-2
-        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(:,iExch), 'Color', Param.CMat(iExch+1,:), 'linestyle', char(Param.linS(iExch+1)), 'LineWidth', Param.LineWidth)
-        ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
+    for iMol = Controls.MoleculesOI
+        if (iMol == 1)
+            NExch = Syst.NProc-2;
+        else
+            NExch = OtherSyst(iMol-1).Syst.NProc-2;
+        end
+        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).Molecule(iMol).DissGlobal(:,1), 'Color', Param.CMat(iC,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+        iC        = iC + 1;
+        ProcNames = [ProcNames, {[Syst.Molecule(iMol).Name, ', $k_{Global}^D$']}];
+        hold on
+        for iExch = 1:NExch
+            if (iMol == 1)
+                TempStr = [Syst.Molecule(iMol).Name, ', $k_{Global}^{E_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}}$'];
+            else
+                TempStr = [Syst.Molecule(iMol).Name, ', $k_{Global}^{E_{', OtherSyst(iMol-1).Syst.Molecule(OtherSyst(iMol-1).Syst.ExchToMol(iExch)).Name,'}}$'];
+            end
+            loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(:,iExch), 'Color', Param.CMat(iC,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+            iC        = iC + 1;
+            ProcNames = [ProcNames, TempStr];
+        end
     end
     hold on
 
@@ -60,7 +74,7 @@ function Plot_GlobalRates(Controls)
     xlab.Interpreter = 'latex';
     %xlim(XLimPlot);
 
-    str_y = ['$\bar{K}$~$[cm^3/s]$'];
+    str_y = ['$k_{Global}$~$[cm^3/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
@@ -70,15 +84,15 @@ function Plot_GlobalRates(Controls)
     pbaspect([1 1 1])
     
     if Input.SaveFigsFlgInt > 0
-        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
+        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
             FileName   = strcat(FolderPath, 'GlobalRates');
-            export_fig(FileName, '-pdf')
+            export_fig(FileName, '-pdf');
         elseif Input.SaveFigsFlgInt == 2
             FileName   = strcat(FolderPath, 'GlobalRates.fig');
-            savefig(FileName)
+            savefig(FileName);
         end
         close
     end

@@ -2,15 +2,13 @@ close all
 clear all
 clc
 
-
 global Param Input Syst
 iFig = 1;
 
 Input.SystNameLong       = 'O2C_NASA'
 Input.Paths.MainFldr     = '/home/venturi/WORKSPACE/Mars_Paper/'
-Input.Paths.KGlobal      = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/KGlobal_9_1_1_0_CO.csv')
+Input.Paths.CDepletions  = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/EDCoeffs_O2_9_1_1_0.csv')
 NPESs                    = 0
-ExchToMol                = [1,2];
 
 Input.FigureFormat       = 'PrePrint';
 Input.iFig               = 101;
@@ -23,7 +21,7 @@ Syst          = Initialize_ChemicalSyst(Syst)
 Initialize_Parameters()
 
 
-Plot_Ks(ExchToMol)
+Plot_CDepletions()
 
 % figure(4321)
 % for iPES = 1:NPESs

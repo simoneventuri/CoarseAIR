@@ -1,6 +1,6 @@
 %% The Function Reads the Grouped Molecules' Partion Functions and Energies
 %
-function Read_EeV_and_Q_CG()     
+function [Syst] = Read_EeV_and_Q_CG(Syst)     
 
     % -- MATLAB --
     %%==============================================================================================================
@@ -24,7 +24,7 @@ function Read_EeV_and_Q_CG()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Temp Param Syst
+    global Temp Param
     %global Input
  
     fprintf('= Read_EeV_and_Q_CG ==================== T = %i K\n', Temp.TNow)

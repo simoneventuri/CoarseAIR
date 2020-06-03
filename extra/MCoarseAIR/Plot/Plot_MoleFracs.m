@@ -41,6 +41,24 @@ function Plot_MoleFracs(Controls)
     end
     hold on
 
+    if (Input.Tasks.Plot_Populations.Flg)
+        jStep = 1;
+        for tStep = Input.Tasks.Plot_Populations.tSteps
+            iStep = 1;
+            while Kin.T(Temp.iT).t(iStep) < tStep
+                iStep = iStep + 1;
+            end  
+            Controls.iSteps(jStep) = iStep;
+            jStep = jStep + 1;
+        end
+        Controls.iSteps(jStep) = Kin.T(Temp.iT).QSS.i;
+
+        for iMol = Input.Tasks.Plot_Populations.MoleculesOI
+            iComp = Syst.MolToCFDComp(iMol);
+            semilogx(Kin.T(Temp.iT).t(Controls.iSteps), Kin.T(Temp.iT).MolFracs(Controls.iSteps,iComp), 'o', 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'MarkerEdgeColor', Syst.CFDComp(iComp).Color)
+        end
+    end
+
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
     yt = get(gca, 'YTick');
@@ -64,15 +82,15 @@ function Plot_MoleFracs(Controls)
 
 
     if Input.SaveFigsFlgInt > 0
-        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr)
+        [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
         FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
         [status,msg,msgID] = mkdir(FolderPath);
         if Input.SaveFigsFlgInt == 1
             FileName   = strcat(FolderPath, 'MoleFractions');
-            export_fig(FileName, '-pdf')
+            export_fig(FileName, '-pdf');
         elseif Input.SaveFigsFlgInt == 2
             FileName   = strcat(FolderPath, 'MoleFractions.fig');
-            savefig(FileName)
+            savefig(FileName);
         end
         close
     end

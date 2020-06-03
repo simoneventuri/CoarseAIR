@@ -3,7 +3,7 @@
 %  Input Global Var: - Temp.TNowChar
 %                    - Syst.HDF5_File
 %
-function Read_Rates_FromCoarseAIR()    
+function [Rates] = Read_Rates_FromCoarseAIR(Rates, Syst, OtherSyst)    
 
     %%==============================================================================================================
     % 
@@ -26,7 +26,7 @@ function Read_Rates_FromCoarseAIR()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Input Rates Syst Temp Param  
+    global Input Temp Param  
     
     
     fprintf('  = Read_Rates_FromCoarseAIR ============= T = %i K\n', Temp.TNow)

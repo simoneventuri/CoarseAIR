@@ -26,7 +26,7 @@ function Compute_Rates_Global()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Rates Syst Temp Kin
+    global Rates Syst OtherSyst Temp Kin Input
     
     fprintf('= Compute_Rates_Global ================= T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
@@ -35,28 +35,50 @@ function Compute_Rates_Global()
     if (Syst.NAtoms == 3)
         
         
-        iMol   = Syst.Pair(1).ToMol;
+        iMol   = 1;
         iNBins = Syst.Molecule(iMol).EqNStatesIn;
-        
-        ExchTot = zeros(iNBins, Syst.NProc-2);
-        for iExch = 1:Syst.NProc-2
-            ExchTot(:,iExch) = sum(Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
-        end
-        
-        Rates.T(Temp.iT).DissGlobal = zeros(Kin.T(Temp.iT).NSteps,1);
-        Rates.T(Temp.iT).ExchGlobal = zeros(Kin.T(Temp.iT).NSteps,Syst.NProc-2);
-        
+
+
+        Rates.T(Temp.iT).Molecule(iMol).DissGlobal = zeros(Kin.T(Temp.iT).NSteps,1);
+        Rates.T(Temp.iT).Molecule(iMol).ExchGlobal = zeros(Kin.T(Temp.iT).NSteps,Syst.NProc-2);
+
         for iStep = 1:Kin.T(Temp.iT).NSteps
-            Rates.T(Temp.iT).DissGlobal(iStep)           = sum( Rates.T(Temp.iT).Diss(:,1) .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+            Rates.T(Temp.iT).Molecule(iMol).DissGlobal(iStep)           = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,1)       .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
             for iExch = 1:Syst.NProc-2
-                Rates.T(Temp.iT).ExchGlobal(iStep,iExch) = sum( ExchTot(:,iExch)           .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+                Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(iStep,iExch) = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
             end
         end
-        
 
-        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
+
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).Molecule(iMol).DissGlobal(end) ) 
         for iExch = 1:Syst.NProc-2
-            fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
+            fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(end,iExch) ) 
+        end
+
+
+        for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+            if (Input.Kin.ReadOtherSyst(iSyst))
+                iMol = iSyst + 1;
+                fprintf(['Computing Global Rates Also for Molecule ', OtherSyst(iSyst).Syst.Molecule(1).Name, '\n'] )
+                iNBins = OtherSyst(iSyst).Syst.Molecule(1).EqNStatesIn;
+
+                Rates.T(Temp.iT).Molecule(iMol).DissGlobal = zeros(Kin.T(Temp.iT).NSteps,1);
+                Rates.T(Temp.iT).Molecule(iMol).ExchGlobal = zeros(Kin.T(Temp.iT).NSteps,OtherSyst(iSyst).Syst.NProc-2);
+
+                for iStep = 1:Kin.T(Temp.iT).NSteps
+                    Rates.T(Temp.iT).Molecule(iMol).DissGlobal(iStep)           = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,1)       .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+                    for iExch = 1:OtherSyst(iSyst).Syst.NProc-2
+                        Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(iStep,iExch) = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) .* Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)' ); 
+                    end
+                end
+
+
+                fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).Molecule(iMol).DissGlobal(end) ) 
+                for iExch = 1:OtherSyst(iSyst).Syst.NProc-2
+                    fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(end,iExch) ) 
+                end
+
+            end
         end
 
         
@@ -66,25 +88,25 @@ function Compute_Rates_Global()
         iMol   = Syst.Pair(1).ToMol;
         jMol   = Syst.Pair(6).ToMol;
 
-        Rates.T(Temp.iT).DissGlobal          = zeros(Kin.T(Temp.iT).NSteps,1);
-        Rates.T(Temp.iT).DissGlobal_Diss     = zeros(Kin.T(Temp.iT).NSteps,1);
-        Rates.T(Temp.iT).DissGlobal_DissInel = zeros(Kin.T(Temp.iT).NSteps,1);
+        Rates.T(Temp.iT).Molecule(iMol).DissGlobal          = zeros(Kin.T(Temp.iT).NSteps,1);
+        Rates.T(Temp.iT).Molecule(iMol).DissGlobal_Diss     = zeros(Kin.T(Temp.iT).NSteps,1);
+        Rates.T(Temp.iT).Molecule(iMol).DissGlobal_DissInel = zeros(Kin.T(Temp.iT).NSteps,1);
         
         for iStep = 1:Kin.T(Temp.iT).NSteps
 
             for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
                 for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                    Rates.T(Temp.iT).DissGlobal_Diss(iStep)     = Rates.T(Temp.iT).DissGlobal_Diss(iStep)     + 2.0 * Rates.T(Temp.iT).Diss(iBin,jBin,1)            * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
+                    Rates.T(Temp.iT).Molecule(iMol).DissGlobal_Diss(iStep)     = Rates.T(Temp.iT).Molecule(iMol).DissGlobal_Diss(iStep)     + 2.0 * Rates.T(Temp.iT).Diss(iBin,jBin,1)            * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
                 end
             end
 
             for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
                 for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                    Rates.T(Temp.iT).DissGlobal_DissInel(iStep) = Rates.T(Temp.iT).DissGlobal_DissInel(iStep) + sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1)))  * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
+                    Rates.T(Temp.iT).Molecule(iMol).DissGlobal_DissInel(iStep) = Rates.T(Temp.iT).Molecule(iMol).DissGlobal_DissInel(iStep) + sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1)))  * Kin.T(Temp.iT).Molecule(iMol).DF(iStep,iBin) * Kin.T(Temp.iT).Molecule(jMol).DF(iStep,jBin); 
                 end
             end
 
-            Rates.T(Temp.iT).DissGlobal(iStep)                  = Rates.T(Temp.iT).DissGlobal_Diss(iStep)     + Rates.T(Temp.iT).DissGlobal_DissInel(iStep);
+            Rates.T(Temp.iT).Molecule(iMol).DissGlobal(iStep)                  = Rates.T(Temp.iT).Molecule(iMol).DissGlobal_Diss(iStep)     + Rates.T(Temp.iT).Molecule(iMol).DissGlobal_DissInel(iStep);
 
         end
         

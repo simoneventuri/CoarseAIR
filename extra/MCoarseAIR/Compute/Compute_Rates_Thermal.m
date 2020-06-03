@@ -26,7 +26,7 @@ function Compute_Rates_Thermal()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Rates Syst Temp Input
+    global Rates Syst Temp Input OtherSyst
     
 
     fprintf('= Compute_Rates_Thermal ================ T = %i K\n', Temp.TNow)
@@ -36,53 +36,60 @@ function Compute_Rates_Thermal()
     if (Syst.NAtoms == 3)
     
         
-        iMol   = Syst.Pair(1).ToMol;
-        iNBins = Syst.Molecule(iMol).EqNStatesIn;
-        iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
-
-        ExchTot = zeros(iNBins, Syst.NProc-2);
-        for iExch = 1:Syst.NProc-2
-            ExchTot(:,iExch) = sum(Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
-        end
-        
-        Rates.T(Temp.iT).DissTh = 0.0;
-        Rates.T(Temp.iT).ExchTh = zeros(1,Syst.NProc-2);
-        for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
-            Rates.T(Temp.iT).DissTh              = sum( Rates.T(Temp.iT).Diss(:,1) .* iQTemp(:) ); 
-            for iExch = 1:Syst.NProc-2
-                Rates.T(Temp.iT).ExchTh(1,iExch) = sum( ExchTot(:,iExch)           .* iQTemp(:) ); 
+        for iMol = 1:length(Input.Kin.ReadOtherSyst)+1
+            if iMol == 1
+                ComputeFlg = true;
+                NProc      = Syst.NProc;
+            elseif (Input.Kin.ReadOtherSyst(iMol-1))
+                ComputeFlg = true;
+                NProc      = OtherSyst(iMol-1).Syst.NProc;
             end
-        end
-        
-        
-        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
-        for iExch = 1:Syst.NProc-2
-            fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
-        end
 
-        
-        %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
-        %
-        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
-        FileName           = strcat(Input.Paths.SaveDataFldr, '/KEq.csv');
-        if exist(FileName, 'file')
-            fileID1  = fopen(FileName,'a');
-        else
-            fileID1  = fopen(FileName,'w');
-            if Syst.NProc == 3
-                HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq \n');
-            else
-                HeaderStr = strcat('# T [K], K^D Eq, K_{', Syst.Molecule(Syst.ExchToMol(1)).Name, '}^E Eq, K_{', Syst.Molecule(Syst.ExchToMol(2)).Name, '}^E Eq \n');
+            if (ComputeFlg)
+                iNBins = Syst.Molecule(iMol).EqNStatesIn;
+                iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
+
+                Rates.T(Temp.iT).Molecule(iMol).DissTh = 0.0;
+                Rates.T(Temp.iT).Molecule(iMol).ExchTh = zeros(1,NProc-2);
+                for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
+                    Rates.T(Temp.iT).Molecule(iMol).DissTh              = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,1)       .* iQTemp(:) ); 
+                    for iExch = 1:NProc-2
+                        Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,iExch) = sum( Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) .* iQTemp(:) ); 
+                    end
+                end
+
+
+                fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).Molecule(iMol).DissTh )
+                for iExch = 1:NProc-2
+                    fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).Molecule(iMol).ExchTh(iExch) ) 
+                end
+
+
+                %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
+                %
+                [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
+                FileName           = strcat(Input.Paths.SaveDataFldr, '/KEq_', Input.Kin.Proc.OverallFlg, '_', Syst.Molecule(iMol).Name , '.csv');
+                if exist(FileName, 'file')
+                    fileID1  = fopen(FileName,'a');
+                else
+                    fileID1  = fopen(FileName,'w');
+                    if NProc == 3
+                        HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq \n');
+                    else
+                        HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K_2^E Eq \n');
+                    end
+                    fprintf(fileID1,HeaderStr);
+                end
+                if NProc == 3
+                    fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Rates.T(Temp.iT).Molecule(iMol).DissTh, Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1) );
+                else
+                    fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Rates.T(Temp.iT).Molecule(iMol).DissTh, Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1), Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,2) );
+                end
+                fclose(fileID1);
+            
             end
-            fprintf(fileID1,HeaderStr);
+
         end
-        if Syst.NProc == 3
-            fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Rates.T(Temp.iT).DissTh, Rates.T(Temp.iT).ExchTh(1,1) );
-        else
-            fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Rates.T(Temp.iT).DissTh, Rates.T(Temp.iT).ExchTh(1,1), Rates.T(Temp.iT).ExchTh(1,2) );
-        end
-        fclose(fileID1);
-        
         
     else
 

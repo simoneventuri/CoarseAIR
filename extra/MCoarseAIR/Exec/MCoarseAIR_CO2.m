@@ -21,10 +21,10 @@
 %%==============================================================================================================
 
 clear all
-%close all
+close all
 clc
 
-global Input Syst Temp Param Kin Rates
+global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 
 
 
@@ -37,9 +37,9 @@ Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/CO2_ALL/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Mars_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Mars_Database/HDF5_Database/');
-Input.TranVec               = [5000 10000 20000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000]
+Input.TranVec               = [12500 15000 20000]% [2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
 Input.SystNameLong          = 'CO2_NASA';
-Input.iPES                  = 1;
+Input.iPES                  = 0;
 Input.Suffix                = ''
 Input.RunSuffix             = '';
 
@@ -54,17 +54,19 @@ Input.Kin.CGM_Strategy      = ['CBM'; 'CBM'];
 Input.Kin.ParamsGroupsOut   = [  1.0,   1.0];
 Input.Kin.NGroupsOut        = [   83,    49];
 
-Input.Kin.Proc.DissFlg      = 1;
+Input.Kin.Proc.DissFlg      = 9;
 Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 0;
-Input.Kin.Proc.ExchFlg2     = 0;
+Input.Kin.Proc.ExchFlg1     = 1;
+Input.Kin.Proc.ExchFlg2     = 1;
 
-Input.Kin.ReadRatesProc     = [true, false, false, true]
+Input.Kin.ReadRatesProc     = [true, false, false,  true; ...
+                               true, false,  true, false]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.Kin.OtherExchInHDF5   = false
+Input.Kin.ReadOtherSyst     = [true]
+Input.Kin.OtherSystInHDF5   = [true]
 
 Input.FigureFormat          = 'PrePrint';
 Input.ReLoad                = 1;
@@ -73,7 +75,7 @@ Input.ReLoad                = 1;
 
 %% Inputs for Plotting
 Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 0;
+Input.SaveFigsFlgInt     = 2;
 Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Mars_Paper/Figures/');
 
 
@@ -93,7 +95,7 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
-Input.Tasks.Write_RatesParaview.Flg                    = true;
+Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [1e-12, 5e-13, 1e-13]
 % Compute Grouped Rate Coefficients
 Input.Tasks.Compute_GroupedRates.Flg                   = false;
@@ -102,38 +104,43 @@ Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = false;
+Input.Tasks.Plot_MoleFracs.Flg                         = true;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg                       = false;
+Input.Tasks.Plot_GlobalRates.Flg                       = true;
+Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1,2];
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1,2];
 % Plotting Vib. Distribution Function
 Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = false;
-Input.Tasks.Plot_Populations.MoleculesOI               = [1];
-Input.Tasks.Plot_Populations.tSteps                    = [5.e-10, 5.e-8, 5.e-6];
+Input.Tasks.Plot_Populations.Flg                       = true;
+Input.Tasks.Plot_Populations.MoleculesOI               = [1, 2];
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-9, 1.e-8, 1.e-7, 1e-6]%, 1e-5, 1e-4, 1e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
+Input.Tasks.Plot_Populations.ProcOI                    = [4,3];
 % Plotting Energies
 Input.Tasks.Plot_Energies.Flg                          = false;
-Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
+Input.Tasks.Plot_Energies.MoleculesOI                  = [1,2];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
-Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
+Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1,2];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
-Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
+Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,2; 2,2];
+Input.Tasks.Plot_EnergyDepletions.Targ                 = [  3;   4];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
-Initialize_ChemicalSyst()
+Syst.NameLong = Input.SystNameLong;
+Syst          = Initialize_ChemicalSyst(Syst)
 Initialize_Input()
 Initialize_Parameters()
 
@@ -143,7 +150,12 @@ Initialize_Parameters()
 if Input.ReLoad > 0 
 
     %% Reading Levels Info
-    Read_LevelInfo()
+    Syst = Read_LevelInfo(Syst)
+    for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+        if (Input.Kin.ReadOtherSyst(iSyst))
+            OtherSyst(iSyst).Syst = Read_LevelInfo(OtherSyst(iSyst).Syst);
+        end
+    end
     
     %% Grouping the Levels in Output
     Group_Out()
@@ -162,14 +174,19 @@ for iT = 1:length(Temp.TranVec)
     
     
     if Input.ReLoad > 0 
-        %close all
+        close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
         
         %% Reading Group Energies and Part Funcs
-        Read_EeV_and_Q_CG() 
+        Syst = Read_EeV_and_Q_CG(Syst) 
+        for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+            if (Input.Kin.ReadOtherSyst(iSyst))
+                OtherSyst(iSyst).Syst = Read_EeV_and_Q_CG(OtherSyst(iSyst).Syst);
+            end
+        end
         
         %% Compute Equilibrium Constants
         Compute_EqConsts()
@@ -333,5 +350,5 @@ for iT = 1:length(Temp.TranVec)
     
     
     %pause
-    %clear Rates Kin
+    clear Rates OtherRates Kin
 end

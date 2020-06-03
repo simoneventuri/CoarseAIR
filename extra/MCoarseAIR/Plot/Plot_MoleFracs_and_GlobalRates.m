@@ -24,7 +24,7 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates
+    global Input Kin Param Syst OtherSyst Temp Rates
 
     fprintf('= Plot_MoleFracs_and_GlobalRates ======= T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
@@ -42,14 +42,29 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     
     
     yyaxis right
-
+    
+    iC        = 1;
     ProcNames = [];
-    loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).DissGlobal, 'Color', Param.CMat(1,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
-    ProcNames = {'$\bar{K}^D$'};
-    hold on
-    for iExch = 1:Syst.NProc-2
-        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).ExchGlobal(:,iExch), 'Color', Param.CMat(iExch+1,:), 'linestyle', char(Param.linS(iExch+1)), 'LineWidth', Param.LineWidth)
-        ProcNames = [ProcNames, strcat('$\bar{K}_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}^E$')];
+    for iMol = Controls.MoleculesOI
+        if (iMol == 1)
+            NExch = Syst.NProc-2;
+        else
+            NExch = OtherSyst(iMol-1).Syst.NProc-2;
+        end
+        loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).Molecule(iMol).DissGlobal(:,1), 'Color', Param.CMat(iC,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+        iC        = iC + 1;
+        ProcNames = [ProcNames, {[Syst.Molecule(iMol).Name, ', $k_{Global}^D$']}];
+        hold on
+        for iExch = 1:NExch
+            if (iMol == 1)
+                TempStr = [Syst.Molecule(iMol).Name, ', $k_{Global}^{E_{', Syst.Molecule(Syst.ExchToMol(iExch)).Name,'}}$'];
+            else
+                TempStr = [Syst.Molecule(iMol).Name, ', $k_{Global}^{E_{', OtherSyst(iMol-1).Syst.Molecule(OtherSyst(iMol-1).Syst.ExchToMol(iExch)).Name,'}}$'];
+            end
+            loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(:,iExch), 'Color', Param.CMat(iC,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
+            iC        = iC + 1;
+            ProcNames = [ProcNames, TempStr];
+        end
     end
     hold on
     
@@ -67,7 +82,7 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     xlab.Interpreter = 'latex';
     %xlim(XLimPlot);
 
-    str_y = ['$\bar{K}$~$[cm^3/s]$'];
+    str_y = ['$k_{Global}$~$[cm^3/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim(YLimPlot);
@@ -80,11 +95,29 @@ function Plot_MoleFracs_and_GlobalRates(Controls)
     
     CompNames = [];
     for iComp = Controls.CompStart:Controls.CompEnd
-      semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
-      hold on
-      CompNames = [CompNames, Syst.CFDComp(iComp).Name];
+        semilogx(Kin.T(Temp.iT).t(:), Kin.T(Temp.iT).MolFracs(:,iComp), 'Color', Syst.CFDComp(iComp).Color, 'linestyle', Syst.CFDComp(iComp).LineStyle, 'LineWidth', Param.LineWidth)
+        hold on
+        CompNames = [CompNames, Syst.CFDComp(iComp).Name];
     end
     hold on
+
+    if (Input.Tasks.Plot_Populations.Flg)
+        jStep = 1;
+        for tStep = Input.Tasks.Plot_Populations.tSteps
+            iStep = 1;
+            while Kin.T(Temp.iT).t(iStep) < tStep
+                iStep = iStep + 1;
+            end  
+            Controls.iSteps(jStep) = iStep;
+            jStep = jStep + 1;
+        end
+        Controls.iSteps(jStep) = Kin.T(Temp.iT).QSS.i;
+        
+        for iMol = Input.Tasks.Plot_Populations.MoleculesOI
+            iComp = Syst.MolToCFDComp(iMol);
+            semilogx(Kin.T(Temp.iT).t(Controls.iSteps), Kin.T(Temp.iT).MolFracs(Controls.iSteps,iComp), 'o', 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'MarkerEdgeColor', Syst.CFDComp(iComp).Color)
+        end
+    end
     
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');

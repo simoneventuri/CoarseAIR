@@ -117,6 +117,7 @@ Module Collision_Class
     procedure ,public   ::    InitializeTrajectories
     procedure ,public   ::    SetInitialConditions
     procedure ,public   ::    ApplyTransformation
+    procedure ,public   ::    ApplyAntiTransformation
 
     procedure ,public   ::    Compute_PES =>  Compute_PES_1d
 
@@ -445,9 +446,10 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
       associate( PES => This%PESsContainer(iPES)%PES )
         allocate( PES%mMiMn( size(This%mMiMn) ) )
         PES%mMiMn = This%mMiMn
+        if (i_Debug_Loc) call Logger%Write( "This%PES(iPES)%mMiMn = ", PES%mMiMn )
       end associate
     end do
-    if (i_Debug_Loc) call Logger%Write( "This%PES(iPES)%mMiMn = ", This%PESsContainer(1)%PES%mMiMn )
+
 
     This%RedMass    =     This%Species(iSpeTar)%Mass * This%Species(iSpePro)%Mass / ( This%Species(iSpeTar)%Mass + This%Species(iSpePro)%Mass )
     if ( This%icoord == 0 ) then
@@ -476,7 +478,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     nsum = This%Species(iSpeTar)%NAtoms + This%Species(iSpePro)%NAtoms
     if ( This%icoord == 0 ) then
       if ( This%NAtoms /= nsum ) then
-      call Logger%Write( "the number of atoms do not match")
+        call Logger%Write( "the number of atoms do not match")
         stop
       end if
     else
@@ -1189,7 +1191,12 @@ Subroutine SetIniCondForward( This, iTraj, Input, Traj, i_Debug, i_Debug_Deep )
 ! ==============================================================================================================
 !     write entry to file specifying initial conditions
 ! ==============================================================================================================
-  if (i_Debug_Loc) call Logger%Write( "write entry to file specifying initial conditions. Calling SetInitialPaQ" )
+  if (i_Debug_Loc) then
+    call Logger%Write( "Write entry to file specifying initial conditions. Calling SetInitialPaQ" )
+    call Logger%Write( "Before SetInitialPaQ" )
+    call Logger%Write( "-> Traj%PaQ(1:6, iTraj) = ", Traj%PaQ(1:6, iTraj), Fr="*(es15.8,3x)")
+    call Logger%Write( "-> Traj%PaQ(7:12,iTraj) = ", Traj%PaQ(7:12,iTraj), Fr="*(es15.8,3x)")
+  end if
   call SetInitialPaQ( This, iTraj, Traj, dQijk )
   if (i_Debug_Loc) then
     call Logger%Write( "Done with SetInitialPaQ" )
@@ -1979,7 +1986,7 @@ End Subroutine
       jmin = mod(i,3)
       if ( jmin == 0 ) jmin = 3
       do j = jmin,This%NEqtVar,3
-        Eki(i) = Eki(i) + This%Transformation%Tpq(i,j) * Traj%PaQ(j,iTraj)
+        Eki(i) = Eki(i) + This%Transformation%Tpq(j,i) * Traj%PaQ(j,iTraj)
       end do
     end do
     do i = 1,This%NEqtVar
@@ -2037,20 +2044,23 @@ PURITY Subroutine Hamiltonian_1d( This, Traj )
 ! ==============================================================================================================
 !   COMPUTING THE KINETIC PART OF THE HAMILTONIAN (TIMES TWO)
 ! ==============================================================================================================
-  Traj%H(1:N)       =   Zero
   if ( .Not. This%NormalKineticEnergy ) then
     do k = 1,N
-      Eki           =   Zero
+      Traj%H(k) = Zero
+      Eki       = Zero
       do i = 1,This%NEqtVar
-        jmin        =   mod(i,3)
+        jmin = mod(i,3)
         if ( jmin == 0 ) jmin = 3
         do j = jmin,This%NEqtVar,3
-          Eki(i)    =   Eki(i) + This%Transformation%Tpq(i,j) * Traj%PaQ(j,k)
+          Eki(i)    =   Eki(i) + This%Transformation%Tpq(j,i) * Traj%PaQ(j,k)
         end do
       end do
-      Traj%H(k)     =   Traj%H(k) + Traj%PaQ(i,k) * Eki(i)
+      do i = 1,This%NEqtVar
+        Traj%H(k)   =   Traj%H(k) + Traj%PaQ(i,k) * Eki(i)
+      end do
     end do
   else
+    Traj%H(1:N)       =   Zero
     do i = 1,This%NEqtVar
       j      =   i / 3
       if ( 3*j /= i ) j = j + 1
@@ -2067,7 +2077,7 @@ PURITY Subroutine Hamiltonian_1d( This, Traj )
   call This%Compute_Rp( Q, Rxyz, Rp )                                                                           ! Computing the cartesian coordinates of last atom (not used) and the atom-atom distances
   do iTraj = 1,size(Rp,2)
     QAll     = [Q(:,iTraj), Rxyz(:,iTraj)]
-    V(iTraj) = This%PESsContainer(Traj%iPES(iTraj))%PES%Potential( Rp(:,iTraj), QAll(:) )                    ! Computing the intramolecular potential
+    V(iTraj) = This%PESsContainer(Traj%iPES(iTraj))%PES%Potential( Rp(:,iTraj), QAll(:) )                       ! Computing the intramolecular potential
   end do
   Traj%Rpi(:,1:N)   =   One / Rp                                                                                ! Computing the inverse of the atom-atom distances
   Traj%H(1:N)       =   Traj%H(1:N) * Half + V                                                                  ! Adding the potential part to the Hamiltonian
@@ -2208,7 +2218,12 @@ PURITY Subroutine Compute_Rp_0d( This, Q, Rxyz, Rp )
   real(rkp) ,dimension(size(Rp),N)                        ::    Rp_         ! Distances of atom-atom pairs [bohr]. Dim=(NPairs,NTraj)
   
   Q_(:,N)     =   Q(:)
-  call This%Compute_Rp( Q_, Rxyz_, Rp_ )
+  if ( This%NAtoms == 3 ) then
+    call Compute_Rp_CartCoord_3Atoms( This%mMiMn, Q_, Rxyz_, Rp_ )
+  else if (This%NAtoms == 4) then 
+    call Compute_Rp_CartCoord_4Atoms( This%mMiMn, Q_, Rxyz_, Rp_ )
+  end if
+  !call This%Compute_Rp( Q_, Rxyz_, Rp_ )
   Rxyz(:)     =   Rxyz_(:,N)
   Rp(:)       =   Rp_(:,N)
   
@@ -2330,7 +2345,7 @@ End Function
 
 
 !________________________________________________________________________________________________________________________________!
-Pure Subroutine SetInitialPaQ( This, iTraj, Traj, dQijk )
+Subroutine SetInitialPaQ( This, iTraj, Traj, dQijk )
 ! Write entry to file specifying initial conditions
 
   use Trajectories_Class    ,only:  Trajectories_Type
@@ -2348,18 +2363,21 @@ Pure Subroutine SetInitialPaQ( This, iTraj, Traj, dQijk )
 
   iE     =   1
   if ( This%icoord == 0 ) then
+    
     do iA = 1,This%Species(iSpeTar)%NAtoms
       do iS = 1,NSpace
         Traj%PaQ0(iE,iTraj) =   dQijk(iS,iA,1)
         iE                  =   iE + 1
       end do
     end do
+    
     do iA = 1,This%Species(iSpePro)%NAtoms-1
       do iS = 1,NSpace
         Traj%PaQ0(iE,iTraj) =   dQijk(iS,iA,2)
         iE                  =   iE + 1
       end do
     end do
+  
   else
     do jE = 1,This%NEqtVar
       Traj%PaQ0(iE,iTraj)   =   Traj%PaQ(jE,iTraj)
@@ -2376,7 +2394,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Pure Function ApplyTransformation( This, iTraj, Traj ) result(PaQ)
+Function ApplyTransformation( This, iTraj, Traj ) result(PaQ)
 ! If Collision%NormalKineticEnergy=False, then the P will be modified. The Q value always remain unchanged
 
   use Trajectories_Class    ,only:  Trajectories_Type
@@ -2390,13 +2408,47 @@ Pure Function ApplyTransformation( This, iTraj, Traj ) result(PaQ)
   integer                                                   ::    i, j
 
   PaQ     =   Traj%PaQ(:,iTraj)
+
   if ( .Not. This%NormalKineticEnergy ) then
     PaQ(1:This%NEqtVar)   =   Zero
+    
     do i = 1,This%NEqtVar
       do j = 1,This%NEqtVar
         PaQ(i) = PaQ(i) + This%Transformation%Tpq(i,j) * Traj%PaQ(j,iTraj)
       end do
     end do
+  
+  end if
+
+End Function
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+!________________________________________________________________________________________________________________________________!
+Function ApplyAntiTransformation( This, iTraj, Traj ) result(PaQ)
+! If Collision%NormalKineticEnergy=False, then the P will be modified. The Q value always remain unchanged
+
+  use Trajectories_Class    ,only:  Trajectories_Type
+  use Parameters_Module     ,only:  Zero
+
+  class(Collision_Type)                     ,intent(in)     ::    This
+  integer                                   ,intent(in)     ::    iTraj
+  type(Trajectories_Type)                   ,intent(in)     ::    Traj
+  real(rkp)   ,dimension( This%NEqtTot )                    ::    PaQ     ! Dim=(NEqtTot)
+
+  integer                                                   ::    i, j
+
+  PaQ     =   Traj%PaQ(:,iTraj)
+
+  if ( .Not. This%NormalKineticEnergy ) then
+    PaQ(1:This%NEqtVar)   =   Zero
+    
+    do i = 1,This%NEqtVar
+      do j = 1,This%NEqtVar
+        PaQ(i) = PaQ(i) + This%Transformation%Tqp(i,j) * Traj%PaQ(j,iTraj)
+      end do
+    end do
+  
   end if
 
 End Function

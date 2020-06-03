@@ -24,7 +24,7 @@ clear all
 close all
 clc
 
-global Input Syst Temp Param Kin Rates
+global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 
 
 
@@ -64,7 +64,8 @@ Input.Kin.Proc.ExchFlg2     = 0;
 
 Input.Kin.ReadRatesProc     = [true, false, false]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.Kin.OtherExchInHDF5   = false
+Input.Kin.ReadOtherSyst     = []
+Input.Kin.OtherSystInHDF5   = []
 
 Input.FigureFormat          = 'PrePrint';
 Input.ReLoad                = 1;
@@ -106,10 +107,12 @@ Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
+Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1,2];
 % Plotting Mole Fractions and Global Rates
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 2;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1,2];
 % Plotting Vib. Distribution Function
 Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
@@ -132,7 +135,8 @@ Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [1,2];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
-Initialize_ChemicalSyst()
+Syst.NameLong = Input.SystNameLong;
+Syst          = Initialize_ChemicalSyst(Syst)
 Initialize_Input()
 Initialize_Parameters()
 
@@ -142,7 +146,12 @@ Initialize_Parameters()
 if Input.ReLoad > 0 
 
     %% Reading Levels Info
-    Read_LevelInfo()
+    Syst = Read_LevelInfo(Syst)
+    for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+        if (Input.Kin.ReadOtherSyst(iSyst))
+            OtherSyst(iSyst).Syst = Read_LevelInfo(OtherSyst(iSyst).Syst);
+        end
+    end
 
     %% Grouping the Levels in Output
     Group_Out()
@@ -167,7 +176,12 @@ for iT = 1:length(Temp.TranVec)
         %%
         
         %% Reading Group Energies and Part Funcs
-        Read_EeV_and_Q_CG() 
+        Syst = Read_EeV_and_Q_CG(Syst) 
+        for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+            if (Input.Kin.ReadOtherSyst(iSyst))
+                OtherSyst(iSyst).Syst = Read_EeV_and_Q_CG(OtherSyst(iSyst).Syst);
+            end
+        end
         
         %% Compute Equilibrium Constants
         Compute_EqConsts()

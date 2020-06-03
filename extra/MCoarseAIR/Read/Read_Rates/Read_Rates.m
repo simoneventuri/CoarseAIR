@@ -26,74 +26,14 @@ function Read_Rates()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Input Rates Syst Temp
+    global Input Rates Syst Temp OtherSyst OtherRates
   
     
     fprintf('= Read_Rates =========================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
     fprintf('Reading Rates \n\n' )
     
-    
-    if (Syst.NAtoms == 3)
-        
-        iMol    = Syst.Pair(1).ToMol;
-        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
-    
-        Rates.T(Temp.iT).Diss                 = zeros(iNBins, 4);
-        Rates.T(Temp.iT).Inel                 = zeros(iNBins, iNBins);
-        for iExch = 1:size(Syst.ExchToMol,1)
-            kMol    = Syst.ExchToMol(iExch,1);
-            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
-            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, kNBins);
-        end
-        
-    else
 
-        iMol    = Syst.Pair(1).ToMol;
-        jMol    = Syst.Pair(6).ToMol;
-        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
-        jNBins  = Syst.Molecule(jMol).EqNStatesIn;    
-
-        Rates.T(Temp.iT).Diss                 = zeros(iNBins, jNBins, 4);
-        Rates.T(Temp.iT).DissInel             = zeros(iNBins, jNBins, iNBins, Syst.NMolecules+6);
-        Rates.T(Temp.iT).Inel                 = zeros(iNBins, jNBins, iNBins, jNBins);
-        for iExch = 1:size(Syst.ExchToMol,1)
-            kMol    = Syst.ExchToMol(iExch,1);
-            lMol    = Syst.ExchToMol(iExch,2);
-            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
-            lNBins  = Syst.Molecule(lMol).EqNStatesIn; 
-            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, jNBins, kNBins, lNBins);
-        end
-        
-    end
-
-    
-    if strcmp(Input.Kin.RateSource, 'HDF5')
-        
-        Read_Rates_FromHDF5();
-    
-    elseif strcmp(Input.Kin.RateSource, 'PLATO')
-        
-        Read_Rates_FromPLATO();
-        
-    elseif strcmp(Input.Kin.RateSource, 'CoarseAIR')
-        
-        Read_Rates_FromCoarseAIR() 
-        
-    elseif strcmp(Input.Kin.RateSource, 'CG-QCT')
-        
-        Read_Rates_FromCoarseAIR() 
-   
-    end
-    
-    
-    if (Input.Kin.DissCorrFactor ~= 1)
-        fprintf(['Correcting Dissociation Rate by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
-        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
-    end
-    
-    
-    
 %     TempBins = Input.Kin.NGroupsOut(1); 
 %     opts = delimitedTextImportOptions("NumVariables", 7);
 %     opts.DataLines = [1, Inf];
@@ -133,22 +73,105 @@ function Read_Rates()
 %         clear TempRates;
 %     end
     
-
-
-    fprintf(strcat('Computing Overall Rates \n') )
+    
+    Rates = Read_RatesLocal(Rates, Syst, OtherSyst(1).Syst, 1);
+    
     if (Syst.NAtoms == 3)
 
-        Rates.T(Temp.iT).Overall(:,1)           =      Rates.T(Temp.iT).Diss(:,1);
-        Rates.T(Temp.iT).Overall(:,2)           = sum( Rates.T(Temp.iT).Inel(:,1),           2);
+        Rates.T(Temp.iT).Molecule(1).Overall(:,1) = Rates.T(Temp.iT).Diss(:,1);
+        Rates.T(Temp.iT).Molecule(1).Overall(:,2) = sum( Rates.T(Temp.iT).Inel(:,1), 2);
         for iExch = 1:size(Syst.ExchToMol,1)
-            Rates.T(Temp.iT).Overall(:,2+iExch) = sum( Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+            Rates.T(Temp.iT).Molecule(1).Overall(:,2+iExch) = sum( Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
         end
 
-    else
-        
     end
-        
+    
+    
+    iMol = 2;
+    for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+        if (Input.Kin.ReadOtherSyst(iSyst))
+            fprintf(['Loading Rates also for the ', OtherSyst(iSyst).Syst.NameLong, ' System \n\n'] )
+            
+            OtherRates(iSyst).Rates.Diss = 0.0;
+            OtherRates(iSyst).Rates      = Read_RatesLocal(OtherRates(iSyst).Rates, OtherSyst(iSyst).Syst, Syst, iSyst+1);
+
+            if (Syst.NAtoms == 3)
+                 Rates.T(Temp.iT).Molecule(iMol).Overall(:,1) = OtherRates(iSyst).Rates.T(Temp.iT).Diss(:,1);
+                for iExch = 1:size(OtherSyst(iSyst).Syst.ExchToMol,1)
+                    Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) = sum( OtherRates(iSyst).Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+                end
+            end
+
+        end
+        iMol = iMol+1;
+    end
+
         
     fprintf('====================================================\n\n')  
     
+end
+
+
+function [Rates] = Read_RatesLocal(Rates, Syst, OtherSyst, iSyst)
+
+    global Input Temp
+
+    if (Syst.NAtoms == 3)
+        
+        iMol    = Syst.Pair(1).ToMol;
+        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
+    
+        Rates.T(Temp.iT).Diss                 = zeros(iNBins, 4);
+        Rates.T(Temp.iT).Inel                 = zeros(iNBins, iNBins);
+        for iExch = 1:size(Syst.ExchToMol,1)
+            kMol    = Syst.ExchToMol(iExch,1);
+            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
+            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, kNBins);
+        end
+        
+    else
+
+        iMol    = Syst.Pair(1).ToMol;
+        jMol    = Syst.Pair(6).ToMol;
+        iNBins  = Syst.Molecule(iMol).EqNStatesIn;
+        jNBins  = Syst.Molecule(jMol).EqNStatesIn;    
+
+        Rates.T(Temp.iT).Diss                 = zeros(iNBins, jNBins, 4);
+        Rates.T(Temp.iT).DissInel             = zeros(iNBins, jNBins, iNBins, Syst.NMolecules+6);
+        Rates.T(Temp.iT).Inel                 = zeros(iNBins, jNBins, iNBins, jNBins);
+        for iExch = 1:size(Syst.ExchToMol,1)
+            kMol    = Syst.ExchToMol(iExch,1);
+            lMol    = Syst.ExchToMol(iExch,2);
+            kNBins  = Syst.Molecule(kMol).EqNStatesIn;
+            lNBins  = Syst.Molecule(lMol).EqNStatesIn; 
+            Rates.T(Temp.iT).ExchType(iExch).Exch = zeros(iNBins, jNBins, kNBins, lNBins);
+        end
+        
+    end
+
+    
+    if strcmp(Input.Kin.RateSource, 'HDF5')
+        
+        [Rates] = Read_Rates_FromHDF5(Rates, Syst, OtherSyst, iSyst);
+    
+    elseif strcmp(Input.Kin.RateSource, 'PLATO')
+        
+        [Rates] = Read_Rates_FromPLATO(Rates, Syst, OtherSyst);
+        
+    elseif strcmp(Input.Kin.RateSource, 'CoarseAIR')
+        
+        [Rates] = Read_Rates_FromCoarseAIR(Rates, Syst, OtherSyst);
+        
+    elseif strcmp(Input.Kin.RateSource, 'CG-QCT')
+        
+        [Rates] = Read_Rates_FromCGQCT(Rates, Syst, OtherSyst);
+   
+    end
+    
+    
+    if (Input.Kin.DissCorrFactor ~= 1)
+        fprintf(['Correcting Dissociation Rate by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
+        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
+    end
+
 end

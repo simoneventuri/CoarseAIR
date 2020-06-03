@@ -1,6 +1,6 @@
 %% The Function reads and plots the Vectors of Dissociation and Exchange Overall Rate Coefficients (at Equilibrium and QSS)
 %
-function Plot_Ks()
+function Plot_Ks(ExchToMol)
 
     %%==============================================================================================================
     % 
@@ -23,13 +23,13 @@ function Plot_Ks()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Param Syst
+    global Input Param
 
     fprintf('= Plot_Ks ==========================================\n')
     fprintf('====================================================\n')
 
     
-    if length(Syst.ExchToMol) == 2
+    if length(ExchToMol) == 2
         opts = delimitedTextImportOptions("NumVariables", 7);
         opts.DataLines = [2, Inf];
         opts.Delimiter = ",";
@@ -74,7 +74,7 @@ function Plot_Ks()
     hold on
     h3 = semilogy(10000.0 ./ TVec, KEEq,      'Color', Param.CMat(2,:), 'linestyle', char(Param.linS(2)), 'LineWidth', Param.LineWidth);
     h4 = semilogy(10000.0 ./ TVec, KDEq+KEEq, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
-    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{E}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}, {'$k^{Dep}$'}];
+    PlotNames = [{'$k^{D}$'}, {strcat('$k^{E}$')}, {'$k^{Dep}$'}];
 
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
@@ -122,7 +122,7 @@ function Plot_Ks()
     hold on
     h3 = semilogy(10000.0 ./ TVec, KEQSS,       'Color', Param.CMat(2,:), 'linestyle', char(Param.linS(2)), 'LineWidth', Param.LineWidth);
     h4 = semilogy(10000.0 ./ TVec, KDQSS+KEQSS, 'Color', Param.CMat(3,:), 'linestyle', char(Param.linS(3)), 'LineWidth', Param.LineWidth);
-    PlotNames = [{'$k^{D}$'}, {strcat('$k^{{E}_{',Syst.Molecule(Syst.ExchToMol(end)).Name,'}}$')}, {'$k^{Dep}$'}];
+    PlotNames = [{'$k^{D}$'}, {strcat('$k^{E}$')}, {'$k^{Dep}$'}];
 
     xt = get(gca, 'XTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');

@@ -73,6 +73,8 @@ Module Integrator_Class
     integer                                    ::    NTrajOverall
     integer                                    ::    iProc
 
+    logical                                    ::    CMFrameFlg = .True.
+
   contains
     private
     procedure ,public   ::    Initialize            =>  InitializeIntegrator
@@ -228,6 +230,8 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
   real(rkp) ,dimension(:)         ,allocatable              ::    buff                    ! Dim=(NEqtTot+2)
   type(Trajectories_Type)                                   ::    Traj
   type(Trajectories_Type)                                   ::    TrajTemp
+  type(Trajectories_Type)                                   ::    TrajTemp0
+  type(Trajectories_Type)                                   ::    TrajTempF
   character(*)                                  ,parameter  ::    ProcName = 'Integrate'
   integer ,parameter                                        ::    IterMax = 100000
   integer                                                   ::    Iter
@@ -386,17 +390,19 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
       flush(Logger%Unit)
       call CPU_Time( StartTime2 )
       Traj%NTraj = NTrajTemp
+      TrajTemp0     = Traj
+      TrajTemp0%PaQ = Traj%PaQ0
 
 
       ! ==============================================================================================================
       !  INTEGRATION LOOP
       ! *** ===========================================================================================================
       if (i_Debug_Loc) call Logger%Write( "Starting integration", NewLine=.True. )
-      
+
+     
       Iter =   0
       Intagration_Loop: do 
         Iter = Iter + 1
-        
    
         if ( .Not. Restart ) then
           Outer: do iCall = 1,Input%ncall
@@ -416,17 +422,13 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
             
           end do Outer
         end if
-        
-              
+            
         call Collision%Hamiltonian( Traj )
-        
 
-        if ((Input%PaQEvoFlg) .or. (Input%XXEvoFlg)) call This%PrintingEvo( Input, Collision, Traj, TrajTemp, Converged, i_Debug=i_Debug_Loc )
-        
-        
         Converged(1:Traj%NTraj) = Traj%AssessConvergence()
-        
-        
+        if ((Input%PaQEvoFlg) .or. (Input%XXEvoFlg)) call This%PrintingEvo( Input, Collision, Traj, TrajTemp, Converged, i_Debug=i_Debug_Loc )
+
+
         if ( any(Converged(1:Traj%NTraj)) ) exit Intagration_Loop                                   ! If at least one trajectory is converged, then exiting the integration loop
       end do Intagration_Loop                                                                                                                    
       if ( Iter == IterMax ) call Error( "Error: In Integrate, the maximum number of iteration has been reached" )
@@ -438,9 +440,13 @@ Subroutine Integrate( This, Input, Collision, i_Debug, i_Debug_ODE )
         if ( .Not. Converged(iTraj) ) cycle                                                                                         ! If current trajectory is not converged, then cycle
         
         Traj%PaQ(:,iTraj) = Collision%ApplyTransformation( iTraj, Traj )
+        
         !if ( Input%BwrdIntegrationFlg ) call Traj%DoBackwardStuff( iTraj, PaQ(:), itemp )
         IdxOverall = (This%NTrajOverall) * (This%iProc-1) + Traj%Idx(iTraj)
-        if (Input%PaQSolFlg) write(This%PaQSolFile%Unit,This%PaQSolFile%Format) IdxOverall, Traj%t(iTraj), Traj%H0(iTraj), Traj%PaQ0(:,iTraj), Traj%H(iTraj), Traj%PaQ(:,iTraj)
+
+
+        if (Input%PaQSolFlg) write(This%PaQSolFile%Unit,This%PaQSolFile%Format) IdxOverall, Traj%t(iTraj), Traj%H0(iTraj), TrajTemp0%PaQ(:,iTraj), Traj%H(iTraj), Traj%PaQ(:,iTraj)
+        
         
         call This%UpdateStatistics( iTraj, Traj )
         
@@ -1056,6 +1062,12 @@ Subroutine InitializePrintingEvo( This, Input, Collision, Traj, TrajTemp, iTraj,
   iPToAtom(2,:) = [1,3,2,4]
   iPToAtom(3,:) = [2,3,1,4]
 
+
+  TrajTemp              = Traj
+  TrajTemp%PaQ(:,iTraj) = Traj%PaQ0(:,iTraj)
+  call This%TrajTemp%SetData( Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj) )
+
+
   ! ==============================================================================================================
   !  OPENING AND WRITING HEADER FOR THE PAQ EVOLUTION
   ! ==============================================================================================================
@@ -1068,7 +1080,14 @@ Subroutine InitializePrintingEvo( This, Input, Collision, Traj, TrajTemp, iTraj,
       if (This%PaQEvoFile(iTraj)%Status /= 0) call Error( "Error opening file: " // This%PaQEvoFile(iTraj)%Name )
       This%PaQEvoFile(iTraj)%Format = "(2x,*(3x,es15.8:))"
       write(This%PaQEvoFile(iTraj)%Unit,"('#',3x,*(3x,a15:))") [ character(15) :: "time", "H", ("PaQ("//Convert_To_String(i)//")",i=1,Collision%NEqtTot) ]
-      write(This%PaQEvoFile(iTraj)%Unit,This%PaQEvoFile(iTraj)%Format) Zero, Traj%H0(iTraj), Traj%PaQ0(:,iTraj)
+      
+      if (.not. This%CMFrameFlg) then
+        call This%TrajTemp%SetData( Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj) )
+        TrajTemp%PaQ(:,iTraj) = Collision%ApplyAntiTransformation( iTraj, TrajTemp )
+      end if
+
+      call This%TrajTemp%SetData( Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj) )
+      write(This%PaQEvoFile(iTraj)%Unit,This%PaQEvoFile(iTraj)%Format) Zero, Traj%H0(iTraj), TrajTemp%PaQ(:,iTraj)
     end if
   end if
   ! ==============================================================================================================
@@ -1079,6 +1098,9 @@ Subroutine InitializePrintingEvo( This, Input, Collision, Traj, TrajTemp, iTraj,
   ! ==============================================================================================================
   if (Input%XXEvoFlg) then
     if (This%XXEvoFile(iTraj)%Active) then
+      
+      call ComputeCoordAndVeloc( This%TrajTemp, Collision, xx, xxdot )   
+
       if (Input%XXEvoSnglFileFlg) then
         if (i_Debug_Loc) call Logger%Write( "Opening the evolution file (XXEvo-*.out)? ", This%XXEvoFile(iTraj)%Active )
 
@@ -1236,7 +1258,7 @@ Subroutine PrintingEvo( This, Input, Collision, Traj, TrajTemp, Converged, i_Deb
   use Trajectories_Class          ,only:  Trajectories_Type
   use String_Module               ,only:  Convert_Ratio, Convert_To_Real, Convert_To_String
   use Sorting_Module              ,only:  hpsort
-  
+
   class(Integrator_Type)                    ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
@@ -1251,9 +1273,9 @@ Subroutine PrintingEvo( This, Input, Collision, Traj, TrajTemp, Converged, i_Deb
   logical                                                   ::    i_Debug_Loc
   real(rkp) ,dimension(3)                                   ::    Rbs, Rbs_                   
   integer   ,dimension(3)                                   ::    iRbs 
-  integer                                                   ::    i, j, iP, jP, iTrajj 
-  integer   ,dimension(3,4)                                 ::    iPToAtom         
-
+  integer                                                   ::    i, j, iP, jP, iTrajj, NEqtVar 
+  integer   ,dimension(3,4)                                 ::    iPToAtom        
+  real(rkp) ,dimension(12)                                  ::    PaQ 
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "PrintingEvo" )
@@ -1263,18 +1285,24 @@ Subroutine PrintingEvo( This, Input, Collision, Traj, TrajTemp, Converged, i_Deb
   iPToAtom(2,:) = [1,3,2,4]
   iPToAtom(3,:) = [2,3,1,4]
   
+
   do iTraj = 1,Traj%NTraj
     if (.not. Converged(iTraj)) then
       
-      TrajTemp%PaQ(:,iTraj) = Collision%ApplyTransformation( iTraj, Traj )
+      if (This%CMFrameFlg) then
+        TrajTemp%PaQ(:,iTraj) = Collision%ApplyTransformation( iTraj, Traj )
+      else
+        TrajTemp%PaQ(:,iTraj) = Traj%PaQ(:,iTraj)
+      end if
       call This%TrajTemp%SetData( Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj) )
-      
+
       if (Input%PaQEvoFlg) then
         if (This%PaQEvoFile(Traj%Idx(iTraj))%Active) then
           write(This%PaQEvoFile(Traj%Idx(iTraj))%Unit,This%PaQEvoFile(Traj%Idx(iTraj))%Format)  Traj%t(iTraj), Traj%H(iTraj), TrajTemp%PaQ(:,iTraj)
         end if
       end if
-    
+
+      
       if (Input%XXEvoFlg) then
         if (This%XXEvoFile(Traj%Idx(iTraj))%Active) then
         

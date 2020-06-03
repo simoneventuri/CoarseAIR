@@ -3,7 +3,7 @@
 %  Input Global Var: - Temp.TNowChar
 %                    - Syst.HDF5_File
 %
-function Read_Rates_FromCGQCT()    
+function [Rates] = Read_Rates_FromCGQCT(Rates, Syst, OtherSyst)    
 
     %%==============================================================================================================
     % 
@@ -26,7 +26,7 @@ function Read_Rates_FromCGQCT()
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
     
-    global Input Rates Syst Temp Param  
+    global Input Temp Param  
     
     
     fprintf('  = Read_Rates_FromCGQCT ================= T = %i K\n', Temp.TNow)
