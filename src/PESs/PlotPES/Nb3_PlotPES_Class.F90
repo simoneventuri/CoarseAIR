@@ -252,14 +252,14 @@ Subroutine Nb3_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
                 end if
                 !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
                 if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
-                  write(Unit,'(es17.6E3,3(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
+                  write(Unit,'(es17.6E3,3(A,es25.15E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
                 end if
                 
               elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
                 
                 call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Zero*Rp, V, dVdR, dVdQ )     
                 if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
-                  write(Unit,'(es15.6,6(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
+                  write(Unit,'(es15.6,6(A,es25.15))') Rp(1), ',', Rp(2), ',', Rp(3), ',', (V - VRef) * VConverter, ',', (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter 
                 end if
                 
               end if  

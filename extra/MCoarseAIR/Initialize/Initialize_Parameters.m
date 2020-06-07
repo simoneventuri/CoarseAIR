@@ -43,6 +43,8 @@ function Initialize_Parameters
     Param.AvN      = 6.0221409e+23;
     Param.AMUToKg  = 1.d0/Param.AvN*1.d-3;
     Param.EhToeV   = 27.2113839712790;
+    Param.KcmToEh  = 0.159360144e-2;
+    Param.BToAng   = 0.52917721067d0;
     Param.DSWtoKg  = 1.d-3/1.8208e+03;
     Param.ATMToPa  = 101325.d0;
 

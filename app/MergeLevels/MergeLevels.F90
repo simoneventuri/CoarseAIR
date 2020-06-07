@@ -52,8 +52,8 @@ Program MergeLevels
   integer                                           ::    Status
   real(rkp)                                         ::    StartTime, EndTime
 
-  logical   ,parameter                              ::    i_Debug_ML        = .False.
-  logical   ,parameter                              ::    i_Debug_ML_Deep   = .False.
+  logical   ,parameter                              ::    i_Debug_ML        = .True.
+  logical   ,parameter                              ::    i_Debug_ML_Deep   = .True.
   
   call CPU_Time( StartTime )
   

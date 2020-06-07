@@ -497,7 +497,7 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   ! ==============================================================================================================
 
 
-  if ( (TaskType_Loc == 2) .or. (TaskType_Loc == 3) .or. (TaskType_Loc > 5) ) then   !!! <----- If NOT PLOTTING PES, RUNNING TRAJECTORIES or COMPUTING STATISTICS
+  if ( (TaskType_Loc == 1) .or. (TaskType_Loc == 2) .or. (TaskType_Loc == 3) .or. (TaskType_Loc > 5) ) then   !!! <----- If NOT RUNNING TRAJECTORIES or COMPUTING STATISTICS
     ! ==============================================================================================================
     !   7. INITIALING MOLECULES (WITH LEVELS AND BINS)
     ! ==============================================================================================================

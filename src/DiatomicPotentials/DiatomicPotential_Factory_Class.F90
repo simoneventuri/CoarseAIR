@@ -45,22 +45,24 @@ Module DiatomicPotential_Factory_Class
 !________________________________________________________________________________________________________________________________!
 Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
 
-  use Atom_Class                          ,only:  Atom_Type
-  use Input_Class                         ,only:  Input_Type
-  use DiatomicPotential_Class             ,only:  DiatomicPotential_Type
-  use Null_DiatomicPotential_Class        ,only:  Null_DiatomicPotential_Type
-  use Morse_DiatomicPotential_Class       ,only:  Morse_DiatomicPotential_Type
-  use N2_LeRoy_DiatomicPotential_Class    ,only:  N2_LeRoy_DiatomicPotential_Type
-  use O2_UMN_DiatomicPotential_Class      ,only:  O2_UMN_DiatomicPotential_Type
-  use O2_Varandas_DiatomicPotential_Class ,only:  O2_Varandas_DiatomicPotential_Type
-  use O2_NASA_DiatomicPotential_Class     ,only:  O2_NASA_DiatomicPotential_Type
-  use CO_DiatomicPotential_Class          ,only:  CO_DiatomicPotential_Type
+  use Atom_Class                             ,only:  Atom_Type
+  use Input_Class                            ,only:  Input_Type
+  use DiatomicPotential_Class                ,only:  DiatomicPotential_Type
+  use Null_DiatomicPotential_Class           ,only:  Null_DiatomicPotential_Type
+  use Morse_DiatomicPotential_Class          ,only:  Morse_DiatomicPotential_Type
+  use N2_LeRoy_DiatomicPotential_Class       ,only:  N2_LeRoy_DiatomicPotential_Type
+  use O2_UMN_DiatomicPotential_Class         ,only:  O2_UMN_DiatomicPotential_Type
+  use O2_Basel_DiatomicPotential_Class       ,only:  O2_Basel_DiatomicPotential_Type
+  use O2_Varandas_DiatomicPotential_Class    ,only:  O2_Varandas_DiatomicPotential_Type
+  use O2_NASA_DiatomicPotential_Class        ,only:  O2_NASA_DiatomicPotential_Type
+  use CO_DiatomicPotential_Class             ,only:  CO_DiatomicPotential_Type
   use N2_UMN_ForN4_DiatomicPotential_Class   ,only:  N2_UMN_ForN4_DiatomicPotential_Type
   use N2_UMN_ForN2O2_DiatomicPotential_Class ,only:  N2_UMN_ForN2O2_DiatomicPotential_Type
-  use NO_UMN_DiatomicPotential_Class      ,only:  NO_UMN_DiatomicPotential_Type
-  use CN_UIUC_DiatomicPotential_Class     ,only:  CN_UIUC_DiatomicPotential_Type
-  use HN_UIUC_DiatomicPotential_Class     ,only:  HN_UIUC_DiatomicPotential_Type
-  use CH_UIUC_DiatomicPotential_Class     ,only:  CH_UIUC_DiatomicPotential_Type
+  use NO_UMN_DiatomicPotential_Class         ,only:  NO_UMN_DiatomicPotential_Type
+  use NO_Basel_DiatomicPotential_Class       ,only:  NO_Basel_DiatomicPotential_Type
+  use CN_UIUC_DiatomicPotential_Class        ,only:  CN_UIUC_DiatomicPotential_Type
+  use HN_UIUC_DiatomicPotential_Class        ,only:  HN_UIUC_DiatomicPotential_Type
+  use CH_UIUC_DiatomicPotential_Class        ,only:  CH_UIUC_DiatomicPotential_Type
 
   type(Atom_Type) ,dimension(:)                 ,intent(in)     ::    Atoms
   integer         ,dimension(:)                 ,intent(in)     ::    iA
@@ -102,6 +104,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
       else
 
         select case ( SpeciesName )
+
           case ('N2', 'NNa', 'NNb', 'NNc', 'NNd', 'NaNb','NcNd','NbNc','NaNd','NaNc','NbNd' )
             if (Input%Diatomic_Model(iMol) == 'LeRoy') then
               allocate( N2_LeRoy_DiatomicPotential_Type :: DiatPot )
@@ -158,6 +161,8 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
               allocate( O2_UMN_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'Varandas') then
               allocate( O2_Varandas_DiatomicPotential_Type :: DiatPot )
+            elseif (Input%Diatomic_Model(iMol) == 'Basel') then
+              allocate( O2_Basel_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
               allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
@@ -178,9 +183,11 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
               call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
             end if
             
-          case ('NO')
+          case ('NO', 'ON')
             if (Input%Diatomic_Model(iMol) == 'UMN') then
               allocate( NO_UMN_DiatomicPotential_Type :: DiatPot )
+            elseif (Input%Diatomic_Model(iMol) == 'Basel') then
+              allocate( NO_Basel_DiatomicPotential_Type :: DiatPot )
             elseif (Input%Diatomic_Model(iMol) == 'NONE') then
               allocate( Null_DiatomicPotential_Type :: DiatPot )
             else
@@ -220,7 +227,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
 
 
   if (i_Debug_Loc) call Logger%Write( "Calling DiatPot%Initialize" )
-  call DiatPot%Initialize( Input, SpeciesName, iMol, Mass1, Mass2 )
+  call DiatPot%Initialize( Input, SpeciesName, iMol, Mass1, Mass2, i_Debug=i_Debug_Loc )
 
   if (i_Debug_Loc) call Logger%Exiting
 

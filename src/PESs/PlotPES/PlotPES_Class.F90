@@ -124,7 +124,7 @@ Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
   real(rkp)                                                 ::    Temp
   integer                                                   ::    i, j
   integer                                                   ::    iTot
-  integer                                                   ::    iA, iP
+  integer                                                   ::    iA, iP, iMol
   integer                                                   ::    iPES
   character(4)                                              ::    iPESChar
   character(:)                 ,allocatable                 ::    FileName  
@@ -183,47 +183,51 @@ Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
   write(*,*) Input%NGridPlot
 
 
-  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/VDiat_From_VDiat.csv'
-  open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
-  if (Status/=0) call Error( "Error opening file: " // FileName )
-  write(Unit1,'(A)') 'Variables = "r1", "V"'
+  do iMol = 1,Input%NMolecules
 
-  FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/dVDiat_From_VDiat.csv'
-  open( File=FileName, NewUnit=Unit2, status='REPLACE', iostat=Status )
-  if (Status/=0) call Error( "Error opening file: " // FileName )
-  write(Unit2,'(A)') 'Variables = "r1", "V", "dV"'
-    
+    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/VDiat_From_VDiat_' // trim(adjustl(Collision%MoleculesContainer(iMol)%Molecule%Name)) // '.csv'
+    open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName )
+    write(Unit1,'(A)') 'Variables = "r1", "V"'
+
+    FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/dVDiat_From_VDiat_' // trim(adjustl(Collision%MoleculesContainer(iMol)%Molecule%Name)) // '.csv'
+    open( File=FileName, NewUnit=Unit2, status='REPLACE', iostat=Status )
+    if (Status/=0) call Error( "Error opening file: " // FileName )
+    write(Unit2,'(A)') 'Variables = "r1", "V", "dV"'
       
-    Rp = RpLong
-    do i = 1,Input%NGridPlot(1)
+        
+      Rp = RpLong
+      do i = 1,Input%NGridPlot(1)
+        
+        Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
       
-      Rp(1) = ( Input%MinGridPlot(1) + hGrid(1) * (i-1) ) 
-    
-      V = Collision%Species(1)%DiatPot%DiatomicPotential( Rp(1) * RConverter )  
-      write(Unit1,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
+        V = Collision%MoleculesContainer(iMol)%Molecule%DiatPot%DiatomicPotential( Rp(1) * RConverter )  
+        write(Unit1,'(f15.6,(A,f15.6))') Rp(1), ',', (V - VRef) * VConverter   
 
-      call Collision%Species(1)%DiatPot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
-      write(Unit2,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
-          
-    end do
+        call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%Compute_Vd_dVd( Rp(1) * RConverter, V, dV )                                          
+        write(Unit2,'(f15.6,2(A,f15.6))') Rp(1), ',',  (V - VRef) * VConverter, ',', (dV) * dVConverter                                           
+            
+      end do
 
-    
-  close(Unit1)   
+      
+    close(Unit1)   
 
-  close(Unit2)   
+    close(Unit2)   
+
+  end do
 
 
-  do iP = 1,6
+  do iP = 1,3!6
     write(iPChar,'(I1)') iP
 
     do iPES = 1,Input%NPESs
       write(iPESChar,'(I4)') iPES
 
 
-      FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/VDiat_From_PES' // trim(adjustl(iPESChar)) // '.csv.' // trim(adjustl(iPChar))
+      FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/dVDiat_From_PES' // trim(adjustl(iPESChar)) // '.csv.' // trim(adjustl(iPChar))
       open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
       if (Status/=0) call Error( "Error opening file: " // FileName )
-      write(Unit1,'(A)') 'Variables = "r1", "V"'
+      write(Unit1,'(A)') 'Variables = "r1", "V", "dVdR"'
 
         Rp     = RpLong
         do i = 1,Input%NGridPlot(1)
@@ -249,8 +253,8 @@ Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
           end if
 
 
-          !V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp )
-          write(Unit1,'(f15.6,(A,f15.6))') Rp(iP), ',', (V - VRef) * VConverter   
+          call Collision%PESsContainer(iPES)%PES%Compute( Rp, Qp, V, dVdR, dVdQ )    
+          write(Unit1,'(f15.6,*(A,f15.6))') Rp(iP), ',', (V - VRef) * VConverter, ',', (dVdR(iP)) * dVConverter     
               
         end do
 

@@ -58,6 +58,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
   use O4_UMN_PES_Class     ,only:    O4_UMN_PES_Type
   use N2O_UMN_PES_Class    ,only:    N2O_UMN_PES_Type
   use N2O_Basel_PES_Class  ,only:    N2O_Basel_PES_Type
+  use NO2_Basel_PES_Class  ,only:    NO2_Basel_PES_Type
   use N4_NASA_PES_Class    ,only:    N4_NASA_PES_Type
   use N4_UMN_PES_Class     ,only:    N4_UMN_PES_Type
   use CHN_UIUC_PES_Class   ,only:    CHN_UIUC_PES_Type
@@ -94,6 +95,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
     allocate( LEPS_PES_Type :: PES )
   else
     select case (Input%System)    
+
       case('N3', 'NNN', 'NaNbNc')
         !Input%System = 'N3'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
@@ -109,6 +111,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select
+
       case('CO2', 'O2C', 'COO', 'OCO', 'OOC')
         !Input%System = 'CO2'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                         
@@ -124,6 +127,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select
+
       case('O3', 'OOO')
         !Input%System = 'O3'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
@@ -186,6 +190,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select
+
       case('N2O', 'ON2', 'NNO', 'NON', 'ONN')
         !Input%System = 'N2O'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
@@ -204,6 +209,23 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select    
+
+      case('NO2', 'O2N', 'NOO', 'OON', 'ONO' )
+        !Input%System = 'N2O'
+        select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
+          case ('Basel_2A1')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N2O_Basel_PES_Type object; Surface Selected 2A'" )   
+            allocate(NO2_Basel_PES_Type :: PES )
+          case ('Basel_2A2')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N2O_Basel_PES_Type object; Surface Selected 2A''" )   
+            allocate(NO2_Basel_PES_Type :: PES ) 
+          case ('Basel_4A1')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N2O_Basel_PES_Type object; Surface Selected 4A'" )   
+            allocate(NO2_Basel_PES_Type :: PES ) 
+          case default
+            call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
+        end select    
+
       case('COAr', 'CArO', 'ArCO', 'ArOC', 'OCAr', 'OArC')
         !Input%System = 'COAr'
         select case (Input%PES_Model(iPES))                                                                                  
@@ -213,6 +235,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select
+
       case('CHN', 'CNH', 'NCH', 'NHC', 'HCN', 'HNC')
         !Input%System = 'CHN'
         select case (Input%PES_Model(iPES))                                                                                  
@@ -222,6 +245,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select
+
       case('N4', 'N2N2', 'NNNN', 'NaNbNcNd')
         !Input%System = 'N4'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
@@ -234,6 +258,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select
+
       case('O4', 'O2O2', 'OOOO', 'OaObOcOd')
         !Input%System = 'N4'
         select case (adjustl(trim(Input%PES_Model(iPES))))                                                                     
@@ -249,8 +274,10 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case default
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select
+
       case default
         call Error( "PES not supported: Input%System = " // Input%System )
+    
     end select
   end if
   

@@ -6,11 +6,11 @@ clc
 global Param Input Syst
 iFig = 1;
 
-Input.SystNameLong       = 'O2C_NASA'
+Input.SystNameLong       = 'CO2_NASA'
 Input.Paths.MainFldr     = '/home/venturi/WORKSPACE/Mars_Paper/'
-Input.Paths.KGlobal      = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/KGlobal_9_1_1_0_CO.csv')
+Input.Paths.KGlobal      = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/KGlobal_9_1_1_1_O2.csv')
 NPESs                    = 0
-ExchToMol                = [1,2];
+ExchToMol                = [2];
 
 Input.FigureFormat       = 'PrePrint';
 Input.iFig               = 101;

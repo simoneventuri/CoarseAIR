@@ -547,6 +547,7 @@ Subroutine ReadEnergyLevels( Input, Collision, iMol, i_Debug )
 
 
   FileName = Collision%MoleculesContainer(iMol)%Molecule%PathToMolFldr // trim(adjustl(Input%GeneratedLevelsFile(iMol)))
+  if (i_Debug_Loc) call Logger%Write( "Writing Levels in ", FileName )
   call LevelsContainer%WriteList( FileName, SortLevelsFlg=Input%SortLevelsFlg, i_Debug=i_Debug_Loc ) 
 
   

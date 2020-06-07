@@ -44,6 +44,7 @@ Module TrajectoryPoint_Class
     real(rkp)                               ::    b           =   Zero  !< Impact parameter
     real(rkp)                               ::    xkin        =   Zero  !< Energy
     real(rkp) ,dimension(3)                 ::    Vrel        =   Zero  !< Relative velocity components
+    logical                                 ::    WriteData   =  .False.!< Flag for Writing the Trajectory 
     type(MolecularState_Type) ,dimension(2) ::    Molecules             !< Array of MolecularState objects. Note: Harded-codded dimensions to avoid allocation for each trajectory. Number of effective molecuels is given by component NMolecules.
   contains
     private

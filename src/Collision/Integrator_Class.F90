@@ -66,12 +66,16 @@ Module Integrator_Class
 
     type(File_Type)                            ::    UnconvTrajsFile
     type(File_Type)                            ::    AnalysisOutputFile
+    type(File_Type)                            ::    AnalysisOutputNotConsFile
+    type(File_Type)                            ::    AnalysisOutputTempFile
     type(File_Type)                            ::    ProgressFile
     type(File_Type)                            ::    PaQSolFile
     type(File_Type) ,dimension(:) ,allocatable ::    PaQEvoFile
     type(File_Type) ,dimension(:) ,allocatable ::    XXEvoFile
     integer                                    ::    NTrajOverall
     integer                                    ::    iProc
+
+    real(rkp)                                  ::    HamAbsTol                                      !< Absolute tolerance for comparion the inital and final Hamiltonial values
 
     logical                                    ::    CMFrameFlg = .True.
 
@@ -141,6 +145,9 @@ Subroutine InitializeIntegrator( This, Input, i_Debug )
   This%iwnogood   =   0
   This%NTrajTimeMax = 0
   This%NumNotCvg  =   0
+
+  This%HamAbsTol  = Input%HamAbsTol
+  if (i_Debug_Loc) call Logger%Write( "Tolerance on Hamiltonian:      This%HamAbsTol  = ", This%HamAbsTol )
 ! ==============================================================================================================
 
 
@@ -183,7 +190,33 @@ Subroutine InitializeIntegrator( This, Input, i_Debug )
     else
        call Error( "Error from 'InitializeIntegrator':: case Input%NInitMolecules > 2 NOT available!" )  
     endif
+    if (File%Status/=0) call Error( "Error writing header in file trajectories.out" )
+    if (i_Debug_Loc) call Logger%Write( "-> File%Status = ", File%Status )
+  end associate
+
+
+  if (i_Debug_Loc) call Logger%Write( "Initializing the analysis output file: AnalysisOutputNotConsFile" )
+  associate( File => This%AnalysisOutputNotConsFile )
+    if (i_Debug_Loc) call Logger%Write( "-> Calling File%Open" )
+    FileName = trim(adjustl(Input%LevelOutputDir)) // '/Node_' // trim(adjustl(Input%iNode_char)) // '/Proc_' // trim(adjustl(Input%iProc_char)) // '/trajectories_HNotCons.out'
+    if (i_Debug_Loc) call Logger%Write( " File%Name = ", FileName )
+    call File%Open( FileName )
+    if (i_Debug_Loc) call Logger%Write( "-> File%Status = ", File%Status )
+    if (File%Status/=0) call Error( "Error opening file " // 'fort.7' )
+    if (i_Debug_Loc) call Logger%Write( "-> Writing header" )
     if (File%Status/=0) call Error( "Error writing header in file " // 'fort.7' )
+    if ( allocated(Format) ) deallocate(Format)
+    allocate( Format , source = "( a8,3x,a4,3x,3(a11,3x),*(a14,3x) )" )
+    if (Input%NInitMolecules.eq.1) then 
+       write(File%Unit,'(A)',iostat=File%Status)  &
+       '#    iTraj, iPES,       bmax,        b_i,           j_i,           v_i,         arr_i,           j_f,           v_f,         arr_f'
+    elseif (Input%NInitMolecules.eq.2) then
+       write(File%Unit,'(A)',iostat=File%Status)  &
+       '#    iTraj, iPES,       bmax,        b_i,          j1_i,          v1_i,          j2_i,          v2_i,         arr_i,          j1_f,          v1_f,          j2_f,          v2_f,         arr_f'
+    else
+       call Error( "Error from 'InitializeIntegrator':: case Input%NInitMolecules > 2 NOT available!" )  
+    endif
+    if (File%Status/=0) call Error( "Error writing header in file trajectories_HNotCons.out" )
     if (i_Debug_Loc) call Logger%Write( "-> File%Status = ", File%Status )
   end associate
 ! ==============================================================================================================
@@ -679,8 +712,6 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   logical                                                   ::    i_Debug_Loc
-  logical                                       ,parameter  ::    WriteData = .True.
-  real(rkp)                                     ,parameter  ::    HamAbsTol = 1.0E-5_rkp                                          !< Absolute tolerance for comparion the inital and final Hamiltonial values
   integer                                                   ::    iM          ! Index of molecuels
   integer                                                   ::    ib
 !  real(rkp)                                                 ::    StartTime, EndTime
@@ -721,13 +752,27 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
 
 
   econs     =   ''
-  if ( abs(This%TrajIni%H-This%TrajFin%H) > HamAbsTol ) then
+  if ( abs(This%TrajIni%H-This%TrajFin%H) > This%HamAbsTol ) then
+
     if (i_Debug_Loc) then
       call Logger%Write( "<WARNING> Energy not conserved!" )
       call Logger%Write( "-> Hf - Hi = ", This%TrajIni%H - This%TrajFin%H, Fr="es15.8" )
     end if
-    econs          = 'not'
-    This%NumNotCvg = This%NumNotCvg + 1
+
+    econs                  = 'not'
+    This%NumNotCvg         = This%NumNotCvg + 1
+
+    This%TrajFin%WriteData = .False.
+
+  else
+
+    if (i_Debug_Loc) then
+      call Logger%Write( "Energy conserved!" )
+      call Logger%Write( "-> Hf - Hi = ", This%TrajIni%H - This%TrajFin%H, Fr="es15.8" )
+    end if
+
+    This%TrajFin%WriteData = .True.
+
   end if
 
 
@@ -783,10 +828,12 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
   end if
   ! ==============================================================================================================
 
+
   dot3    =   dot_product( This%TrajIni%Vrel , This%TrajFin%Vrel ) / sqrt( sum(This%TrajIni%Vrel**2) * sum(This%TrajFin%Vrel**2) )
   dEkin   =   This%TrajIni%xkin - This%TrajFin%xkin   ! change in internal energy: recall ein0 + This%TrajIni%xkin = etot0 = etotf = einf + This%TrajFin%xkin,   so einf - ein0 = This%TrajIni%xkin - This%TrajFin%xkin
 
-  if ((Traj%t(iTraj) <= Traj%tmax) .and. (WriteData)) then
+
+  if ((Traj%t(iTraj) <= Traj%tmax)) then
 
     if (size(This%TrajIni%Molecules).gt.2) call Error( "Error: in 'AnalysisTrajPoints', maximum number of molecules MUST be 2!")
 
@@ -833,9 +880,16 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
     !    and may have the sames values as 'p' in the 3 ATOMS case 
     ! (convention taken from David Schwenke's QCT code)
     IdxOverall = (This%NTrajOverall) * (This%iProc-1) + Traj%Idx(iTraj)
-    if ( Collision%NAtoms == 3 ) then
 
-      write(This%AnalysisOutputFile%Unit, 1)                                                                        &
+    if (This%TrajFin%WriteData) then
+      This%AnalysisOutputTempFile = This%AnalysisOutputFile
+    else
+      This%AnalysisOutputTempFile = This%AnalysisOutputNotConsFile
+    end if 
+
+    if ( ( Collision%NAtoms == 3 ) ) then
+
+      write(This%AnalysisOutputTempFile%Unit, 1)                                                                    &
                                               IdxOverall,                                                       ',',&
                                               Traj%iPES(iTraj),                                                 ',',&
                                               bmax,                                                             ',',& 
@@ -846,11 +900,11 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
                                               This%TrajFin%Molecules(1)%AngMom,                                 ',',&
                                               This%TrajFin%Molecules(1)%viba,                                   ',',& 
                                               This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + Half
-      flush(This%AnalysisOutputFile%Unit)
+      flush(This%AnalysisOutputTempFile%Unit)
 
-    else
+    elseif ( ( Collision%NAtoms == 4 ) ) then
 
-      write(This%AnalysisOutputFile%Unit, 1)                                                                                            & 
+      write(This%AnalysisOutputTempFile%Unit, 1)                                                                                        & 
                                               IdxOverall,                                                                           ',',&
                                               Traj%iPES(iTraj),                                                                     ',',& 
                                               bmax,                                                                                 ',',& 
@@ -865,10 +919,12 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
                                               This%TrajFin%Molecules(2)%AngMom,                                                     ',',&
                                               This%TrajFin%Molecules(2)%viba,                                                       ',',&
                                               This%TrajFin%Molecules(1)%iPair*16.0_rkp + iTypeFin(1) + 4.0_rkp*iTypeFin(2) + Half
-      flush(This%AnalysisOutputFile%Unit)                       
+      flush(This%AnalysisOutputTempFile%Unit)                       
     end if
     ! ==============================================================================================================
 
+  else
+    if (i_Debug_Loc) call Logger%Write( "Trajectory did not satisfy the Energy Conservation. Trajectory Rejected" )
   end if
 
 

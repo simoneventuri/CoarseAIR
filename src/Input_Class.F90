@@ -222,7 +222,7 @@ Module Input_Class
     real(rkp)                                 ::    rfact                               !<
     real(rkp)                                 ::    tthres                              !<
     real(rkp)                                 ::    tthresau                            !<
-
+    real(rkp)                                 ::    HamAbsTol   = 1.e-5_rkp
 ! STATISTICS INPUTS
 ! =================
     logical                                   ::    StatReadsBinaryFlg    = .False.
@@ -1188,6 +1188,11 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             READ(line_input, '(d20.10)') This%eps
             if (i_Debug_Loc) call Logger%Write( "Error control parameter:      This%eps  = ", This%eps )
             
+          case("Tolerance on Hamiltonian")
+            line_input = line_input(i_eq+2:150)
+            READ(line_input, '(d20.10)') This%HamAbsTol
+            if (i_Debug_Loc) call Logger%Write( "Tolerance on Hamiltonian:      This%HamAbsTol  = ", This%HamAbsTol )
+
           case("Stepsize increase damping factor")
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%Relax

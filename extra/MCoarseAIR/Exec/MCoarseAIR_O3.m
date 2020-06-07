@@ -44,6 +44,7 @@ Input.Suffix                = ''
 Input.RunSuffix             = '';
 
 Input.Kin.MolResolutionIn   = ['StS'];
+Input.Kin.EqNStatesIn       = [ 6115];
 Input.Kin.MinStateIn        = [    1];
 Input.Kin.MaxStateIn        = [ 6115];
 Input.Kin.PathToMappingIn   = [   ''];
@@ -62,7 +63,7 @@ Input.Kin.Proc.InelFlg      = 1;
 Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
 
-Input.Kin.ReadRatesProc     = [true, false, false]
+Input.Kin.ReadRatesProc     = [false, false, false]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst     = []
 Input.Kin.OtherSystInHDF5   = []
@@ -85,7 +86,8 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Mars_Paper/Data/');
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = false;
+Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0; 1.5, 6.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
 % Plotting Overall Rate Coefficients (Dissociation and Exchange)
@@ -93,12 +95,12 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
-Input.Tasks.Write_RatesParaview.Flg                    = true;
+Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [1e-12, 1e-12, 1e-12]
 % Compute Grouped Rate Coefficients
-Input.Tasks.Compute_GroupedRates.Flg                   = true;
+Input.Tasks.Compute_GroupedRates.Flg                   = false;
 % Plotting Reconstructed Rate Coefficients
-Input.Tasks.Plot_ReconstructedRates.Flg                = true;
+Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
@@ -237,8 +239,12 @@ for iT = 1:length(Temp.TranVec)
             
         end
         
-        %% Computing Thermal Rates
-        Compute_Rates_Thermal()   
+        if (any(Input.Kin.ReadRatesProc(1,:)))
+        
+            %% Computing Thermal Rates
+            Compute_Rates_Thermal()   
+        
+        end
         
         if (Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg)

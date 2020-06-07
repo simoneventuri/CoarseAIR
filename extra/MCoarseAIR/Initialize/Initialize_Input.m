@@ -39,7 +39,8 @@ function Initialize_Input()
     
     for iMol = 1:size(Input.Kin.MolResolutionIn,1)
         Syst.Molecule(iMol).KinMthdIn(:) = Input.Kin.MolResolutionIn(iMol,:);
-
+        Syst.Molecule(iMol).EqNStatesIn  = Input.Kin.EqNStatesIn(iMol);
+        
         Syst.Molecule(iMol).MinStateIn   = Input.Kin.MinStateIn(iMol);
         Syst.Molecule(iMol).MaxStateIn   = Input.Kin.MaxStateIn(iMol);
         

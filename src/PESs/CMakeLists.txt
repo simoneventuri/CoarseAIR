@@ -18,6 +18,7 @@ add_sources (
   O3_NN_PES_Class.F90
   N2O_UMN_PES_Class.F90
   N2O_Basel_PES_Class.F90
+  NO2_Basel_PES_Class.F90
   CHN_UIUC_PES_Class.F90
   LEPS_PES_Class.F90
   NN_PES_Class.F90

@@ -36,7 +36,7 @@ function [Syst] = Read_LevelInfo(Syst)
         
         LevelsFile = strcat(Syst.HDF5_File);
         fprintf(['  Checking if HDF5 File is Present: ' LevelsFile '\n'] )
-        
+                
         if isfile(strcat(LevelsFile))
             
             %% Reading HDF5 File
@@ -132,13 +132,15 @@ function [Syst] = Read_LevelInfo(Syst)
         
         Syst.Molecule(iMol).LevelECB  = Syst.Molecule(iMol).LevelVMax - Syst.Molecule(iMol).LevelEeV; 
 
-        
         vToLevel = zeros(Syst.Molecule(iMol).Nvqn,1);
         for iLevels = 1:Syst.Molecule(iMol).NLevels
             if (Syst.Molecule(iMol).Leveljqn(iLevels) == 0) 
                 vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1,1)                   = iLevels; 
                 Syst.Molecule(iMol).vEeVVib0(Syst.Molecule(iMol).Levelvqn(iLevels)+1) = Syst.Molecule(iMol).LevelEeV0(iLevels);         
             end
+        end
+                
+        for iLevels = 1:Syst.Molecule(iMol).NLevels
             Syst.Molecule(iMol).LevelEeVVib0(iLevels) = Syst.Molecule(iMol).LevelEeV0(vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1));
             Syst.Molecule(iMol).LevelEeVRot(iLevels)  = Syst.Molecule(iMol).LevelEeV0(iLevels) - Syst.Molecule(iMol).LevelEeVVib0(iLevels);
         end
