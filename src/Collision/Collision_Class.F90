@@ -1559,9 +1559,23 @@ Subroutine RelativeTranslationEnergy_FromGaussian( EMu, ESD, Er, RandNum )
   real(rkp)                         ,intent(out)    ::    Er                            !< Relative translational energy [?]
   real(rkp)                         ,intent(inout)  ::    RandNum                       !< Random number
 
-  real(rkp) ,parameter                              ::    Tolerence =   1.0E-5_rkp
+  real(rkp) ,parameter                              ::    Tolerance =   1.0E-13_rkp
+  real(rkp)                                         ::    X, Func, FuncInt
+  real(rkp)                                         ::    err
+  integer                                           ::    iter
+  
+  Er   = EMu
+  iter = 0
+  do
+    iter = iter + 1
+    X        = (Er - EMu) / (ESD * sqrt(Two))
+    Func     = exp(-(X ** 2)) / (ESD * sqrt(Two * Pi))
+    FuncInt  = Half * (One + erf(X))
 
-  Er = EMu
+    err      = -(FuncInt - RandNum) / Func
+    Er       = Er + err
+    if ( abs(err) <= Tolerance ) exit
+  end do  
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
