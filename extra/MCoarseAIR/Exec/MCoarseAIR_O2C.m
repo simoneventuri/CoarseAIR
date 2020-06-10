@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O2C_ALL/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Mars_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Mars_Database/HDF5_Database/');
-Input.TranVec               = 5000%[2500 5000 7500 10000 12500 15000 20000]; %[5000 10000 20000]
+Input.TranVec               = [7500]; %[2500 5000 7500 10000 12500 15000 20000]
 Input.SystNameLong          = 'O2C_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -63,7 +63,7 @@ Input.Kin.Proc.InelFlg      = 1;
 Input.Kin.Proc.ExchFlg1     = 1;
 Input.Kin.Proc.ExchFlg2     = 0;
 
-Input.Kin.ReadRatesProc     = [true, true,  true, false; ...
+Input.Kin.ReadRatesProc     = [true, false,  true, false; ...
                                true, false, false,  true]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst     = [true]
@@ -87,7 +87,7 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Mars_Paper/Data/');
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 4.0; 1.5, 4.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0];
@@ -96,7 +96,7 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
-Input.Tasks.Write_RatesParaview.Flg                    = true;
+Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [5e-13, 5e-13, 1e-13]
 Input.Tasks.Write_RatesParaview.Proc                   = [false, true, false, false]
 Input.Tasks.Write_RatesParaview.vqns                   = [0,  0,  0,  0,  0,  0, 10, 10, 10, 10, 10, 10, 25,25, 25, 25, 25, 40,40, 40, 40, 60,60]
@@ -108,14 +108,14 @@ Input.Tasks.Plot_ReconstructedRates.Flg                = false
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = false;
+Input.Tasks.Plot_MoleFracs.Flg                         = true;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1,2];
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1,2];
@@ -126,15 +126,15 @@ Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.9
 % Plotting RVS Populations
 Input.Tasks.Plot_Populations.Flg                       = false;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1, 2];
-Input.Tasks.Plot_Populations.tSteps                    = [1e-6]%[1e-12, 1e-11, 1.e-10, 1e-9, 1e-8, 1.e-6, 1.e-4];
-Input.Tasks.Plot_Populations.GroupColors               = 3;
+Input.Tasks.Plot_Populations.tSteps                    = 1e-7 %[1e-12, 1e-11, 1.e-10, 1e-9, 1e-8, 1e-7, 1.e-6, 1.e-5, 1.e-4, 1.e-3];
+Input.Tasks.Plot_Populations.GroupColors               = 0;
 Input.Tasks.Plot_Populations.ProcOI                    = [3,4];
 % Plotting Energies
 Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1,2];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1,2];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [2,2; 1,2];
@@ -351,6 +351,6 @@ for iT = 1:length(Temp.TranVec)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     
-    %pause
-    %clear Rates OtherRates Kin
+    pause
+    clear Rates OtherRates Kin
 end

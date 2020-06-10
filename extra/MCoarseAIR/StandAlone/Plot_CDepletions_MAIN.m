@@ -7,7 +7,7 @@ iFig = 1;
 
 Input.SystNameLong       = 'O2C_NASA'
 Input.Paths.MainFldr     = '/home/venturi/WORKSPACE/Mars_Paper/'
-Input.Paths.CDepletions  = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/EDCoeffs_O2_9_1_1_0.csv')
+Input.Paths.CDepletions  = strcat(Input.Paths.MainFldr, '/Data/', Input.SystNameLong, '/EDCoeffs_CO_9_1_1_0.csv')
 NPESs                    = 0
 
 Input.FigureFormat       = 'PrePrint';

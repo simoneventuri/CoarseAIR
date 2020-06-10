@@ -1286,6 +1286,9 @@ Subroutine CoordVeloc_FreeTotAngMom( This, Input, iTraj, Traj, Q, dQdt, i_Debug 
     elseif (trim(adjustl(Input%ImpParStrataType)) == 'Rings') then                                                                !!! SIMONE
       if (i_Debug_Loc) call Logger%Write( "Impact parameter is negative. bNew = sqrt( bmin**2 + RandNum * (Traj%b(iTraj)**2 - bmin**2) ) " )
        Traj%b(iTraj) =  sqrt( bmin**2 + RandNum * (Traj%b(iTraj)**2 - bmin**2) )
+    elseif (trim(adjustl(Input%ImpParStrataType)) == 'Segments') then                                                             !!! SIMONE
+      if (i_Debug_Loc) call Logger%Write( "Impact parameter is negative. bmin + RandNum * (- Traj%b(iTraj) - bmin) " )
+       Traj%b(iTraj) = bmin + RandNum * (- Traj%b(iTraj) - bmin)
     end if
     if (i_Debug_Loc) call Logger%Write( "-> Impact parameter: Traj%b(iTraj) = ", Traj%b(iTraj), Fr="es15.8" )
   end if
