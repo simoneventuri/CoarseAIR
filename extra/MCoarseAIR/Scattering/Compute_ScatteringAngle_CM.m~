@@ -1,9 +1,6 @@
-function [Theta_CM] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc)
+function [Theta_CM, TOF] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc, Dist)
     
-    EhToKcalMol   = 627.5096080305927;
 
-   
-    
     iTarg = [1,2];
     iProj = [3];
     
@@ -22,11 +19,11 @@ function [Theta_CM] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc)
         iTarg = [1,2];
         iProj = [3];
     elseif iProc == 2
-        iTarg = [1,3];
         iProj = [2];
+        iTarg = [1,3];
     elseif iProc == 3
-        iTarg = [2,3];
         iProj = [1];
+        iTarg = [2,3];
     end
     
     mTarg = sum(Masses(iTarg)); 
@@ -40,6 +37,9 @@ function [Theta_CM] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc)
     
      
     
-    Theta_CM  = acos( sum(vReli_CM .* vRelf_CM) / (norm(vReli_CM) * norm(vRelf_CM)) ) / pi * 180.0;
+    Theta_CM  = acos( dot(vReli_CM, vRelf_CM) / (vecnorm(vReli_CM) * vecnorm(vRelf_CM)) ) / pi * 180.0;
 
+    
+    TOF = Dist / norm(VProjf);
+    
 end

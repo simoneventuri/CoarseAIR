@@ -6,11 +6,11 @@ function [EColl_CM] = Compute_CollisionEnergy_CM(V, Masses, iProc)
         iTarg = [1,2];
         iProj = [3];
     elseif iProc == 2
-        iTarg = [1,3];
-        iProj = [2];
+        iTarg = [2];
+        iProj = [1,3];
     elseif iProc == 3
-        iTarg = [2,3];
-        iProj = [1];
+        iTarg = [1];
+        iProj = [2,3];
     end
     
     mTarg = sum(Masses(iTarg)); 

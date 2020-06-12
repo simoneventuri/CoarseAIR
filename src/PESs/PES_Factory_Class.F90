@@ -62,6 +62,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
   use N4_NASA_PES_Class    ,only:    N4_NASA_PES_Type
   use N4_UMN_PES_Class     ,only:    N4_UMN_PES_Type
   use CHN_UIUC_PES_Class   ,only:    CHN_UIUC_PES_Type
+  use CNO_Basel_PES_Class  ,only:    CNO_Basel_PES_Type
 
   use LEPS_PES_Class       ,only:    LEPS_PES_Type
   use NN_PES_Class         ,only:    NN_PES_Type
@@ -242,6 +243,22 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case ('UIUC')        
             if (i_Debug_Loc) call Logger%Write( "Constructing a CHN_UIUC_PES_Type object" )
             allocate( CHN_UIUC_PES_Type :: PES )
+          case default
+            call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
+        end select
+
+       case('CON', 'CNO', 'NCO', 'NOC', 'OCN', 'ONC')
+        !Input%System = 'CON'
+        select case (Input%PES_Model(iPES))                                                                                  
+          case ('Basel_2A1')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a CNO_Basel_PES_Type object; Surface Selected 2A'" )
+            allocate( CNO_Basel_PES_Type :: PES )
+          case ('Basel_2A2')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a CNO_Basel_PES_Type object; Surface Selected 2A''" )
+            allocate( CNO_Basel_PES_Type :: PES )
+          case ('Basel_4A2')        
+            if (i_Debug_Loc) call Logger%Write( "Constructing a CNO_Basel_PES_Type object; Surface Selected 4A''" )
+            allocate( CNO_Basel_PES_Type :: PES )
           case default
             call Error( "PES Model not supported: Input%PES_Model(iPES) = " // Input%PES_Model(iPES) )
         end select

@@ -4,7 +4,7 @@ clc
 
 
 NTrajs = 100000;
-
+Dist   = 33.7e-2 * 1.889725989e+10;
 
 %%% Physics Parameters 
 AvN           = 6.0221409e+23;
@@ -23,7 +23,7 @@ mu        = (mO16 * mO18O18) / (mO16 + mO18O18);
 vO16_Lab    = 8026.0;
 vO18O18_Lab = 587.0;
 
-Masses       = [mO16, mO16, mO16];
+Masses       = [mO18, mO18, mO16];
 
 
 
@@ -184,6 +184,7 @@ for iTraj = 1:NTrajsOI%length(Idx)
             Inelastic.Hf(iInel)     = H_fin(iTraj);
             Inelastic.PaQi(iInel,:) = Trajs.PaQi(jTraj,:);
             Inelastic.PaQf(iInel,:) = Trajs.PaQf(jTraj,:);
+            Inelastic.b(iInel)      = b(iTraj);
 
             [X, Vi]                    = Transform_PaQ_To_XVCM(Inelastic.PaQi(iInel,:), Masses);
             Trajs.EColli_CM(jTraj)     = Compute_CollisionEnergy_CM(Vi, Masses, 1);
@@ -191,10 +192,9 @@ for iTraj = 1:NTrajsOI%length(Idx)
             
             [X, Vf]                    = Transform_PaQ_To_XVCM(Inelastic.PaQf(iInel,:), Masses);
             Inelastic.ECollf_CM(iInel) = Compute_CollisionEnergy_CM(Vf, Masses, 1);
+                        
+            [Inelastic.Theta_CM(iInel), Inelastic.TOF(iInel)] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 1, Dist);
             
-            Inelastic.Theta_CM(iInel)  = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 1);
-            
-
         elseif Mapping(Idx(iTraj),1) == 2
             iExch1 = Mapping(Idx(iTraj),3);
 
@@ -203,17 +203,17 @@ for iTraj = 1:NTrajsOI%length(Idx)
             Exch1.Hf(iExch1)     = H_fin(iTraj);
             Exch1.PaQi(iExch1,:) = Trajs.PaQi(jTraj,:);
             Exch1.PaQf(iExch1,:) = Trajs.PaQf(jTraj,:);
-
+            Exch1.b(iExch1)   = b(iTraj);
+            
             [X, Vi]                 = Transform_PaQ_To_XVCM(Exch1.PaQi(iExch1,:), Masses);
             Trajs.EColli_CM(jTraj)  = Compute_CollisionEnergy_CM(Vi, Masses, 1);
             Exch1.EColli_CM(iExch1) = Trajs.EColli_CM(jTraj);
             
             [X, Vf]                 = Transform_PaQ_To_XVCM(Exch1.PaQf(iExch1,:), Masses);
             Exch1.ECollf_CM(iExch1) = Compute_CollisionEnergy_CM(Vf, Masses, 2);
-            
-            Exch1.Theta_CM(iExch1)  = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 2);
-            
-            
+                        
+            [Exch1.Theta_CM(iExch1), Exch1.TOF(iExch1)] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 2, Dist);
+
         elseif Mapping(Idx(iTraj),1) == 3
             iExch2 = Mapping(Idx(iTraj),3);
 
@@ -230,7 +230,7 @@ for iTraj = 1:NTrajsOI%length(Idx)
             [X, Vf]                 = Transform_PaQ_To_XVCM(Exch2.PaQf(iExch2,:), Masses);
             Exch2.ECollf_CM(iExch2) = Compute_CollisionEnergy_CM(Vf, Masses, 3);
             
-            Exch2.Theta_CM(iExch2)  = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 3);
+            [Exch2.Theta_CM(iExch2), Exch2.TOF(iExch2)] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, 3, Dist);
             
         end
         
@@ -260,3 +260,7 @@ figure(5)
 histogram(Exch1.Theta_CM, 100)
 hold on
 histogram(Exch2.Theta_CM, 100)
+
+
+figure(6)
+histogram(Inelastic.Theta_CM, 100)
