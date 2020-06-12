@@ -139,7 +139,7 @@ Elemental Subroutine Compute_Vd_dVd_Modified_Morse( This, R, V, dV )
   real(rkp)                                    ,intent(out)    ::    dV                        ! First derivative of the potential energy wrt the distance [hartree/bohr]
   
   real(rkp)                                                    ::    RTemp, RTemp4, re4
-  real(rkp)                                                    ::    poly, dpoly
+  real(rkp)                                                    ::    poly, dpoly, dydR
   real(rkp)                                                    ::    y, yTemp
   integer                                                      ::    iOrd
 
@@ -156,13 +156,16 @@ Elemental Subroutine Compute_Vd_dVd_Modified_Morse( This, R, V, dV )
     dpoly = dpoly + (iOrd+1) * This%cPol(iOrd+1) * yTemp
   end do
   yTemp   =     y * yTemp
-  poly    =  poly +    This%cPol(This%PolyOrder) * yTemp
+  poly    =  poly +    This%cPol(This%PolyOrder) * yTemp 
 
-  V      = This%De * (One - exp(-poly*(RTemp-This%re)))**2  - This%De + This%cPol(This%PolyOrder+1)
-  V      =  V * eV_To_Hartree
+  dpoly   = dpoly * Eight*re4*rTemp**3 / (RTemp4+re4)**2
+  dydR    = Four * RTemp**3 * ((RTemp4+re4)-(RTemp4-re4)) / (RTemp4+re4)**2
 
-  dV     = Two * This%De * (One - exp(-poly*(RTemp-This%re))) * (-exp(-poly*(RTemp-This%re))) * (-dpoly*(RTemp-This%re) - poly*RTemp)
-  dV     = dV * eV_To_Hartree 
+  V       = This%De * (One - exp(-poly*(RTemp-This%re)))**2  - This%De + This%cPol(This%PolyOrder+1)
+  V       =  V * eV_To_Hartree
+
+  dV      = Two * This%De * (One - exp(-poly*(RTemp-This%re))) * (-exp(-poly*(RTemp-This%re))) * (-dpoly*dydR*(RTemp-This%re) - poly)
+  dV      = dV * eV_To_Hartree 
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

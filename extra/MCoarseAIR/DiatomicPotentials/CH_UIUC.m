@@ -77,9 +77,11 @@ function [ V, dV ] = CH_UIUC( r )
           12.d0*cPol(13).*y11 + ...
           13.d0*cPol(14).*y12 + ...
           14.d0*cPol(15).*y13;
-
-  V      =         De .* (1.d0 - exp(-poly .* (r-re))).^2  - De + cPol(16);
-  dV     = 2.d0 .* De .* (1.d0 - exp(-poly .* (r-re))) .* (-exp(-poly  .* (r-re))) .* (-dpoly .* (r-re) - poly);
+  
+  dydR    =  4.d0 .* r.^3 .* ((RTemp4+re4)-(RTemp4-re4))./(RTemp4+re4).^2;
+      
+  V       =         De .* (1.d0 - exp(-poly .* (r-re))).^2  - De + cPol(16);
+  dV      = 2.d0 .* De .* (1.d0 - exp(-poly .* (r-re))) .* (-exp(-poly  .* (r-re))) .* (-dpoly .* dydR .* (r-re) - poly);
 
 %   V       = V  ;%./27.2113839712790;
 %   dV      = dV ;%./27.2113839712790;

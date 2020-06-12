@@ -3,7 +3,7 @@ clear all
 clc
 
 
-NTrajs =10000;
+NTrajs =100000;
 Dist   = 33.7e-2 * 1.889725989e+10;
 
 %%% Physics Parameters 
@@ -13,17 +13,32 @@ JMolToKcalMol = 0.0002390057361376673;
 EhToKcalMol   = 627.5096080305927;
 
 
-%%% System Properties
-% O2+O 
-mO16      = 29148.94559d0; %15.9994d-3;
-mO18      = mO16 * 18.0 / 16.0;
-mO18O18   = mO18 + mO18;
-mu        = (mO16 * mO18O18) / (mO16 + mO18O18);
+% %%% System Properties
+% % O2+O 
+% mO16      = 29148.94559d0; %15.9994d-3;
+% mO18      = mO16 * 18.0 / 16.0;
+% mO18O18   = mO18 + mO18;
+% mu        = (mO16 * mO18O18) / (mO16 + mO18O18);
+% 
+% vO16_Lab    = 8026.0;
+% vO18O18_Lab = 587.0;
+% 
+% Masses       = [mO18, mO18, mO16];
 
-vO16_Lab    = 8026.0;
-vO18O18_Lab = 587.0;
 
-Masses       = [mO18, mO18, mO16];
+
+% %% CO+O
+RunFldr  = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/'
+mO16     = 29148.94559d0;%15.9994d-3;
+mO18     = mO16 * 18.0 / 16.0;
+mC       = 21868.661757d0;%12.011e-3;
+mCO18    = mC + mO18;
+mu       = (mO16 * mCO18) / (mO16 + mCO18);
+
+vO16_Lab    = 8100.0;
+vCO18_Lab   = 800;
+
+Masses       = [mC, mO16, mO16];
 
 
 
@@ -38,7 +53,7 @@ opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
 opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "WhitespaceRule", "preserve");
 opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "EmptyFieldRule", "auto");
-tbl = readtable("/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Test/EMu/Bins_2_0/trajectories.csv", opts);
+tbl = readtable(strcat(RunFldr, "/Test/EMu/Bins_2_0/trajectories.csv"), opts);
 Idx   = tbl.iTraj;
 iPES  = tbl.iPES;
 b_i   = tbl.b_i;
@@ -122,7 +137,7 @@ opts.VariableNames = ["Trajindex", "t_fin", "H_ini", "PaQ_ini1", "PaQ_ini2", "Pa
 opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
 opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
-tbl = readtable("/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Test/EMu/Bins_2_0/PaQSol.csv", opts);
+tbl = readtable(strcat(RunFldr, "/Test/EMu/Bins_2_0/PaQSol.csv"), opts);
 Idx       = tbl.Trajindex;
 t_fin     = tbl.t_fin;
 H_ini     = tbl.H_ini;
@@ -317,3 +332,10 @@ figure(8)
 semilogy(bVec(1:end-1), bVec_Exch./bVec_Tot)
 hold on
 %histogram(Exch2.b, 100)
+
+
+figure(10)
+scatter(Exch.b, Exch.Theta_CM)
+
+figure(11)
+scatter(Exch.EColli_CM, Exch.Theta_CM)
