@@ -737,7 +737,7 @@ Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj,
 ! The coordinates are cartesian with the center of mass at the origin.
 ! This procedure was initially called 'inid'.
 
-  use Parameters_Module     ,only:  One, Two, Half, TwoPi
+  use Parameters_Module     ,only:  One, Two, Half, Pi, TwoPi
   use RandomVector_Module   ,only:  RanddwsVec
 
   real(rkp) ,dimension(2)                   ,intent(in)     ::    Masses        !> Mass of atoms
