@@ -1638,8 +1638,8 @@ Subroutine ComputeCoordinatesVelocities( This, b, Er, Q, dQdt, i_Debug )
   if (i_Debug_Loc) then
     call Logger%Write( " -> System Recudced Mass:              This%RedMass:  = ", This%RedMass, Fr="es15.8" )
     call Logger%Write( " -> Projectile-Target Relative Speed : vEr            = ", vEr,          Fr="es15.8" )
-  end
-   
+  end if
+
   vErx        = - vEr * sqrt( One - Ratio**2 )
   vErz        = - vEr * Ratio
 
