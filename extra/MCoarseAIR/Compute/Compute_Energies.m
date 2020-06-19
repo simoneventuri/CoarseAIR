@@ -131,8 +131,8 @@ function Compute_Energies(Controls)
         fprintf('P*tau_Vib = %e [atm*s]\n\n', Kin.T(Temp.iT).Molecule(iMol).tauVibP );
 
 
-       [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
-        FileName          = strcat(Input.Paths.SaveDataFldr, '/Taus_', Syst.Molecule(iMol).Name, '_', Input.Kin.Proc.OverallFlg, '.csv');
+        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
+        FileName           = strcat(Input.Paths.SaveDataFldr, '/Taus_', Syst.Molecule(iMol).Name, '_', Input.Kin.Proc.OverallFlg, '.csv');
         if exist(FileName, 'file')
             fileID1  = fopen(FileName,'a');
         else

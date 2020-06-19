@@ -70,7 +70,7 @@ function Initialize_Parameters
         Param.LegendFontSz = 24;
         Param.LegendFontNm = 'Times';
         
-    elseif strcmp(Input.FigureFormat, 'RePrint')
+    elseif strcmp(Input.FigureFormat, 'PrePrint')
         Param.LineWidth  = 3;
 
         Param.AxisFontSz = 36;

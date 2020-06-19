@@ -1282,13 +1282,16 @@ Subroutine CoordVeloc_FreeTotAngMom( This, Input, iTraj, Traj, Q, dQdt, i_Debug 
 
     if (trim(adjustl(Input%ImpParStrataType)) == 'Circles') then                                                                  ! Original David
       if (i_Debug_Loc) call Logger%Write( "Impact parameter is negative. bNew = - sqrt(RandNum) * bOld " )                          
-      Traj%b(iTraj) =  - sqrt(RandNum) * Traj%b(iTraj)  
+      Traj%b(iTraj) =  - (RandNum)**(1.0/2.0) * Traj%b(iTraj)  
+    
     elseif (trim(adjustl(Input%ImpParStrataType)) == 'Rings') then                                                                !!! SIMONE
       if (i_Debug_Loc) call Logger%Write( "Impact parameter is negative. bNew = sqrt( bmin**2 + RandNum * (Traj%b(iTraj)**2 - bmin**2) ) " )
        Traj%b(iTraj) =  sqrt( bmin**2 + RandNum * (Traj%b(iTraj)**2 - bmin**2) )
+    
     elseif (trim(adjustl(Input%ImpParStrataType)) == 'Segments') then                                                             !!! SIMONE
       if (i_Debug_Loc) call Logger%Write( "Impact parameter is negative. bmin + RandNum * (- Traj%b(iTraj) - bmin) " )
        Traj%b(iTraj) = bmin + RandNum * (- Traj%b(iTraj) - bmin)
+    
     end if
     if (i_Debug_Loc) call Logger%Write( "-> Impact parameter: Traj%b(iTraj) = ", Traj%b(iTraj), Fr="es15.8" )
   end if
@@ -1621,6 +1624,7 @@ Subroutine ComputeCoordinatesVelocities( This, b, Er, Q, dQdt, i_Debug )
   Qx1           =   fa * This%Dinit
   Qx2           =   fb * This%Dinit
 
+
   if ( b > This%Dinit ) then
     call Logger%Write( "Current value of impact parameter exceeds initial separation" )
     call Logger%Write( " -> Trajectory index:   i = ", i )
@@ -1631,6 +1635,8 @@ Subroutine ComputeCoordinatesVelocities( This, b, Er, Q, dQdt, i_Debug )
 
   vEr         =   sqrt( Two * Er / This%RedMass )           ! Computing sqrt(2*Er/mu)
   Ratio       =   b / This%Dinit                            ! Computing b/d
+  call Logger%Write( " -> System Recudced Mass:              This%RedMass:  = ", This%RedMass, Fr="es15.8" )
+  call Logger%Write( " -> Projectile-Target Relative Speed : vEr            = ", vEr,          Fr="es15.8" )
   
   vErx        = - vEr * sqrt( One - Ratio**2 )
   vErz        = - vEr * Ratio
@@ -1643,7 +1649,7 @@ Subroutine ComputeCoordinatesVelocities( This, b, Er, Q, dQdt, i_Debug )
   Q(z,2)    =   Zero                        ! Computing zb'
 
 
-  dQdt(x,1) =   fa * vErx                   ! Computing xa' dot                     ! fa and fb are used for destribtuing the relative velocity to the atoms velocities. ...
+  dQdt(x,1) =   fa * vErx                   ! Computing xa' dot                     ! fa and fb are used for destributing the relative velocity to the atoms velocities. ...
   dQdt(y,1) =   Zero                        ! Computing ya' dot                     ! ... This is because the frame is fixed to the center of mass.
   dQdt(z,1) =   fa * vErz                   ! Computing za' dot
   dQdt(x,2) =   fb * vErx                   ! Computing xb' dot

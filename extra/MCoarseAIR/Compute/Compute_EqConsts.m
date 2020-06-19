@@ -83,27 +83,29 @@ function Compute_EqConsts()
         iExch = iExch + 1;
     end
 
-
-    [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
-    FileName          = strcat(Input.Paths.SaveDataFldr, '/EqConstants.csv');
-    if exist(FileName, 'file')
-        fileID1  = fopen(FileName,'a');
-    else
-        fileID1  = fopen(FileName,'w');
-        if (Syst.NProc == 3)
-            HeaderStr = strcat('# T [K], KDiss, KExch1\n');
-        elseif (Syst.NProc == 4)
-            HeaderStr = strcat('# T [K], KDiss, KExch1, KExch2\n');
+    if (Syst.NProc > 2)
+        [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
+        FileName          = strcat(Input.Paths.SaveDataFldr, '/EqConstants.csv');
+        if exist(FileName, 'file')
+            fileID1  = fopen(FileName,'a');
+        else
+            fileID1  = fopen(FileName,'w');
+            if (Syst.NProc == 3)
+                HeaderStr = strcat('# T [K], KDiss, KExch1\n');
+            elseif (Syst.NProc == 4)
+                HeaderStr = strcat('# T [K], KDiss, KExch1, KExch2\n');
+            end
+            fprintf(fileID1,HeaderStr);
         end
-        fprintf(fileID1,HeaderStr);
+        if (Syst.NProc == 3)
+            fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Syst.T(Temp.iT).KEqDiss, Syst.T(Temp.iT).KEqExch(1) );
+        elseif (Syst.NProc == 4)
+            fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Syst.T(Temp.iT).KEqDiss, Syst.T(Temp.iT).KEqExch(1), Syst.T(Temp.iT).KEqExch(2)  );
+        end
+        fclose(fileID1);
     end
-    if (Syst.NProc == 3)
-        fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Syst.T(Temp.iT).KEqDiss, Syst.T(Temp.iT).KEqExch(1) );
-    elseif (Syst.NProc == 4)
-        fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Syst.T(Temp.iT).KEqDiss, Syst.T(Temp.iT).KEqExch(1), Syst.T(Temp.iT).KEqExch(2)  );
-    end
-    fclose(fileID1);
-
+    
+    
 
     fprintf('====================================================\n\n')        
     

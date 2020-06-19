@@ -174,6 +174,7 @@ Module Input_Class
     character(10)                             ::    Erel_char
     character(:)               ,allocatable   ::    TintModel                           !< Model for Internal Modes
     real(rkp)                                 ::    Tint        =   Zero                !< Internal temperature [K]
+    real(rkp)                                 ::    TIntFixed   =   Zero                !< Temporary Internal temperature [K]
     character(10)                             ::    Tint_char
     character(:)               ,allocatable   ::    ImpParModel                         !< Model for Sampling the Impact Parameter
     character(:)               ,allocatable   ::    ImpParStrataType
@@ -773,6 +774,12 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (Status/=0) call Error( "Error allocating This%TtraVecIntChar" )
             if (i_Debug_Loc) call Logger%Write( "-> Allocating This%TtraVecIntChar to This%NTtra = ", This%NTtra )
             
+
+          case("Internal Temperature")
+            READ(line_input(i_eq+2:150), '(d20.10)') This%TIntFixed
+            if (i_Debug_Loc) call Logger%Write( "Fixed Internal Temperature = ", This%TIntFixed )
+
+
           case("Nb of Internal Temperatures")
             This%NTint_char = trim(adjustl(line_input(i_eq+2:150)))
             READ(This%NTint_char, '(I2)') This%NTint

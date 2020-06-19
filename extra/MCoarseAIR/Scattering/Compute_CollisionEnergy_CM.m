@@ -19,8 +19,8 @@ function [EColl_CM] = Compute_CollisionEnergy_CM(V, Masses, iProc)
 
     VTarg(:) = Masses(iTarg) * V(iTarg,:) ./ mTarg;
     VProj(:) = Masses(iProj) * V(iProj,:) ./ mProj;   
-    
+     
     vRel_CM    = norm(VTarg-VProj);
     EColl_CM   = 0.5 * mu * vRel_CM^2 * EhToKcalMol;
-
+    
 end

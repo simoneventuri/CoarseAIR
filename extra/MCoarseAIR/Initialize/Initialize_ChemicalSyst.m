@@ -28,8 +28,100 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
     fprintf('====================================================\n')
     fprintf(['Loading Variables for Chemical System: ', Syst.NameLong, '\n'])
     
+    if strcmp(Syst.NameLong, 'N3_NASA')
+        
+        %%% System
+        Syst.Name          = 'N3';
+
+        Syst.NProc         = 2; %(Diss+Inel&Exch)
+        
+        
+        %%% Atoms
+        Syst.NAtoms        = 3;
+        
+        Syst.Atom(1).Name  = 'N';
+        Syst.Atom(2).Name  = 'N';
+        Syst.Atom(3).Name  = 'N';
+
+        Syst.Atom(1).Color = [0, 0, 1];
+        Syst.Atom(2).Color = [0, 0, 1];
+        Syst.Atom(3).Color = [0, 0, 1];
+
+        Syst.Atom(1).Size  = 200;
+        Syst.Atom(2).Size  = 200;
+        Syst.Atom(3).Size  = 200;
+
+        Syst.Atom(1).Mass  = 29148.94559;
+        Syst.Atom(2).Mass  = 29148.94559;
+        Syst.Atom(3).Mass  = 29148.94559;
+        
+        
+        %%% Molecules
+        Syst.NMolecules                   = 1;
+        Syst.Molecule(1).Name             = 'N2';
+        Syst.Molecule(1).DissEn           = 0.0;
+        Syst.Molecule(1).DegeneracyFactor = [3, 6];
+        Syst.Molecule(1).Mu               = 28.0134d-3;
+        Syst.Molecule(1).NLevelsOrig      = 9390;
+        Syst.Molecule(1).ToAtoms          = [1,2];
+        Syst.Molecule(1).DiatPot          = 'N2_NASA';  
+        Syst.MolToOtherSyst(1)            = 0;
+        
+        Syst.OtherSyst_NameLong           = '';
+
+        %%% Pairs
+        Syst.Pair(1).Name  = 'N2';
+        Syst.Pair(2).Name  = 'N2';
+        Syst.Pair(3).Name  = 'N2';
+
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 1;
+        Syst.Pair(3).ToMol = 1;
+
+        Syst.Pair(1).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(2).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(3).Color = [17, 17, 17] ./ 256;
+
+        
+        %% CFD Components (For PLATO and KONIG)
+        Syst.NComp             =  2;
+        
+        Syst.CFDComp(1).Name   = 'N';
+        Syst.CFDComp(2).Name   = 'N2';
+
+        Syst.CFDComp(1).ToMol   = 0;
+        Syst.CFDComp(2).ToMol   = 1;
+
+        Syst.CFDComp(1).Mass    = Syst.Atom(1).Mass;
+        Syst.CFDComp(2).Mass    = 2.0 * Syst.Atom(1).Mass;
+
+        Syst.CFDComp(1).Qe      = 12;
+        Syst.CFDComp(2).Qe      = 1;
+
+        Syst.CFDComp(1).Color   = [ 102, 102, 102] ./ 256;
+        Syst.CFDComp(2).Color   = [   0,   0,   0] ./ 256;
+        
+        Syst.CFDComp(1).LineStyle = ':';
+        Syst.CFDComp(2).LineStyle = '-';
+        
+        Syst.RxLxIdx = [-2, 1;   % Diss
+                         0, 0];  % Inel&Exch1
+                        
+        Syst.MolToCFDComp       = [2];
+
+        
+        %% Exchange Properties
+        Syst.ExchToMol          = [];
+        Syst.ExchToAtom         = [];
+        
+        Syst.PairToExch         = [];
+        
+        Syst.ToOtherExch        = []    ;
+        
+        Syst.ColPartToComp      = 1; 
     
-    if strcmp(Syst.NameLong, 'O3_UMN')
+    
+    elseif strcmp(Syst.NameLong, 'O3_UMN')
         
         %%% System
         Syst.Name              = 'O3';

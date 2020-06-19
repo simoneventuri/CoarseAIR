@@ -92,7 +92,7 @@ Program RunTrajectories
   read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
   if (Status/=0) call Error( "Error reading the argument Input%Tint" )
   if (i_Debug_RT) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint)
-  
+
   call getarg( 4, Input%NProc_char )
   if (trim(adjustl(Input%NProc_char)) .eq. '') then
     Input%NProc_char  = '1'
@@ -164,6 +164,17 @@ Program RunTrajectories
     if (i_Debug_RT) call Logger%Write( "Level/Bin of Interest for Molecule Nb", iMol, ":     Input%BinOI(iMol) = ", Input%BinOI(iMol))
   
   end do
+
+
+  if (Input%TIntFixed > Zero) then
+    
+    Input%Tint = Input%TIntFixed
+    if (i_Debug_RT) call Logger%Write( "Fixed TInt: ", Input%TIntFixed)
+    write(Input%Tint_char, "(d10.5)", iostat=Status) Input%Tint
+    if (Status/=0) call Error( "Error writing Input%Tint_char" )
+    if (i_Debug_RT) call Logger%Write( "Fixed TInt: Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint)
+  
+  end if
 ! ==============================================================================================================
 
 

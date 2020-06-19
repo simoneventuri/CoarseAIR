@@ -73,14 +73,18 @@ function Compute_Rates_Thermal()
                     fileID1  = fopen(FileName,'a');
                 else
                     fileID1  = fopen(FileName,'w');
-                    if NProc == 3
+                    if NProc == 2
+                        HeaderStr = strcat('# T [K], K^D Eq\n');
+                    elseif NProc == 3
                         HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq \n');
                     else
                         HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K_2^E Eq \n');
                     end
                     fprintf(fileID1,HeaderStr);
                 end
-                if NProc == 3
+                if NProc == 2
+                    fprintf(fileID1,'%e,%e\n',       Temp.TNow, Rates.T(Temp.iT).Molecule(iMol).DissTh );
+                elseif NProc == 3
                     fprintf(fileID1,'%e,%e,%e\n',    Temp.TNow, Rates.T(Temp.iT).Molecule(iMol).DissTh, Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1) );
                 else
                     fprintf(fileID1,'%e,%e,%e,%e\n', Temp.TNow, Rates.T(Temp.iT).Molecule(iMol).DissTh, Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1), Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,2) );

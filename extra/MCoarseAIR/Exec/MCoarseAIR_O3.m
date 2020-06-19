@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates OtherSyst OtherRates
@@ -35,9 +35,9 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
 
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
-Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/O3Diss_Database/Run_0D');
-Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/O3Diss_Database/HDF5_Database/');
-Input.TranVec               = [5000, 10000, 20000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
+Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
+Input.TranVec               = [20000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong          = 'O3_UMN';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -63,7 +63,7 @@ Input.Kin.Proc.InelFlg      = 1;
 Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
 
-Input.Kin.ReadRatesProc     = [false, false, false]
+Input.Kin.ReadRatesProc     = [2, 2, 2]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst     = []
 Input.Kin.OtherSystInHDF5   = []
@@ -75,11 +75,11 @@ Input.ReLoad                = 1;
 %% Inputs for Plotting
 Input.iFig               = 101;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Mars_Paper/Figures/');
+Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Mars_Paper/Data/');
+Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 
 %% Tasks Inputs
@@ -97,6 +97,13 @@ Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
 Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [1e-12, 1e-12, 1e-12]
+% Writing Rates for Clustering
+Input.Tasks.Write_RatesForClustering.Flg               = true;
+Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
+Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
+Input.Tasks.Write_RatesForClustering.MinState          = 1;
+Input.Tasks.Write_RatesForClustering.MaxState          = 100000;
+Input.Tasks.Write_RatesForClustering.IncludeExch       = true;
 % Compute Grouped Rate Coefficients
 Input.Tasks.Compute_GroupedRates.Flg                   = false;
 % Plotting Reconstructed Rate Coefficients
@@ -191,11 +198,12 @@ for iT = 1:length(Temp.TranVec)
         if (Input.Tasks.Plot_OverallRates.Flg              || ...
             Input.Tasks.Plot_DifferentDissRates.Flg        || ...
             Input.Tasks.Write_RatesParaview.Flg            || ...
+            Input.Tasks.Write_RatesForClustering.Flg       || ...
             Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg          || ...
-            any(Input.Kin.ReadRatesProc))
+            (sum(Input.Kin.ReadRatesProc)>0) ) 
         
             %% Reading Rates
             Read_Rates()
@@ -239,7 +247,7 @@ for iT = 1:length(Temp.TranVec)
             
         end
         
-        if (any(Input.Kin.ReadRatesProc(1,:)))
+        if ( (sum(Input.Kin.ReadRatesProc)>0) )
         
             %% Computing Thermal Rates
             Compute_Rates_Thermal()   
@@ -282,6 +290,20 @@ for iT = 1:length(Temp.TranVec)
     end
     
     
+    %%%% Writing Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  
+    
+    %% Writing Rate Coefficients for Paraview
+    if (Input.Tasks.Write_RatesParaview.Flg)
+        Write_RatesForParaview(Input.Tasks.Write_RatesParaview)
+    end
+    
+    %% Writing Rate Coefficients for Clustering
+    if (Input.Tasks.Write_RatesForClustering.Flg)
+        Write_RatesForClustering(Input.Tasks.Write_RatesForClustering)
+    end
+    
+    
     %%%% Plotting Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%   
     
@@ -298,11 +320,6 @@ for iT = 1:length(Temp.TranVec)
     %% Plotting Pair Contributions to Dissociation Rate Coefficients
     if (Input.Tasks.Plot_DifferentDissRates.Flg)
         Plot_DifferentDissRates()
-    end
-    
-    %% Writing Rate Coefficients for Paraview
-    if (Input.Tasks.Write_RatesParaview.Flg)
-        Write_RatesForParaview(Input.Tasks.Write_RatesParaview)
     end
     
     %% Plotting Reconstructed Rate Coefficients

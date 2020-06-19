@@ -174,6 +174,7 @@ Subroutine AnalyzeTrajectoryPoint( This, Collision, i_Debug )
 !     COMPUTING THE 3 COORDINATES AND 3 VELOCITIES ASSOCIATED TO ALL ATOMS
 ! ==============================================================================================================
   if (i_Debug_Loc)  write(Logger%Unit,"(8x,'[AnalyzeTrajectoryPoint]: Computing the 3 coordinates and 3 velocities associated to all atoms. Calling ComputeCoordAndVeloc')")
+  if (i_Debug_Loc) call Logger%Write( "Collision%mMiMn(:) = ", Collision%mMiMn(:) )
   call ComputeCoordAndVeloc( This, Collision, xx, xxdot )
   if (i_Debug_Loc)  then
     do iA = 1,Collision%NAtoms

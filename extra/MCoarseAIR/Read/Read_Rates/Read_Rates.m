@@ -31,81 +31,66 @@ function Read_Rates()
     
     fprintf('= Read_Rates =========================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
+    
+    
+    if (isempty(OtherSyst))
+        OtherSyst(1).Syst = Syst;
+    end
+    
+    
     fprintf('Reading Rates \n\n' )
-    
-
-%     TempBins = Input.Kin.NGroupsOut(1); 
-%     opts = delimitedTextImportOptions("NumVariables", 7);
-%     opts.DataLines = [1, Inf];
-%     opts.Delimiter = ["(", ")", ",", ":"];
-%     opts.VariableNames = ["Var1", "VarName2", "Var3", "E12", "Var5", "Var6", "Var7"];
-%     opts.SelectedVariableNames = ["VarName2", "E12"];
-%     opts.VariableTypes = ["string", "double", "string", "double", "string", "string", "string"];
-%     opts = setvaropts(opts, [1, 3, 5, 6, 7], "WhitespaceRule", "preserve");
-%     opts = setvaropts(opts, [1, 3, 5, 6, 7], "EmptyFieldRule", "auto");
-%     opts.ExtraColumnsRule = "ignore";
-%     opts.EmptyLineRule = "read";
-%     if Input.Kin.Proc.DissFlg == 2 || Input.Kin.Proc.DissFlg == 6
-%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Corrected.dat"), opts);
-%     elseif Input.Kin.Proc.DissFlg == 3
-%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_VS.dat"), opts);
-%     elseif Input.Kin.Proc.DissFlg == 4
-%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Phys_",num2str(TempBins),"Bins.dat"), opts);
-%     elseif Input.Kin.Proc.DissFlg == 5
-%         tbl = readtable(strcat("/home/venturi/WORKSPACE/O3Diss_Database/Run_0D/database/kinetics/O3_UMN/T",Temp.TNowChar,"K/Diss_Phys_Fitted_",num2str(TempBins),"Bins.dat"), opts);
-%     end 
-%     Idx      = tbl.VarName2;
-%     DissTemp = tbl.E12;
-%     clear opts tbl
-%     Rates.T(Temp.iT).Diss(Idx(:),1) = DissTemp(:);
-    
-
-    
-%     fprintf(strcat('Computing Backward Rates \n') )
-%     
-%     Rates.T(Temp.iT).Recomb(:,1) = Compute_BckwdRates(Rates.T(Temp.iT).Diss(:,1), 1, Syst.Molecule(1).LevelEeV, Syst.Molecule(1).Levelq, 0.0, 0.0);
-%     
-%     iMol      = 1;
-%     for iExch = size(Syst.ExchToMol,1)%1:size(Syst.ExchToMol,1)
-%         jMol      = Syst.ExchToMol;
-%         TempRates = Compute_BckwdRates(Rates.T(Temp.iT).ExchType(iExch).Exch, 2+iExch, Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).Levelq, Syst.Molecule(jMol).LevelEeV, Syst.Molecule(jMol).Levelq);
-%         Rates.T(Temp.iT).ExchType(iExch).Exch = TempRates;
-%         clear TempRates;
-%     end
-    
-    
     Rates = Read_RatesLocal(Rates, Syst, OtherSyst(1).Syst, 1);
+    
+    
+    
+    if (Input.Kin.DissCorrFactor ~= 1)
+        fprintf(['Correcting Dissociation Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
+        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
+        if (Input.Kin.ReadRatesProc(1, 1) == 2)
+            fprintf(['Correcting Recombination Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
+            Rates.T(Temp.iT).Recomb = Rates.T(Temp.iT).Recomb .* Input.Kin.DissCorrFactor;           
+        end
+    end
+    
+    
     
     if (Syst.NAtoms == 3)
 
+
+        fprintf(strcat('Computing Overall Rates \n') )
         Rates.T(Temp.iT).Molecule(1).Overall(:,1) = Rates.T(Temp.iT).Diss(:,1);
         Rates.T(Temp.iT).Molecule(1).Overall(:,2) = sum( Rates.T(Temp.iT).Inel(:,1), 2);
         for iExch = 1:size(Syst.ExchToMol,1)
             Rates.T(Temp.iT).Molecule(1).Overall(:,2+iExch) = sum( Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
         end
-
-    end
-    
-    
-    iMol = 2;
-    for iSyst = 1:length(Input.Kin.ReadOtherSyst)
-        if (Input.Kin.ReadOtherSyst(iSyst))
-            fprintf(['Loading Rates also for the ', OtherSyst(iSyst).Syst.NameLong, ' System \n\n'] )
+        
+        
             
-            OtherRates(iSyst).Rates.Diss = 0.0;
-            OtherRates(iSyst).Rates      = Read_RatesLocal(OtherRates(iSyst).Rates, OtherSyst(iSyst).Syst, Syst, iSyst+1);
+%         iMol = 2;
+%         for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+%             if (Input.Kin.ReadOtherSyst(iSyst))
+%                 fprintf(['Loading Rates also for the ', OtherSyst(iSyst).Syst.NameLong, ' System \n\n'] )
+% 
+%                 OtherRates(iSyst).Rates.Diss = 0.0;
+%                 OtherRates(iSyst).Rates      = Read_RatesLocal(OtherRates(iSyst).Rates, OtherSyst(iSyst).Syst, Syst, iSyst+1);
+% 
+%                 if (Syst.NAtoms == 3)
+%                     Rates.T(Temp.iT).Molecule(iMol).Overall(:,1) = OtherRates(iSyst).Rates.T(Temp.iT).Diss(:,1);
+%                     for iExch = 1:size(OtherSyst(iSyst).Syst.ExchToMol,1)
+%                         Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) = sum( OtherRates(iSyst).Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
+%                     end
+%                 end
+% 
+%             end
+%             iMol = iMol+1;
+%         end
+        
 
-            if (Syst.NAtoms == 3)
-                 Rates.T(Temp.iT).Molecule(iMol).Overall(:,1) = OtherRates(iSyst).Rates.T(Temp.iT).Diss(:,1);
-                for iExch = 1:size(OtherSyst(iSyst).Syst.ExchToMol,1)
-                    Rates.T(Temp.iT).Molecule(iMol).Overall(:,2+iExch) = sum( OtherRates(iSyst).Rates.T(Temp.iT).ExchType(iExch).Exch, 2);
-                end
-            end
-
-        end
-        iMol = iMol+1;
+        
     end
-
+    
+    Rates
+        
         
     fprintf('====================================================\n\n')  
     
@@ -167,11 +152,6 @@ function [Rates] = Read_RatesLocal(Rates, Syst, OtherSyst, iSyst)
         [Rates] = Read_Rates_FromCGQCT(Rates, Syst, OtherSyst);
    
     end
-    
-    
-    if (Input.Kin.DissCorrFactor ~= 1)
-        fprintf(['Correcting Dissociation Rate by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
-        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
-    end
+
 
 end

@@ -1,4 +1,4 @@
-%% The Function plots the Ro-Vibrational Populations at Given Time Steps
+%% The Function writes the Rates in the Format for Paraview
 %
 function Write_RatesForParaview(Controls)    
     
@@ -97,11 +97,11 @@ function Write_RatesForParaview(Controls)
                         fprintf(fileID,'id,v,J,EeV,rIn,rOut,EeVVib,EeVRot,dCentBarr,rIn_i,J_i,EeV_i,KInel\n');
                         for jLevel = 1:Syst.Molecule(iMol).NLevels
                             
-                            if (Syst.Molecule(iMol).LevelEeV(iLevel) >= Syst.Molecule(iMol).LevelEeV(jLevel))
+%                             if (Syst.Molecule(iMol).LevelEeV(iLevel) >= Syst.Molecule(iMol).LevelEeV(jLevel))
                                 KInel = Rates.T(Temp.iT).Inel(iLevel,jLevel);
-                            else
-                                KInel = Rates.T(Temp.iT).Inel(jLevel,iLevel) * Syst.Molecule(iMol).T(Temp.iT).Levelq(jLevel) / Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
-                            end
+%                             else
+%                                 KInel = Rates.T(Temp.iT).Inel(jLevel,iLevel) * Syst.Molecule(iMol).T(Temp.iT).Levelq(jLevel) / Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
+%                             end
                             if (KInel > Controls.MinRate(Temp.iT))
                                 fprintf(fileID,'%i,%i,%i,%e,%e,%e,%e,%e,%e,%e,%e,%e,%e\n', jLevel,       	                ...
                                                                                   Syst.Molecule(iMol).Levelvqn(jLevel),     ...
