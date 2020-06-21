@@ -52,7 +52,7 @@
 ###########################################################################################
 
    #Levels File Name, Molecule 1 = N2_levels_venturi.dat
-   Levels File Name, Molecule 1 = n2.leroy.Sort.dat
+   Levels File Name, Molecule 1 = MyLeroy_FromRobyn.inp
    #Levels File Name, Molecule 1 = n2.leroy.Robyn
    
    Min Energy for Cutting Levels, Molecule 1 = -10000.d0
@@ -72,7 +72,7 @@
    #                                                                         <- If Final    Level==0, CoarseAIR computes until the molecule's last level/bin
    Sorting Method, Molecule 1 = State-Specific
      Starting Level, Molecule 1 = 1                              
-     Final    Level, Molecule 1 = 1
+     Final    Level, Molecule 1 = 0
    #*##
    
    #:##                                                                      <- Uncomment from #: to #* for Running CoarseAIR with vibrational specific binning
@@ -105,7 +105,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 20000
+   Nb of Trajectories per Level / Bin = 30000
    #  Nb of Trajectories per Mini-Batch = 20000
    
    Generate a CPU-Clock Dependent Seed? = no
@@ -242,7 +242,7 @@
 
    Distinguish Exchanges from Inelastic? = yes
 
-   Temperature for Distribution Function Computation [K] = 1400.d0
+   Temperature for Distribution Function Computation [K] = 300.d0
 
    Writing Rate Files in Binary Format? = no
    

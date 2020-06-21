@@ -5,127 +5,148 @@ clc
 
 global Param Input Syst
 
-Input.NTrajs       = 1500000;
-Input.BinVec       = [2,12,22];
+Input.NTrajs       = 100;
 Input.Dist         = 33.7e-2 * 1.889725989e+10;
 Input.iPES         = 0;
+NPESs              = 3;
 Syst.NAtoms        = 3;
+%Syst.Name_Long     = 'O3_UMN';
+Syst.Name_Long     = 'CO2_NASA';
 
 
-%% O2+O
-Input.RunFldr      = strcat('/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Test_PES', num2str(Input.iPES), '/');
-mO16               = 29148.94559d0; %15.9994d-3;
-mO18               = mO16 * 18.0 / 16.0;
-Input.Masses       = [mO16, mO16, mO16];
-PESNames           = ["All", "1${}^1$A'", "1${}^1$A''", "2${}^1$A'", "1${}^3$A'", "1${}^3$A''", "2${}^3$A'"];
-PESName            = PESNames(Input.iPES+1)
+if strcmp(Syst.Name_Long, 'O3_UMN')
+    %% O2+O
+    Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Test_PES', num2str(Input.iPES), '/')
+    mO16                     = 29148.94559d0; %15.9994d-3;
+    mO18                     = mO16 * 18.0 / 16.0;
+    Input.Masses             = [mO16, mO16, mO16];
+    PESNames                 = ["All", "1${}^1$A'", "1${}^1$A''", "2${}^1$A'", "1${}^3$A'", "1${}^3$A''", "2${}^3$A'"];
+    PESName                  = PESNames(Input.iPES+1)
+    Input.EMu                = 86.0;
+    Input.ESD                =  6.e-5;
+    Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Figures/';
+    Input.BinVec             = [2, 12, 22];
 
+else strcmp(Syst.Name_Long, 'CO2_NASA')
+    %% CO+O
+    %Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test_PES', num2str(Input.iPES), '_/')
+    Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test')
+    mO16                     = 29148.94559d0;%15.9994d-3;
+    mO18                     = mO16 * 18.0 / 16.0;
+    mC                       = 21868.661757d0;%12.011e-3;
+    Input.Masses             = [mC, mO16, mO16];
+    PESNames                 = ["All", "1${}^3$A'", "1${}^3$A''", "2${}^3$A''"];
+    PESName                  = PESNames(Input.iPES+1)
+    Input.EMu                = 83.0;
+    Input.ESD                = 30.0/2.355;
+    Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Figures/';
+    Input.BinVec             = [1];
 
-% %% CO+O
-% Input.RunFldr      = '/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test'
-% mO16               = 29148.94559d0;%15.9994d-3;
-% mO18               = mO16 * 18.0 / 16.0;
-% mC                 = 21868.661757d0;%12.011e-3;
-% Input.Masses       = [mC, mO16, mO16];
-
-
+end
 
 Input.FigureFormat       = 'PrePrint';
 Input.SaveFigsFlgInt     = 2;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CoarseAIR/O3_Scattering/Figures/';
+
 
 Initialize_Parameters()
 
 
 
-
-NBefore  = 0;
-
 Mapping  = zeros(1500000,3);
 iInel    = 0;
 iExch1   = 0;
 iExch2   = 0;
-for iBin = Input.BinVec    
+NBefore  = 0;
+for jPES = 1:NPESs
+    if NPESs == 1
+        RunFldr = Input.RunFldr;
+    else
+        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_/');
+    end
     
-    %%% Reading Quantum Mechanics
-    opts = delimitedTextImportOptions("NumVariables", 10);
-    opts.DataLines = [2, Inf];
-    opts.Delimiter = ",";
-    opts.VariableNames = ["iTraj", "iPES", "Var3", "b_i", "Var5", "Var6", "Var7", "j_f", "v_f", "arr_f"];
-    opts.SelectedVariableNames = ["iTraj", "iPES", "b_i", "j_f", "v_f", "arr_f"];
-    opts.VariableTypes = ["double", "double", "string", "double", "string", "string", "string", "double", "double", "double"];
-    opts.ExtraColumnsRule = "ignore";
-    opts.EmptyLineRule = "read";
-    opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "WhitespaceRule", "preserve");
-    opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "EmptyFieldRule", "auto");
-    tbl = readtable(strcat(Input.RunFldr, "/EMu/Bins_", num2str(iBin), "_0/trajectories.csv"), opts);
-    Idx    = tbl.iTraj + NBefore;
-    iPES_  = tbl.iPES;
-    b_i_   = tbl.b_i;
-    j_f_   = tbl.j_f;
-    v_f_   = tbl.v_f;
-    arr_f_ = tbl.arr_f;
-    clear opts tbl
+    for iBin = Input.BinVec
+        fprintf('Initial PES: %i; Initial Level: %i\n\n', jPES, iBin )
 
-    
-    NTrajsOI = min(length(arr_f_), Input.NTrajs);
-    for jTraj = 1:NTrajsOI%length(Idx) 
-        iTraj = jTraj + NBefore; 
-        
-        Idx_  = Idx(jTraj);
-        
-        Mapping(Idx_,2) = iTraj; 
-        b_i   = b_i_(jTraj);
-        iPES  = iPES_(jTraj);
-        j_f   = j_f_(jTraj);
-        v_f   = v_f_(jTraj);
-        arr_f = arr_f_(jTraj);
-        
-        Trajs.b(iTraj)    = b_i;
-        Trajs.iPES(iTraj) = iPES;
-        Trajs.J(iTraj)    = j_f;
-        Trajs.v(iTraj)    = v_f;
+        %%% Reading Quantum Mechanics
+        clear Idx iPES_ b_i_ j_f_ v_f_ arr_f_
+        opts = delimitedTextImportOptions("NumVariables", 10);
+        opts.DataLines = [2, Inf];
+        opts.Delimiter = ",";
+        opts.VariableNames = ["iTraj", "iPES", "Var3", "b_i", "Var5", "Var6", "Var7", "j_f", "v_f", "arr_f"];
+        opts.SelectedVariableNames = ["iTraj", "iPES", "b_i", "j_f", "v_f", "arr_f"];
+        opts.VariableTypes = ["double", "double", "string", "double", "string", "string", "string", "double", "double", "double"];
+        opts.ExtraColumnsRule = "ignore";
+        opts.EmptyLineRule = "read";
+        opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "WhitespaceRule", "preserve");
+        opts = setvaropts(opts, ["Var3", "Var5", "Var6", "Var7"], "EmptyFieldRule", "auto");
+        tbl = readtable(strcat(RunFldr, "/EMu/Bins_", num2str(iBin), "_0/trajectories.csv"), opts);
+        Idx    = tbl.iTraj + NBefore;
+        iPES_  = tbl.iPES;
+        b_i_   = tbl.b_i;
+        j_f_   = tbl.j_f;
+        v_f_   = tbl.v_f;
+        arr_f_ = tbl.arr_f;
+        clear opts tbl
 
-        if     (round(arr_f-0.5) == 16) || (round(arr_f-0.5) == 17)
-            iInel                 = iInel + 1; 
-            Mapping(Idx_,1) = 1; 
-            Mapping(Idx_,3) = iInel; 
 
-            Inelastic.b(iInel)    = b_i;
-            Inelastic.iPES(iInel) = iPES;
-            Inelastic.J(iInel)    = j_f;
-            Inelastic.v(iInel)    = v_f;
+        NTrajsOI = min(length(arr_f_), Input.NTrajs);
+        for jTraj = 1:NTrajsOI%length(Idx) 
+            iTraj = jTraj + NBefore; 
 
-        elseif (round(arr_f-0.5) == 32) || (round(arr_f-0.5) == 33)
-            iExch1                = iExch1 + 1;
-            Mapping(Idx_,1)       = 2;
-            Mapping(Idx_,3)       = iExch1; 
-            %Mapping(Idx(jTraj),4) = iExch1+iExch2; 
+            Idx_  = Idx(jTraj);
 
-            Exch1.b(iExch1)       = b_i;
-            Exch1.iPES(iExch1)    = iPES;
-            Exch1.J(iExch1)       = j_f;
-            Exch1.v(iExch1)       = v_f;
+            Mapping(Idx_,2) = iTraj; 
+            b_i   = b_i_(jTraj);
+            iPES  = iPES_(jTraj);
+            j_f   = j_f_(jTraj);
+            v_f   = v_f_(jTraj);
+            arr_f = arr_f_(jTraj);
 
-        elseif (round(arr_f-0.5) == 48) || (round(arr_f-0.5) == 49)
-            iExch2                = iExch2 + 1;
-            Mapping(Idx_,1)       = 3;
-            Mapping(Idx_,3)       = iExch2; 
-            %Mapping(Idx(jTraj),4) = iExch1+iExch2; 
+            Trajs.b(iTraj)    = b_i;
+            Trajs.iPES(iTraj) = iPES;
+            Trajs.J(iTraj)    = j_f;
+            Trajs.v(iTraj)    = v_f;
 
-            Exch2.b(iExch2)       = b_i;        
-            Exch2.iPES(iExch2)    = iPES;
-            Exch2.J(iExch2)       = j_f;
-            Exch2.v(iExch2)       = v_f;
+            if     (round(arr_f-0.5) == 16) || (round(arr_f-0.5) == 17)
+                iInel           = iInel + 1; 
+                Mapping(Idx_,1) = 1; 
+                Mapping(Idx_,3) = iInel; 
+
+                Inelastic.b(iInel)    = b_i;
+                Inelastic.iPES(iInel) = iPES;
+                Inelastic.J(iInel)    = j_f;
+                Inelastic.v(iInel)    = v_f;
+
+            elseif (round(arr_f-0.5) == 32) || (round(arr_f-0.5) == 33)
+                iExch1                = iExch1 + 1;
+                Mapping(Idx_,1)       = 2;
+                Mapping(Idx_,3)       = iExch1; 
+                %Mapping(Idx(jTraj),4) = iExch1+iExch2; 
+
+                Exch1.b(iExch1)       = b_i;
+                Exch1.iPES(iExch1)    = iPES;
+                Exch1.J(iExch1)       = j_f;
+                Exch1.v(iExch1)       = v_f;
+
+            elseif (round(arr_f-0.5) == 48) || (round(arr_f-0.5) == 49)
+                iExch2                = iExch2 + 1;
+                Mapping(Idx_,1)       = 3;
+                Mapping(Idx_,3)       = iExch2; 
+                %Mapping(Idx(jTraj),4) = iExch1+iExch2; 
+
+                Exch2.b(iExch2)       = b_i;        
+                Exch2.iPES(iExch2)    = iPES;
+                Exch2.J(iExch2)       = j_f;
+                Exch2.v(iExch2)       = v_f;
+
+            end
 
         end
+        %NTrajs = max(Idx);
+        clear Idx
 
+        NBefore = NBefore + NTrajsOI;
     end
-    %NTrajs = max(Idx);
-    clear Idx
-
-    
-    NBefore = NBefore + NTrajsOI;
 end
 iExch = iExch1 + iExch2;
 iTot  = iInel  + iExch;
@@ -171,6 +192,11 @@ Inelastic.ECollf_CM = zeros(1,iInel);
 Inelastic.Theta_CM  = zeros(1,iInel); 
 Inelastic.VProjf_CM = zeros(1,iInel); 
 
+% Inelastic.b    = zeros(1,iInel); 
+% Inelastic.v    = zeros(1,iInel); 
+% Inelastic.J    = zeros(1,iInel); 
+% Inelastic.iPES = zeros(1,iInel);
+
 
 Exch1.Angle1   = zeros(1,iExch1); 
 Exch1.Angle2   = zeros(1,iExch1); 
@@ -189,6 +215,13 @@ Exch1.EColli_CM = zeros(1,iExch1);
 Exch1.ECollf_CM = zeros(1,iExch1); 
 Exch1.Theta_CM  = zeros(1,iExch1); 
 Exch1.VProjf_CM = zeros(1,iExch1); 
+
+if iExch1 == 0
+    Exch1.b    = zeros(1,iExch1); 
+    Exch1.v    = zeros(1,iExch1); 
+    Exch1.J    = zeros(1,iExch1); 
+    Exch1.iPES = zeros(1,iExch1); 
+end
 
 
 Exch2.Angle1   = zeros(1,iExch2); 
@@ -209,278 +242,322 @@ Exch2.ECollf_CM = zeros(1,iExch2);
 Exch2.Theta_CM  = zeros(1,iExch2); 
 Exch2.VProjf_CM = zeros(1,iExch2); 
 
-
-NBefore = 0;
-for iBin = Input.BinVec
-    fprintf('Initial Level: %i\n\n', iBin )
-    iExch1 = 0;
-    iExch2 = 0;
-    
-    
-    %% Reading Initial Parameters
-    opts = delimitedTextImportOptions("NumVariables", 19);
-    opts.DataLines = [2, Inf];
-    opts.Delimiter = ",";
-    opts.VariableNames = ["iTraj", "iPES", "Angle1", "Angle2", "Angle3", "ETran", "Ekin", "rBond", "rdotBond", "b", "Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"];
-    opts.SelectedVariableNames = ["iTraj", "iPES", "Angle1", "Angle2", "Angle3", "ETran", "Ekin", "rBond", "rdotBond", "b"];
-    opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "string", "string", "string", "string", "string", "string", "string", "string"];
-    opts.ExtraColumnsRule = "ignore";
-    opts.EmptyLineRule = "read";
-    opts = setvaropts(opts, ["Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"], "WhitespaceRule", "preserve");
-    opts = setvaropts(opts, ["Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"], "EmptyFieldRule", "auto");
-    tbl = readtable(strcat(Input.RunFldr, "/EMu/Bins_", num2str(iBin), "_0/Params.csv"), opts);
-    Idx_Par  = tbl.iTraj + NBefore;
-    %iPES1_    = tbl.iPES;
-    Angle1_   = tbl.Angle1;
-    Angle2_   = tbl.Angle2;
-    Angle3_   = tbl.Angle3;
-    ETran_    = tbl.ETran;
-    Ekin_     = tbl.Ekin;
-    rBond_    = tbl.rBond;
-    rdotBond_ = tbl.rdotBond;
-    %b_        = tbl.b;
-    clear opts tbl
-    
-    
-    %% Reading Classical Mechanics
-    opts = delimitedTextImportOptions("NumVariables", 28);
-    opts.DataLines = [2, Inf];
-    opts.Delimiter = ",";
-    opts.VariableNames = ["Trajindex", "t_fin", "H_ini", "PaQ_ini1", "PaQ_ini2", "PaQ_ini3", "PaQ_ini4", "PaQ_ini5", "PaQ_ini6", "PaQ_ini7", "PaQ_ini8", "PaQ_ini9", "PaQ_ini10", "PaQ_ini11", "PaQ_ini12", "H_fin", "PaQ_fin1", "PaQ_fin2", "PaQ_fin3", "PaQ_fin4", "PaQ_fin5", "PaQ_fin6", "PaQ_fin7", "PaQ_fin8", "PaQ_fin9", "PaQ_fin10", "PaQ_fin11", "PaQ_fin12"];
-    opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-    opts.ExtraColumnsRule = "ignore";
-    opts.EmptyLineRule = "read";
-    tbl = readtable(strcat(Input.RunFldr, "/EMu/Bins_", num2str(iBin), "_0/PaQSol.csv"), opts);
-    Idx       = tbl.Trajindex + NBefore;
-    t_fin     = tbl.t_fin;
-    H_ini     = tbl.H_ini;
-    PaQ_ini1  = tbl.PaQ_ini1;
-    PaQ_ini2  = tbl.PaQ_ini2;
-    PaQ_ini3  = tbl.PaQ_ini3;
-    PaQ_ini4  = tbl.PaQ_ini4;
-    PaQ_ini5  = tbl.PaQ_ini5;
-    PaQ_ini6  = tbl.PaQ_ini6;
-    PaQ_ini7  = tbl.PaQ_ini7;
-    PaQ_ini8  = tbl.PaQ_ini8;
-    PaQ_ini9  = tbl.PaQ_ini9;
-    PaQ_ini10 = tbl.PaQ_ini10;
-    PaQ_ini11 = tbl.PaQ_ini11;
-    PaQ_ini12 = tbl.PaQ_ini12;
-    H_fin     = tbl.H_fin;
-    PaQ_fin1  = tbl.PaQ_fin1;
-    PaQ_fin2  = tbl.PaQ_fin2;
-    PaQ_fin3  = tbl.PaQ_fin3;
-    PaQ_fin4  = tbl.PaQ_fin4;
-    PaQ_fin5  = tbl.PaQ_fin5;
-    PaQ_fin6  = tbl.PaQ_fin6;
-    PaQ_fin7  = tbl.PaQ_fin7;
-    PaQ_fin8  = tbl.PaQ_fin8;
-    PaQ_fin9  = tbl.PaQ_fin9;
-    PaQ_fin10 = tbl.PaQ_fin10;
-    PaQ_fin11 = tbl.PaQ_fin11;
-    PaQ_fin12 = tbl.PaQ_fin12;
-    clear opts tbl
-    for iTraj = 1:NTrajsOI%length(Idx)
-        if ( mod(iTraj,floor(NTrajsOI/20)) == 0 )
-            fprintf('  %f%% of Trajectories Postprocessed \n', iTraj/NTrajsOI*100 )
-        end
-
-        jTraj = Mapping(Idx(iTraj),2);
-        if (jTraj ~= 0)
-            
-            Angle1   = Angle1_(iTraj);
-            Angle2   = Angle2_(iTraj);
-            Angle3   = Angle3_(iTraj);
-            ETran    = ETran_(iTraj);
-            Ekin     = Ekin_(iTraj);
-            rBond    = rBond_(iTraj);
-            rdotBond = rdotBond_(iTraj);
-            
-            Trajs.Angle1(jTraj)   = Angle1;
-            Trajs.Angle2(jTraj)   = Angle2;
-            Trajs.Angle3(jTraj)   = Angle3;
-            Trajs.ETran(jTraj)    = ETran;
-            Trajs.Ekin(jTraj)     = Ekin;
-            Trajs.rBond(jTraj)    = rBond;
-            Trajs.rdotBond(jTraj) = rdotBond;
-            
-            
-            tf       = t_fin(iTraj);
-            Hi       = H_ini(iTraj);
-            Hf       = H_fin(iTraj);
-            PaQi(1)  = PaQ_ini1(iTraj);
-            PaQi(2)  = PaQ_ini2(iTraj);
-            PaQi(3)  = PaQ_ini3(iTraj);
-            PaQi(4)  = PaQ_ini4(iTraj);
-            PaQi(5)  = PaQ_ini5(iTraj);
-            PaQi(6)  = PaQ_ini6(iTraj);
-            PaQi(7)  = PaQ_ini7(iTraj);
-            PaQi(8)  = PaQ_ini8(iTraj);
-            PaQi(9)  = PaQ_ini9(iTraj);
-            PaQi(10) = PaQ_ini10(iTraj);
-            PaQi(11) = PaQ_ini11(iTraj);
-            PaQi(12) = PaQ_ini12(iTraj);
-            PaQf(1)  = PaQ_fin1(iTraj);
-            PaQf(2)  = PaQ_fin2(iTraj);
-            PaQf(3)  = PaQ_fin3(iTraj);
-            PaQf(4)  = PaQ_fin4(iTraj);
-            PaQf(5)  = PaQ_fin5(iTraj);
-            PaQf(6)  = PaQ_fin6(iTraj);
-            PaQf(7)  = PaQ_fin7(iTraj);
-            PaQf(8)  = PaQ_fin8(iTraj);
-            PaQf(9)  = PaQ_fin9(iTraj);
-            PaQf(10) = PaQ_fin10(iTraj);
-            PaQf(11) = PaQ_fin11(iTraj);
-            PaQf(12) = PaQ_fin12(iTraj);
-
-
-            Trajs.tf(jTraj)      = tf;
-            Trajs.Hi(jTraj)      = Hi;
-            Trajs.Hf(jTraj)      = Hf;
-            Trajs.PaQi(:,jTraj)  = PaQi(:);
-            Trajs.PaQf(:,jTraj)  = PaQf(:);
-
-
-
-            if     Mapping(Idx(iTraj),1) == 1
-                iInel = Mapping(Idx(iTraj),3);
-
-                Inelastic.Angle1(iInel)   = Angle1;
-                Inelastic.Angle2(iInel)   = Angle2;
-                Inelastic.Angle3(iInel)   = Angle3;
-                Inelastic.ETran(iInel)    = ETran;
-                Inelastic.Ekin(iInel)     = Ekin;
-                Inelastic.rBond(iInel)    = rBond;
-                Inelastic.rdotBond(iInel) = rdotBond;
-                
-                Inelastic.tf(iInel)     = tf;
-                Inelastic.Hi(iInel)     = Hi;
-                Inelastic.Hf(iInel)     = Hf;
-                Inelastic.PaQi(:,iInel) = PaQi(:);
-                Inelastic.PaQf(:,iInel) = PaQf(:);
-
-                [X, Vi]                    = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
-                Trajs.EColli_CM(jTraj)     = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
-                Inelastic.EColli_CM(iInel) = Trajs.EColli_CM(jTraj);
-
-                [X, Vf]                    = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
-                Inelastic.ECollf_CM(iInel) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 1);
-
-                [Inelastic.Theta_CM(iInel), Inelastic.TOF(iInel)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 1, Input.Dist);
-
-                %Inelastic.VProjf_CM(iInel) = Compute_VelocityFlux_CM(Vi, Vf, Masses, 1);
-
-                
-            elseif Mapping(Idx(iTraj),1) == 2
-                iExch1 = Mapping(Idx(iTraj),3);
-                %iExch  = Mapping(Idx(iTraj),4);
-                
-                Exch1.Angle1(iExch1)   = Angle1;
-                Exch1.Angle2(iExch1)   = Angle2;
-                Exch1.Angle3(iExch1)   = Angle3;
-                Exch1.ETran(iExch1)    = ETran;
-                Exch1.Ekin(iExch1)     = Ekin;
-                Exch1.rBond(iExch1)    = rBond;
-                Exch1.rdotBond(iExch1) = rdotBond;
-
-                Exch1.tf(iExch1)     = tf;
-                Exch1.Hi(iExch1)     = Hi;
-                Exch1.Hf(iExch1)     = Hf;
-                Exch1.PaQi(:,iExch1) = PaQi(:);
-                Exch1.PaQf(:,iExch1) = PaQf(:);
-
-                [X, Vi]                 = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
-                Trajs.EColli_CM(jTraj)  = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
-                Exch1.EColli_CM(iExch1) = Trajs.EColli_CM(jTraj);
-
-                [X, Vf]                 = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
-                Exch1.ECollf_CM(iExch1) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 2);
-
-                [Exch1.Theta_CM(iExch1), Exch1.TOF(iExch1)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 2, Input.Dist);
-
-                Exch1.VProjf_CM(iExch1) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 2);
-
-                
-            elseif Mapping(Idx(iTraj),1) == 3
-                iExch2 = Mapping(Idx(iTraj),3);
-                %iExch  = Mapping(Idx(iTraj),4);
-                
-                Exch2.Angle1(iExch2)   = Angle1;
-                Exch2.Angle2(iExch2)   = Angle2;
-                Exch2.Angle3(iExch2)   = Angle3;
-                Exch2.ETran(iExch2)    = ETran;
-                Exch2.Ekin(iExch2)     = Ekin;
-                Exch2.rBond(iExch2)    = rBond;
-                Exch2.rdotBond(iExch2) = rdotBond;
-
-                Exch2.tf(iExch2)     = t_fin(iTraj);
-                Exch2.Hi(iExch2)     = H_ini(iTraj);
-                Exch2.Hf(iExch2)     = H_fin(iTraj);
-                Exch2.PaQi(:,iExch2) = PaQi(:);
-                Exch2.PaQf(:,iExch2) = PaQf(:);
-
-                [X, Vi]                 = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
-                Trajs.EColli_CM(jTraj)  = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
-                Exch2.EColli_CM(iExch2) = Trajs.EColli_CM(jTraj);
-
-                [X, Vf]                 = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
-                Exch2.ECollf_CM(iExch2) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 3);
-
-                [Exch2.Theta_CM(iExch2), Exch2.TOF(iExch2)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 3, Input.Dist);
-
-                Exch2.VProjf_CM(iExch2) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 3);
-
-
-            end
-            
-            if (Trajs.EColli_CM(jTraj) == 0)
-                pause
-            end
-
-        end
-
-    end
-
-    
-    NBefore = NBefore + NTrajsOI;
+if iExch2 == 0
+    Exch2.b    = zeros(1,iExch2); 
+    Exch2.v    = zeros(1,iExch2); 
+    Exch2.J    = zeros(1,iExch2); 
+    Exch2.iPES = zeros(1,iExch2); 
 end
 
-Exch.Angle1   = [Exch1.Angle1,   Exch2.Angle1]';
-Exch.Angle2   = [Exch1.Angle2,   Exch2.Angle2]';
-Exch.Angle3   = [Exch1.Angle3,   Exch2.Angle3]';
-Exch.ETran    = [Exch1.ETran,    Exch2.ETran]';
-Exch.Ekin     = [Exch1.Ekin,     Exch2.Ekin]';
-Exch.rBond    = [Exch1.rBond,    Exch2.rBond]';
-Exch.rdotBond = [Exch1.rdotBond, Exch2.rdotBond]';
 
-Exch.tf        = [Exch1.tf,        Exch2.tf]';
-Exch.Hi        = [Exch1.Hi,        Exch2.Hi]';
-Exch.Hf        = [Exch1.Hf,        Exch2.Hf]';
-Exch.PaQi      = [Exch1.PaQi,      Exch2.PaQi]';
-Exch.PaQf      = [Exch1.PaQf,      Exch2.PaQf]';
-Exch.EColli_CM = [Exch1.EColli_CM, Exch2.EColli_CM]';
-Exch.ECollf_CM = [Exch1.ECollf_CM, Exch2.ECollf_CM]';
-Exch.Theta_CM  = [Exch1.Theta_CM,  Exch2.Theta_CM]';
-Exch.VProjf_CM = [Exch1.VProjf_CM, Exch2.VProjf_CM]';
-Exch.b         = [Exch1.b,         Exch2.b]';
-Exch.v         = [Exch1.v,         Exch2.v]';
-Exch.J         = [Exch1.J,         Exch2.J]';
-Exch.iPES      = [Exch1.iPES,      Exch2.iPES]';
+iInel    = 0;
+iExch1   = 0;
+iExch2   = 0;
+NBefore  = 0;
+for jPES = 1:NPESs
+    if NPESs == 1
+        RunFldr = Input.RunFldr;
+    else
+        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_/');
+    end
+
+        
+    for iBin = Input.BinVec
+        fprintf('Initial PES: %i; Initial Level: %i\n\n', jPES, iBin )
+       
+
+        %% Reading Initial Parameters
+        opts = delimitedTextImportOptions("NumVariables", 19);
+        opts.DataLines = [2, Inf];
+        opts.Delimiter = ",";
+        opts.VariableNames = ["iTraj", "iPES", "Angle1", "Angle2", "Angle3", "ETran", "Ekin", "rBond", "rdotBond", "b", "Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"];
+        opts.SelectedVariableNames = ["iTraj", "iPES", "Angle1", "Angle2", "Angle3", "ETran", "Ekin", "rBond", "rdotBond", "b"];
+        opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "string", "string", "string", "string", "string", "string", "string", "string"];
+        opts.ExtraColumnsRule = "ignore";
+        opts.EmptyLineRule = "read";
+        opts = setvaropts(opts, ["Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"], "WhitespaceRule", "preserve");
+        opts = setvaropts(opts, ["Var11", "Var12", "Var13", "Var14", "Var15", "Var16", "Var17", "Var18", "Var19"], "EmptyFieldRule", "auto");
+        tbl = readtable(strcat(RunFldr, "/EMu/Bins_", num2str(iBin), "_0/Params.csv"), opts);
+        Idx_Par  = tbl.iTraj + NBefore;
+        %iPES1_    = tbl.iPES;
+        Angle1_   = tbl.Angle1;
+        Angle2_   = tbl.Angle2;
+        Angle3_   = tbl.Angle3;
+        ETran_    = tbl.ETran;
+        Ekin_     = tbl.Ekin;
+        rBond_    = tbl.rBond;
+        rdotBond_ = tbl.rdotBond;
+        %b_        = tbl.b;
+        clear opts tbl
 
 
+        %% Reading Classical Mechanics
+        opts = delimitedTextImportOptions("NumVariables", 28);
+        opts.DataLines = [2, Inf];
+        opts.Delimiter = ",";
+        opts.VariableNames = ["Trajindex", "t_fin", "H_ini", "PaQ_ini1", "PaQ_ini2", "PaQ_ini3", "PaQ_ini4", "PaQ_ini5", "PaQ_ini6", "PaQ_ini7", "PaQ_ini8", "PaQ_ini9", "PaQ_ini10", "PaQ_ini11", "PaQ_ini12", "H_fin", "PaQ_fin1", "PaQ_fin2", "PaQ_fin3", "PaQ_fin4", "PaQ_fin5", "PaQ_fin6", "PaQ_fin7", "PaQ_fin8", "PaQ_fin9", "PaQ_fin10", "PaQ_fin11", "PaQ_fin12"];
+        opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
+        opts.ExtraColumnsRule = "ignore";
+        opts.EmptyLineRule = "read";
+        tbl = readtable(strcat(RunFldr, "/EMu/Bins_", num2str(iBin), "_0/PaQSol.csv"), opts);
+        Idx       = tbl.Trajindex + NBefore;
+        t_fin     = tbl.t_fin;
+        H_ini     = tbl.H_ini;
+        PaQ_ini1  = tbl.PaQ_ini1;
+        PaQ_ini2  = tbl.PaQ_ini2;
+        PaQ_ini3  = tbl.PaQ_ini3;
+        PaQ_ini4  = tbl.PaQ_ini4;
+        PaQ_ini5  = tbl.PaQ_ini5;
+        PaQ_ini6  = tbl.PaQ_ini6;
+        PaQ_ini7  = tbl.PaQ_ini7;
+        PaQ_ini8  = tbl.PaQ_ini8;
+        PaQ_ini9  = tbl.PaQ_ini9;
+        PaQ_ini10 = tbl.PaQ_ini10;
+        PaQ_ini11 = tbl.PaQ_ini11;
+        PaQ_ini12 = tbl.PaQ_ini12;
+        H_fin     = tbl.H_fin;
+        PaQ_fin1  = tbl.PaQ_fin1;
+        PaQ_fin2  = tbl.PaQ_fin2;
+        PaQ_fin3  = tbl.PaQ_fin3;
+        PaQ_fin4  = tbl.PaQ_fin4;
+        PaQ_fin5  = tbl.PaQ_fin5;
+        PaQ_fin6  = tbl.PaQ_fin6;
+        PaQ_fin7  = tbl.PaQ_fin7;
+        PaQ_fin8  = tbl.PaQ_fin8;
+        PaQ_fin9  = tbl.PaQ_fin9;
+        PaQ_fin10 = tbl.PaQ_fin10;
+        PaQ_fin11 = tbl.PaQ_fin11;
+        PaQ_fin12 = tbl.PaQ_fin12;
+        clear opts tbl
+        for iTraj = 1:NTrajsOI%length(Idx)
+            if ( mod(iTraj,floor(NTrajsOI/20)) == 0 )
+                fprintf('  %f%% of Trajectories Postprocessed \n', iTraj/NTrajsOI*100 )
+            end
+
+            jTraj = Mapping(Idx(iTraj),2);
+            if (jTraj == 0)
+                pause
+            else
+                      
+                Angle1   = Angle1_(iTraj);
+                Angle2   = Angle2_(iTraj);
+                Angle3   = Angle3_(iTraj);
+                ETran    = ETran_(iTraj);
+                Ekin     = Ekin_(iTraj);
+                rBond    = rBond_(iTraj);
+                rdotBond = rdotBond_(iTraj);
+
+                Trajs.Angle1(jTraj)   = Angle1;
+                Trajs.Angle2(jTraj)   = Angle2;
+                Trajs.Angle3(jTraj)   = Angle3;
+                Trajs.ETran(jTraj)    = ETran;
+                Trajs.Ekin(jTraj)     = Ekin;
+                Trajs.rBond(jTraj)    = rBond;
+                Trajs.rdotBond(jTraj) = rdotBond;
+
+
+                tf       = t_fin(iTraj);
+                Hi       = H_ini(iTraj);
+                Hf       = H_fin(iTraj);
+                PaQi(1)  = PaQ_ini1(iTraj);
+                PaQi(2)  = PaQ_ini2(iTraj);
+                PaQi(3)  = PaQ_ini3(iTraj);
+                PaQi(4)  = PaQ_ini4(iTraj);
+                PaQi(5)  = PaQ_ini5(iTraj);
+                PaQi(6)  = PaQ_ini6(iTraj);
+                PaQi(7)  = PaQ_ini7(iTraj);
+                PaQi(8)  = PaQ_ini8(iTraj);
+                PaQi(9)  = PaQ_ini9(iTraj);
+                PaQi(10) = PaQ_ini10(iTraj);
+                PaQi(11) = PaQ_ini11(iTraj);
+                PaQi(12) = PaQ_ini12(iTraj);
+                PaQf(1)  = PaQ_fin1(iTraj);
+                PaQf(2)  = PaQ_fin2(iTraj);
+                PaQf(3)  = PaQ_fin3(iTraj);
+                PaQf(4)  = PaQ_fin4(iTraj);
+                PaQf(5)  = PaQ_fin5(iTraj);
+                PaQf(6)  = PaQ_fin6(iTraj);
+                PaQf(7)  = PaQ_fin7(iTraj);
+                PaQf(8)  = PaQ_fin8(iTraj);
+                PaQf(9)  = PaQ_fin9(iTraj);
+                PaQf(10) = PaQ_fin10(iTraj);
+                PaQf(11) = PaQ_fin11(iTraj);
+                PaQf(12) = PaQ_fin12(iTraj);
+
+
+                Trajs.tf(jTraj)      = tf;
+                Trajs.Hi(jTraj)      = Hi;
+                Trajs.Hf(jTraj)      = Hf;
+                Trajs.PaQi(:,jTraj)  = PaQi(:);
+                Trajs.PaQf(:,jTraj)  = PaQf(:);
+
+
+
+                if     Mapping(Idx(iTraj),1) == 1
+                    iInel = Mapping(Idx(iTraj),3);
+
+                    Inelastic.Angle1(iInel)   = Angle1;
+                    Inelastic.Angle2(iInel)   = Angle2;
+                    Inelastic.Angle3(iInel)   = Angle3;
+                    Inelastic.ETran(iInel)    = ETran;
+                    Inelastic.Ekin(iInel)     = Ekin;
+                    Inelastic.rBond(iInel)    = rBond;
+                    Inelastic.rdotBond(iInel) = rdotBond;
+
+                    Inelastic.tf(iInel)     = tf;
+                    Inelastic.Hi(iInel)     = Hi;
+                    Inelastic.Hf(iInel)     = Hf;
+                    Inelastic.PaQi(:,iInel) = PaQi(:);
+                    Inelastic.PaQf(:,iInel) = PaQf(:);
+
+                    [X, Vi]                    = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
+                    Trajs.EColli_CM(jTraj)     = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
+                    if (Trajs.EColli_CM(jTraj) == 0)
+                        pause
+                    end
+                    Inelastic.EColli_CM(iInel) = Trajs.EColli_CM(jTraj);
+
+                    [X, Vf]                    = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
+                    Inelastic.ECollf_CM(iInel) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 1);
+
+                    [Inelastic.Theta_CM(iInel), Inelastic.TOF(iInel)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 1, Input.Dist);
+
+                    %Inelastic.VProjf_CM(iInel) = Compute_VelocityFlux_CM(Vi, Vf, Masses, 1);
+
+
+                elseif Mapping(Idx(iTraj),1) == 2
+                    iExch1 = Mapping(Idx(iTraj),3);
+                    %iExch  = Mapping(Idx(iTraj),4);
+
+                    Exch1.Angle1(iExch1)   = Angle1;
+                    Exch1.Angle2(iExch1)   = Angle2;
+                    Exch1.Angle3(iExch1)   = Angle3;
+                    Exch1.ETran(iExch1)    = ETran;
+                    Exch1.Ekin(iExch1)     = Ekin;
+                    Exch1.rBond(iExch1)    = rBond;
+                    Exch1.rdotBond(iExch1) = rdotBond;
+
+                    Exch1.tf(iExch1)     = tf;
+                    Exch1.Hi(iExch1)     = Hi;
+                    Exch1.Hf(iExch1)     = Hf;
+                    Exch1.PaQi(:,iExch1) = PaQi(:);
+                    Exch1.PaQf(:,iExch1) = PaQf(:);
+
+                    [X, Vi]                 = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
+                    Trajs.EColli_CM(jTraj)  = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
+                    if (Trajs.EColli_CM(jTraj) == 0)
+                        pause
+                    end
+                    Exch1.EColli_CM(iExch1) = Trajs.EColli_CM(jTraj);
+
+                    [X, Vf]                 = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
+                    Exch1.ECollf_CM(iExch1) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 2);
+
+                    [Exch1.Theta_CM(iExch1), Exch1.TOF(iExch1)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 2, Input.Dist);
+
+                    Exch1.VProjf_CM(iExch1) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 2);
+
+
+                elseif Mapping(Idx(iTraj),1) == 3
+                    iExch2 = Mapping(Idx(iTraj),3);
+                    %iExch  = Mapping(Idx(iTraj),4);
+
+                    Exch2.Angle1(iExch2)   = Angle1;
+                    Exch2.Angle2(iExch2)   = Angle2;
+                    Exch2.Angle3(iExch2)   = Angle3;
+                    Exch2.ETran(iExch2)    = ETran;
+                    Exch2.Ekin(iExch2)     = Ekin;
+                    Exch2.rBond(iExch2)    = rBond;
+                    Exch2.rdotBond(iExch2) = rdotBond;
+
+                    Exch2.tf(iExch2)     = t_fin(iTraj);
+                    Exch2.Hi(iExch2)     = H_ini(iTraj);
+                    Exch2.Hf(iExch2)     = H_fin(iTraj);
+                    Exch2.PaQi(:,iExch2) = PaQi(:);
+                    Exch2.PaQf(:,iExch2) = PaQf(:);
+
+                    [X, Vi]                 = Transform_PaQ_To_XVCM(PaQi, Input.Masses);
+                    Trajs.EColli_CM(jTraj)  = Compute_CollisionEnergy_CM(Vi, Input.Masses, 1);
+                    Exch2.EColli_CM(iExch2) = Trajs.EColli_CM(jTraj);
+
+                    [X, Vf]                 = Transform_PaQ_To_XVCM(PaQf, Input.Masses);
+                    Exch2.ECollf_CM(iExch2) = Compute_CollisionEnergy_CM(Vf, Input.Masses, 3);
+
+                    [Exch2.Theta_CM(iExch2), Exch2.TOF(iExch2)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 3, Input.Dist);
+
+                    Exch2.VProjf_CM(iExch2) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 3);
+
+
+                end
+
+
+            end
+
+        end
+        
+        NBefore = NBefore + NTrajsOI;
+    end
+end
+
+
+
+if strcmp(Syst.Name_Long, 'O3_UMN')
+    Exch.Angle1    = [Exch1.Angle1,   Exch2.Angle1]';
+    Exch.Angle2    = [Exch1.Angle2,   Exch2.Angle2]';
+    Exch.Angle3    = [Exch1.Angle3,   Exch2.Angle3]';
+    Exch.ETran     = [Exch1.ETran,    Exch2.ETran]';
+    Exch.Ekin      = [Exch1.Ekin,     Exch2.Ekin]';
+    Exch.rBond     = [Exch1.rBond,    Exch2.rBond]';
+    Exch.rdotBond  = [Exch1.rdotBond, Exch2.rdotBond]';
+    Exch.tf        = [Exch1.tf,        Exch2.tf]';
+    Exch.Hi        = [Exch1.Hi,        Exch2.Hi]';
+    Exch.Hf        = [Exch1.Hf,        Exch2.Hf]';
+    Exch.PaQi      = [Exch1.PaQi,      Exch2.PaQi]';
+    Exch.PaQf      = [Exch1.PaQf,      Exch2.PaQf]';
+    Exch.EColli_CM = [Exch1.EColli_CM, Exch2.EColli_CM]';
+    Exch.ECollf_CM = [Exch1.ECollf_CM, Exch2.ECollf_CM]';
+    Exch.Theta_CM  = [Exch1.Theta_CM,  Exch2.Theta_CM]';
+    Exch.VProjf_CM = [Exch1.VProjf_CM, Exch2.VProjf_CM]';
+    Exch.b         = [Exch1.b,         Exch2.b]';
+    Exch.v         = [Exch1.v,         Exch2.v]';
+    Exch.J         = [Exch1.J,         Exch2.J]';
+    Exch.iPES      = [Exch1.iPES,      Exch2.iPES]';
+elseif strcmp(Syst.Name_Long, 'CO2_NASA')
+    Exch.Angle1    = [Exch1.Angle1]';
+    Exch.Angle2    = [Exch1.Angle2]';
+    Exch.Angle3    = [Exch1.Angle3]';
+    Exch.ETran     = [Exch1.ETran]';
+    Exch.Ekin      = [Exch1.Ekin]';
+    Exch.rBond     = [Exch1.rBond]';
+    Exch.rdotBond  = [Exch1.rdotBond]';
+    Exch.tf        = [Exch1.tf]';
+    Exch.Hi        = [Exch1.Hi]';
+    Exch.Hf        = [Exch1.Hf]';
+    Exch.PaQi      = [Exch1.PaQi]';
+    Exch.PaQf      = [Exch1.PaQf]';
+    Exch.EColli_CM = [Exch1.EColli_CM]';
+    Exch.ECollf_CM = [Exch1.ECollf_CM]';
+    Exch.Theta_CM  = [Exch1.Theta_CM]';
+    Exch.VProjf_CM = [Exch1.VProjf_CM]';
+    Exch.b         = [Exch1.b]';
+    Exch.v         = [Exch1.v]';
+    Exch.J         = [Exch1.J]';
+    Exch.iPES      = [Exch1.iPES]';
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 figure(1)
 fig = gcf;
-ExtVec    = linspace(min(Trajs.EColli_CM)-10, max(Trajs.EColli_CM)+10, 100);
+%ExtVec    = [min(Trajs.EColli_CM)-10:5.8:max(Trajs.EColli_CM)+10];
+ExtVec    = [min(Trajs.EColli_CM)-10:1.0:max(Trajs.EColli_CM)+10];
 EColliVec = histcounts(Trajs.EColli_CM, ExtVec);
 EColliVec = EColliVec./max(EColliVec);
 h1 = plot(ExtVec(1:end-1), EColliVec, 'k', 'LineWidth', 2);
 %histogram(Trajs.EColli_CM, 100);
 hold on
-yy = normpdf(ExtVec,86,6.0);
+yy = normpdf(ExtVec,Input.EMu,Input.ESD);
 yy = yy./max(yy);
 h2 = plot(ExtVec,yy, 'r', 'LineWidth', 2);
 
@@ -521,20 +598,20 @@ end
 %%
 figure(2)
 fig = gcf;
-ExtVec = linspace(0.0, 8.0, 100);
+ExtVec = linspace(0.0, 10.0, 100);
 bbVec  = histcounts(Trajs.b, ExtVec);
 bbVec  = bbVec./max(bbVec);
 h1 = plot(ExtVec(1:end-1), bbVec, 'k', 'LineWidth', 2);
 %histogram(Exch.Exch.ECollf_CM, 100);
 hold on
 
-ExtVec = linspace(0.0, 8.0, 100);
+ExtVec = linspace(0.0, 10.0, 100);
 bbVec  = histcounts(Inelastic.b, ExtVec);
 bbVec  = bbVec./max(bbVec);
 h2 = plot(ExtVec(1:end-1), bbVec, 'g', 'LineWidth', 2);
 %histogram(Exch.Exch.ECollf_CM, 100);
 
-ExtVec = linspace(0.0, 8.0, 100);
+ExtVec = linspace(0.0, 10.0, 100);
 bbVec  = histcounts(Exch.b, ExtVec);
 bbVec  = bbVec./max(bbVec);
 h3 = plot(ExtVec(1:end-1), bbVec, 'b', 'LineWidth', 2);
@@ -572,13 +649,14 @@ end
 %%
 figure(3)
 fig = gcf;
-ExtVec    = linspace(min(Inelastic.ECollf_CM)-10, max(Inelastic.ECollf_CM)+10, 100);
+%ExtVec    = [min(Trajs.EColli_CM)-10:5.8:max(Trajs.EColli_CM)+10];
+ExtVec    = [min(Inelastic.ECollf_CM)-10:1.0:max(Inelastic.ECollf_CM)+10];
 ECollfVec = histcounts(Inelastic.ECollf_CM, ExtVec);
 ECollfVec = ECollfVec./max(ECollfVec);
 h2 = plot(ExtVec(1:end-1), ECollfVec, 'g', 'LineWidth', 2);
 %histogram(Inelastic.ECollf_CM, 100);
 hold on
-yy = normpdf(ExtVec,86,6.0);
+yy = normpdf(ExtVec,Input.EMu,Input.ESD);
 yy = yy./max(yy);
 h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
 
@@ -614,14 +692,23 @@ end
 %%
 figure(4)
 fig = gcf;
+
+ExtVec     = [min(Exch.ECollf_CM)-10:0.1:max(Exch.ECollf_CM)+10];
+ExtVecLong = [min(Exch.ECollf_CM)-10:1.0:max(Exch.ECollf_CM)+10];
+
 if (Input.iPES == 0)
-    ExtVec    = linspace(min(Exch.ECollf_CM)-10, max(Exch.ECollf_CM)+10, 100);
-    ECollfVec = histcounts(Exch.ECollf_CM, ExtVec);
-    ECollfVec = ECollfVec./max(ECollfVec);
-    h2 = plot(ExtVec(1:end-1), ECollfVec, 'b', 'LineWidth', 2);
-    %histogram(Inelastic.ECollf_CM, 100);
+    ECollfVec           = histcounts(Exch.ECollf_CM, ExtVec);
+    [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
+    ft                  = fittype( 'smoothingspline' );
+    opts                = fitoptions( 'Method', 'SmoothingSpline' );
+    opts.SmoothingParam = 0.95;
+    [fitresult, gof]    = fit( xData, yData, ft, opts );
+    %h3                  = plot(xData, yData./max(yData));
     hold on
-    yy = normpdf(ExtVec,86,6.0);
+    ECollfVec           = fitresult(ExtVecLong)./max(fitresult(ExtVecLong));
+    h2                  = plot(ExtVecLong, ECollfVec, 'b', 'LineWidth', 2);
+    %histogram(Inelastic.ECollf_CM, 100);
+    yy = normpdf(ExtVec,Input.EMu,Input.ESD);
     yy = yy./max(yy);
     h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
     
@@ -629,10 +716,16 @@ if (Input.iPES == 0)
     clab.Interpreter = 'latex';
     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
 else
-    ExtVec    = linspace(0.0, 180.0, 100);
-    ECollfVec = histcounts(Exch.ECollf_CM, ExtVec, 'Normalization', 'probability');
-    h2 = plot(ExtVec(1:end-1), ECollfVec, 'b', 'LineWidth', 2);
-    
+    ExtVec              = [min(Exch.ECollf_CM)-10:1.0:max(Exch.ECollf_CM)+10];
+    ECollfVec           = histcounts(Exch.ECollf_CM, ExtVec, 'Normalization', 'probability');
+    [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
+    ft                  = fittype( 'smoothingspline' );
+    opts                = fitoptions( 'Method', 'SmoothingSpline' );
+    opts.SmoothingParam = 0.9156669976201;
+    [fitresult, gof]    = fit( xData, yData, ft, opts );
+    ECollfVec = ECollfVec./max(ECollfVec);
+    h2        = plot(ExtVec(1:end-1), ECollfVec, 'b', 'LineWidth', 2);
+        
     clab             = legend([h2], PESName, 'Location', 'Best');
     clab.Interpreter = 'latex';
     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
@@ -666,9 +759,11 @@ end
 %%
 figure(5)
 fig = gcf;
-ExtVec     =       linspace( 0.0, 180.0, 360);
-ExtVecCos  = acos(linspace( 1.0,  -1.0, 360))./pi.*180;
-ThetaCMVec = histcounts(Inelastic.Theta_CM, ExtVecCos);
+ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
+ExtVec     = linspace( 0.0, 180.0, 91);
+ExtVecUni  = linspace(-1.0,   1.0, 91);
+ExtVecCos  = acos(-ExtVecUni) ./ pi .* 180.0;
+ThetaCMVec = histcounts(Inelastic.Theta_CM, ExtVec);
 ThetaCMVec = ThetaCMVec./max(ThetaCMVec);
 h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'g', 'LineWidth', 2);
 %histogram(Exch.Exch.ECollf_CM, 100);
@@ -705,19 +800,19 @@ end
 %%
 figure(6)
 fig = gcf;
+ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
+ExtVec     = linspace( 0.0, 180.0, 40);
+ExtVecUni  = linspace(-1.0,   1.0, 91);
+ExtVecCos  = acos(-ExtVecUni) ./ pi .* 180.0;
 if (Input.iPES == 0)
-    ThetaTrans = acos(Exch.Theta_CM./180.*2.0-1.0).*180.0;
-    ExtVec     = linspace( 0.0, 180.0, 360);
-    ExtVecCos  = acos(linspace(1.0, -1.0, 360)) ./ pi .* 180.0;
     %ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos);
     ThetaCMVec = histcounts(ThetaTrans, ExtVec);
     ThetaCMVec = ThetaCMVec./max(ThetaCMVec);
     h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'b', 'LineWidth', 2);
     %histogram(Exch.Exch.ECollf_CM, 100);
 else
-    ExtVec     = linspace( 0.0, 180.0, 360);
-    ExtVecCos  = acos(linspace(1.0, -1.0, 360)) ./ pi .* 180.0;
-    ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos, 'Normalization', 'probability');
+    %ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos, 'Normalization', 'probability');
+    ThetaCMVec = histcounts(ThetaTrans, ExtVec, 'Normalization', 'probability');
     h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'b', 'LineWidth', 2);
     
     clab             = legend([h2], PESName, 'Location', 'Best');
@@ -811,8 +906,9 @@ ylab     = '$\theta$ [deg]';
 xlimm    = [0.0,   5.0];
 ylimm    = [0.0, 180.0];
 SaveFlg  = Input.SaveFigsFlgInt;
+ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
 FileName = strcat(FolderPath, 'Theta_vs_b');
-outfile  = heatscatter(Exch.b, Exch.Theta_CM, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
+outfile  = heatscatter(Exch.b, ThetaTrans, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -825,9 +921,10 @@ xlab     = 'E$_{Tr}$ [kcal/mol]';
 ylab     = '$\theta$ [deg]';
 xlimm    = [60.0, 120.0];
 ylimm    = [0.0, 180.0];
+ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
 SaveFlg  = Input.SaveFigsFlgInt;
 FileName = strcat(FolderPath, 'Theta_vs_E');
-outfile  = heatscatter(Exch.EColli_CM, Exch.Theta_CM, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
+outfile  = heatscatter(Exch.EColli_CM, ThetaTrans, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -843,17 +940,33 @@ ylimm       = [-4000.0, 4000.0];
 SaveFlg     = Input.SaveFigsFlgInt;
 FileName    = strcat(FolderPath, 'VelocityFlux');
 
-ThetaTrans  = acos(Exch.Theta_CM./180.*2.0-1.0).*180.0;
+ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
 Exch.VFluxX = Exch.VProjf_CM .* sin(ThetaTrans./180.0.*pi);
 Exch.VFluxY = Exch.VProjf_CM .* cos(ThetaTrans./180.0.*pi);
 XVec        = [Exch.VFluxX; -Exch.VFluxX];
 YVec        = [Exch.VFluxY; Exch.VFluxY];
 %outfile     = heatscatter(XVec, YVec, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
-[N,c]       = hist3([XVec, YVec],[50,50]);
+[N,c]       = hist3([XVec, YVec],[60,60]);
 cx          = c{1};
 cy          = c{2};
 [XMat, YMat] = meshgrid(cx, cy);
-surf(XMat,YMat,N);
+surf(XMat,YMat,N./max(max(N)));
+
+NN = N./max(max(N)); 
+% B  = ones(3,3)/3^2; 
+% C  = conv2(NN,B,'same'); 
+h = fspecial('gaussian');
+C = filter2(h, NN);
+
+FileName    = strcat(FolderPath, 'VelocityFlux.csv');
+fileID = fopen(FileName,'w');
+fprintf(fileID,'x,y,z\n');
+for i=1:size(XMat,1)
+    for j=1:size(XMat,2)
+       fprintf(fileID,'%e,%e,%e\n', XMat(i,j),YMat(i,j),C(i,j));
+    end
+end
+fclose(fileID);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

@@ -11,7 +11,7 @@ function [Theta_CM, TOF] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc, Dis
     VTargi(:) = Masses(iTarg) * Vi(iTarg,:) ./ mTarg;
     VProji(:) = Masses(iProj) * Vi(iProj,:) ./ mProj;   
     
-    vReli_CM  = VTargi-VProji;
+    vReli_CM  = VProji-VTargi;
     
     %Theta_i  = acos( dot(VTargi, VProji) / (vecnorm(VTargi) * vecnorm(VProji)) ) / pi * 180.0;
     
@@ -19,15 +19,15 @@ function [Theta_CM, TOF] = Compute_ScatteringAngle_CM(Vi, Vf, Masses, iProc, Dis
     if iProc == 1
         iTarg = [1,2];
         iProj = [3];
-        Coeff = 1;
+        Coeff = -1;
     elseif iProc == 2
         iProj = [2];
         iTarg = [1,3];
-        Coeff = -1;
+        Coeff = 1;
     elseif iProc == 3
         iProj = [1];
         iTarg = [2,3];
-        Coeff = -1;
+        Coeff = 1;
     end
     
     mTarg = sum(Masses(iTarg)); 
