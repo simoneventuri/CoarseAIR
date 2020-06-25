@@ -97,6 +97,10 @@ Subroutine Initialize_O3_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   This%CartCoordFlg =   .False.
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
@@ -307,8 +311,6 @@ Subroutine Compute_O3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   end do 
   call UnifiedBis( This, RAng, rM, P, dMsdR, dBdR )
   
-
-  dVdQ = Zero
   ! Evaluate dV(3) by taken the product of C(j) and dPdR(i,j) 
   dVdR = Zero
   do j=1,56                                                                                                                       
@@ -317,6 +319,10 @@ Subroutine Compute_O3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
     end do
   end do
   dVdR = dVdR * KcmAng_To_HartB + dVDiat
+
+
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

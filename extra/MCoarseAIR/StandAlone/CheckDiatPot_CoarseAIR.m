@@ -2,8 +2,8 @@ close all
 clear all
 clc
 
-RunFldr      = '/home/venturi/WORKSPACE/CoarseAIR/O2N_Basel/'
-MoleculesVec = {'NO'}%[{'O2'}, {'NO'}]
+RunFldr      = '/home/venturi/WORKSPACE/CoarseAIR/O4_TEST/'
+MoleculesVec = {'OaOb'}%[{'O2'}, {'NO'}]
 
 iMol = 1;
 for Molecule = MoleculesVec
@@ -45,7 +45,7 @@ for Molecule = MoleculesVec
 end
 
 
-for iP = 2:3
+for iP = 1:6
    
     FileName = strcat(RunFldr, "/Test/PlotPES/dVDiat_From_PES1.csv.", num2str(iP))
     opts = delimitedTextImportOptions("NumVariables", 3);

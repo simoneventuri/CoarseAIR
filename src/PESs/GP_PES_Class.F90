@@ -104,6 +104,10 @@ Subroutine Initialize_GP_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
@@ -472,11 +476,14 @@ Subroutine Compute_GP_PES_1d( This, R, Q, V, dVdR, dVdQ )
   !write(*,*) 'Time for Potential CalculationsB = ', t3-t2
   
   !exp(Ksum) from Compute_Mean_Var_dV
-  V     = (KSum - This%y_Scaling)*eV_To_Hartree + sum(VDiat)  
+  V    = (KSum - This%y_Scaling)*eV_To_Hartree + sum(VDiat)  
   
 
-  dVdQ         = Zero
-  dVdR         = dVDiat + matmul(KDerSum, dG)*KSum*eV_To_Hartree
+  dVdR = dVDiat + matmul(KDerSum, dG)*KSum*eV_To_Hartree
+
+
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
   !call cpu_time ( t4 )
   !write(*,*) 'Time for Potential CalculationsC = ', t4-t3

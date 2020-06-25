@@ -105,6 +105,10 @@ Subroutine Initialize_O3_NN_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
@@ -462,9 +466,10 @@ Subroutine Compute_O3_NN_PES_1d( This, R, Q, V, dVdR, dVdQ )
 !  call dgemm("N","N",This%NHL(2),3,This%NHL(2),1.0,dVdz2,This%NHL(2),dz2dR,This%NHL(2),0.0,dVTemp,This%NHL(2))
   dVTemp = matmul(dVdz2, dz2dR)
   
+  dVdR   = sum(dVTemp,1) * eV_To_Hartree + dVDiat 
 
-  dVdQ         = Zero
-  dVdR         = sum(dVTemp,1) * eV_To_Hartree + dVDiat 
+  dVdQ   = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
   !call cpu_time ( t2 )
   !write(*,*) 'Time for Potential Calculations = ', t2-t1

@@ -153,6 +153,10 @@ Subroutine Initialize_N2O_Basel_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       = 3                 ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
@@ -458,7 +462,6 @@ Subroutine Compute_N2O_Basel_PES_1d( This, R, Q, V, dVdR, dVdQ )
   VDiat = VDiat + This%Pairs(This%iN2)%Vd%DiatomicPotential(RTemp(3))
 
   V     = VDiat * Kcm_To_Hartree
-  dVdQ  = Zero
 
   ! call This%USERE(EU, X*B_To_Ang, Y*B_To_Ang, Z*B_To_Ang, DX, DY, DZ, QECONT, ECONT, 3)
   ! V       = EU * Kcm_To_Hartree
@@ -473,8 +476,9 @@ Subroutine Compute_N2O_Basel_PES_1d( This, R, Q, V, dVdR, dVdQ )
   ! dVdQ(9) = DZ(3)
   ! dVdQ    = dVdQ * Kcm_To_Hartree / B_To_Ang
 
-  dVdR    = Zero
-
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
+  
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 

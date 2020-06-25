@@ -238,6 +238,10 @@ Subroutine Initialize_N4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   This%CartCoordFlg =   .False.
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
 
+  ! allocate( This%mMiMn(4) )
+  ! This%mMiMn(1:3) = - Atoms(1:3)%Mass / Atoms(4)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:) = [1, 2]
   iA(2,:) = [1, 3]
   iA(3,:) = [1, 4]
@@ -345,19 +349,8 @@ Subroutine Compute_N4_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   V    = VTriat    + VDiat
   dVdR = dVdRTriat + dVdRDiat
 
-  ! ! Extract derivatives with respect to Cartesian coordinates of fourth atom
-  ! dVdR4 = dVdQin(10:12)
-
-  ! ! Form derivatives with respect to Cartesian coordinates of the first three atoms
-  ! ! by applying the chain-rule and by exploiting the fact that all atoms have the 
-  ! ! same mass. Hence dx_4/dx_i = -1, i = 1,2,3
-  ! atom_loop : do at = 1,3 
-  !    dir_loop : do dir = 1,3
-  !       dVdQ(3*(at - 1) + dir) = dVdQin(3*(at - 1) + dir) - dVdR4(dir)     
-  !    enddo dir_loop
-  ! enddo atom_loop
-
   dVdQ = Zero
+  call This%TransToCart_4Atoms( R, Q, dVdR, dVdQ)
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

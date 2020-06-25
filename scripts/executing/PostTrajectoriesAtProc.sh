@@ -442,7 +442,7 @@ else
         stop
       else
         iLevel1=$( printf "%.0f" $((${iProcessesTot} / ${NLevels2} )) )
-        iLevel1=$((${iLevel1} + 1))
+        #iLevel1=$((${iLevel1} + 1))
         Temp=$(( $((${iLevel1} - 1)) * ${NLevels2} ))
         iLevel2=$((${iProcessesTot} - ${Temp}))
       fi

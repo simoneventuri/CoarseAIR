@@ -5,10 +5,10 @@ clc
 
 global Param Input Syst
 
-Input.NTrajs       = 100;
+Input.NTrajs       = 3000000;
 Input.Dist         = 33.7e-2 * 1.889725989e+10;
-Input.iPES         = 1;
-NPESs              = 1;
+Input.iPES         = 0;
+NPESs              = 3;
 Syst.NAtoms        = 3;
 %Syst.Name_Long     = 'O3_UMN';
 Syst.Name_Long     = 'CO2_NASA';
@@ -29,8 +29,8 @@ if strcmp(Syst.Name_Long, 'O3_UMN')
 
 else strcmp(Syst.Name_Long, 'CO2_NASA')
     %% CO+O
-    Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test_PES', num2str(Input.iPES), '_/')
-    %Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test')
+    %Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test_PES', num2str(Input.iPES), '_Smallb/')
+    Input.RunFldr            = strcat('/home/venturi/WORKSPACE/CoarseAIR/CO2_ALL_SCATTERING/Test')
     mO16                     = 29148.94559d0;%15.9994d-3;
     mO18                     = mO16 * 18.0 / 16.0;
     mC                       = 21868.661757d0;%12.011e-3;
@@ -52,6 +52,9 @@ Initialize_Parameters()
 
 
 
+
+
+
 Mapping  = zeros(1500000,3);
 iInel    = 0;
 iExch1   = 0;
@@ -61,8 +64,35 @@ for jPES = 1:NPESs
     if NPESs == 1
         RunFldr = Input.RunFldr;
     else
-        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_/');
+        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_Smallb/');
     end
+    
+    opts = delimitedTextImportOptions("NumVariables", 6);
+    opts.DataLines = [2, Inf];
+    opts.Delimiter = ",";
+    opts.VariableNames = ["Var1", "vqn", "jqn", "EeV", "Var5", "Var6"];
+    opts.SelectedVariableNames = ["vqn", "jqn", "EeV"];
+    opts.VariableTypes = ["string", "double", "double", "double", "string", "string"];
+    opts.ExtraColumnsRule = "ignore";
+    opts.EmptyLineRule = "read";
+    opts = setvaropts(opts, ["Var1", "Var5", "Var6"], "WhitespaceRule", "preserve");
+    opts = setvaropts(opts, ["Var1", "Var5", "Var6"], "EmptyFieldRule", "auto");
+    tbl = readtable(strcat(RunFldr, "/CO2/CO/Bins_83/QNsEnBin.csv"), opts);
+    vqn0 = tbl.vqn;
+    jqn0 = tbl.jqn;
+    EeV0 = tbl.EeV;
+    clear opts tbl
+    EeVRef = min(EeV0);
+
+    EKcalMol_v = zeros(max(vqn0)+1,1);
+    QNToLevel  = zeros(max(vqn0)+1,max(jqn0)+1);
+    for iLevel=1:length(vqn0)
+        if (jqn0(iLevel)==0)
+            EKcalMol_v(vqn0(iLevel)+1) = (EeV0(iLevel)-EeVRef) * 23.060541945329334;
+        end
+        QNToLevel(vqn0(iLevel)+1,jqn0(iLevel)+1) = iLevel; 
+    end
+
     
     for iBin = Input.BinVec
         fprintf('Initial PES: %i; Initial Level: %i\n\n', jPES, iBin )
@@ -150,9 +180,9 @@ for jPES = 1:NPESs
 end
 iExch = iExch1 + iExch2;
 iTot  = iInel  + iExch;
-fprintf('  Found %i    Inelastic Trajectories \n',   iInel )
-fprintf('  Found %i 1st Exchange Trajectories \n',   iExch1 )
-fprintf('  Found %i 2nd Exchange Trajectories \n\n', iExch2 )
+
+CrossSec = iExch/iTot * pi*(max(Trajs.b)*Param.BToCm)^2;
+fprintf('  Exchange Cross Section = %e cm^2 \n\n', CrossSec )
 
 
 Trajs.Angle1   = zeros(1,iTot); 
@@ -191,6 +221,8 @@ Inelastic.EColli_CM = zeros(1,iInel);
 Inelastic.ECollf_CM = zeros(1,iInel); 
 Inelastic.Theta_CM  = zeros(1,iInel); 
 Inelastic.VProjf_CM = zeros(1,iInel); 
+Inelastic.ELostPerc = zeros(1,iInel); 
+Inelastic.Deltav    = zeros(1,iInel); 
 
 % Inelastic.b    = zeros(1,iInel); 
 % Inelastic.v    = zeros(1,iInel); 
@@ -215,6 +247,8 @@ Exch1.EColli_CM = zeros(1,iExch1);
 Exch1.ECollf_CM = zeros(1,iExch1); 
 Exch1.Theta_CM  = zeros(1,iExch1); 
 Exch1.VProjf_CM = zeros(1,iExch1); 
+Exch1.ELostPerc = zeros(1,iExch1); 
+Exch1.Deltav    = zeros(1,iExch1); 
 
 if iExch1 == 0
     Exch1.b    = zeros(1,iExch1); 
@@ -241,6 +275,8 @@ Exch2.EColli_CM = zeros(1,iExch2);
 Exch2.ECollf_CM = zeros(1,iExch2); 
 Exch2.Theta_CM  = zeros(1,iExch2); 
 Exch2.VProjf_CM = zeros(1,iExch2); 
+Exch2.ELostPerc = zeros(1,iExch2); 
+Exch2.Deltav    = zeros(1,iExch2); 
 
 if iExch2 == 0
     Exch2.b    = zeros(1,iExch2); 
@@ -258,7 +294,7 @@ for jPES = 1:NPESs
     if NPESs == 1
         RunFldr = Input.RunFldr;
     else
-        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_/');
+        RunFldr = strcat(Input.RunFldr, '_PES', num2str(jPES), '_Smallb/');
     end
 
         
@@ -424,8 +460,16 @@ for jPES = 1:NPESs
                     [Inelastic.Theta_CM(iInel), Inelastic.TOF(iInel)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 1, Input.Dist);
 
                     %Inelastic.VProjf_CM(iInel) = Compute_VelocityFlux_CM(Vi, Vf, Masses, 1);
-
-
+                    
+                    ETemp                      = abs(Inelastic.EColli_CM(iInel) - Inelastic.ECollf_CM(iInel));
+                    Inelastic.DeltaEInt(iInel) = ETemp;
+                    Inelastic.ELostPerc(iInel) = ETemp / Inelastic.EColli_CM(iInel) * 100.0;
+                    iv = 2;
+                    while EKcalMol_v(iv) <= ETemp
+                        iv = iv + 1;
+                    end
+                    Inelastic.Deltav(iInel) = iv-2;
+                    
                 elseif Mapping(Idx(iTraj),1) == 2
                     iExch1 = Mapping(Idx(iTraj),3);
                     %iExch  = Mapping(Idx(iTraj),4);
@@ -457,8 +501,16 @@ for jPES = 1:NPESs
                     [Exch1.Theta_CM(iExch1), Exch1.TOF(iExch1)] = Compute_ScatteringAngle_CM(Vi, Vf, Input.Masses, 2, Input.Dist);
 
                     Exch1.VProjf_CM(iExch1) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 2);
-
-
+                    
+                    ETemp                   = abs(Exch1.EColli_CM(iExch1) - Exch1.ECollf_CM(iExch1));
+                    Exch1.DeltaEInt(iExch1) = ETemp;
+                    Exch1.ELostPerc(iExch1) = ETemp / Exch1.EColli_CM(iExch1) * 100.0;
+                    iv = 2;
+                    while EKcalMol_v(iv) <= ETemp
+                        iv = iv + 1;
+                    end
+                    Exch1.Deltav(iExch1) = iv-2;
+                    
                 elseif Mapping(Idx(iTraj),1) == 3
                     iExch2 = Mapping(Idx(iTraj),3);
                     %iExch  = Mapping(Idx(iTraj),4);
@@ -488,7 +540,16 @@ for jPES = 1:NPESs
 
                     Exch2.VProjf_CM(iExch2) = Compute_VelocityFlux_CM(Vi, Vf, Input.Masses, 3);
 
-
+                    ETemp                   = abs(Exch1.EColli_CM(iExch2) - Exch1.ECollf_CM(iExch2));
+                    Exch2.DeltaEInt(iExch2) = ETemp;
+                    Exch2.ELostPerc(iExch2) = ETemp / ExchEColli_CM(iExch2) * 100.0;
+                    iv = 2;
+                    while EKcalMol_v(iv) <= ETemp
+                        iv = iv + 1;
+                    end
+                    Exch2.Deltav(iExch2) = iv-2;
+                    
+                    
                 end
 
 
@@ -499,7 +560,9 @@ for jPES = 1:NPESs
         NBefore = NBefore + NTrajsOI;
     end
 end
-
+fprintf('  Percentage of Energy Transformed in Internal trough Inelastic Collisions: %e \n',   mean(Inelastic.ELostPerc) )
+fprintf('  Percentage of Energy Transformed in Internal trough Exch 1    Collisions: %e \n',   mean(Exch1.ELostPerc) )
+fprintf('  Percentage of Energy Transformed in Internal trough Exch 2    Collisions: %e \n\n', mean(Exch2.ELostPerc) )
 
 
 if strcmp(Syst.Name_Long, 'O3_UMN')
@@ -650,16 +713,19 @@ end
 %%
 figure(3)
 fig = gcf;
-%ExtVec    = [min(Trajs.EColli_CM)-10:5.8:max(Trajs.EColli_CM)+10];
-ExtVec    = [min(Inelastic.ECollf_CM)-10:1.0:max(Inelastic.ECollf_CM)+10];
+
+ExtVec     = [-0.30:5.8:120];
+ExtVecHalf = (ExtVec(1:end-1)+ExtVec(2:end))./2.0;
+%ExtVec     = linspace(0,120,1000);
+
 ECollfVec = histcounts(Inelastic.ECollf_CM, ExtVec);
 ECollfVec = ECollfVec./max(ECollfVec);
-h2 = plot(ExtVec(1:end-1), ECollfVec, 'g', 'LineWidth', 2);
+h2 = plot(ExtVecHalf, ECollfVec, 'g', 'LineWidth', 2);
 %histogram(Inelastic.ECollf_CM, 100);
-hold on
-yy = normpdf(ExtVec,Input.EMu,Input.ESD);
-yy = yy./max(yy);
-h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
+% hold on
+% yy = normpdf(ExtVec,Input.EMu,Input.ESD);
+% yy = yy./max(yy);
+% h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
 
 xt = get(gca, 'XTick');
 set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
@@ -674,9 +740,9 @@ str_y = ['P(E$_{Tr}$)'];
 ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
 ylab.Interpreter = 'latex';
 
-clab             = legend([h1,h2], 'Reagents', 'Inelastic Products', 'Location', 'Best');
-clab.Interpreter = 'latex';
-set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+% clab             = legend([h1,h2], 'Reagents', 'Inelastic Products', 'Location', 'Best');
+% clab.Interpreter = 'latex';
+% set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
 
 if Input.SaveFigsFlgInt == 1
     FileName   = strcat(FolderPath, 'E_InelProd');
@@ -694,38 +760,42 @@ end
 figure(4)
 fig = gcf;
 
-ExtVec     = [min(Exch.ECollf_CM)-10:0.1:max(Exch.ECollf_CM)+10];
-ExtVecLong = [min(Exch.ECollf_CM)-10:1.0:max(Exch.ECollf_CM)+10];
+ExtVec     = [-0.30:4.0:120];
+ExtVecHalf = (ExtVec(1:end-1)+ExtVec(2:end))./2.0;
+ExtVecLong = [min(Exch.ECollf_CM)-10:0.1:max(Exch.ECollf_CM)+10];
 
 if (Input.iPES == 0)
     ECollfVec           = histcounts(Exch.ECollf_CM, ExtVec);
-    [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
-    ft                  = fittype( 'smoothingspline' );
-    opts                = fitoptions( 'Method', 'SmoothingSpline' );
-    opts.SmoothingParam = 0.95;
-    [fitresult, gof]    = fit( xData, yData, ft, opts );
-    %h3                  = plot(xData, yData./max(yData));
-    hold on
-    ECollfVec           = fitresult(ExtVecLong)./max(fitresult(ExtVecLong));
-    h2                  = plot(ExtVecLong, ECollfVec, 'b', 'LineWidth', 2);
-    %histogram(Inelastic.ECollf_CM, 100);
-    yy = normpdf(ExtVec,Input.EMu,Input.ESD);
-    yy = yy./max(yy);
-    h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
-    
-    clab             = legend([h1,h2], 'Reagents', 'Exchange Products', 'Location', 'Best');
-    clab.Interpreter = 'latex';
-    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+%     [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
+%     ft                  = fittype( 'smoothingspline' );
+%     opts                = fitoptions( 'Method', 'SmoothingSpline' );
+%     opts.SmoothingParam = 0.95;
+%     [fitresult, gof]    = fit( xData, yData, ft, opts );
+%     %h3                  = plot(xData, yData./max(yData));
+%     hold on
+%     ECollfVec           = fitresult(ExtVecLong)./max(fitresult(ExtVecLong));
+%     h2                  = plot(ExtVecLong, ECollfVec, 'b', 'LineWidth', 2);
+    ECollfVec           = ECollfVec./max(ECollfVec);
+    h2                  = plot(ExtVecHalf, ECollfVec, 'b', 'LineWidth', 2);
+%     yy = normpdf(ExtVec,Input.EMu,Input.ESD);
+%     yy = yy./max(yy);
+%     h1 = plot(ExtVec,yy, 'k', 'LineWidth', 2);
+%     
+%     clab             = legend([h1,h2], 'Reagents', 'Exchange Products', 'Location', 'Best');
+%     clab.Interpreter = 'latex';
+%     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
 else
-    ExtVec              = [min(Exch.ECollf_CM)-10:1.0:max(Exch.ECollf_CM)+10];
     ECollfVec           = histcounts(Exch.ECollf_CM, ExtVec, 'Normalization', 'probability');
-    [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
-    ft                  = fittype( 'smoothingspline' );
-    opts                = fitoptions( 'Method', 'SmoothingSpline' );
-    opts.SmoothingParam = 0.9156669976201;
-    [fitresult, gof]    = fit( xData, yData, ft, opts );
+%     [xData, yData]      = prepareCurveData( ExtVec(1:end-1), ECollfVec );
+%     ft                  = fittype( 'smoothingspline' );
+%     opts                = fitoptions( 'Method', 'SmoothingSpline' );
+%     opts.SmoothingParam = 1.0;
+%     [fitresult, gof]    = fit( xData, yData, ft, opts );
+%     ECollfVec = fitresult(ExtVecLong);
+%     ECollfVec = ECollfVec./max(ECollfVec);
+%     h2        = plot(ExtVecLong, ECollfVec', 'b', 'LineWidth', 2);
     ECollfVec = ECollfVec./max(ECollfVec);
-    h2        = plot(ExtVec(1:end-1), ECollfVec, 'b', 'LineWidth', 2);
+    h2        = plot(ExtVecHalf, ECollfVec, 'b', 'LineWidth', 2);
         
     clab             = legend([h2], PESName, 'Location', 'Best');
     clab.Interpreter = 'latex';
@@ -760,13 +830,14 @@ end
 %%
 figure(5)
 fig = gcf;
-ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
-ExtVec     = linspace( 0.0, 180.0, 91);
+ThetaTrans  = 180.0 .* (1.0-cos(Inelastic.Theta_CM./180.*pi));
+ExtVec     = [0.0:2.0:180.0];
+ExtVecHalf = [1.0:2.0:179.0];
 ExtVecUni  = linspace(-1.0,   1.0, 91);
 ExtVecCos  = acos(-ExtVecUni) ./ pi .* 180.0;
-ThetaCMVec = histcounts(Inelastic.Theta_CM, ExtVec);
+ThetaCMVec = histcounts(ThetaTrans, ExtVec);
 ThetaCMVec = ThetaCMVec./max(ThetaCMVec);
-h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'g', 'LineWidth', 2);
+h2 = plot(ExtVecHalf, ThetaCMVec, 'g', 'LineWidth', 2);
 %histogram(Exch.Exch.ECollf_CM, 100);
 
 xt = get(gca, 'XTick');
@@ -799,27 +870,69 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
+figure(51)
+fig = gcf;
+ThetaTrans  = 180.0 .* (cos(Inelastic.Theta_CM./180.*pi));
+ExtVec     = [0.0:2.0:180.0];
+ExtVecHalf = [1.0:2.0:179.0];
+ExtVecUni  = linspace(-1.0,   1.0, 91);
+ExtVecCos  = acos(-ExtVecUni) ./ pi .* 180.0;
+ThetaCMVec = histcounts(ThetaTrans, ExtVec);
+ThetaCMVec = ThetaCMVec./max(ThetaCMVec);
+h2 = plot(ExtVecHalf, ThetaCMVec, 'g', 'LineWidth', 2);
+%histogram(Exch.Exch.ECollf_CM, 100);
+
+xt = get(gca, 'XTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+yt = get(gca, 'YTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+
+str_x = ['$\theta$ [deg]'];
+xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+xlab.Interpreter = 'latex';
+
+str_y = ['P($\theta$)'];
+ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+ylab.Interpreter = 'latex';
+
+% clab             = legend([h1,h2], 'Reagents', 'Reactants, Reactive', 'Location', 'Best');
+% clab.Interpreter = 'latex';
+% set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+
+if Input.SaveFigsFlgInt == 1
+    FileName   = strcat(FolderPath, 'Theta_InelProd_Mol');
+    export_fig(FileName, '-pdf');
+elseif Input.SaveFigsFlgInt == 2
+    FileName   = strcat(FolderPath, 'Theta_InelProd_Mol.fig');
+    savefig(FileName);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 figure(6)
 fig = gcf;
 ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
-ExtVec     = linspace( 0.0, 180.0, 40);
+ExtVec     = [0:5.0:180.0];
+ExtVecHalf = ExtVec(1:end-1);%(ExtVec(1:end-1)+ExtVec(2:end))./2.0;
 ExtVecUni  = linspace(-1.0,   1.0, 91);
 ExtVecCos  = acos(-ExtVecUni) ./ pi .* 180.0;
-if (Input.iPES == 0)
+%if (Input.iPES == 0)
     %ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos);
     ThetaCMVec = histcounts(ThetaTrans, ExtVec);
     ThetaCMVec = ThetaCMVec./max(ThetaCMVec);
-    h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'b', 'LineWidth', 2);
+    h2 = plot(ExtVecHalf, ThetaCMVec, 'b', 'LineWidth', 2);
     %histogram(Exch.Exch.ECollf_CM, 100);
-else
-    %ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos, 'Normalization', 'probability');
-    ThetaCMVec = histcounts(ThetaTrans, ExtVec, 'Normalization', 'probability');
-    h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'b', 'LineWidth', 2);
-    
-    clab             = legend([h2], PESName, 'Location', 'Best');
-    clab.Interpreter = 'latex';
-    set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
-end
+% else
+%     %ThetaCMVec = histcounts(Exch.Theta_CM, ExtVecCos, 'Normalization', 'probability');
+%     ThetaCMVec = histcounts(ThetaTrans, ExtVec, 'Normalization', 'probability');
+%     h2 = plot(ExtVec(1:end-1), ThetaCMVec, 'b', 'LineWidth', 2);
+%     
+%     clab             = legend([h2], PESName, 'Location', 'Best');
+%     clab.Interpreter = 'latex';
+%     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+% end
 
 xt = get(gca, 'XTick');
 set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
@@ -858,7 +971,7 @@ bVec_Tot  = bVec_Inel + bVec_Exch;
 
 figure(7)
 fig = gcf;
-h2 = semilogy(bVec(1:end-1)*0.529177, bVec_Exch./bVec_Tot, 'b', 'LineWidth', 2);
+h2 = semilogy(bVec(1:end-1), bVec_Exch./bVec_Tot, 'b', 'LineWidth', 2);
 hold on
 %histogram(Exch2.b, 100)
 
@@ -907,7 +1020,7 @@ ylab     = '$\theta$ [deg]';
 xlimm    = [0.0,   5.0];
 ylimm    = [0.0, 180.0];
 SaveFlg  = Input.SaveFigsFlgInt;
-ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
+ThetaTrans  = 180.0 - 90.0 .* (1.0+cos(Exch.Theta_CM./180.*pi));
 FileName = strcat(FolderPath, 'Theta_vs_b');
 outfile  = heatscatter(Exch.b, ThetaTrans, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -922,7 +1035,7 @@ xlab     = 'E$_{Tr}$ [kcal/mol]';
 ylab     = '$\theta$ [deg]';
 xlimm    = [60.0, 120.0];
 ylimm    = [0.0, 180.0];
-ThetaTrans  = 180.0 .* (1.0-cos(Exch.Theta_CM./180.*pi));
+ThetaTrans  = 180.0 - 90.0 .* (1.0+cos(Exch.Theta_CM./180.*pi));
 SaveFlg  = Input.SaveFigsFlgInt;
 FileName = strcat(FolderPath, 'Theta_vs_E');
 outfile  = heatscatter(Exch.EColli_CM, ThetaTrans, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
@@ -932,7 +1045,6 @@ outfile  = heatscatter(Exch.EColli_CM, ThetaTrans, xlab, ylab, xlimm, ylimm, Sav
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%figure(12)
 %hist2d(Exch.VFluxX', Exch.VFluxY')
 xlab        = 'v$_x$ [m/s]';
 ylab        = 'v$_y$ [m/s]';
@@ -947,17 +1059,22 @@ Exch.VFluxY = Exch.VProjf_CM .* cos(ThetaTrans./180.0.*pi);
 XVec        = [Exch.VFluxX; -Exch.VFluxX];
 YVec        = [Exch.VFluxY; Exch.VFluxY];
 %outfile     = heatscatter(XVec, YVec, xlab, ylab, xlimm, ylimm, SaveFlg, FileName)
-[N,c]       = hist3([XVec, YVec],[60,60]);
+[N,c]       = hist3([XVec, YVec],[100,100]);
 cx          = c{1};
 cy          = c{2};
 [XMat, YMat] = meshgrid(cx, cy);
-surf(XMat,YMat,N./max(max(N)));
-
 NN = N./max(max(N)); 
-% B  = ones(3,3)/3^2; 
-% C  = conv2(NN,B,'same'); 
-h = fspecial('gaussian');
-C = filter2(h, NN);
+
+figure(12)
+surf(XMat,YMat,NN);
+
+figure(13)
+B  = ones(8,8)/8^2; 
+C  = conv2(NN,B,'same'); 
+% h = fspecial('gaussian');
+% C = filter2(h, NN);
+C  = C./max(max(C));
+surf(XMat,YMat,C);
 
 FileName    = strcat(FolderPath, 'VelocityFlux.csv');
 fileID = fopen(FileName,'w');
@@ -970,6 +1087,76 @@ end
 fclose(fileID);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+figure(13)
+histogram(Inelastic.Deltav, 'Normalization', 'cdf')
+%histogram(Inelastic.DeltaEInt, 'Normalization', 'cdf')
+
+xt = get(gca, 'XTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+yt = get(gca, 'YTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+
+str_x = ['$\Delta$ v'];
+xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+xlab.Interpreter = 'latex';
+%xlim([0.0, 3.5])
+
+str_y = ['CDF'];
+ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+ylab.Interpreter = 'latex';
+%ylim([1.e-3, 1.0])
+
+% clab             = legend([h1,h2], 'Reagents', 'Reactants, Reactive', 'Location', 'Best');
+% clab.Interpreter = 'latex';
+% set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+
+if Input.SaveFigsFlgInt == 1
+    FileName   = strcat(FolderPath, 'CDF_Deltav_Inel');
+    export_fig(FileName, '-pdf');
+elseif Input.SaveFigsFlgInt == 2
+    FileName   = strcat(FolderPath, 'CDF_Deltav_Inel');
+    savefig(FileName);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+figure(14)
+histogram(Exch1.Deltav, 'Normalization', 'cdf')
+%histogram(Exch1.DeltaEInt, 'Normalization', 'cdf')
+
+xt = get(gca, 'XTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+yt = get(gca, 'YTick');
+set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+
+str_x = ['$\Delta$ v'];
+xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+xlab.Interpreter = 'latex';
+%xlim([0.0, 3.5])
+
+str_y = ['CDF'];
+ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+ylab.Interpreter = 'latex';
+%ylim([1.e-3, 1.0])
+
+% clab             = legend([h1,h2], 'Reagents', 'Reactants, Reactive', 'Location', 'Best');
+% clab.Interpreter = 'latex';
+% set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');
+
+if Input.SaveFigsFlgInt == 1
+    FileName   = strcat(FolderPath, 'CDF_Deltav_Exch');
+    export_fig(FileName, '-pdf');
+elseif Input.SaveFigsFlgInt == 2
+    FileName   = strcat(FolderPath, 'CDF_Deltav_Exch');
+    savefig(FileName);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

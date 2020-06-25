@@ -303,6 +303,7 @@ function ComputeTrajs {
     # done
 
     for (( iProcessesTot=${MinProcessInNode}; iProcessesTot<=${MaxProcessInNode}; iProcessesTot++ )); do
+      echo "  [ComputeTrajs]: NLevels2 = "${NLevels2}
       if [ ${NMolecules} -eq 1 ]; then 
         iLevel1=${iProcessesTot}
         iLevel2=0
@@ -312,7 +313,7 @@ function ComputeTrajs {
           stop
         else
           iLevel1=$( printf "%.0f" $((${iProcessesTot} / ${NLevels2} )) )
-          iLevel1=$((${iLevel1} + 1))
+          #iLevel1=$((${iLevel1} + 1))
           Temp=$(( $((${iLevel1} - 1)) * ${NLevels2} ))
           iLevel2=$((${iProcessesTot} - ${Temp}))
         fi
@@ -330,7 +331,7 @@ function ComputeTrajs {
 
 
 
-# -------------------------------------------------------------------------------------------------------- RunTrajectoriesAtNode #
+# -------------------------------------------------------------------------------------------------------- ComputeTrajsHERE #
 function ComputeTrajsHERE {
 
   echo "    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin " ${iLevel1} " -------------------------------- "

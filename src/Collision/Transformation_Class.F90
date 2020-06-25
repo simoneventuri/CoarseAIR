@@ -218,7 +218,7 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine dR_To_dX(R, X, dVdR, dRdX, dVdX)
+Subroutine dR_To_dX(R, X, dVdR, dVdX)
 !**********************************************************************
 ! Subroutine to evaluate dRdX for giving R and X 
 ! R:    R(:), 3/6 bond lengths
@@ -226,12 +226,13 @@ Subroutine dR_To_dX(R, X, dVdR, dRdX, dVdX)
 ! 
 !**********************************************************************
 
-  real(rkp) ,dimension(:)   ,intent(in)              :: R
-  real(rkp) ,dimension(:)   ,intent(in)              :: X
-  real(rkp) ,dimension(:)   ,intent(in)    ,optional :: dVdR
-  real(rkp) ,dimension(:,:) ,intent(out)   ,optional :: dRdX
-  real(rkp) ,dimension(:)   ,intent(out)   ,optional :: dVdX
+  real(rkp) ,dimension(:)               ,intent(in)              :: R
+  real(rkp) ,dimension(:)               ,intent(in)              :: X
+  real(rkp) ,dimension(:)               ,intent(in)    ,optional :: dVdR
+  !real(rkp) ,dimension(size(R),size(X)) ,intent(out)   ,optional :: dRdX
+  real(rkp) ,dimension(:)               ,intent(out)   ,optional :: dVdX
 
+  real(rkp) ,dimension(size(R),size(X))  :: dRdX
   integer                                :: i, j
   integer                                :: NAtoms, NPairs
   logical                                :: ComputeDerFlg  = .false.
@@ -241,7 +242,7 @@ Subroutine dR_To_dX(R, X, dVdR, dRdX, dVdX)
   end if
 
   NAtoms = size(X,1) / 3
-  NPairs = size(R,1) !NAtoms * (NAtoms - 1) / 2
+  NPairs = NAtoms * (NAtoms - 1) / 2
 
   ! Initialize dRdX
   dRdX = Zero
@@ -324,6 +325,7 @@ Subroutine dR_To_dX(R, X, dVdR, dRdX, dVdX)
   end if
   ! Finish the calculation of non-zero dRdX
 
+  dVdX = Zero
   if (ComputeDerFlg) then
     do i=1,NAtoms*3
       do j=1,NPairs

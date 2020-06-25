@@ -137,6 +137,10 @@ Subroutine Initialize_BNN_PES( This, Input, Atoms, iPES, i_Debug )
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+
   ! ==============================================================================================================
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
   ! ==============================================================================================================
@@ -607,12 +611,14 @@ Subroutine Compute_BNN_PES_1d( This, R, Q, V, dVdR, dVdQ )
 !  dVTemp = matmul(dVdz2, dz2dR)
   
 
-  dVdQ         = Zero
-  dVdR         = VExp * sum(dVTemp,1) * eV_To_Hartree + dVDiat 
+  dVdR = VExp * sum(dVTemp,1) * eV_To_Hartree + dVDiat 
+
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
   !call cpu_time ( t2 )
   !write(*,*) 'Time for Potential Calculations = ', t2-t1
-  
+
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 

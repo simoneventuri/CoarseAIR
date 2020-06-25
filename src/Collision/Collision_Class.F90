@@ -2165,6 +2165,7 @@ PURITY Subroutine Compute_PES_1d( This, iPES, Q, mdVdQ, V, Rpi )
   real(rkp)   ,dimension(size(Rpi,1),size(V,1))           ::    Rp          ! Distances of atom-atom pairs [bohr]. Dim=(NPairs,NTraj)
   real(rkp)   ,dimension( This%NEqtVar+NSpace )           ::    QAll        ! Cartesian coordinates of all the atoms. Dim=(NEqtVar+NSpace)
   real(rkp)   ,dimension(size(Rpi,1),size(V,1))           ::    dVdRi       ! Derivative of the PES wrt atom-atom distances [hartree/bohr]. Dim=(NPairs,NTraj)
+  real(rkp)   ,dimension(size(Rpi,1))                     ::    Rx, Ry, Rz, dVdRi_
   logical     ,dimension(size(V,1))                       ::    CartCoordFlg
 
 ! ==============================================================================================================
@@ -2184,27 +2185,10 @@ PURITY Subroutine Compute_PES_1d( This, iPES, Q, mdVdQ, V, Rpi )
    
     call This%PESsContainer(iPES(iTraj))%PES%Compute( Rp(:,iTraj), QAll(:), V(iTraj), dVdRi(:,iTraj), mdVdQ(:,iTraj) )
 
-    ! Need to change sign here. PES container subroutine returns the derivatives with respect to Cartesian coordinates
-    ! (for Hamilton's equations ones needs; dp_i/dt= -dV/dQ_i) 
-    mdVdQ(:,iTraj) = -mdVdQ(:,iTraj)
-
   end do
-  dVdRi = dVdRi * Rpi
 
-  do iTraj = 1,size(V,1)
-    if ( .not. This%PESsContainer(iPES(iTraj))%PES%CartCoordFlg ) then
-      if ( This%NAtoms == 3 ) then
-        mdVdQ(1,iTraj)  =   -dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) - dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*This%mMiMn(1)
-        mdVdQ(2,iTraj)  =   -dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) - dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*This%mMiMn(1)
-        mdVdQ(3,iTraj)  =   -dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) - dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * (one-This%mMiMn(1)) + dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*This%mMiMn(1)
-        mdVdQ(4,iTraj)  =    dVdRi(1,iTraj) * (Q(1,iTraj)-Q(4,iTraj)) + dVdRi(2,iTraj) * (Q(1,iTraj)-Rxyz(1,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(4,iTraj)-Rxyz(1,iTraj))*(one-This%mMiMn(2))
-        mdVdQ(5,iTraj)  =    dVdRi(1,iTraj) * (Q(2,iTraj)-Q(5,iTraj)) + dVdRi(2,iTraj) * (Q(2,iTraj)-Rxyz(2,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(5,iTraj)-Rxyz(2,iTraj))*(one-This%mMiMn(2))
-        mdVdQ(6,iTraj)  =    dVdRi(1,iTraj) * (Q(3,iTraj)-Q(6,iTraj)) + dVdRi(2,iTraj) * (Q(3,iTraj)-Rxyz(3,iTraj)) * This%mMiMn(2)       - dVdRi(3,iTraj) * (Q(6,iTraj)-Rxyz(3,iTraj))*(one-This%mMiMn(2))
-      else
-        write(*,*) 'Subroutine Compute_PES_1d from Collision_Class.F90. dV/dR -> dV/dQ still to be Implemented for 4 Atoms Systems!'
-      end if
-    end if
-  end do
+  ! Need to change sign here. PES container subroutine returns the derivatives with respect to Cartesian coordinates (for Hamilton's equations ones needs: dp_i/dt= -dV/dQ_i) 
+  mdVdQ = -mdVdQ
 
 ! ==============================================================================================================
 

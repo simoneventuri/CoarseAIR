@@ -124,6 +124,9 @@ Subroutine Initialize_COAr_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
   
   do iP = 1,This%NPairs
     if ( ( trim(adjustl(Input%AtomsName(MatrixTemp((iP-1)*2+1))) ) .ne. "C" ) .and. ( trim(adjustl(Input%AtomsName(MatrixTemp((iP-1)*2+2)))) .ne. "O" ) ) then
@@ -297,8 +300,10 @@ Subroutine Compute_COAr_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
   iCAr = This%iCAr
   iOAr = This%iOAr
 
-  dVdQ         = Zero
   call Compute_COAr_NASA_PES_1d_NoTraj( This, R(iCO), R(iCAr), R(iOAr), V, dVdR(:) )
+
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
  
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

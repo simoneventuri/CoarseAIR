@@ -119,6 +119,10 @@ Subroutine Initialize_LEPS_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
   iA(3,:)           =   [2,3]
@@ -478,7 +482,7 @@ End Function
 !________________________________________________________________________________________________________________________________!
 Subroutine Compute_LEPS_PES_1d( This, R, Q, V, dVdR, dVdQ )
 
-  class(LEPS_PES_Type)                       ,intent(in)  ::    This
+  class(LEPS_PES_Type)                          ,intent(in)  ::    This
   real(rkp) ,dimension(:)          CONTIGUOUS   ,intent(in)  ::    R            !< Distances of atom-atom pairs [bohr]. Dim=(NPairs)
   real(rkp) ,dimension(:)          CONTIGUOUS   ,intent(in)  ::    Q            !< Atom Cartisian Coordinates [bohr]. Dim=(NAtoms*3) 
   real(rkp)                                     ,intent(out) ::    V            !< Potential energy in [hartree].
@@ -540,6 +544,7 @@ Subroutine Compute_LEPS_PES_1d( This, R, Q, V, dVdR, dVdQ )
   dVdR = dVDiat     + dVTriat
 
   dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

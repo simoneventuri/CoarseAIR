@@ -24,7 +24,7 @@ Module PES_Class
 
 #include "../qct.inc"
 
-  use Parameters_Module         ,only:  rkp, Zero
+  use Parameters_Module         ,only:  rkp, Zero, One
   use Logger_Class              ,only:  Logger
   use DiatomicPotential_Class   ,only:  DiatomicPotential_Type
   use File_Class                ,only:  File_Type
@@ -43,11 +43,11 @@ Module PES_Class
   Type    ,abstract                                         ::    PES_Type
     logical                                                 ::    Initialized         !< Indicator whether the object is initialized
     integer                                                 ::    NPairs              !< Number of pairs
-    character(:)                              ,allocatable  ::    Name                !< Name of current PES
-    character(:)                              ,allocatable  ::    Model               !< Name of current PES
-    real(rkp)                   ,dimension(:) ,allocatable  ::    mMiMn               !< Opposite of the ratio of the mass of the N-1 first atoms over the mass of 
+    character(:)                               ,allocatable ::    Name                !< Name of current PES
+    character(:)                               ,allocatable ::    Model               !< Name of current PES
+    real(rkp)                    ,dimension(:) ,allocatable ::    mMiMn               !< Opposite of the ratio of the mass of the N-1 first atoms over the mass of 
                                                                                       !< the last atoms: -Mi(1:N-1)/M(N). Dim=(NAtoms-1)
-    type(DiatPotContainer_Type)  ,dimension(:) ,allocatable  ::    Pairs               !< Vector of Pair objects. Each pair can have a different diatomic-potential object
+    type(DiatPotContainer_Type)  ,dimension(:) ,allocatable ::    Pairs               !< Vector of Pair objects. Each pair can have a different diatomic-potential object
     logical                                                 ::    CartCoordFlg
   contains
     private
@@ -60,9 +60,12 @@ Module PES_Class
     
     procedure              ,public                          ::    Compute          =>    Compute_0d
     
-    procedure              ,public                          ::    SampleParamPost  => SampleParamPost_PES
-    procedure              ,public                          ::    ReadParamPost    => ReadParamPost_PES
-    procedure              ,public                          ::    WriteParamSample => WriteParamSample_PES
+    procedure              ,public                          ::    SampleParamPost  =>    SampleParamPost_PES
+    procedure              ,public                          ::    ReadParamPost    =>    ReadParamPost_PES
+    procedure              ,public                          ::    WriteParamSample =>    WriteParamSample_PES
+
+    procedure              ,public                          ::    TransToCart_3Atoms
+    procedure              ,public                          ::    TransToCart_4Atoms
 
   End Type
   
@@ -70,7 +73,6 @@ Module PES_Class
   real(rkp)       ,dimension(:) ,allocatable                ::    tPES
   logical                                                   ::    PESEvoFlg = .false.
 
-  integer   ,parameter                                      ::    NSpace = 3
   logical   ,parameter                                      ::    i_Debug_Global = .False.
 
   contains
@@ -238,6 +240,120 @@ Subroutine WriteParamSample_PES(This, PESiseed, LevelOutputDir)
   class(PES_Type)                          ,intent(in)  ::    This
   integer                                  ,intent(in)  ::    PESiseed
   character(150)                           ,intent(in)  ::    LevelOutputDir
+
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine TransToCart_3Atoms(This, R, Q, dVdR, mdVdQ)
+
+  use Transformation_Class, only: dR_To_dX
+
+  class(PES_Type)                           ,intent(in)  ::    This
+  real(rkp)       ,dimension(3)             ,intent(in)  ::    R
+  real(rkp)       ,dimension(9)             ,intent(in)  ::    Q
+  real(rkp)       ,dimension(3)             ,intent(in)  ::    dVdR
+  real(rkp)       ,dimension(6)             ,intent(out) ::    mdVdQ
+
+  real(rkp)       ,dimension(9)                          ::    dVdQ
+  real(rkp)       ,dimension(3)                          ::    Rx, Ry, Rz, dVdRi_
+
+  Rx        = [Q(1)-Q(4), Q(1)-Q(7), Q(4)-Q(7)]
+  Ry        = [Q(2)-Q(5), Q(2)-Q(8), Q(5)-Q(8)]
+  Rz        = [Q(3)-Q(6), Q(3)-Q(9), Q(6)-Q(9)]
+  dVdRi_    = dVdR / R
+
+
+  ! !!! OLD IMPLEMENTATION
+  ! !
+  ! mdVdQ(1)  =   -dVdRi_(1) * (Q(1)-Q(4)) - dVdRi_(2) * (Q(1)-Rxyz(1)) * (one-This%mMiMn(1)) + dVdRi_(3) * (Q(4)-Rxyz(1))*This%mMiMn(1)
+  ! mdVdQ(2)  =   -dVdRi_(1) * (Q(2)-Q(5)) - dVdRi_(2) * (Q(2)-Rxyz(2)) * (one-This%mMiMn(1)) + dVdRi_(3) * (Q(5)-Rxyz(2))*This%mMiMn(1)
+  ! mdVdQ(3)  =   -dVdRi_(1) * (Q(3)-Q(6)) - dVdRi_(2) * (Q(3)-Rxyz(3)) * (one-This%mMiMn(1)) + dVdRi_(3) * (Q(6)-Rxyz(3))*This%mMiMn(1)
+  ! mdVdQ(4)  =    dVdRi_(1) * (Q(1)-Q(4)) + dVdRi_(2) * (Q(1)-Rxyz(1)) * This%mMiMn(2)       - dVdRi_(3) * (Q(4)-Rxyz(1))*(one-This%mMiMn(2))
+  ! mdVdQ(5)  =    dVdRi_(1) * (Q(2)-Q(5)) + dVdRi_(2) * (Q(2)-Rxyz(2)) * This%mMiMn(2)       - dVdRi_(3) * (Q(5)-Rxyz(2))*(one-This%mMiMn(2))
+  ! mdVdQ(6)  =    dVdRi_(1) * (Q(3)-Q(6)) + dVdRi_(2) * (Q(3)-Rxyz(3)) * This%mMiMn(2)       - dVdRi_(3) * (Q(6)-Rxyz(3))*(one-This%mMiMn(2))
+
+
+  !!! IMPLEMENTATION 2
+  !
+  mdVdQ(1)  =  dVdRi_(1)*Rx(1) +(One-This%mMiMn(1))*dVdRi_(2)*Rx(2)       -This%mMiMn(1)*dVdRi_(3)*Rx(3)
+  mdVdQ(2)  =  dVdRi_(1)*Ry(1) +(One-This%mMiMn(1))*dVdRi_(2)*Ry(2)       -This%mMiMn(1)*dVdRi_(3)*Ry(3)
+  mdVdQ(3)  =  dVdRi_(1)*Rz(1) +(One-This%mMiMn(1))*dVdRi_(2)*Rz(2)       -This%mMiMn(1)*dVdRi_(3)*Rz(3)
+
+  mdVdQ(4)  = -dVdRi_(1)*Rx(1)       -This%mMiMn(2)*dVdRi_(2)*Rx(2) +(One-This%mMiMn(2))*dVdRi_(3)*Rx(3)
+  mdVdQ(5)  = -dVdRi_(1)*Ry(1)       -This%mMiMn(2)*dVdRi_(2)*Ry(2) +(One-This%mMiMn(2))*dVdRi_(3)*Ry(3)
+  mdVdQ(6)  = -dVdRi_(1)*Rz(1)       -This%mMiMn(2)*dVdRi_(2)*Rz(2) +(One-This%mMiMn(2))*dVdRi_(3)*Rz(3)
+  
+
+  ! !!! IMPLEMENTATION 3
+  ! !
+  ! call dR_To_dX(R, Q, dVdR=dVdR, dVdX=dVdQ)
+
+  ! mdVdQ(1) = dVdQ(1) + This%mMiMn(1)*dVdQ(7)
+  ! mdVdQ(2) = dVdQ(2) + This%mMiMn(1)*dVdQ(8)
+  ! mdVdQ(3) = dVdQ(3) + This%mMiMn(1)*dVdQ(9)
+
+  ! mdVdQ(4) = dVdQ(4) + This%mMiMn(2)*dVdQ(7)
+  ! mdVdQ(5) = dVdQ(5) + This%mMiMn(2)*dVdQ(8)
+  ! mdVdQ(6) = dVdQ(6) + This%mMiMn(2)*dVdQ(9)
+  
+End Subroutine
+!--------------------------------------------------------------------------------------------------------------------------------!
+
+
+
+!________________________________________________________________________________________________________________________________!
+Subroutine TransToCart_4Atoms(This, R, Q, dVdR, mdVdQ)
+
+  use Transformation_Class, only: dR_To_dX
+
+  class(PES_Type)                           ,intent(in)  ::    This
+  real(rkp)       ,dimension(6)             ,intent(in)  ::    R
+  real(rkp)       ,dimension(12)            ,intent(in)  ::    Q
+  real(rkp)       ,dimension(6)             ,intent(in)  ::    dVdR
+  real(rkp)       ,dimension(9)             ,intent(out) ::    mdVdQ
+
+  real(rkp)       ,dimension(12)                         ::    dVdQ
+  real(rkp)       ,dimension(6)                          ::    Rx, Ry, Rz, dVdRi_
+
+
+  !!! IMPLEMENTATION 2
+  !
+  Rx        = [Q(1)-Q(4), Q(1)-Q(7), Q(1)-Q(10), Q(4)-Q(7), Q(4)-Q(10), Q(7)-Q(10)]
+  Ry        = [Q(2)-Q(5), Q(2)-Q(8), Q(2)-Q(11), Q(5)-Q(8), Q(5)-Q(11), Q(8)-Q(11)]
+  Rz        = [Q(3)-Q(6), Q(3)-Q(9), Q(3)-Q(12), Q(6)-Q(9), Q(6)-Q(12), Q(9)-Q(12)]
+  dVdRi_    = dVdR / R
+
+  mdVdQ(1)  =  dVdRi_(1)*Rx(1) +dVdRi_(2)*Rx(2) +(One-This%mMiMn(1))*dVdRi_(3)*Rx(3)                        -This%mMiMn(1)*dVdRi_(5)*Rx(5)       -This%mMiMn(1)*dVdRi_(6)*Rx(6)
+  mdVdQ(2)  =  dVdRi_(1)*Ry(1) +dVdRi_(2)*Ry(2) +(One-This%mMiMn(1))*dVdRi_(3)*Ry(3)                        -This%mMiMn(1)*dVdRi_(5)*Ry(5)       -This%mMiMn(1)*dVdRi_(6)*Ry(6)
+  mdVdQ(3)  =  dVdRi_(1)*Rz(1) +dVdRi_(2)*Rz(2) +(One-This%mMiMn(1))*dVdRi_(3)*Rz(3)                        -This%mMiMn(1)*dVdRi_(5)*Rz(5)       -This%mMiMn(1)*dVdRi_(6)*Rz(6)
+
+  mdVdQ(4)  = -dVdRi_(1)*Rx(1)                        -This%mMiMn(2)*dVdRi_(3)*Rx(3) +dVdRi_(4)*Rx(4) +(One-This%mMiMn(2))*dVdRi_(5)*Rx(5)       -This%mMiMn(2)*dVdRi_(6)*Rx(6)
+  mdVdQ(5)  = -dVdRi_(1)*Ry(1)                        -This%mMiMn(2)*dVdRi_(3)*Ry(3) +dVdRi_(4)*Ry(4) +(One-This%mMiMn(2))*dVdRi_(5)*Ry(5)       -This%mMiMn(2)*dVdRi_(6)*Ry(6)
+  mdVdQ(6)  = -dVdRi_(1)*Rz(1)                        -This%mMiMn(2)*dVdRi_(3)*Rz(3) +dVdRi_(4)*Rz(4) +(One-This%mMiMn(2))*dVdRi_(5)*Rz(5)       -This%mMiMn(2)*dVdRi_(6)*Rz(6)
+
+  mdVdQ(7)  =                  -dVdRi_(2)*Rx(2)       -This%mMiMn(3)*dVdRi_(3)*Rx(3) -dVdRi_(4)*Rx(4)       -This%mMiMn(3)*dVdRi_(5)*Rx(5) +(One-This%mMiMn(3))*dVdRi_(6)*Rx(6)
+  mdVdQ(8)  =                  -dVdRi_(2)*Ry(2)       -This%mMiMn(3)*dVdRi_(3)*Ry(3) -dVdRi_(4)*Ry(4)       -This%mMiMn(3)*dVdRi_(5)*Ry(5) +(One-This%mMiMn(3))*dVdRi_(6)*Ry(6)
+  mdVdQ(9)  =                  -dVdRi_(2)*Rz(2)       -This%mMiMn(3)*dVdRi_(3)*Rz(3) -dVdRi_(4)*Rz(4)       -This%mMiMn(3)*dVdRi_(5)*Rz(5) +(One-This%mMiMn(3))*dVdRi_(6)*Rz(6)
+
+
+  ! !!! IMPLEMENTATION 3
+  ! !
+  ! call dR_To_dX(R, Q, dVdR=dVdR, dVdX=dVdQ)
+
+  ! mdVdQ(1) = dVdQ(1) + This%mMiMn(1)*dVdQ(10)
+  ! mdVdQ(2) = dVdQ(2) + This%mMiMn(1)*dVdQ(11)
+  ! mdVdQ(3) = dVdQ(3) + This%mMiMn(1)*dVdQ(12)
+
+  ! mdVdQ(4) = dVdQ(4) + This%mMiMn(2)*dVdQ(10)
+  ! mdVdQ(5) = dVdQ(5) + This%mMiMn(2)*dVdQ(11)
+  ! mdVdQ(6) = dVdQ(6) + This%mMiMn(2)*dVdQ(12)
+
+  ! mdVdQ(7) = dVdQ(7) + This%mMiMn(3)*dVdQ(10)
+  ! mdVdQ(8) = dVdQ(8) + This%mMiMn(3)*dVdQ(11)
+  ! mdVdQ(9) = dVdQ(9) + This%mMiMn(3)*dVdQ(12)
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

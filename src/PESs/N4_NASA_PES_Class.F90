@@ -144,6 +144,10 @@ Subroutine Initialize_N4_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   This%CartCoordFlg =   .True.
   This%NPairs       =   6               ! Setting the number of atom-atom pairs
 
+  ! allocate( This%mMiMn(4) )
+  ! This%mMiMn(1:3) = - Atoms(1:3)%Mass / Atoms(4)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   iA(1,:) = [1, 2]
   iA(2,:) = [1, 3]
   iA(3,:) = [1, 4]

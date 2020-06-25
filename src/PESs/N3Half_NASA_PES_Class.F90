@@ -148,6 +148,10 @@ Subroutine Initialize_N3Half_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   iA(2,:) = [1, 3]
   iA(3,:) = [2, 3]
 
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
   do iP = 1,This%NPairs
     allocate( N2_LeRoy_DiatomicPotential_Type :: This%Pairs(iP)%Vd  )

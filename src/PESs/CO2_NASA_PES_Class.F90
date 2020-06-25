@@ -145,6 +145,10 @@ Subroutine Initialize_CO2_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   This%NPairs       =   3               ! Setting the number of atom-atom pairs
   allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
   ii = 1
+
+  ! allocate( This%mMiMn(3) )
+  ! This%mMiMn(1:2) = - Atoms(1:2)%Mass / Atoms(3)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
   
   iA(1,:)           =   [1,2]
   iA(2,:)           =   [1,3]
@@ -326,17 +330,10 @@ Subroutine Compute_CO2_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
   type(O2_NASA_DiatomicPotential_Type)                       :: O2_NASA_DiatPot
   real(rkp)                                                  :: VTemp
 
-  dVdQ         = Zero
   call Compute_CO2_NASA_PES_1d_NoTraj( This, R(This%iO2), R(This%iCO), R(This%jCO), V, dVdR(:) )
 
-  ! V = Zero
-  ! call CO_DiatPot%Compute_Vd_dVd( R(This%iCO), VTemp, dVdR(This%iCO) )   
-  ! V = V + VTemp
-  ! call CO_DiatPot%Compute_Vd_dVd( R(This%jCO), VTemp, dVdR(This%jCO) ) 
-  ! V = V + VTemp  
-  ! call O2_NASA_DiatPot%Compute_Vd_dVd( R(This%iO2), VTemp, dVdR(This%iO2) )   
-  ! V = V + VTemp
-  ! write(*,*) V
+  dVdQ = Zero 
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

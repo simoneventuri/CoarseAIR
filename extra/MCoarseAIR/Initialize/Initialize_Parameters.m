@@ -45,6 +45,7 @@ function Initialize_Parameters
     Param.EhToeV   = 27.2113839712790;
     Param.KcmToEh  = 0.159360144e-2;
     Param.BToAng   = 0.52917721067d0;
+    Param.BToCm    = 5.2918e-11 * 1e2;
     Param.DSWtoKg  = 1.d-3/1.8208e+03;
     Param.ATMToPa  = 101325.d0;
 
