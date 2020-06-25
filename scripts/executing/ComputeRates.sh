@@ -468,7 +468,10 @@ function MergeTrajectories {
           if [ -f ./Node_$iNode/Proc_$iProc/Params.out ]; then
             tail -n+2 ./Node_$iNode/Proc_$iProc/Params.out >> ./Params.csv
           fi
-          
+          if [ -f ./Node_$iNode/Proc_$iProc/trajectories_HNotCons.out ]; then
+            tail -n+2 ./Node_$iNode/Proc_$iProc/trajectories_HNotCons.out >> ./trajectories_HNotCons.out
+          fi
+
         else
         
           cat ./Node_${iNode}/Proc_${iProc}/trajectories.out > ./trajectories.csv
@@ -477,6 +480,9 @@ function MergeTrajectories {
           fi
           if [ -f ./Node_$iNode/Proc_$iProc/Params.out ]; then
             cat ./Node_$iNode/Proc_$iProc/Params.out > ./Params.csv
+          fi
+          if [ -f ./Node_$iNode/Proc_$iProc/trajectories_HNotCons.out ]; then
+            cat ./Node_$iNode/Proc_$iProc/trajectories_HNotCons.out > ./trajectories_HNotCons.out
           fi
           
         fi

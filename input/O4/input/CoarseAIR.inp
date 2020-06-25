@@ -156,7 +156,7 @@
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3
 
-   Initial Distance between Target and Projectile = 40.d0
+   Initial Distance between Target and Projectile = 30.d0
    
    Nb of PESs = 3
      Model, PES 1 = UMN_Singlet
@@ -260,7 +260,7 @@
    Stepsize increase damping factor = 0.8d0
    Nb of extrapolation steps = 3  
    Nb of integration between end checking = 10   
-   Max distance between atom pair [bohr] = 41.d0
+   Max distance between atom pair [bohr] = 40.d0
    Max trajectory time [a.u.] = 3000000.d0
    Tolerance on Hamiltonian = 5.e-4
 
