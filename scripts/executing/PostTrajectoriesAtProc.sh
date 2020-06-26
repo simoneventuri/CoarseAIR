@@ -185,8 +185,8 @@ function PostTrajectoriesHERE
           ## If the Trajectory File actually contains Trajectories, then Compute Cross Sections and Rate Coefficients
           ## 
 
-          echo "      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      "${TrajectoriesStatsCommand}
-          eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
+          #echo "      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      "${TrajectoriesStatsCommand}
+          #eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
 
           echo "      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: "${TrajectoriesStatsCommand}
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"

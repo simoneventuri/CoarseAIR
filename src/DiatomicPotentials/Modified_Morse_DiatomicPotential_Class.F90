@@ -95,7 +95,7 @@ Subroutine Initialize_Modified_Morse_DiatomicPotential( This, Input, SpeciesName
   if (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'NONE') then
     Modified_Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/Modified_Morse.dat'
   elseif (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'Local') then
-    Modified_Morse_file = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/LEPS.dat'
+    Modified_Morse_file = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/Modified_Morse.dat'
   else
     Modified_Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/' // trim(adjustl(Input%DiatPot_ParamsFile(iMol)))
   end if
@@ -117,7 +117,7 @@ Subroutine Initialize_Modified_Morse_DiatomicPotential( This, Input, SpeciesName
     call Logger%Write( "PolyOrder:      This%PolyOrder  = ", This%PolyOrder )
     allocate(This%cPol(0:This%PolyOrder+1))
     
-    do iOrd = 1,This%PolyOrder+1
+    do iOrd = 1,This%PolyOrder+2
       READ(Unit, *) This%cPol(iOrd-1)
       call Logger%Write( "Coeffecient Nb ", iOrd, ":   This%cPol(iOrd)  = ", This%cPol(iOrd-1) )
     end do            
@@ -143,6 +143,7 @@ Elemental Subroutine Compute_Vd_dVd_Modified_Morse( This, R, V, dV )
   real(rkp)                                                    ::    y, yTemp
   integer                                                      ::    iOrd
 
+  RTemp  = R
   RTemp4 = RTemp**4
   re4    = This%re**4
   y      = (RTemp4-re4)/(RTemp4+re4)
@@ -158,7 +159,6 @@ Elemental Subroutine Compute_Vd_dVd_Modified_Morse( This, R, V, dV )
   yTemp   =     y * yTemp
   poly    =  poly +    This%cPol(This%PolyOrder) * yTemp 
 
-  dpoly   = dpoly * Eight*re4*rTemp**3 / (RTemp4+re4)**2
   dydR    = Four * RTemp**3 * ((RTemp4+re4)-(RTemp4-re4)) / (RTemp4+re4)**2
 
   V       = This%De * (One - exp(-poly*(RTemp-This%re)))**2  - This%De + This%cPol(This%PolyOrder+1)
@@ -185,6 +185,7 @@ Elemental Function DiatomicPotential_Modified_Morse( This, R ) result( V )
 
  
 !  RTemp  = R * B_To_Ang
+  RTemp  = R
   RTemp4 = RTemp**4
   re4    = This%re**4
   y      = (RTemp4-re4)/(RTemp4+re4)

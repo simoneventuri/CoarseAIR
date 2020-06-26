@@ -728,12 +728,12 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
               call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
 
               !!! New Process ??? !!!!
-              Proc_To_Line = This%Proc_To_LineVec(Idx)
+              Proc_To_Line = This%Proc_To_LineVec(Idx-1)
               if (Proc_To_Line < 1) then
                 !!! New Process! Allocating it !!!!
-                This%NProc_Cleaned        = This%NProc_Cleaned + 1
+                This%NProc_Cleaned          = This%NProc_Cleaned + 1
                 call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-                This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
+                This%Proc_To_LineVec(Idx-1) = This%NProc_Cleaned
                 
               else
                 !!! Old Process! Adding Cross Section !!!!
