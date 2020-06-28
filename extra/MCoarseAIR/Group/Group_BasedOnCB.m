@@ -1,6 +1,6 @@
 %% Group the Levels Based on Centrifugal Barrier
 %
-function [LevelToGroup] = Group_BasedOnCB(Controls, iMol)    
+function [LevelToGroup] = Group_BasedOnCB(Syst, Controls, iMol)    
     
     %%==============================================================================================================
     % 
@@ -23,7 +23,7 @@ function [LevelToGroup] = Group_BasedOnCB(Controls, iMol)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates
+    global Input Kin Param Temp Rates
 
     fprintf('  = Group_BasedOnCB ==================================\n')
     fprintf('  ====================================================\n')
@@ -33,21 +33,27 @@ function [LevelToGroup] = Group_BasedOnCB(Controls, iMol)
 
     alpha = Controls.alpha(iMol);
     fprintf('  Alpha Parameter = %e \n', alpha );
+    
+    MinEeV = min(Controls.MinEeV(iMol), abs(max(Syst.Molecule(iMol).LevelECB)));
+    fprintf('  Maximum Distance from Centrifugal Barrier = %e eV\n', MinEeV)
 
-
-    Extr(1) = abs(max(Syst.Molecule(iMol).LevelECB));
+    Extr(1) = MinEeV;
     for i=1:NBins
-       Extr(i+1) =  (1.0 - (i/NBins)^alpha) * Extr(1);
+       Extr(i+1) =  (1.0 - (i/NBins)^(alpha)) * Extr(1);
     end
+    figure
+    plot(Extr,'o-')
     
     LevelToGroup = zeros(Syst.Molecule(iMol).NLevels,1);
     for iLevels = 1:Syst.Molecule(iMol).NLevels
-      iBin = 1;
-      while (-Syst.Molecule(iMol).LevelECB(iLevels) >= -Extr(iBin)+1e-20)
-        iBin = iBin + 1;
-      end
-      iBin = iBin - 1;
-      LevelToGroup(iLevels) = iBin;
+        if (Syst.Molecule(iMol).LevelECB(iLevels) < MinEeV)
+            iBin = 1;
+            while (-Syst.Molecule(iMol).LevelECB(iLevels) >= -Extr(iBin)+1e-20)
+                iBin = iBin + 1;
+            end
+            iBin = iBin - 1;
+            LevelToGroup(iLevels) = iBin;
+        end
     end    
     
     fprintf('  ====================================================\n\n')

@@ -23,7 +23,7 @@ function Plot_Populations(Controls)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates OtherRates
+    global Input Kin Param Syst Temp Rates
 
     fprintf('= Plot_Populations ===================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
@@ -33,7 +33,11 @@ function Plot_Populations(Controls)
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
         
         clear LevelToBin Levelvqn LevelEeV LevelPop
-        LevelToBin = Syst.Molecule(iMol).LevelToGroupOut;
+        if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
+            LevelToBin = Syst.Molecule(iMol).LevelToGroupIn;
+        else
+            LevelToBin = Syst.Molecule(iMol).LevelToGroupOut;
+        end
         Levelvqn   = Syst.Molecule(iMol).Levelvqn;
         LevelEeV   = Syst.Molecule(iMol).LevelEeV;
         iComp      = Syst.MolToCFDComp(iMol);
@@ -49,7 +53,7 @@ function Plot_Populations(Controls)
             if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
                 LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:);            
             else
-                LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
+                LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
             end
 
 
@@ -158,119 +162,119 @@ function Plot_Populations(Controls)
 
         end
 
+        if (Input.Kin.Proc.DissFlg > 0)
         
-        
-        iStep = Kin.T(Temp.iT).QSS.i;   
-        fprintf(['Plotting QSS: Time Step Nb ' num2str(iStep) ', t = ' num2str(Kin.T(Temp.iT).t(iStep)) ' s\n'] );
+            iStep = Kin.T(Temp.iT).QSS.i;   
+            fprintf(['Plotting QSS: Time Step Nb ' num2str(iStep) ', t = ' num2str(Kin.T(Temp.iT).t(iStep)) ' s\n'] );
 
-        if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
-            LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:);            
-        else
-            LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
-        end
+            if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
+                LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:);            
+            else
+                    LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
+            end
 
-        figure(Input.iFig)
-        fig = gcf;
-        screensize   = get( groot, 'Screensize' );
-        %fig.Position = screensize;
-        %fig.Color='None';
+            figure(Input.iFig)
+            fig = gcf;
+            screensize   = get( groot, 'Screensize' );
+            %fig.Position = screensize;
+            %fig.Color='None';
 
-        if Controls.GroupColors == 0
+            if Controls.GroupColors == 0
 
-            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
-            hold on
+                scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
+                hold on
 
-        elseif Controls.GroupColors == 1
+            elseif Controls.GroupColors == 1
 
-            scatter(LevelEeV, LevelPop, 20, LevelToBin, 'Filled');
-            colormap(distinguishable_colors(max(max(LevelToBin))))
-            cb=colorbar;
-            %cb.Ticks = [1, 1.5]; %Create 8 ticks from zero to 1
-            %cb.TickLabels = {'1','2'}
-            ylab = ylabel(cb, 'Group');
-            ylab.Interpreter = 'latex';
-            set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
-            cb.Label.Interpreter = 'latex';
+                scatter(LevelEeV, LevelPop, 20, LevelToBin, 'Filled');
+                colormap(distinguishable_colors(max(max(LevelToBin))))
+                cb=colorbar;
+                %cb.Ticks = [1, 1.5]; %Create 8 ticks from zero to 1
+                %cb.TickLabels = {'1','2'}
+                ylab = ylabel(cb, 'Group');
+                ylab.Interpreter = 'latex';
+                set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
+                cb.Label.Interpreter = 'latex';
 
-         elseif Controls.GroupColors == 2
+             elseif Controls.GroupColors == 2
 
-            iivM = 0;
-            iivP = Syst.Molecule(iMol).Nvqn-1;
-            ColorMat = distinguishable_colors(Syst.Molecule(iMol).Nvqn);
+                iivM = 0;
+                iivP = Syst.Molecule(iMol).Nvqn-1;
+                ColorMat = distinguishable_colors(Syst.Molecule(iMol).Nvqn);
 
-            for iv = iivP:-1:iivM+1
-                jj = 0;
-                for iLevel = 1:Syst.Molecule(iMol).NLevels
-                    if Levelvqn(iLevel) == iv
-                        jj = jj + 1;
-                        LevelEeVTemp(jj) = LevelEeV(iLevel);
-                        LevelPopTemp(jj) = LevelPop(iLevel);
+                for iv = iivP:-1:iivM+1
+                    jj = 0;
+                    for iLevel = 1:Syst.Molecule(iMol).NLevels
+                        if Levelvqn(iLevel) == iv
+                            jj = jj + 1;
+                            LevelEeVTemp(jj) = LevelEeV(iLevel);
+                            LevelPopTemp(jj) = LevelPop(iLevel);
+                        end
                     end
+                    scatter(LevelEeVTemp, LevelPopTemp, 300, '.', 'MarkerEdgeColor', ColorMat(iv,:), 'MarkerFaceColor', ColorMat(iv,:), 'LineWidth', 1.5)
+                    plot(LevelEeVTemp', LevelPopTemp', 'Color', ColorMat(iv,:), 'LineWidth', 1.5)
+                    set(gca, 'YScale', 'log')
+                    hold on
+                    clear LevelEeVTemp LevelPopTemp
                 end
-                scatter(LevelEeVTemp, LevelPopTemp, 300, '.', 'MarkerEdgeColor', ColorMat(iv,:), 'MarkerFaceColor', ColorMat(iv,:), 'LineWidth', 1.5)
-                plot(LevelEeVTemp', LevelPopTemp', 'Color', ColorMat(iv,:), 'LineWidth', 1.5)
+
+             elseif Controls.GroupColors == 3
+
+                clear DissRates
+                DissRates = log10(Rates.T(Temp.iT).Molecule(iMol).Overall(:,Controls.ProcOI(iMol)));
+
+                scatter(LevelEeV, LevelPop, 80, DissRates', '.' )
                 set(gca, 'YScale', 'log')
                 hold on
-                clear LevelEeVTemp LevelPopTemp
+
+                c = jet;
+                c = flipud(c);
+                colormap(c);
+                cb = colorbar;
+                ylabel(cb, '$log_{10}(k_i^D)$')
+                set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
+                cb.Label.Interpreter = 'latex';
+
             end
 
-         elseif Controls.GroupColors == 3
+            xt = get(gca, 'XTick');
+            set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
+            yt = get(gca, 'YTick');
+            set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-            clear DissRates
-            DissRates = log10(Rates.T(Temp.iT).Molecule(iMol).Overall(:,Controls.ProcOI(iMol)));
+            str_x = ['$\epsilon_i$ [eV]'];
+            xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+            xlab.Interpreter = 'latex';
+            %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
 
-            scatter(LevelEeV, LevelPop, 80, DissRates', '.' )
+            str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
+            ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
+            ylab.Interpreter = 'latex';
+            ylim([1.d5, 1.d23]);
             set(gca, 'YScale', 'log')
-            hold on
-        
-            c = jet;
-            c = flipud(c);
-            colormap(c);
-            cb = colorbar;
-            ylabel(cb, '$log_{10}(k_i^D)$')
-            set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
-            cb.Label.Interpreter = 'latex';
 
-        end
+            pbaspect([1 1 1])
 
-        xt = get(gca, 'XTick');
-        set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
-        yt = get(gca, 'YTick');
-        set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
-
-        str_x = ['$\epsilon_i$ [eV]'];
-        xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
-        xlab.Interpreter = 'latex';
-        %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
-
-        str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
-        ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
-        ylab.Interpreter = 'latex';
-        ylim([1.d5, 1.d23]);
-        set(gca, 'YScale', 'log')
-
-        pbaspect([1 1 1])
-
-        if Input.SaveFigsFlgInt > 0
-            [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
-            FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
-            [status,msg,msgID] = mkdir(FolderPath);
-            FileName = strcat(Syst.Molecule(iMol).Name, '_Pops_AtQSS');
-            if Input.SaveFigsFlgInt == 1
-                FileName   = strcat(FolderPath, FileName);
-                export_fig(FileName, '-pdf');
-            elseif Input.SaveFigsFlgInt == 2
-                FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
-                savefig(FileName);
+            if Input.SaveFigsFlgInt > 0
+                [status,msg,msgID]  = mkdir(Input.Paths.SaveFigsFldr);
+                FolderPath = strcat(Input.Paths.SaveFigsFldr, '/T_', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, '/');
+                [status,msg,msgID] = mkdir(FolderPath);
+                FileName = strcat(Syst.Molecule(iMol).Name, '_Pops_AtQSS');
+                if Input.SaveFigsFlgInt == 1
+                    FileName   = strcat(FolderPath, FileName);
+                    export_fig(FileName, '-pdf');
+                elseif Input.SaveFigsFlgInt == 2
+                    FileName   = strcat(FolderPath, strcat(FileName,'.fig'));
+                    savefig(FileName);
+                end
+                close
+            else
+                str_title = [Syst.Molecule(iMol).Name, ', t = ',  num2str(Kin.T(Temp.iT).t(iStep)), ' s (@ QSS)'];
+                title(str_title, 'interpreter', 'latex'); 
             end
-            close
-        else
-            str_title = [Syst.Molecule(iMol).Name, ', t = ',  num2str(Kin.T(Temp.iT).t(iStep)), ' s (@ QSS)'];
-            title(str_title, 'interpreter', 'latex'); 
+            Input.iFig = Input.iFig + 1;
+
         end
-        Input.iFig = Input.iFig + 1;
-        
-        
         
         
         iStep = length(Kin.T(Temp.iT).t);   
@@ -279,7 +283,7 @@ function Plot_Populations(Controls)
         if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
             LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:);            
         else
-            LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
+            LevelPop(:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:) ./ Syst.Molecule(iMol).Levelg(:);
         end
 
         figure(Input.iFig)

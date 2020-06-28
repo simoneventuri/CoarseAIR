@@ -25,7 +25,7 @@ function [Syst] = Read_LevelInfo(Syst)
     %%==============================================================================================================
 
     
-    global Input Param 
+    global Input Param
 
     fprintf('= Read_LevelInfo ===================================\n')
     fprintf('====================================================\n')
@@ -40,7 +40,7 @@ function [Syst] = Read_LevelInfo(Syst)
         if isfile(strcat(LevelsFile))
             
             %% Reading HDF5 File
-            fprintf(['Reading From File: ' LevelsFile '\n'] )
+            fprintf(['  Reading From File: ' LevelsFile '\n'] )
             
             VarChar                        = strcat('/', Syst.Molecule(iMol).Name, '/LevelVMax');
             TempVar                        = h5read(Syst.HDF5_File, VarChar);
@@ -144,6 +144,17 @@ function [Syst] = Read_LevelInfo(Syst)
             Syst.Molecule(iMol).LevelEeVVib0(iLevels) = Syst.Molecule(iMol).LevelEeV0(vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1));
             Syst.Molecule(iMol).LevelEeVRot(iLevels)  = Syst.Molecule(iMol).LevelEeV0(iLevels) - Syst.Molecule(iMol).LevelEeVVib0(iLevels);
         end
+        
+    end
+    
+    
+    fprintf('Grouping Molecules in Input \n')
+    Syst = Group_In(Syst)
+    
+    
+    
+    for iMol = 1:Syst.NMolecules       
+        fprintf('Reading Level Quantities for Molecule Nb %i \n',  iMol )
         
         
         %% Computing Equivalent Number of States = Levels/Groups

@@ -59,7 +59,7 @@ function [FinalRateMat] = Compute_BckwdRates(RateMat, iProc, LevelEeV1, Levelq1,
                 if LevelEeV1(iLevel) >= LevelEeV2(jLevel) 
                     FinalRateMat(iLevel,jLevel) = RateMat(iLevel,jLevel);
                 else
-                    FinalRateMat(iLevel,jLevel) = RateMat(jLevel,iLevel) * Levelq1(iLevel) / Levelq2(jLevel) * Qe * Qt;
+                    FinalRateMat(iLevel,jLevel) = RateMat(jLevel,iLevel) / (Levelq1(iLevel) / Levelq2(jLevel) * Qe * Qt);
                 end
             end
         end

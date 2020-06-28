@@ -7,22 +7,10 @@
   Reading Grid Points? = no
   
   Computing Grid Points? = yes
-  
-  Computing Double-Grid Points? = no
-  
-  Computing Triple-Grid Points? = no
-  
-  Computing Points for Scatter Comparison? = no
-  
-  Computing Stochastic PES Statistics? = no
 
-  Writing Sampled Parameters of Stochastic PES? = no
-  
-  Plotting Cuts with Varga et al.'s style? = no
-  
   
   ### Potential / Force
-  Potential or Force = Potential
+  Potential or Force = Force
   
   ### PES / Diatomic
   PES or Diatomic = PES
@@ -36,8 +24,8 @@
   ### Hartree / KcalMol / ElectronVolt
   Unit of measure for Potential = ElectronVolt
   
-  Nb of Grid Points, Axis 1 = 100 
-  Nb of Grid Points, Axis 2 = 100
+  Nb of Grid Points, Axis 1 = 200
+  Nb of Grid Points, Axis 2 = 200
  
   Grid Min, Axis 1 = 1.5d0
   Grid Min, Axis 2 = 1.5d0
@@ -56,6 +44,6 @@
      
   Energy Cut-Off (From Dissociation Energy) = 1.d100
   
-  Setting the Energy Reference to 0.0? = yes
+  Flag for Energy Reference = 0
 
   Plotting Only Triatomic Component of PES? = no

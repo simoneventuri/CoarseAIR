@@ -94,7 +94,11 @@ function Read_Pops()
         
         Kin.T(Temp.iT).Molecule(iMol).Pop = zeros(Kin.T(Temp.iT).NSteps, iNBins);
         for iStep = 1:Kin.T(Temp.iT).NSteps
-            Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:) .* Syst.Molecule(iMol).T(Temp.iT).GroupsIn.g';
+            if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
+                Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:) .* Syst.Molecule(iMol).T(Temp.iT).GroupsIn.g';
+            else
+                Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,:) .* Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q';
+            end 
             TotPop   = sum(Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:));
             Kin.T(Temp.iT).Molecule(iMol).DF(iStep,:)  = Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:) ./ TotPop;
         end

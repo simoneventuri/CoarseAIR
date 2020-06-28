@@ -57,7 +57,7 @@ function Compute_Energies(Controls)
             if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
                 LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:);            
             else
-                LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:);
+                LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:);
             end
             PopTot = sum(LevelPop);
             
@@ -100,8 +100,12 @@ function Compute_Energies(Controls)
         Kin.T(Temp.iT).Molecule(iMol).tauInt = fzero(fitresult, tauInt);
         
         eRotLim = (eRot(end) - eRot(1)) * 0.632 + eRot(1);
+        TempCoeff = 1;
+        if eRot(end) < eRot(1)
+            TempCoeff = -1;
+        end
         iRot=1;
-        while eRot(iRot) < eRotLim
+        while TempCoeff*eRot(iRot) < TempCoeff*eRotLim
           iRot = iRot+1;
         end
         tauRot = (Kin.T(Temp.iT).t(iRot) + Kin.T(Temp.iT).t(iRot-1)) / 2.d0;

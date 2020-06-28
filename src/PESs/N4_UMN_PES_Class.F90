@@ -236,11 +236,8 @@ Subroutine Initialize_N4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   This%Name         =   Name_PES
   This%Initialized  =   .True.
   This%CartCoordFlg =   .False.
-  This%NPairs       =   3               ! Setting the number of atom-atom pairs
-
-  ! allocate( This%mMiMn(4) )
-  ! This%mMiMn(1:3) = - Atoms(1:3)%Mass / Atoms(4)%Mass 
-  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
+  This%NPairs       =   6               ! Setting the number of atom-atom pairs
+  allocate( This%Pairs(This%NPairs) )   ! Allocating the Pairs array which contains the polymorphic Diatomi-Potential associated to each pair
   
   iA(1,:) = [1, 2]
   iA(2,:) = [1, 3]
@@ -249,6 +246,9 @@ Subroutine Initialize_N4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   iA(5,:) = [2, 4]
   iA(6,:) = [3, 4]  
 
+  ! allocate( This%mMiMn(4) )
+  ! This%mMiMn(1:3) = - Atoms(1:3)%Mass / Atoms(4)%Mass 
+  ! if (i_Debug_Loc) call Logger%Write( "This%mMiMn = ", This%mMiMn )
 
   ! ==============================================================================================================
   !   CONSTRUCTING THE DIATOMIC POTENTIAL OBJECT
@@ -299,8 +299,10 @@ Function N4_UMN_Potential_From_R( This, R, Q ) result( V )
     VDiat = VDiat + VTemp
   end do
 
-  call n4pes(R, VTriat, dVdRTriat, 0)
-  V    = VTriat   + VDiat
+  call n4pes(R*B_To_Ang, VTriat, dVdRTriat, 0)
+  VTriat = VTriat * Kcm_To_Hartree + Eref
+
+  V      = VTriat + VDiat
 
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -316,7 +318,8 @@ Function N4_UMN_Potential_From_R_OnlyTriat( This, R, Q ) result( V )
 
   real(rkp) ,dimension(6)                                    ::    dVdR
   
-  call n4pes(R, V, dVdR, 0)
+  call n4pes(R*B_To_Ang, V, dVdR, 0)
+  V = V * Kcm_To_Hartree + Eref
   
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -336,15 +339,18 @@ Subroutine Compute_N4_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp) ,dimension(6)                                    ::    dVdRDiat, dVdRTriat
   integer                                                    ::    iP
 
-  dVdR = Zero
-
-  VDiat = Zero
+  VDiat     = Zero
+  dVdRDiat  = Zero 
   do iP=1,6
     call This%Pairs(iP)%Vd%Compute_Vd_dVd( R(iP), VTemp, dVdRDiat(iP) )
     VDiat = VDiat + VTemp
   end do
 
-  call n4pes(R, VTriat, dVdRTriat, 1)
+  VTriat    = Zero
+  dVdRTriat = Zero
+  call n4pes(R*B_To_Ang, VTriat, dVdRTriat, 1)
+  VTriat    =    VTriat * Kcm_To_Hartree + Eref
+  dVdRTriat = dVdRTriat * Kcm_To_Hartree * B_To_Ang
 
   V    = VTriat    + VDiat
   dVdR = dVdRTriat + dVdRDiat
@@ -407,9 +413,6 @@ Subroutine n4pes(R, V, dVdR, igrad)
   else
     write (*,*) 'Only igrad = 0, 1 is allowed!'
   endif
-
-  V    = (V + Eref) * Kcm_To_Hartree
-  dVdR = dVdR       * Kcm_To_Hartree * B_To_Ang
 
 end Subroutine 
 !--------------------------------------------------------------------------------------------------------------------------------!

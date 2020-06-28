@@ -152,7 +152,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         %%% Molecules
         Syst.NMolecules                   = 1;
         Syst.Molecule(1).Name             = 'O2';
-        Syst.Molecule(1).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -5.211;
         Syst.Molecule(1).DegeneracyFactor = [1/2, 1/2];
         Syst.Molecule(1).Mu               = 31.9988e-3;
         Syst.Molecule(1).NLevelsOrig      = 6115;

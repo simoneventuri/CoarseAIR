@@ -5,36 +5,18 @@
 ###########################################################################################
 
   Reading Grid Points? = no
-
+  
   Computing Grid Points? = yes
-  
-  Computing Double-Grid Points? = no
-  
-  Computing Triple-Grid Points? = no
-  
-  Computing Points for Scatter Comparison? = no
-  
-  Computing Stochastic PES Statistics? = no
 
-  Writing Sampled Parameters of Stochastic PES? = no
-
-  Plotting Cuts with Varga et al.'s style? = no
-
-  Computing Rotating 3rd Atom? = no
-  
   
   ### Potential / Force
   Potential or Force = Force
   
   ### PES / Diatomic
-  #PES or Diatomic = PES
   PES or Diatomic = PES
 
   ### Distance / Angle
   Y Axis Variable = Distance  
-
-  ### KcalMolAngstrom / HartreeBohr
-  Unit of measure for Force = HartreeBohr
 
   ### Bohr / Angstrom
   Unit of measure for Distance = Bohr
@@ -59,10 +41,9 @@
      Angle 5 = 140.d0
      Angle 6 = 160.d0
      Angle 7 = 180.d0
-
      
-  Energy Cut-Off (From Dissociation Energy) = 20.d10
+  Energy Cut-Off (From Dissociation Energy) = 1.d100
   
-  #Flag for Energy Reference 
-  
+  Flag for Energy Reference = 0
+
   Plotting Only Triatomic Component of PES? = no

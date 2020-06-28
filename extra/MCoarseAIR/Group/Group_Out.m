@@ -40,7 +40,7 @@ function Group_Out()
         elseif (strcmp(Input.Kin.MolResolutionOut(iMol,:), 'VSM'))
             fprintf('Grouping based on Vibrational Quantum Number\n\n')
             
-            LevelToGroup = Group_BasedOnVib(iMol);
+            LevelToGroup = Group_BasedOnVib(Syst, iMol);
             
         elseif (strcmp(Input.Kin.MolResolutionOut(iMol,:), 'CGM'))
             fprintf('Grouping for Coarse-Grained Model\n')
@@ -50,13 +50,13 @@ function Group_Out()
 
                 Controls.NBins(iMol) = Input.Kin.NGroupsOut(iMol);
                 Controls.alpha(iMol) = Input.Kin.ParamsGroupsOut(iMol);
-                LevelToGroup = Group_BasedOnCB(Controls, iMol);  
+                LevelToGroup = Group_BasedOnCB(Syst, Controls, iMol);  
                 
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol,:), 'File'))
                 fprintf('Reading Levels-Groups Mapping from File\n\n')
                 
-                Controls.FilePath(iMol) = Input.Kin.PathToMappingOut(iMol);
-                LevelToGroup = Group_FromFile(Controls, iMol);
+                Controls.FilePath(iMol,:) = Input.Kin.PathToMappingOut(iMol,:);
+                LevelToGroup = Group_FromFile(Syst, Controls, iMol);
                 
             end
         

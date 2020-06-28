@@ -48,16 +48,28 @@ function Write_RatesForClustering(Controls)
         MaxState = min(Controls.MaxState, Syst.Molecule(iMol).NLevels);
 
         
+        Controls.MinEeV(iMol) = abs(Syst.Molecule(iMol).DissEn) / 2.0;
+        Controls.NBins        = 15;
+        Controls.alpha(iMol)  = 1.0/2.0; 
+        LevelToGroup          = Group_BasedOnCB(Syst, Controls, iMol);
+  
         
         fprintf('Writing Level Properties\n')
+        
+        FileName2 = strcat(WriteFldr, '/LevelsInfo_CB.csv');
+        fileID2   = fopen(FileName2,'w');
+        fprintf(fileID2,'#Idx,EeV,g,rIn,v,J,ECB,Group_CB,iLevel\n');
+         
         FileName1 = strcat(WriteFldr, '/LevelsInfo.dat');
         fileID1   = fopen(FileName1,'w');
         jLevel    = 0;
+        kLevel    = 1;
         Mapping   = -1. * ones(Syst.Molecule(iMol).NLevels,1);
         for iLevel = MinState:MaxState
             WritingFlg = ( (sum(Rates.T(Temp.iT).Inel(iLevel,:)) > Controls.MinRate*Syst.Molecule(iMol).NLevels) && ...
-                           (sum(Rates.T(Temp.iT).Inel(:,iLevel)) > Controls.MinRate*Syst.Molecule(iMol).NLevels) );
-            
+                           (sum(Rates.T(Temp.iT).Inel(:,iLevel)) > Controls.MinRate*Syst.Molecule(iMol).NLevels) && ...
+                           (LevelToGroup(iLevel) == 0)                                                           );
+
             if (WritingFlg)
                 Mapping(iLevel) = jLevel;
                 fprintf(fileID1,'%i %e %e %e %i %i %e %i %i\n',    jLevel,                                      ...
@@ -67,15 +79,26 @@ function Write_RatesForClustering(Controls)
                                                                    Syst.Molecule(iMol).Levelvqn(iLevel),        ...
                                                                    Syst.Molecule(iMol).Leveljqn(iLevel),        ...
                                                                    Syst.Molecule(iMol).LevelECB(iLevel),        ...
-                                                                   Syst.Molecule(iMol).LevelToGroupOut(iLevel), ...
+                                                                   iLevel,                                      ...
                                                                    jLevel);
                 jLevel = jLevel+1;
             else
                 fprintf('Excluded Level Nb %i\n', iLevel)
+                fprintf(fileID2,'%i,%e,%e,%e,%i,%i,%e,%i,%i\n',    kLevel,                                      ...
+                                                                   Syst.Molecule(iMol).LevelEeV(iLevel),        ...
+                                                                   Syst.Molecule(iMol).Levelg(iLevel),          ...
+                                                                   Syst.Molecule(iMol).LevelrIn(iLevel),        ...
+                                                                   Syst.Molecule(iMol).Levelvqn(iLevel),        ...
+                                                                   Syst.Molecule(iMol).Leveljqn(iLevel),        ...
+                                                                   Syst.Molecule(iMol).LevelECB(iLevel),        ...
+                                                                   LevelToGroup(iLevel),                        ...
+                                                                   iLevel);
+                kLevel = kLevel+1;
             end
             
         end
         fclose(fileID1);
+        fclose(fileID2);
         
         
         KDiss = Rates.T(Temp.iT).Diss(:,1)   .* cm3_To_m3;
@@ -105,6 +128,7 @@ function Write_RatesForClustering(Controls)
             for iLevel = MinState:jLevel-1
                 if (Kji(iLevel,jLevel) > MinRate) && (Mapping(iLevel) > -1) && (Mapping(jLevel) > -1)
                     fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
+                    %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
                                                    %        i,        j,                Kij,                Kji 
                                                    %        where dni/dt  = - sum_j Kij ni nC + sum_j kji nj nC
                 end
@@ -138,6 +162,7 @@ function Write_RatesForClustering(Controls)
                 for iLevel = MinState:jLevel-1
                     if (Kji(iLevel,jLevel) > MinRate) && (Mapping(iLevel) > -1)  && (Mapping(jLevel) > -1)
                         fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
+                        %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
                                                        %        i,        j,                Kij,                Kji 
                                                        %        where dni/dt  = - sum_j Kij ni nC + sum_j kji nj nC
                     end

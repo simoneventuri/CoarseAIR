@@ -24,16 +24,16 @@
 # Ex. of Call: bash RunMECVODE.sh O3 10000 $WORKSPACE_PATH/neqplasma_QCT/ME_CVODE $WORKSPACE_PATH/Mars_Database/Run_0D/database/ $WORKSPACE_PATH/Mars_Database/Run_0D/ 1 1 0 -1
 
 echo '------------------------------------------------------------------------------------------'
-echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories                     '
+echo ' CoarseAIR: Coarse-Grained Quasi-Classical Trajectories                                   '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 echo '------------------------------------------------------------------------------------------'
-echo '   PipeLine for Running External Codes                            '
+echo '   PipeLine for Running External Codes                                                    '
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 
 source ~/.bashrc
-module purge
+#module purge
 COARSEAIR_UPDATE
 COARSEAIR_release
 #PLATONORECOMB_gnu_release
@@ -41,12 +41,12 @@ PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule_vec=('O2')
-export FldrName=''
-export Tran_vec=(12000 20000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000) 
+export FldrName='_30Inel_15CB'
+export Tran_vec=(20000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
-export PathToDtbFldr=$WORKSPACE_PATH/O3Diss_Database/Run_0D/database/
-export PathToRunFldr=$WORKSPACE_PATH/O3Diss_Database/Run_0D/
+export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
+export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
 
 export DissFlg=2
 export InelFlg=1
@@ -98,23 +98,26 @@ function Call_MeCvode() {
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
 
-  if [ $DissFlg -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_NoDiss'
-  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil_OnlyDiss'
-  else
-    export ExFldr=${PathToMECVODEFldr}/${System}/'DissPaper_T'${TTran}'K_Danil'
-  fi  
-  echo "[RunMECVODE]: Copying MeCvode Executable from "${ExFldr}/'exec/box_'
+  export ExFldr=${PathToMECVODEFldr}/Generic/
+  echo "[RunMECVODE]: Copying MeCvode Executable from: "${ExFldr}/'exec/box_'
   scp ${ExFldr}'/exec/box_' ./
+
+  if [ $DissFlg -eq 0 ]; then
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/NoDiss/T'${TTran}'K.inp'
+  elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/OnlyDiss/T'${TTran}'K.inp'
+  else
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/All/T'${TTran}'K.inp'
+  fi  
+  echo "[RunMECVODE]: Input File: "${InputFile}
   
-  echo "[RunMECVODE]: MeCvode will be executed in the Folder "$(pwd)
-  ./box_ ${OPENBLAS_NUM_THREADS}
+  echo "[RunMECVODE]: MeCvode will be executed in the Folder: "$(pwd)
+  ./box_ ${OPENBLAS_NUM_THREADS} ${InputFile}
 }
 
 
 for TTran in "${Tran_vec[@]}"; do :
-  echo "[RunMECVODE]: Translational Temperature, TTran = "${TTran}
+  echo "[RunMECVODE]: Translational Temperature: TTran = "${TTran}
 
   echo "[RunMECVODE]: Calling Load_Initialize_0D"
   Load_Initialize_0D

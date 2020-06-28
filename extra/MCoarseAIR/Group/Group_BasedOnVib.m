@@ -1,6 +1,6 @@
 %% Group the Levels Based on Centrifugal Barrier
 %
-function [LevelToGroup] = Group_BasedOnVib(iMol)    
+function [LevelToGroup] = Group_BasedOnVib(Syst, iMol)    
     
     %%==============================================================================================================
     % 
@@ -23,7 +23,7 @@ function [LevelToGroup] = Group_BasedOnVib(iMol)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Syst Temp Rates
+    global Input Kin Param Temp Rates
 
     fprintf('  = Group_BasedOnVib =================================\n')
     fprintf('  ====================================================\n')

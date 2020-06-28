@@ -46,18 +46,18 @@ function Compute_EnergyDepletions(Controls)
         LevelEeVRot  = Syst.Molecule(iMol).LevelEeVRot;
         LevelEeVVib0 = Syst.Molecule(iMol).LevelEeVVib0;
         Nvqn         = Syst.Molecule(iMol).Nvqn;
-        NLevels      = Syst.Molecule(iMol).NLevels;
+        NLevels      = Syst.Molecule(iMol).NLevels;%EqNStatesIn;
+        
         
         KRemoval = ones(NLevels,1) .* 1.d-30;
         for iProc = Controls.RemovalProc
-            KRemoval(:) = KRemoval(:) + Rates.T(Temp.iT).Molecule(iMol).Overall(:,iProc);
+            KRemoval(:) = KRemoval(:) + Rates.T(Temp.iT).Molecule(iMol).Overall(LevelToBin(:),iProc);
         end
-        
         
         if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
             LevelPopEq(:,1) = Kin.T(Temp.iT).Molecule(iMol).Pop(end,:) + 1;            
         else
-            LevelPopEq(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(end,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:);
+            LevelPopEq(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(end,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:);
         end
         PopTotEq    = sum(LevelPopEq);
         rhoAEq      = Kin.T(Temp.iT).nd(end) * Kin.T(Temp.iT).MolFracs(end,iProj(1));
@@ -71,19 +71,19 @@ function Compute_EnergyDepletions(Controls)
             if strcmp(Syst.Molecule(iMol).KinMthdIn, 'StS')
                 LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).Pop(iStep,:);              
             else
-                LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:)) .* Kin.T(Temp.iT).Molecule(iMol).Levelq(:);
+                LevelPop(:,1) = Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,LevelToBin(:))' .* Syst.Molecule(iMol).T(Temp.iT).Levelq(:);
             end
             PopTot = sum(LevelPop);
             
             rhoI      = LevelPop(:,1)            .* 0.0;
             rhoA      = Kin.T(Temp.iT).nd(iStep) .* Kin.T(Temp.iT).MolFracs(iStep,iProj(1));
             rhoB      = Kin.T(Temp.iT).nd(iStep) .* Kin.T(Temp.iT).MolFracs(iStep,iProj(2));
-            rhoM      = Kin.T(Temp.iT).nd(iStep) .* Kin.T(Temp.iT).MolFracs(iStep,iTarg)   ;
+            rhoM      = PopTot; %Kin.T(Temp.iT).nd(iStep) .* Kin.T(Temp.iT).MolFracs(iStep,iTarg);
             rhoI(:,1) = rhoM .* LevelPop(:,1) ./ PopTot;
-            PopA      = PopTot / Kin.T(Temp.iT).MolFracs(iStep,iTarg) * Kin.T(Temp.iT).MolFracs(iStep,iProj(1)) * Kin.T(Temp.iT).MolFracs(iStep,iProj(2));
+            PopA      = PopTot / Kin.T(Temp.iT).MolFracs(iStep,iTarg) * Kin.T(Temp.iT).MolFracs(iStep,iProj(1));
             
             %TempVec(:,1)  = KRemoval(:,1) .* LevelPopEq(:,1) .* PopTot .* ( rhoI(:,1)./rhoIEq(:,1) - rhoA/rhoAEq .* rhoB/rhoBEq );
-            TempVec(:,1)  = KRemoval(:,1) .* LevelPop(:,1) .* PopA .* ( rhoI(:,1) - rhoA .* rhoB );
+            TempVec(:,1)  = KRemoval(:,1) .* LevelPop(:,1) .* PopA .* ( rhoA .* rhoB - rhoI(:,1));
             Determ        = sum( TempVec );
             
             CDInt(jStep)  = sum( TempVec .* LevelEeV0 )     ./ Determ;
