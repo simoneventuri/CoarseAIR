@@ -63,7 +63,9 @@ function ComputeLevelsAtNode {
   elif [[ ${NProc} -eq 32 ]]; then  	    
     parallel --xapply -j 32 "sh ${COARSEAIR_SH_DIR}/ComputeLevelsAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_BIN_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} " ::: {1..32}
   elif [[ ${NProc} -eq 40 ]]; then        
-    parallel --xapply -j 32 "sh ${COARSEAIR_SH_DIR}/ComputeLevelsAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_BIN_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} " ::: {1..40}
+    parallel --xapply -j 40 "sh ${COARSEAIR_SH_DIR}/ComputeLevelsAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_BIN_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} " ::: {1..40}
+  elif [[ ${NProc} -eq 64 ]]; then        
+    parallel --xapply -j 64 "sh ${COARSEAIR_SH_DIR}/ComputeLevelsAtProc.sh '${COARSEAIR_OUTPUT_DIR}' '${COARSEAIR_BIN_OUTPUT_DIR}' '${COARSEAIR_WORKING_DIR}' ${NNode} ${iNode} ${NProc} {1} " ::: {1..40}
   else
     echo "ERROR: Number of Precessors not Coherent with ComputeLevelsAtNode (Check GenerateLevels.sh)"
     exit 1

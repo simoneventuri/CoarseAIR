@@ -93,15 +93,10 @@ for ib=1:Nbb
 %            pause
 %        end
        TypeATemp                        = ceil(mod(mod(arr_f,16),4))  ;
-       TypeA = 2;
-       if sum(TypeATemp == [1,2,4]) > 0
-          TypeA = 1;
+       if Type(
+           
        end
        TypeBTemp                        = (floor(mod(arr_f,16)/4) + 1);
-       TypeB = 2;
-       if sum(TypeBTemp == [1,2,4]) > 0
-          TypeB = 1;
-       end
        if TypeA < 1 || TypeA > 2 || TypeB < 1 || TypeB > 2
            pause
        end
