@@ -375,6 +375,7 @@ function RunTrajectoriesAtNode {
   mkdir -p ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode}
   python3 ${COARSEAIR_SH_DIR}'/SplitLevelsList.py' ${COARSEAIR_BIN_OUTPUT_DIR}/Node_${iNode} ${COARSEAIR_OUTPUT_DIR} ${System} ${NMolecules} ${Molecule1} ${NLevels1} ${iLevel1} ${Molecule2} ${NLevels2} ${iLevel2}
 
+
   if [[ ${NProc} -eq 1 ]]; then
     RunTrajectoriesAtProc 1
   elif [[ ${NProc} -eq 2 ]]; then

@@ -49,7 +49,7 @@ function Write_RatesForClustering(Controls)
 
         
         Controls.MinEeV(iMol) = abs(Syst.Molecule(iMol).DissEn) / 2.0;
-        Controls.NBins        = 4;
+        Controls.NBins        = 21;
         Controls.alpha(iMol)  = 1.0/2.0; 
         LevelToGroup          = Group_BasedOnCB(Syst, Controls, iMol);
   
@@ -127,8 +127,8 @@ function Write_RatesForClustering(Controls)
         for jLevel = MinState:MaxState
             for iLevel = MinState:jLevel-1
                 if (Kji(iLevel,jLevel) > MinRate) && (Mapping(iLevel) > -1) && (Mapping(jLevel) > -1)
-                    %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
-                    fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
+                    fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
+                    %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
                                                    %        i,        j,                Kij,                Kji 
                                                    %        where dni/dt  = - sum_j Kij ni nC + sum_j kji nj nC
                 end

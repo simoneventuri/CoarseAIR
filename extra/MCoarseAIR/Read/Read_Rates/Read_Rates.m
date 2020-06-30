@@ -49,7 +49,7 @@ function Read_Rates()
         Rates.T(Temp.iT).Molecule(1).Overall(:,1) = Rates.T(Temp.iT).Diss(:,1);
         Rates.T(Temp.iT).Molecule(1).Overall(:,2) = sum( (Rates.T(Temp.iT).Inel - diag(diag(Rates.T(Temp.iT).Inel))), 2);
         for iExch = 1:size(Syst.ExchToMol,1)
-            Rates.T(Temp.iT).Molecule(1).Overall(:,2+iExch) = sum( (Rates.T(Temp.iT).ExchType(iExch).Exch - diag(diag(Rates.T(Temp.iT).ExchType(iExch).Exch))), 2);
+            Rates.T(Temp.iT).Molecule(1).Overall(:,2+iExch) = sum( (Rates.T(Temp.iT).ExchType(iExch).Exch), 2);
         end
         
         

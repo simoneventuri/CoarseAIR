@@ -34,7 +34,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Name          = 'N3';
 
         Syst.NProc         = 2; %(Diss+Inel&Exch)
-        
+%         Syst.NProc         = 3; %(Diss+Inel+Exch)
         
         %%% Atoms
         Syst.NAtoms        = 3;
@@ -59,7 +59,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         %%% Molecules
         Syst.NMolecules                   = 1;
         Syst.Molecule(1).Name             = 'N2';
-        Syst.Molecule(1).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -9.899298;
         Syst.Molecule(1).DegeneracyFactor = [3, 6];
         Syst.Molecule(1).Mu               = 28.0134d-3;
         Syst.Molecule(1).NLevelsOrig      = 9390;
@@ -103,18 +103,27 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         
         Syst.CFDComp(1).LineStyle = ':';
         Syst.CFDComp(2).LineStyle = '-';
-        
-        Syst.RxLxIdx = [-2, 1;   % Diss
-                         0, 0];  % Inel&Exch1
-                        
+
         Syst.MolToCFDComp       = [2];
 
         
+        Syst.RxLxIdx = [-2, 1;   % Diss;
+                         0, 0];  % Inel+Exch1
+
         %% Exchange Properties
         Syst.ExchToMol          = [];
-        Syst.ExchToAtom         = [];
-        
+        Syst.ExchToAtom         = [];        
         Syst.PairToExch         = [];
+
+                     
+%         Syst.RxLxIdx = [-2, 1;   % Diss
+%                          0, 0;   % Inel
+%                          0, 0];  % Exch1                        
+
+%         %% Exchange Properties
+%         Syst.ExchToMol          = [1];
+%         Syst.ExchToAtom         = [3];
+%         Syst.PairToExch         = [1];
         
         Syst.ToOtherExch        = []    ;
         

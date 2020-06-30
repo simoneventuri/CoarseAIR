@@ -3,10 +3,19 @@ clear all
 clc
 
 
-NLevels  = 6115;
-InelFile = "/home/venturi/WORKSPACE/SpectralCluster/data/O3_UMN/T10000K/GroupingInfo_6Bins_WExch.csv";
-CBFile   = "/home/venturi/WORKSPACE/SpectralCluster/data/O3_UMN/T10000K/LevelsInfo_CB.csv";
+% NLevels  = 6115;
+% InelFile = "/home/venturi/WORKSPACE/SpectralCluster/data/O3_UMN/T10000K/GroupingInfo_6Bins_WExch.csv";
+% CBFile   = "/home/venturi/WORKSPACE/SpectralCluster/data/O3_UMN/T10000K/LevelsInfo_CB.csv";
+% DestFldr = "/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/";
+
+NLevels  = 9390;
+InelFile = "/home/venturi/WORKSPACE/SpectralCluster/data/N3_NASA/T10000K/GroupingInfo_30Bins_WExch.csv";
+CBFile   = "/home/venturi/WORKSPACE/SpectralCluster/data/N3_NASA/T10000K/LevelsInfo_CB.csv";
 DestFldr = "/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/";
+
+
+
+
 
 Group    = zeros(NLevels,1);
 

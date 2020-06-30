@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates OtherSyst OtherRates
@@ -34,36 +34,36 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 %% System Inputs
 Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
 
-Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
+Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CG-QCT/N3_NASA/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [10000]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
-Input.SystNameLong          = 'O3_UMN';
+Input.TranVec               = [10000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.SystNameLong          = 'N3_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
-Input.RunSuffix             = '';
+Input.RunSuffix             = '_VSM';
 
-Input.Kin.MolResolutionIn   = ['StS'];
-Input.Kin.EqNStatesIn       = [ 6115];
+Input.Kin.MolResolutionIn   = ['VSM'];
+Input.Kin.EqNStatesIn       = [ 9390];
 Input.Kin.MinStateIn        = [    1];
-Input.Kin.MaxStateIn        = [ 6115];
+Input.Kin.MaxStateIn        = [ 9390];
 Input.Kin.PathToMappingIn   = [   ''];
 Input.Kin.NGroupsIn         = [    0];
 Input.Kin.MolResolutionOut  = ['VSM'];
 Input.Kin.PathToMappingOut  = [   ''];
-Input.Kin.CGM_Strategy      = [  ''];
+Input.Kin.CGM_Strategy      = ['CBM'];
 Input.Kin.ParamsGroupsOut   = [  1.0];
-Input.Kin.NGroupsOut        = [   45];
+Input.Kin.NGroupsOut        = [   50];
 
-Input.Kin.Proc.DissFlg      = 2;
+Input.Kin.Proc.DissFlg      = 1;
 Input.Kin.NBinsSuffix       = 0;
-Input.Kin.DissCorrFactor    = 16.0/3.0;
+Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
 Input.Kin.Proc.ExchFlg1     = 1;
 Input.Kin.Proc.ExchFlg2     = 0;
 
-Input.Kin.ReadRatesProc     = [2, 2, 2]
+Input.Kin.ReadRatesProc     = [2, 2]
 Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst     = []
 Input.Kin.OtherSystInHDF5   = []
@@ -88,7 +88,7 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 % Plotting Diatomic Potential
 Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
-Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0; 1.5, 6.0];
+Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
 % Plotting Overall Rate Coefficients (Dissociation and Exchange)
 Input.Tasks.Plot_OverallRates.Flg                      = false;
@@ -116,12 +116,12 @@ Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = false;
+Input.Tasks.Plot_MoleFracs.Flg                         = true;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
-Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1,2];
+Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1];
 % Plotting Mole Fractions and Global Rates
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 2;
@@ -130,22 +130,23 @@ Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1];
 % Plotting Vib. Distribution Function
 Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
-Input.Tasks.Plot_VDF.tSteps                            = [1.e-14, 1e-12, 1e-10, 1e-8, 1e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
+Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
 Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1e-12, 1e-10, 1e-8]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
-Input.Tasks.Plot_Populations.GroupColors               = 2;
+Input.Tasks.Plot_Populations.GroupColors               = 0;
 % Plotting Energies
 Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
-Input.Tasks.Plot_Energies.LTFlag                       = false;
+Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
 Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
 Input.Tasks.Plot_EnergyDepletions.Targ                 = [2];
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

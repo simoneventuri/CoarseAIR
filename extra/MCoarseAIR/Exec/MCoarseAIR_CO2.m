@@ -35,9 +35,9 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE'
 
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/CO2_ALL/Test/');
-Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
-Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [5000 10000 20000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
+Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Mars_Database/Run_0D/');
+Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Mars_Database/HDF5_Database/');
+Input.TranVec               = [10000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
 Input.SystNameLong          = 'CO2_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
@@ -49,13 +49,13 @@ Input.Kin.MinStateIn        = [    1,     1];
 Input.Kin.MaxStateIn        = [13521,  6078];
 Input.Kin.PathToMappingIn   = [   '';    ''];
 Input.Kin.NGroupsIn         = [    0,     0];
-Input.Kin.MolResolutionOut  = ['CGM'; 'CGM'];
+Input.Kin.MolResolutionOut  = ['VSM'; 'VSM'];
 Input.Kin.PathToMappingOut  = [   '';    ''];
 Input.Kin.CGM_Strategy      = ['CBM'; 'CBM'];
 Input.Kin.ParamsGroupsOut   = [  1.0,   1.0];
 Input.Kin.NGroupsOut        = [   83,    49];
 
-Input.Kin.Proc.DissFlg      = 9;
+Input.Kin.Proc.DissFlg      = 2;
 Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
@@ -87,7 +87,7 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1,2];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 10.0; 1.5, 10.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [44];
@@ -96,7 +96,7 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
-Input.Tasks.Write_RatesParaview.Flg                    = true;
+Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [1e-12, 1e-13, 5e-13]
 Input.Tasks.Write_RatesParaview.Proc                   = [false, true, false, false]
 % Input.Tasks.Write_RatesParaview.vqns                   = [0, 10,  0,20,40, 30,60, 30, 20, 20,  7, 10, 30, 25, 45, 5, 10, 10]
@@ -133,7 +133,7 @@ Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = false;
+Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1, 2];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-12, 1.e-11, 1.e-10, 1.e-9, 1.e-8, 1.e-7, 1e-6, 1e-5, 1e-4, 1e-3]%, 1e-5, 1e-4, 1e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 0;
