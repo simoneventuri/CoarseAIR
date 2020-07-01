@@ -503,8 +503,8 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Molecule(1).Name             = 'N2';
         Syst.Molecule(2).Name             = 'NO';
 
-        Syst.Molecule(1).DissEn           = 0.0;
-        Syst.Molecule(2).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -9.904361;
+        Syst.Molecule(2).DissEn           = -6.617426;
 
         Syst.Molecule(1).DegeneracyFactor = [ 3, 6]; %Odd, Even
         Syst.Molecule(2).DegeneracyFactor = [ 2, 2];
@@ -518,7 +518,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Molecule(1).ToAtoms          = [1,2];
         Syst.Molecule(2).ToAtoms          = [2,3];
         
-        Syst.Molecule(1).DiatPot          = 'N2_UMN';
+        Syst.Molecule(1).DiatPot          = 'N2_UMN_ForN2O2';
         Syst.Molecule(2).DiatPot          = 'NO_UMN';
         
         Syst.MolToOtherSyst(1)            = 0;
@@ -626,8 +626,8 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Molecule(1).Name             = 'NO';
         Syst.Molecule(2).Name             = 'N2';
 
-        Syst.Molecule(1).DissEn           = 0.0;
-        Syst.Molecule(2).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -6.617426;
+        Syst.Molecule(2).DissEn           = -9.904361;
 
         Syst.Molecule(1).DegeneracyFactor = [2, 2];
         Syst.Molecule(2).DegeneracyFactor = [3, 6];
@@ -642,7 +642,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Molecule(2).ToAtoms          = [1,3];
         
         Syst.Molecule(1).DiatPot          = 'NO_UMN';
-        Syst.Molecule(2).DiatPot          = 'N2_UMN';
+        Syst.Molecule(2).DiatPot          = 'N2_UMN_ForN2O2';
         
         Syst.MolToOtherSyst(1)            = 0;
         Syst.MolToOtherSyst(2)            = 1;

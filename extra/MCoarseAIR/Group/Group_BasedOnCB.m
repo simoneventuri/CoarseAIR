@@ -23,39 +23,38 @@ function [LevelToGroup] = Group_BasedOnCB(Syst, Controls, iMol)
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
 
-    global Input Kin Param Temp Rates
 
-    fprintf('  = Group_BasedOnCB ==================================\n')
-    fprintf('  ====================================================\n')
+    fprintf('    = Group_BasedOnCB ==================================\n')
+    fprintf('    ====================================================\n')
   
-    NBins = Controls.NBins(iMol);
-    fprintf('  Nb Bins         = %i \n', NBins );
+    NGroups = Controls.NGroups_CB(iMol);
+    fprintf('    Nb Groups       = %i \n', NGroups );
 
     alpha = Controls.alpha(iMol);
-    fprintf('  Alpha Parameter = %e \n', alpha );
+    fprintf('    Alpha Parameter = %e \n', alpha );
     
     MinEeV = min(Controls.MinEeV(iMol), abs(max(Syst.Molecule(iMol).LevelECB)));
-    fprintf('  Maximum Distance from Centrifugal Barrier = %e eV\n', MinEeV)
+    fprintf('    Maximum Distance from Centrifugal Barrier = %e eV\n', MinEeV)
 
     Extr(1) = MinEeV;
-    for i=1:NBins
-       Extr(i+1) =  (1.0 - (i/NBins)^(alpha)) * Extr(1);
+    for i=1:NGroups
+       Extr(i+1) =  (1.0 - (i/NGroups)^(alpha)) * Extr(1);
     end
-    figure
-    plot(Extr,'o-')
-    
+%     figure
+%     plot(Extr,'o-')
+%     
     LevelToGroup = zeros(Syst.Molecule(iMol).NLevels,1);
     for iLevels = 1:Syst.Molecule(iMol).NLevels
         if (Syst.Molecule(iMol).LevelECB(iLevels) < MinEeV)
-            iBin = 1;
-            while (-Syst.Molecule(iMol).LevelECB(iLevels) >= -Extr(iBin)+1e-20)
-                iBin = iBin + 1;
+            iGroup = 1;
+            while (-Syst.Molecule(iMol).LevelECB(iLevels) >= -Extr(iGroup)+1e-20)
+                iGroup = iGroup + 1;
             end
-            iBin = iBin - 1;
-            LevelToGroup(iLevels) = iBin;
+            iGroup = iGroup - 1;
+            LevelToGroup(iLevels) = iGroup;
         end
     end    
     
-    fprintf('  ====================================================\n\n')
+    fprintf('    ====================================================\n\n')
     
 end

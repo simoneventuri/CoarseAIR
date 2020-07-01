@@ -25,37 +25,44 @@ function Group_Out()
 
     global Input Kin Param Syst Temp Rates
 
-    fprintf('= Group_Out =======================================\n')
+    fprintf('= Group_Out ========================================\n')
     fprintf('====================================================\n')
     
     
     for iMol = 1:Syst.NMolecules
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
 
-        if (strcmp(Input.Kin.MolResolutionOut(iMol,:), 'StS'))
+        if (strcmp(Input.Kin.MolResolutionOut(iMol), 'StS'))
             fprintf('Not Grouping the Molecule\n')
 
             LevelToGroup = [1:Syst.Molecule(iMol).NLevels]';
             
-        elseif (strcmp(Input.Kin.MolResolutionOut(iMol,:), 'VSM'))
+        elseif (strcmp(Input.Kin.MolResolutionOut(iMol), 'VSM'))
             fprintf('Grouping based on Vibrational Quantum Number\n\n')
             
             LevelToGroup = Group_BasedOnVib(Syst, iMol);
             
-        elseif (strcmp(Input.Kin.MolResolutionOut(iMol,:), 'CGM'))
+        elseif (strcmp(Input.Kin.MolResolutionOut(iMol), 'CGM'))
             fprintf('Grouping for Coarse-Grained Model\n')
                             
-            if (strcmp(Input.Kin.CGM_Strategy(iMol,:), 'CBM'))
+            if (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
                 fprintf('Gropuing based on Energy-Distance from Centrifugal Barrier\n\n')
 
-                Controls.NBins(iMol) = Input.Kin.NGroupsOut(iMol);
-                Controls.alpha(iMol) = Input.Kin.ParamsGroupsOut(iMol);
+                Controls.NGroups_CB(iMol) = Input.Kin.NGroupsOut(iMol);
+                Controls.alpha(iMol)      = Input.Kin.ParamsGroupsOut(iMol);
                 LevelToGroup = Group_BasedOnCB(Syst, Controls, iMol);  
                 
-            elseif (strcmp(Input.Kin.CGM_Strategy(iMol,:), 'File'))
+            elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'DPM'))
+                fprintf('Gropuing based on Diatomic Potential\n\n')
+
+                Controls.NGroups(iMol)       = Input.Kin.NGroupsOut(iMol);
+                Controls.NGroups_Excit(iMol) = ceil(Input.Kin.ParamsGroupsOut(iMol) * Controls.NGroups(iMol));
+                LevelToGroup = Group_BasedOnDP(Syst, Controls, iMol);  
+                
+            elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'File'))
                 fprintf('Reading Levels-Groups Mapping from File\n\n')
                 
-                Controls.FilePath(iMol,:) = Input.Kin.PathToMappingOut(iMol,:);
+                Controls.FilePath(iMol) = Input.Kin.PathToMappingOut(iMol);
                 LevelToGroup = Group_FromFile(Syst, Controls, iMol);
                 
             end
@@ -68,6 +75,17 @@ function Group_Out()
             break;
         end
         Syst.Molecule(iMol).NGroupsOut      = max(Syst.Molecule(iMol).LevelToGroupOut);
+        
+        
+        if not(strcmp(Input.Kin.PathToWriteMappingOut, ''))
+            
+            Controls.WriteFldr    = Input.Kin.PathToWriteMappingOut;
+            Controls.LevelToGroup = Syst.Molecule(iMol).LevelToGroupOut;
+            Controls.Strategy     = Input.Kin.MolResolutionOut(iMol);
+            Write_GroupsMapping(Controls, iMol)
+            
+        end
+        
     end
     
     

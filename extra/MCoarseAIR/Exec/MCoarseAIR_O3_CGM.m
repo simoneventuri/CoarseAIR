@@ -32,47 +32,47 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
+Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 
-Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
-Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
-Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [2500]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
-Input.SystNameLong          = 'O3_UMN';
-Input.iPES                  = 0;
-Input.Suffix                = ''
-%Input.RunSuffix             = '_45Amal';
-Input.RunSuffix             = '_12Inel_8CB';
+Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
+Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
+Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
+Input.TranVec                   = [10000]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.SystNameLong              = 'O3_UMN';
+Input.iPES                      = 0;
+Input.Suffix                    = ''
+%Input.RunSuffix                 = '_45Amal';
+Input.RunSuffix                 = '_DP45';
 
-Input.Kin.MolResolutionIn   = ['CGM'];
-Input.Kin.CGM_Strategy      = ['File'];
-Input.Kin.EqNStatesIn       = [ 6115];
-Input.Kin.MinStateIn        = [    1];
-Input.Kin.MaxStateIn        = [ 6115];
-%Input.Kin.PathToMappingIn   = ['/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/GroupingIdxs_45Bins_WExch.csv'];
-Input.Kin.PathToMappingIn   = ['/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/12Inel_8CB.csv'];
-Input.Kin.NGroupsIn         = [   20];
-Input.Kin.MolResolutionOut  = ['CGM'];
-%Input.Kin.PathToMappingOut  = ['/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/GroupingIdxs_45Bins_WExch.csv'];
-Input.Kin.PathToMappingOut  = ['/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/12Inel_8CB.csv'];
-Input.Kin.ParamsGroupsOut   = [  1.0];
-Input.Kin.NGroupsOut        = [   20];
+Input.Kin.MolResolutionIn       = [{'CGM'}];
+Input.Kin.CGM_Strategy          = [{'File'}];
+Input.Kin.EqNStatesIn           = [   6115];
+Input.Kin.MinStateIn            = [      1];
+Input.Kin.MaxStateIn            = [   6115];
+Input.Kin.PathToMappingIn       = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DP45.csv'}];
+Input.Kin.PathToWriteMappingIn  = [   {''}];
+Input.Kin.NGroupsIn             = [     45];
+Input.Kin.MolResolutionOut      = [{'CGM'}];
+Input.Kin.PathToMappingOut      = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DP45.csv'}];
+Input.Kin.ParamsGroupsOut       = [    0.5];
+Input.Kin.NGroupsOut            = [     45]; %45
+Input.Kin.PathToWriteMappingOut = [   {''}];
 
-Input.Kin.Proc.DissFlg      = 2;
-Input.Kin.NBinsSuffix       = 0;
-Input.Kin.DissCorrFactor    = 16.0/3.0;
-Input.Kin.Proc.DissInelFlg  = 0;
-Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 1;
-Input.Kin.Proc.ExchFlg2     = 0;
+Input.Kin.Proc.DissFlg          = 2;
+Input.Kin.NBinsSuffix           = 0;
+Input.Kin.DissCorrFactor        = 16.0/3.0;
+Input.Kin.Proc.DissInelFlg      = 0;
+Input.Kin.Proc.InelFlg          = 1;
+Input.Kin.Proc.ExchFlg1         = 1;
+Input.Kin.Proc.ExchFlg2         = 0;
 
-Input.Kin.ReadRatesProc     = [1, 1, 1]
-Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.Kin.ReadOtherSyst     = []
-Input.Kin.OtherSystInHDF5   = []
+Input.Kin.ReadRatesProc         = [1, 1, 1]
+Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
+Input.Kin.ReadOtherSyst         = []
+Input.Kin.OtherSystInHDF5       = []
 
-Input.FigureFormat          = 'PrePrint';
-Input.ReLoad                = 1;
+Input.FigureFormat              = 'PrePrint';
+Input.ReLoad                    = 1;
 
 
 %% Inputs for Plotting

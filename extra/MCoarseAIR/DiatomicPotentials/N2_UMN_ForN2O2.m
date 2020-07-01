@@ -1,6 +1,6 @@
-%% NO Diatomic Potential from UMN (..., 2016)
+%% NO Diatomic Potential from UMN (..., 2016) for N2O2 PES
 %
-function [V, dV] = NO_UMN(R)    
+function [V, dV] = N2_UMN_ForN2O2(R)    
 
     %%==============================================================================================================
     % 
@@ -25,31 +25,41 @@ function [V, dV] = NO_UMN(R)
     
     global Param
     
-% NO UMN Min @ 2.17661 (V=-6.617426)
+% N2 UMN Min @ 2.075 (V=-9.904361)
 
-    cs   = [ 0.322338e0, 5.878590e0, -12.790761e0, 13.320811e0, -7.516309e0, 1.875839e0, -0.052723e0, -0.037783e0, 0.48294e0, 1.98697e0]; 
-    red  = 1.1508;
-    de   = 152.6;
-    VRef = 0.0;%0.191619504727d0;
+    cs   = [ 2.71405774451e0, 1.32757649829e-1, 2.66756890408e-1, 1.95350725241e-1, -4.08663480982e-1, 3.92451705557e-1, 1.13006674877e0]; 
+    red  = 1.098d0;
+    red4 = 1.4534810048d0;
+    de   = 228.4d0;
+    VRef = 0.0d0;%0.191619504727d0;
 
-    RAng = R .* Param.BToAng;
 
-    u    = exp( -(RAng-red) ./ cs(9) - (RAng-red) .^2.0 ./ (cs(10)) );
+    RAng    = R .* Param.BToAng;
 
-    dfdr =  ( -2.0 .* (RAng-red)./cs(10) - 1.0./cs(9) );
+    RAng3   = RAng.^3;
+    RAng4   = RAng3.*RAng;
+    TempSum = (RAng4 + red4);
+    y       = (RAng4 - red4) ./ TempSum;
+    y2      = y.^2;
+    y3      = y2 .* y;
+    y4      = y2 .* y2;
+    y5      = y3 .* y2;
+    y6      = y3 .* y3;
 
-    V    =  - de*(cs(1) .* u + cs(2) .* u.^2 + cs(3) .* u.^3 + cs(4) .* u.^4 + cs(5) .* u.^5.0 + cs(6) .* u.^6 + cs(7) .* u.^7 + cs(8) .* u.^8);
-    V    = (V' * Param.KcmToEh + VRef) .* Param.EhToeV;
+    fy      =   cs(1) + cs(2)*y + cs(3)*y2 + cs(4)*y3 + cs(5)*y4 + cs(6)*y5 + cs(7)*y6;
+    u       =   exp(-fy .* (RAng-red));
+    minu    =   1.d0 - u;
 
-    dV   =  - de .* (cs(1) .*          dfdr .* u        + ...
-                   cs(2) .* 2.0d0 .* dfdr .* u.^2     + ...
-                   cs(3) .* 3.0d0 .* dfdr .* u.^3     + ...
-                   cs(4) .* 4.0d0 .* dfdr .* u.^4     + ...
-                   cs(5) .* 5.0d0 .* dfdr .* u.^5     + ...
-                   cs(6) .* 6.0d0 .* dfdr .* u.^6     + ...
-                   cs(7) .* 7.0d0 .* dfdr .* u.^7     + ...
-                   cs(8) .* 8.0d0 .* dfdr .* u.^8);
+    dfdy    =   cs(2) + 2.0d0.*cs(3).*y + 3.0d0.*cs(4).*y2 + 4.0d0.*cs(5).*y3 + 5.0d0.*cs(6).*y4 + 6.0d0.*cs(7).*y5;
 
+    dydr    =   8.0d0 .* RAng3 .* red4 ./ TempSum.^2;
+    dfdr    =   dfdy .* dydr;
+
+    V       =   de .* minu.^2 - de;
+    dV      =   2.0d0 .* de .* minu .* u .* (dfdr .* (RAng-red) + fy);
+
+
+    V  = (V' .* Param.KcmToEh + VRef) .* Param.EhToeV;
     dV = dV' .* Param.KcmToEh .* Param.EhToeV .* Param.BToAng;
 
 end

@@ -28,7 +28,7 @@ function [LevelToGroup] = Group_FromFile(Syst, Controls, iMol)
     fprintf('  = Group_FromFile ===================================\n')
     fprintf('  ====================================================\n')
     
-    fprintf(['  Reading from File: ', Controls.FilePath(iMol,:), '\n'])
+    fprintf(['  Reading from File: ', char(Controls.FilePath(iMol)), '\n'])
 
     opts = delimitedTextImportOptions("NumVariables", 2);
     opts.DataLines = [2, Inf];
@@ -37,7 +37,7 @@ function [LevelToGroup] = Group_FromFile(Syst, Controls, iMol)
     opts.VariableTypes = ["double", "double"];
     opts.ExtraColumnsRule = "ignore";
     opts.EmptyLineRule = "read";
-    tbl = readtable(Controls.FilePath(iMol,:), opts);
+    tbl   = readtable(char(Controls.FilePath(iMol)), opts);
     Idx   = tbl.Id;
     Group = tbl.Group;
     clear opts tbl

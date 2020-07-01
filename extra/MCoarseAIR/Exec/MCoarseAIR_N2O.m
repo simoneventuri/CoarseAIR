@@ -32,47 +32,47 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
+Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 
-Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CG-QCT/run_N2O_UMN/Test/');
-Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
-Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [5000 10000 20000]%[2500 5000 7500 10000 12500 15000 20000];
-Input.SystNameLong          = 'N2O_UMN';
-Input.iPES                  = 0;
-Input.Suffix                = ''
-Input.RunSuffix             = '';
+Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CG-QCT/run_N2O_UMN/Test/');
+Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
+Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
+Input.TranVec                   = [10000]%[2500 5000 7500 10000 12500 15000 20000];
+Input.SystNameLong              = 'N2O_UMN';
+Input.iPES                      = 0;
+Input.Suffix                    = ''
+Input.RunSuffix                 = '';
 
-Input.Kin.MolResolutionIn   = ['StS'; 'StS'];
-Input.Kin.EqNStatesIn       = [ 9093; 6739];
-Input.Kin.MinStateIn        = [    1,     1];
-Input.Kin.MaxStateIn        = [ 9093,  6739];
-Input.Kin.PathToMappingIn   = [   '';    ''];
-Input.Kin.NGroupsIn         = [    0,     0];
-Input.Kin.MolResolutionOut  = ['VSM'; 'VSM'];
-Input.Kin.PathToMappingOut  = [   '';    ''];
-Input.Kin.CGM_Strategy      = ['CBM'; 'CBM'];
-Input.Kin.ParamsGroupsOut   = [  1.0,   1.0];
-Input.Kin.NGroupsOut        = [   54,    46];
+Input.Kin.MolResolutionIn       = [{'StS'},{'StS'}];
+Input.Kin.EqNStatesIn           = [  9093,   6739];
+Input.Kin.MinStateIn            = [      1,      1];
+Input.Kin.MaxStateIn            = [  9093,   6739];
+Input.Kin.PathToMappingIn       = [   {''},   {''}];
+Input.Kin.PathToWriteMappingIn  = [   {''},   {''}];
+Input.Kin.NGroupsIn             = [      0,      0];
+Input.Kin.MolResolutionOut      = [{'CGM'},{'CGM'}];
+Input.Kin.PathToMappingOut      = [   {''},   {''}];
+Input.Kin.CGM_Strategy          = [{'DPM'},{'DPM'}];
+Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
+Input.Kin.NGroupsOut            = [     54,     46]; %54, 46
+Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
+Input.Kin.Proc.DissFlg          = 0;
+Input.Kin.NBinsSuffix           = 0;
+Input.Kin.DissCorrFactor        = 1.0;
+Input.Kin.Proc.DissInelFlg      = 0;
+Input.Kin.Proc.InelFlg          = 1;
+Input.Kin.Proc.ExchFlg1         = 0;
+Input.Kin.Proc.ExchFlg2         = 0;
 
-Input.Kin.Proc.DissFlg      = 0;
-Input.Kin.NBinsSuffix       = 0;
-Input.Kin.DissCorrFactor    = 1.0;
-Input.Kin.Proc.DissInelFlg  = 0;
-Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 0;
-Input.Kin.Proc.ExchFlg2     = 0;
+Input.Kin.ReadRatesProc         = [1, 1, 1]
+Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
+Input.Kin.ReadOtherSyst         = []
+Input.Kin.OtherSystInHDF5       = []
 
-Input.Kin.ReadRatesProc     = [1, 1, 1]
-Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.Kin.ReadOtherSyst     = []
-Input.Kin.OtherSystInHDF5   = []
+Input.FigureFormat              = 'PrePrint';
+Input.ReLoad                    = 1;
 
-Input.FigureFormat          = 'PrePrint';
-Input.ReLoad                = 1;
-
-Input.RunSuffix = '';
 
 
 %% Inputs for Plotting
@@ -169,11 +169,12 @@ if Input.ReLoad > 0
             OtherSyst(iSyst).Syst = Read_LevelInfo(OtherSyst(iSyst).Syst);
         end
     end
-
+    
     %% Grouping the Levels in Output
     Group_Out()
 
 end
+pause
 
 
 iFigStart = Input.iFig;
