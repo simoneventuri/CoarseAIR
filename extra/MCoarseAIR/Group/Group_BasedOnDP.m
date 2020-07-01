@@ -173,7 +173,7 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
             VqnExtr_3 = [VqnExtr_3, VqnExtr_3(iGroup)+VqnExtr_3_(iGroup)];
         end
     else
-       VqnExtr_3 = [0, MaxSplit3] 
+       VqnExtr_3 = [0, MaxSplit3];
     end
  
     

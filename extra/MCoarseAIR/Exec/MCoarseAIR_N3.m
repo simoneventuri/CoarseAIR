@@ -54,7 +54,7 @@ Input.Kin.MolResolutionOut      = [{'CGM'}];
 Input.Kin.PathToMappingOut      = [   {''}];
 Input.Kin.CGM_Strategy          = [{'DPM'}];
 Input.Kin.ParamsGroupsOut       = [    0.5];
-Input.Kin.NGroupsOut            = [     20]; %61
+Input.Kin.NGroupsOut            = [     61]; %61
 Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
 Input.Kin.Proc.DissFlg          = 1;
