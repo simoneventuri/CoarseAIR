@@ -87,6 +87,7 @@ Module Processes_Class
     character(17)                                           ::    IniMolecules
     integer                ,dimension(:)      ,allocatable  ::    InBins
     character(17)                                           ::    InBinsChar
+    character(17)                                           ::    InBinsCharName
     integer                                                 ::    InProc
     character(:)                              ,allocatable  ::    InProcChar
     integer                                                 ::    NTTra
@@ -290,14 +291,18 @@ Subroutine WritingRates( This, iTTra, iTInt, i_Debug )
   call system('mkdir -p ' // trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString)
 
   if (This%PESoI == 0) then
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv' ))
+    !FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv' ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/' // adjustl(trim(This%InBinsCharName)) // '.csv' ))
+
+
     if (This%NPESs == 1) then
       PES_Name = adjustl(trim(This%PES_Name))
     else
       PES_Name = '           Merged'
     end if
   else 
-    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv.' // This%PESoI_char ))
+    !FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/Proc' // trim(adjustl(This%InProcChar)) // '.csv.' // This%PESoI_char ))
+    FileName = adjustl(trim( trim(adjustl(This%OutputDir)) // '/'// trim(adjustl(This%System)) // '/Rates/' // TsString // '/' // adjustl(trim(This%InBinsCharName)) // '.csv.' // This%PESoI_char ))
     if (This%StochPESFlg) then
       PES_Name = adjustl(trim('SPES_' // This%PESoI_char))
     else

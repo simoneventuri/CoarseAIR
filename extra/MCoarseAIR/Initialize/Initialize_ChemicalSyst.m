@@ -59,7 +59,7 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         %%% Molecules
         Syst.NMolecules                   = 1;
         Syst.Molecule(1).Name             = 'N2';
-        Syst.Molecule(1).DissEn           = -9.899298;
+        Syst.Molecule(1).DissEn           = -9.75;
         Syst.Molecule(1).DegeneracyFactor = [3, 6];
         Syst.Molecule(1).Mu               = 28.0134d-3;
         Syst.Molecule(1).NLevelsOrig      = 9390;
@@ -963,12 +963,11 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         
 
     elseif strcmp(Syst.NameLong, 'N4_NASA')
-
+        
         %%% System
-        Syst.Name = 'N4';
-        
-        Syst.NProc = 3; %(Diss+Inel+Exch)
-        
+        Syst.Name          = 'N4';
+
+        Syst.NProc         = 3; %(Diss+Inel+Exch)
         
         %%% Atoms
         Syst.NAtoms        = 4;
@@ -978,36 +977,35 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(3).Name  = 'N';
         Syst.Atom(4).Name  = 'N';
 
-        Syst.Atom(1).Color = [0, 0, 0];
+        Syst.Atom(1).Color = [0, 0, 1];
         Syst.Atom(2).Color = [0, 0, 1];
         Syst.Atom(3).Color = [0, 0, 1];
         Syst.Atom(4).Color = [0, 0, 1];
 
-        Syst.Atom(1).Size  = 150;
-        Syst.Atom(2).Size  = 150;
-        Syst.Atom(3).Size  = 150;
-        Syst.Atom(4).Size  = 150;
+        Syst.Atom(1).Size  = 200;
+        Syst.Atom(2).Size  = 200;
+        Syst.Atom(3).Size  = 200;
+        Syst.Atom(4).Size  = 200;
 
-        Syst.Atom(1).Mass  = 25526.04298d0;
-        Syst.Atom(2).Mass  = 25526.04298d0;
-        Syst.Atom(3).Mass  = 25526.04298d0;
-        Syst.Atom(4).Mass  = 25526.04298d0;
+        Syst.Atom(1).Mass  = 29148.94559;
+        Syst.Atom(2).Mass  = 29148.94559;
+        Syst.Atom(3).Mass  = 29148.94559;
+        Syst.Atom(4).Mass  = 29148.94559;
 
-
+        
         %%% Molecules
         Syst.NMolecules                   = 1;
         Syst.Molecule(1).Name             = 'N2';
-        Syst.Molecule(1).DissEn           = 0.0;
+        Syst.Molecule(1).DissEn           = -9.75;
         Syst.Molecule(1).DegeneracyFactor = [3, 6];
         Syst.Molecule(1).Mu               = 28.0134d-3;
-        Syst.Molecule(1).NLevelsOrig      = 9390;
+        Syst.Molecule(1).NLevelsOrig      = 9399;
         Syst.Molecule(1).ToAtoms          = [1,2];
         Syst.Molecule(1).DiatPot          = 'N2_NASA';  
         Syst.MolToOtherSyst(1)            = 0;
         
-        Syst.OtherSyst_NameLong(1)        = '';
+        Syst.OtherSyst_NameLong           = '';
 
-      
         %%% Pairs
         Syst.Pair(1).Name  = 'N2';
         Syst.Pair(2).Name  = 'N2';
@@ -1015,21 +1013,20 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Pair(4).Name  = 'N2';
         Syst.Pair(5).Name  = 'N2';
         Syst.Pair(6).Name  = 'N2';
-        
+
         Syst.Pair(1).ToMol = 1;
         Syst.Pair(2).ToMol = 1;
         Syst.Pair(3).ToMol = 1;
         Syst.Pair(4).ToMol = 1;
         Syst.Pair(5).ToMol = 1;
         Syst.Pair(6).ToMol = 1;
-        
+
         Syst.Pair(1).Color = [17, 17, 17] ./ 256;
         Syst.Pair(2).Color = [17, 17, 17] ./ 256;
         Syst.Pair(3).Color = [17, 17, 17] ./ 256;
         Syst.Pair(4).Color = [17, 17, 17] ./ 256;
         Syst.Pair(5).Color = [17, 17, 17] ./ 256;
         Syst.Pair(6).Color = [17, 17, 17] ./ 256;
-        
         
         %% CFD Components (For PLATO and KONIG)
         Syst.NComp             =  2;
@@ -1043,30 +1040,40 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.CFDComp(1).Mass    = Syst.Atom(1).Mass;
         Syst.CFDComp(2).Mass    = 2.0 * Syst.Atom(1).Mass;
 
-        Syst.CFDComp(1).Qe      = 1;
+        Syst.CFDComp(1).Qe      = 12;
         Syst.CFDComp(2).Qe      = 1;
 
         Syst.CFDComp(1).Color   = [ 102, 102, 102] ./ 256;
         Syst.CFDComp(2).Color   = [   0,   0,   0] ./ 256;
-
+        
         Syst.CFDComp(1).LineStyle = ':';
         Syst.CFDComp(2).LineStyle = '-';
-        
-        Syst.RxLxIdx = [-4, 2;   % Double Diss
-                         2, 1;   % Single Diss
-                         0, 0;   % Inel
-                         0, 0];  % Exch1
-        
-        
-        %% Exchange Properties
+
         Syst.MolToCFDComp       = [2];
 
-        Syst.ExchToMol          = [1,1];
-        Syst.ExchToAtom         = [0,0];
-
-        Syst.ColPartToComp      = 1; 
         
-  
+        Syst.RxLxIdx = [-2, 1;   % Diss;
+                         0, 0];  % Inel+Exch1
+
+        %% Exchange Properties
+        Syst.ExchToMol          = [];
+        Syst.ExchToAtom         = [];        
+        Syst.PairToExch         = [];
+
+                     
+%         Syst.RxLxIdx = [-2, 1;   % Diss
+%                          0, 0;   % Inel
+%                          0, 0];  % Exch1                        
+
+%         %% Exchange Properties
+%         Syst.ExchToMol          = [1];
+%         Syst.ExchToAtom         = [3];
+%         Syst.PairToExch         = [1];
+        
+        Syst.ToOtherExch        = []    ;
+        
+        Syst.ColPartToComp      = 1; 
+
     end
     
     Syst

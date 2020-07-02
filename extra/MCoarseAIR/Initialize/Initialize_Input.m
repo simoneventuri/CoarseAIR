@@ -72,8 +72,8 @@ function Initialize_Input()
     end
     Syst.Suffix              = Input.Suffix;
 
-    Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
-    Input.Paths.SaveDataFldr = strcat(Input.Paths.SaveDataFldr, '/', Syst.NameLong, Input.Suffix, Syst.iPES, '/');
+    Input.Paths.SaveFigsFldr = strcat(Input.Paths.SaveFigsFldr, '/', Syst.NameLong, Input.RunSuffix, Syst.iPES, '/');
+    Input.Paths.SaveDataFldr = strcat(Input.Paths.SaveDataFldr, '/', Syst.NameLong, Input.RunSuffix, Syst.iPES, '/');
 
     Syst.HDF5_File           = strcat(Input.Paths.ToHDF5Fldr, Syst.NameLong, Input.Suffix, Syst.iPES, '.hdf5');
     

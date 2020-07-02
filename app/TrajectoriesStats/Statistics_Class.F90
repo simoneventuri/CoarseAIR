@@ -190,8 +190,8 @@ Subroutine ReadInputs( This, i_Debug )
   logical                                                               ::    i_Debug_Loc
   integer(rkp)                                                          ::    iTraj, Idx, iPES
   logical                                                               ::    Limit                                               ! TRUE if There is a limit on the Nb of Trajs to Analyze
-  Integer                                                               ::    iCond
-  Integer                                                               ::    UnitWrite, StatusWrite
+  integer(rkp)                                                          ::    iCond
+  integer                                                               ::    UnitWrite, StatusWrite
   type(File_Type)                                                       ::    DataFile
   integer                                                               ::    iTrajExcluded
   character(10)                                                         ::    iTrajExcluded_Char
@@ -353,9 +353,9 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
   logical                                                               ::    i_Debug_Loc
   integer(rkp)                                                          ::    iTraj, jTraj, Idx, iPES
   logical                                                               ::    Limit                                               ! TRUE if There is a limit on the Nb of Trajs to Analyze
-  Integer                                                               ::    iCond
-  Integer                                                               ::    POSTemp, TotBytes, PESoI
-  Integer                                                               ::    UnitWrite, StatusWrite
+  integer(rkp)                                                          ::    iCond
+  integer(rkp)                                                          ::    POSTemp, TotBytes, PESoI
+  integer                                                               ::    UnitWrite, StatusWrite
   type(File_Type)                                                       ::    DataFile
   real(rkp)                                                             ::    bMax_TEMP, bSampled_TEMP
   real(rkp)               ,dimension(:) ,allocatable                    ::    Qini_TEMP,Qfin_TEMP

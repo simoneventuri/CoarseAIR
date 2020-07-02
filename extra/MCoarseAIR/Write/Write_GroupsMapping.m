@@ -29,6 +29,7 @@ function Write_GroupsMapping(Controls, iMol)
     fprintf('    ====================================================\n')
     
     
+    
     WriteFldr = strcat(char(Controls.WriteFldr));
     [status,msg,msgID] = mkdir(WriteFldr);
     WriteFldr = strcat(WriteFldr, '/', Syst.NameLong, '/');
@@ -37,7 +38,11 @@ function Write_GroupsMapping(Controls, iMol)
     [status,msg,msgID] = mkdir(WriteFldr);
         
     LevelToGroup = Controls.LevelToGroup;
-    Strategy     = char(Controls.Strategy);
+    if strcmp(char(Controls.Strategy), 'CGM')
+        Strategy = char(Input.Kin.CGM_Strategy(iMol));
+    else
+        Strategy = char(Controls.Strategy);
+    end
     NbGroups     = max(LevelToGroup);
     fprintf(['    Grouping Strategy: ' Strategy '\n'] );
     fprintf(['    Nb Groups:         ' num2str(NbGroups) '\n'] );
@@ -46,7 +51,7 @@ function Write_GroupsMapping(Controls, iMol)
 
     fprintf('    Writing Mapping\n')
     %FileName1 = strcat(WriteFldr, '/LevelsMap_', Strategy ,'.csv');
-    FileName1 = strcat(WriteFldr, '/LevelsMap_', Strategy ,'_', num2str(NbGroups), '.csv');
+    FileName1 = strcat(WriteFldr, '/LevelsMap_', Strategy , num2str(NbGroups), '.csv');
     %FileName1 = strcat(WriteFldr, '/LevelsMap_DP20.csv');
     fileID1   = fopen(FileName1,'w');
     fprintf(fileID1,'#Idx,Group\n');
@@ -60,7 +65,7 @@ function Write_GroupsMapping(Controls, iMol)
 
     fprintf('    Writing Level Properties\n')
     %FileName2 = strcat(WriteFldr, '/LevelsInfo_', Strategy ,'.csv');
-    FileName2 = strcat(WriteFldr, '/LevelsInfo_', Strategy ,'_', num2str(NbGroups), '.csv');
+    FileName2 = strcat(WriteFldr, '/LevelsInfo_', Strategy , num2str(NbGroups), '.csv');
     %FileName2 = strcat(WriteFldr, '/LevelsInfo_DP20.csv');
     fileID2   = fopen(FileName2,'w');
     fprintf(fileID2,'#Idx,EeV,g,rIn,v,J,ECB,Group\n');

@@ -31,7 +31,8 @@ function Group_Out()
     
     for iMol = 1:Syst.NMolecules
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
-
+        clear LevelToGroup
+        
         if (strcmp(Input.Kin.MolResolutionOut(iMol), 'StS'))
             fprintf('Not Grouping the Molecule\n')
 
@@ -44,8 +45,16 @@ function Group_Out()
             
         elseif (strcmp(Input.Kin.MolResolutionOut(iMol), 'CGM'))
             fprintf('Grouping for Coarse-Grained Model\n')
-                            
-            if (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
+            
+            if (strcmp(Input.Kin.CGM_Strategy(iMol), 'RVE'))
+                fprintf('  Gropuing based on RoVibrational Energy\n\n')
+
+                Controls.NGroups_E(iMol) = Input.Kin.NGroupsOut(iMol);
+                Controls.DissEn(iMol)    = 0.0;
+                Controls.NGroups_Bound   = Input.Kin.ParamsGroupsOut(iMol);
+                LevelToGroup = Group_BasedOnEnergy(Syst, Controls, iMol);  
+            
+            elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
                 fprintf('Gropuing based on Energy-Distance from Centrifugal Barrier\n\n')
 
                 Controls.NGroups_CB(iMol) = Input.Kin.NGroupsOut(iMol);
@@ -77,8 +86,9 @@ function Group_Out()
         Syst.Molecule(iMol).NGroupsOut      = max(Syst.Molecule(iMol).LevelToGroupOut);
         
         
-        if not(strcmp(Input.Kin.PathToWriteMappingOut, ''))
+        if not(strcmp(Input.Kin.PathToWriteMappingOut, '')) && not(strcmp(char(Input.Kin.MolResolutionOut(iMol)), 'StS'))
             
+            clear Controls.Strategy
             Controls.WriteFldr    = Input.Kin.PathToWriteMappingOut;
             Controls.LevelToGroup = Syst.Molecule(iMol).LevelToGroupOut;
             Controls.Strategy     = Input.Kin.MolResolutionOut(iMol);

@@ -31,7 +31,8 @@ function [Syst] = Group_In(Syst)
     
     for iMol = 1:Syst.NMolecules
         fprintf(['  Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );        
-        
+        clear LevelToGroup
+
         if (strcmp(Input.Kin.MolResolutionIn(iMol), 'StS'))
             fprintf('  Not Grouping the Molecule\n')
 
@@ -44,8 +45,16 @@ function [Syst] = Group_In(Syst)
             
         elseif (strcmp(Input.Kin.MolResolutionIn(iMol), 'CGM'))
             fprintf('  Grouping for Coarse-Grained Model\n')
-                            
-            if (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
+            
+            if (strcmp(Input.Kin.CGM_Strategy(iMol), 'RVE'))
+                fprintf('  Gropuing based on RoVibrational Energy\n\n')
+
+                Controls.NGroups_E(iMol) = Input.Kin.NGroupsIn(iMol);
+                Controls.DissEn(iMol)    = 0.0;
+                Controls.NGroups_Bound   = Input.Kin.ParamsGroupsIn(iMol);
+                LevelToGroup = Group_BasedOnEnergy(Syst, Controls, iMol);  
+            
+            elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
                 fprintf('  Gropuing based on Energy-Distance from Centrifugal Barrier\n\n')
 
                 Controls.NGroups_CB(iMol) = Input.Kin.NGroupsIn(iMol);
@@ -74,14 +83,14 @@ function [Syst] = Group_In(Syst)
             fprintf('  ERROR! Some Levels are not assigned to Groups! \n\n')
             break;
         end
-        Syst.Molecule(iMol).NGroupsIn      = max(Syst.Molecule(iMol).LevelToGroupIn);
+        Syst.Molecule(iMol).NGroupsIn   = max(Syst.Molecule(iMol).LevelToGroupIn);
+        Syst.Molecule(iMol).EqNStatesIn = Syst.Molecule(iMol).NGroupsIn;
         
-        
-        if not(strcmp(Input.Kin.PathToWriteMappingIn(iMol), ''))
+        if not(strcmp(Input.Kin.PathToWriteMappingIn(iMol), '')) && not(strcmp(char(Input.Kin.MolResolutionIn(iMol)), 'StS'))
             
-            Controls.WriteFldr                   = Input.Kin.PathToWriteMappingIn(iMol);
-            Controls.Molecule(iMol).LevelToGroup = Syst.Molecule(iMol).LevelToGroupIn;
-            Controls.Molecule(iMol).Strategy     = Input.Kin.MolResolutionIn(iMol);
+            Controls.WriteFldr    = Input.Kin.PathToWriteMappingIn(iMol);
+            Controls.LevelToGroup = Syst.Molecule(iMol).LevelToGroupIn;
+            Controls.Strategy     = Input.Kin.MolResolutionIn(iMol);
             Write_GroupsMapping(Controls, iMol)
             
         end

@@ -24,7 +24,7 @@ clear all
 close all
 clc
 
-global Input Syst Temp Param Kin Rates
+global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 
 
 
@@ -32,84 +32,134 @@ global Input Syst Temp Param Kin Rates
 %%%% SPECIFYING INPUT 
 
 %% System Inputs
-Input.Paths.ToQCTFldr       = '/home/venturi/WORKSPACE/CoarseAIR/N4_VS_NASA/Test'
-Input.Paths.ToKinMainFldr   = '/home/venturi/WORKSPACE/Mars_Database/Run_0D/'
-Input.Paths.ToHDF5Fldr      = '/home/venturi/WORKSPACE/Mars_Database/HDF5_Database/'
-Input.TranVec               = [20000]
-Input.SystNameLong          = 'N4_NASA'
-Input.Kin.MolResolutionIn   = ['VSM'] 
-Input.Kin.MinStateIn        = [    1]
-Input.Kin.MaxStateIn        = [   61]
-Input.Kin.NGroupsIn         = [    0]
-Input.Kin.Proc.DissFlg      = 0
-Input.Kin.Proc.DissInelFlg  = 1
-Input.Kin.Proc.InelFlg      = 1
-Input.Kin.Proc.ExchFlg1     = 1
-Input.Kin.Proc.ExchFlg2     = 0
-Input.Kin.RateSource        = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
-Input.FigureFormat          = 'PrePrint'
-Input.ReLoad                = 1
+Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 
+Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/N4_NASA_StS/Test/');
+Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
+Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
+Input.TranVec                   = [20000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.SystNameLong              = 'N4_NASA';
+Input.iPES                      = 0;
+Input.Suffix                    = ''
+Input.RunSuffix                 = '';
+
+Input.Kin.MolResolutionIn       = [{'StS'}];
+Input.Kin.EqNStatesIn           = [   9399];
+Input.Kin.MinStateIn            = [      1];
+Input.Kin.MaxStateIn            = [   9399];
+Input.Kin.PathToMappingIn       = [   {''}];
+Input.Kin.PathToWriteMappingIn  = [   {''}];
+Input.Kin.NGroupsIn             = [      0];
+Input.Kin.MolResolutionOut      = [{'CGM'}];
+Input.Kin.PathToMappingOut      = [   {''}];
+Input.Kin.CGM_Strategy          = [{'DPM'}];
+Input.Kin.ParamsGroupsOut       = [    0.5];
+Input.Kin.NGroupsOut            = [     61]; %61
+% Input.Kin.CGM_Strategy          = [{'Energy'}];
+% Input.Kin.ParamsGroupsOut       = [     40];
+% Input.Kin.NGroupsOut            = [     60]; %61
+Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];%[{''}];
+
+Input.Kin.Proc.DissFlg          = 1;
+Input.Kin.NBinsSuffix           = 0;
+Input.Kin.DissCorrFactor        = 1.0;
+Input.Kin.Proc.DissInelFlg      = 0;
+Input.Kin.Proc.InelFlg          = 1;
+Input.Kin.Proc.ExchFlg1         = 0;
+Input.Kin.Proc.ExchFlg2         = 0;
+
+Input.Kin.ReadRatesProc         = [2, 2]
+Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
+Input.Kin.ReadOtherSyst         = []
+Input.Kin.OtherSystInHDF5       = []
+
+Input.FigureFormat              = 'PrePrint';
+Input.ReLoad                    = 1;
 
 
 %% Inputs for Plotting
-Input.iFig               = 1;
+Input.iFig               = 101;
 Input.SaveFigsFlgInt     = 0;
-Input.Paths.SaveFigsFldr = '/home/venturi/WORKSPACE/CO2_Paper/Figures/Temp/N2+N2/';
+Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures_/');
 
 
 %% Inputs for Saving Data
-Input.Paths.SaveDataFldr = '/home/venturi/WORKSPACE/CO2_Paper/Data/Temp/N2+N2/';
-
-
+Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data_/');
 
 
 %% Tasks Inputs
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
+Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
 % Plotting Overall Rate Coefficients (Dissociation and Exchange)
 Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
+% Writing Rates for Paraview
+Input.Tasks.Write_RatesParaview.Flg                    = false;
+Input.Tasks.Write_RatesParaview.MinRate                = [5e-13, 1e-12]
+Input.Tasks.Write_RatesParaview.Proc                   = [false, true]
+% Input.Tasks.Write_RatesParaview.vqns                   = [0, 10,  0,20,40, 30,60, 30, 20, 20,  7, 10, 30, 25, 45, 5, 10, 10]
+% Input.Tasks.Write_RatesParaview.jqns                   = [0,150,240,30,60,120,10,180,150,170,120, 50,  0, 90,110,90,210,250]
+Input.Tasks.Write_RatesParaview.vqns                   = [0,  0,  0,  0,  0,  0, 10, 10, 10, 10, 10, 10, 25,25, 25, 25, 25, 40,40, 40, 40, 60,60]
+Input.Tasks.Write_RatesParaview.jqns                   = [0,120,180,210,240,280, 30,100,150,180,210,240,  0,90,130,160,190, 30,90,130,160, 15,60]
+% Writing Rates for Clustering
+Input.Tasks.Write_RatesForClustering.Flg               = false;
+Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
+Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
+Input.Tasks.Write_RatesForClustering.MinState          = 1;
+Input.Tasks.Write_RatesForClustering.MaxState          = 100000;
+Input.Tasks.Write_RatesForClustering.IncludeExch       = true;
+% Compute Grouped Rate Coefficients
+Input.Tasks.Compute_GroupedRates.Flg                   = false;
+% Plotting Reconstructed Rate Coefficients
+Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
 Input.Tasks.Plot_MoleFracs.Flg                         = false;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
-Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
+Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
+Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1];
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 1;
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 4;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 2;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1];
+% Plotting Vib. Distribution Function
+Input.Tasks.Plot_VDF.Flg                               = false;
+Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
+Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
 Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
-Input.Tasks.Plot_Populations.tSteps                    = [1.e-10, 1.e-8, 1.e-6];
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1e-12, 1e-10, 1e-8]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
+Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
 Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
-Input.Tasks.Plot_EnergyDepletions.ProjTarg             = [2,3];
+Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
+Input.Tasks.Plot_EnergyDepletions.Targ                 = [2];
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
-Initialize_ChemicalSyst()
+Syst.NameLong = Input.SystNameLong;
+Syst          = Initialize_ChemicalSyst(Syst)
 Initialize_Input()
 Initialize_Parameters()
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,62 +167,157 @@ Initialize_Parameters()
 if Input.ReLoad > 0 
 
     %% Reading Levels Info
-    Read_LevelInfo()
+    Syst = Read_LevelInfo(Syst)
+    for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+        if (Input.Kin.ReadOtherSyst(iSyst))
+            OtherSyst(iSyst).Syst = Read_LevelInfo(OtherSyst(iSyst).Syst);
+        end
+    end
+
+    %% Grouping the Levels in Output
+    Group_Out()
 
 end
+pause
 
 
-
+iFigStart = Input.iFig;
 %% Looping On Translational Temperatures
 for iT = 1:length(Temp.TranVec)
     Temp.iT       = iT;
     Temp.TNow     = Temp.TranVec(iT);
     Temp.TNowChar = num2str(Temp.TranVec(iT));
-  
-    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
-
-
+    Input.iFig    = iFigStart;
+    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, Input.RunSuffix);
+    
     if Input.ReLoad > 0 
+        close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
         
         %% Reading Group Energies and Part Funcs
-        Read_EeV_and_Q_CG() 
+        Syst = Read_EeV_and_Q_CG(Syst) 
+        for iSyst = 1:length(Input.Kin.ReadOtherSyst)
+            if (Input.Kin.ReadOtherSyst(iSyst))
+                OtherSyst(iSyst).Syst = Read_EeV_and_Q_CG(OtherSyst(iSyst).Syst);
+            end
+        end
         
-        %% Reading Rates
-        Read_Rates()
+        %% Compute Equilibrium Constants
+        Compute_EqConsts()
         
-        %% Reading Thermodynamics Variables Outputted by KONIG
-        Read_KONIGBox() 
+        if (Input.Tasks.Plot_OverallRates.Flg              || ...
+            Input.Tasks.Plot_DifferentDissRates.Flg        || ...
+            Input.Tasks.Write_RatesParaview.Flg            || ...
+            Input.Tasks.Write_RatesForClustering.Flg       || ...
+            Input.Tasks.Plot_GlobalRates.Flg               || ...
+            Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_Energies.Flg                  || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg          || ...
+            (sum(Input.Kin.ReadRatesProc)>0) ) 
         
-        %% Reading Level/Group Population Outputted by KONIG
-        Read_Pops()    
+            %% Reading Rates
+            Read_Rates()
+            
+        end
         
+        if (Input.Tasks.Plot_MoleFracs.Flg                 || ...
+            Input.Tasks.Plot_GlobalRates.Flg               || ...
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_VDF.Flg                       || ...
+            Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_Energies.Flg                  || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg)
+        
+            %% Reading Thermodynamics Variables Outputted by KONIG
+            Read_KONIGBox() 
+            
+        end
+        
+        if (Input.Tasks.Plot_GlobalRates.Flg               || ...
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_VDF.Flg                       || ...
+            Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_Energies.Flg                  || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg)
+        
+            %% Reading Level/Group Population Outputted by KONIG
+            Read_Pops()    
+            
+        end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         
         %%%% Computing Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
         
-        %% Computing Thermal Rates
-        Compute_Rates_Thermal()   
+        if (Input.Tasks.Compute_GroupedRates.Flg)
+           
+           %% Grouping the Rate Coefficients
+           Compute_GroupedRates()
+            
+        end
+        
+        if ( (sum(Input.Kin.ReadRatesProc)>0) )
+        
+            %% Computing Thermal Rates
+            Compute_Rates_Thermal()   
+        
+        end
+        
+        if ((Input.Tasks.Plot_Populations.Flg && Input.Kin.Proc.DissFlg > 0) || ...
+            Input.Tasks.Plot_GlobalRates.Flg               || ...
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg)
 
-        %% Computing Thermal Rates
-        Compute_Rates_Global()   
+            %% Computing Thermal Rates
+            Compute_Rates_Global()   
         
-        %% Computing Rate Values and Initial-Final Times for QSS 
-        Compute_QSS()
+        end
         
-        %% Computing Energies
-        Compute_Energies(Input.Tasks.Plot_EnergyDepletions)
+        if ((Input.Tasks.Plot_Populations.Flg && Input.Kin.Proc.DissFlg > 0) || ...
+            Input.Tasks.Plot_GlobalRates.Flg                                 || ...
+            Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg                   || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg)
+
+            %% Computing Rate Values and Initial-Final Times for QSS 
+            Compute_QSS()
+            
+        end
         
-        %% Computing Energy Depletions
-        Compute_EnergyDepletions(Input.Tasks.Plot_EnergyDepletions)
+        if (Input.Tasks.Plot_Energies.Flg                  || ...
+            Input.Tasks.Plot_EnergyDepletions.Flg)
         
+            %% Computing Energies
+            Compute_Energies(Input.Tasks.Plot_EnergyDepletions)
+        
+        end
+        
+        if (Input.Tasks.Plot_EnergyDepletions.Flg)
+            
+            %% Computing Energy Depletions
+            Compute_EnergyDepletions(Input.Tasks.Plot_EnergyDepletions)
+        
+        end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
+    end
+    
+    
+    %%%% Writing Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  
+    
+    %% Writing Rate Coefficients for Paraview
+    if (Input.Tasks.Write_RatesParaview.Flg)
+        Write_RatesForParaview(Input.Tasks.Write_RatesParaview)
+    end
+    
+    %% Writing Rate Coefficients for Clustering
+    if (Input.Tasks.Write_RatesForClustering.Flg)
+        Write_RatesForClustering(Input.Tasks.Write_RatesForClustering)
     end
     
     
@@ -193,7 +338,13 @@ for iT = 1:length(Temp.TranVec)
     if (Input.Tasks.Plot_DifferentDissRates.Flg)
         Plot_DifferentDissRates()
     end
-
+    
+    %% Plotting Reconstructed Rate Coefficients
+    if (Input.Tasks.Plot_ReconstructedRates.Flg)
+        Plot_ReconstructedRates()
+    end
+    
+    
     %% Plotting Mole Fractions
     if (Input.Tasks.Plot_MoleFracs.Flg)
         Plot_MoleFracs(Input.Tasks.Plot_MoleFracs)
@@ -209,6 +360,11 @@ for iT = 1:length(Temp.TranVec)
         Plot_MoleFracs_and_GlobalRates(Input.Tasks.Plot_MoleFracs_and_GlobalRates)
     end
     
+    %% Plotting Vib. Distr. Function
+    if (Input.Tasks.Plot_VDF.Flg)
+       Plot_VDF(Input.Tasks.Plot_VDF) 
+    end
+        
     %% Plotting RVS Populations
     if (Input.Tasks.Plot_Populations.Flg)
        Plot_Populations(Input.Tasks.Plot_Populations) 
@@ -227,4 +383,6 @@ for iT = 1:length(Temp.TranVec)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     
+    %pause
+    clear Rates Kin
 end

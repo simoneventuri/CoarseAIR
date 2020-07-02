@@ -41,7 +41,7 @@ PLATO_gnu_release
 
 export System='N3_NASA'
 export Molecule_vec=('N2')
-export FldrName='' #'_12Inel_8CB'
+export FldrName='_RVE60' #'_12Inel_8CB'
 export Tran_vec=(3500 10000 20000) # (1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
 export T0=300 #300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE

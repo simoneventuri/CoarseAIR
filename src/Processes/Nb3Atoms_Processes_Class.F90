@@ -103,8 +103,9 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
   iP1 = Collision%Pairs(1)%To_Molecule
   This%IniMolecules = adjustl(trim(Collision%MoleculesContainer(iP1)%Molecule%Name))
   allocate(This%InBins(1)); This%InBins = Input%BinOI(1)
-  This%InBinsChar   = adjustl(trim(Input%BinOI_char(1)))
-  This%InProc       = This%InBins(1)
+  This%InBinsChar     = adjustl(trim(Input%BinOI_char(1)))
+  This%InBinsCharName = adjustl(trim( 'j' // adjustl(trim(Input%BinOI_char(1))) ))
+  This%InProc         = This%InBins(1)
   allocate( This%InProcChar, source = adjustl(trim(Input%BinOI_char(1))) )
 
   This%NTTra = Input%NTTra

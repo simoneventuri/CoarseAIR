@@ -37,30 +37,33 @@ Input.WORKSPACE_PATH        = '/home/venturi/WORKSPACE/'
 Input.Paths.ToQCTFldr       = strcat(Input.WORKSPACE_PATH, '/CG-QCT/N3_NASA/Test/');
 Input.Paths.ToKinMainFldr   = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr      = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec               = [10000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.TranVec               = [20000]%[5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong          = 'N3_NASA';
 Input.iPES                  = 0;
 Input.Suffix                = ''
 Input.RunSuffix             = '_VSM';
 
-Input.Kin.MolResolutionIn   = ['VSM'];
-Input.Kin.EqNStatesIn       = [ 9390];
-Input.Kin.MinStateIn        = [    1];
-Input.Kin.MaxStateIn        = [ 9390];
-Input.Kin.PathToMappingIn   = [   ''];
-Input.Kin.NGroupsIn         = [    0];
-Input.Kin.MolResolutionOut  = ['VSM'];
-Input.Kin.PathToMappingOut  = [   ''];
-Input.Kin.CGM_Strategy      = ['CBM'];
-Input.Kin.ParamsGroupsOut   = [  1.0];
-Input.Kin.NGroupsOut        = [   50];
+Input.Kin.MolResolutionIn       = [{'VSM'}];
+Input.Kin.CGM_Strategy          = [{'File'}];
+Input.Kin.EqNStatesIn           = [   9390];
+Input.Kin.MinStateIn            = [      1];
+Input.Kin.MaxStateIn            = [   9390];
+Input.Kin.PathToMappingIn       = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/N3_NASA/N3/LevelsMap_CGM_20.csv'}];
+Input.Kin.PathToWriteMappingIn  = [   {''}];
+Input.Kin.NGroupsIn             = [     20];
+Input.Kin.MolResolutionOut      = [{'VSM'}];
+Input.Kin.PathToMappingOut      = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/N3_NASA/N3/LevelsMap_CGM_20.csv'}];
+Input.Kin.ParamsGroupsOut       = [    0.5];
+Input.Kin.NGroupsOut            = [     20]; %45
+Input.Kin.PathToWriteMappingOut = [   {''}];
+
 
 Input.Kin.Proc.DissFlg      = 1;
 Input.Kin.NBinsSuffix       = 0;
 Input.Kin.DissCorrFactor    = 1.0;
 Input.Kin.Proc.DissInelFlg  = 0;
 Input.Kin.Proc.InelFlg      = 1;
-Input.Kin.Proc.ExchFlg1     = 1;
+Input.Kin.Proc.ExchFlg1     = 0;
 Input.Kin.Proc.ExchFlg2     = 0;
 
 Input.Kin.ReadRatesProc     = [2, 2]
@@ -116,14 +119,14 @@ Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
-Input.Tasks.Plot_MoleFracs.Flg                         = true;
+Input.Tasks.Plot_MoleFracs.Flg                         = false;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1];
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 2;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1];
@@ -141,7 +144,7 @@ Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
@@ -378,5 +381,5 @@ for iT = 1:length(Temp.TranVec)
     
     
     %pause
-    %clear Rates Kin
+    clear Rates Kin
 end

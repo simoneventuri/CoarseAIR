@@ -123,16 +123,12 @@ End Subroutine
 
 !________________________________________________________________________________________________________________________________!
 Subroutine Output_DiatPot( This, Unit )
-
   class(DiatomicPotential_Type)             ,intent(in)     ::    This          !< Diatomic-Potential object
   integer                                   ,intent(in)     ::    Unit
-  
   integer                                                   ::    idum
   logical                                                   ::    ldum
-  
   idum  =   Unit              ! Just to remove warning message about unused argument
   ldum  =   This%Initialized  ! Just to remove warning message about unused argument
-  
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 
@@ -156,6 +152,7 @@ Elemental Function DiatomicPotential_DiatPot( This, R ) result( V )
   class(DiatomicPotential_Type) ,intent(in)     ::    This          !< Diatomic-Potential object
   real(rkp)                     ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                                     ::    V             !< Diatomic potential energy [hartree]
+  V = Zero
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
 
@@ -167,28 +164,20 @@ End Function
 ! ********************************************************************************************************************************
 !________________________________________________________________________________________________________________________________!
 Pure Function CenPot_0d( R, Vc_R2 ) result(Vc)
-
   real(rkp)                                 ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                                 ,intent(in)     ::    Vc_R2         !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  
   real(rkp)                                                 ::    Vc            ! Centrifual potential
-  
   Vc        =   Vc_R2 / R**2
-  
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
 
 
 !________________________________________________________________________________________________________________________________!
 Pure Function CenPot_1d( R, Vc_R2 ) result(Vc)
-
   real(rkp) ,dimension(:)                   ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                                 ,intent(in)     ::    Vc_R2         !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  
   real(rkp) ,dimension( size(R) )                           ::    Vc            ! Centrifual potential
-  
   Vc        =   Vc_R2 / R**2
-  
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
 
@@ -201,30 +190,22 @@ End Function
 ! ********************************************************************************************************************************
 !________________________________________________________________________________________________________________________________!
 Pure Function EffPot_From_R_Vc_0d( This, R, Vc_R2 ) result(Ve)
-
   class(DiatomicPotential_Type)             ,intent(in)     ::    This          !< Diatomic-Potential object
   real(rkp)                                 ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                                 ,intent(in)     ::    Vc_R2         !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  
   real(rkp)                                                 ::    Ve            !< Effective potential [hartree]
-  
   Ve      =   This%DiatomicPotential(R) + CentrifualPotential(R,Vc_R2)
-  
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
 
 
 !________________________________________________________________________________________________________________________________!
 Pure Function EffPot_From_R_Vc_1d( This, R, Vc_R2 ) result(Ve)
-
   class(DiatomicPotential_Type)             ,intent(in)     ::    This          !< Diatomic-Potential object
   real(rkp) ,dimension(:)                   ,intent(in)     ::    R             !< Internuclear distance [bohr]
   real(rkp)                                 ,intent(in)     ::    Vc_R2         !< Centrifual potential multiplied by r**2 [hartree.bohr^2]
-  
   real(rkp) ,dimension( size(R) )                           ::    Ve            !< Effective potential [hartree]
-  
   Ve      =   This%DiatomicPotential(R) + CentrifualPotential(R,Vc_R2)
-  
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
 

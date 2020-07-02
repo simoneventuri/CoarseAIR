@@ -157,7 +157,7 @@ Function RanddwsVec(iLine) result(RandNum)
   xMat(iLine,100) =   xMat(iLine,i)
   xMat(iLine,i)   =   Rand12(iSeedStoreVec(iLine,:))
 
-  if (i_Debug_Loc) call Logger%Write( " RandNum = ", RandNum )
+  !if (i_Debug_Loc) call Logger%Write( " RandNum = ", RandNum )
   !if (i_Debug_Loc) call Logger%Exiting
   
 End Function

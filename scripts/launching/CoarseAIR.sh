@@ -21,11 +21,11 @@
 #===============================================================================================================
 
 # ---  PARAMETERS ------------------------------------------------------------------------------- #
-ParNodes=0                                                                                        # Nb of Nodes =0 -> Through .sh; >0 -> Through .pbs
+ParNodes=200                                                                                      # Nb of Nodes =0 -> Through .sh; >0 -> Through .pbs
 ProcType='ivy'                                                                                    # Only for Clusters; 'san'/'ivy' (Sandy Bridge/Ivy Bridge)
-Queue='low'                                                                                       # Only for Clusters; 'devel'/'debug'/'low'/'medium'/'long'
-WallTime=4                                                                                        # Only for Clusters; WallTime in hours (e.g., 120)
-NProc=4                                                                                           # Nb of Processors
+Queue='long'                                                                                      # Only for Clusters; 'devel'/'debug'/'low'/'medium'/'long'
+WallTime=120                                                                                      # Only for Clusters; WallTime in hours (e.g., 120)
+NProc=20                                                                                          # Nb of Processors
 SlncFlg=0                                                                                         # =1 -> Silencing Bash File Echoes
 MergeAllFlg=0                                                                                     # =1 -> Merging All the ASCI Traj Files in 1 File
 RmTrajFlg=0                                                                                       # =1 -> Removing Traj Files from Single Processors

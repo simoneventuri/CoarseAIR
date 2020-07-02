@@ -25,6 +25,7 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
 
     global Temp
 
+    DbgFlg = false;
     
     fprintf('    = Group_BasedOnDP ==================================\n')
     fprintf('    ====================================================\n')
@@ -45,6 +46,7 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
     MaxState = NLevels; %min(Controls.MaxState, Syst.Molecule(iMol).NLevels);
 
 
+    fprintf(['    For Dissociation: \n'] );
     Controls.MinEeV(iMol)     = abs(Syst.Molecule(iMol).DissEn) / 2.0;
     Controls.NGroups_CB(iMol) = NGroups_CB;
     Controls.alpha(iMol)      = 1.0/2.0; 
@@ -65,6 +67,9 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
         end
     end
 
+    
+    
+    fprintf(['    For Excitation: \n'] );
 
     MaxSplit1 = 0;
     MaxSplit2 = 0;
@@ -86,97 +91,87 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
         end
     end
 
-%         PreGroups(1) = 0;
-%         PreGroups(2) = MaxSplit1;
-%         PreGroups(3) = MaxSplit1 + MaxSplit2;
-%         PreGroups(4) = MaxSplit1 + MaxSplit2 + MaxSplit3;
-%         LevelToGroup = zeros(NLevels,1);
-%         for iLevel = 1:NLevels
-%             if (LevelToGroupCB(iLevel) == 0)
-%                 LevelToGroup(iLevel) = Split(iLevel,1) + PreGroups(Split(iLevel,2));
-%             else
-%                 LevelToGroup(iLevel) = PreGroups(4)    + LevelToGroupCB(iLevel);
-%             end
-%         end
-
-
 
     NGroups_Excit_1 = floor(NGroups_Excit / 2    );
     NGroups_Excit_2 = floor(NGroups_Excit * 2 / 5);
     NGroups_Excit_3 = NGroups_Excit - (NGroups_Excit_1+NGroups_Excit_2);
+    fprintf(['    Nb Groups in Region 1: ' num2str(NGroups_Excit_1) '; Nb Groups in Region 2: ' num2str(NGroups_Excit_2)  '; Nb Groups in Region 3: ' num2str(NGroups_Excit_3)  '\n'] );
 
     
-    VqnExtr_1_ = ones(NGroups_Excit_1-2,1);
-    iTry       = 0;
-    TotVqn     = 0;
-    while (TotVqn < MaxSplit1-NGroups_Excit_1)
-        iTry   = iTry + 1;
-        TotVqn = iTry^2;
+    NBinss    = NGroups_Excit_1;
+    maxvqn    = double(MaxSplit1);
+    x         = [1:1:NBinss];
+    Deltap    = 1.e-3;
+    p         = 0.7-Deltap;
+    SumValues = 0;
+    while SumValues ~= maxvqn
+        p         = p + Deltap;
+        GeoDist   = 1 + round(p.*(1-p).^(max(x)-x) .* (maxvqn+0.1 - NBinss));
+        SumValues = sum(GeoDist);
     end
-    iTry = iTry-1;
-    VqnExtr_1_ = [1; 1; VqnExtr_1_];
-    ii=0;
-    for jTry=iTry:-1:1
-        VqnExtr_1_(end-ii) = VqnExtr_1_(end-ii) + (2*jTry-1); 
-        ii=ii+1;
+    fprintf(['      Region 1, p                    = ' num2str(p) '\n'] );
+    fprintf(['      Region 1, Nb of vqns per Group = ' num2str(GeoDist) '\n'] );
+    if (DbgFlg)
+        figure(4321)
+        hold on
+        plot(x,GeoDist)
     end
-    VqnExtr_1_(end)   = VqnExtr_1_(end)   + floor(2/3*(MaxSplit1 - sum(VqnExtr_1_))); 
-    VqnExtr_1_(end-1) = VqnExtr_1_(end-1) +           (MaxSplit1 - sum(VqnExtr_1_)); 
     VqnExtr_1  = [0];
     for iGroup = 1:NGroups_Excit_1
-        VqnExtr_1 = [VqnExtr_1, VqnExtr_1(iGroup)+VqnExtr_1_(iGroup)];
+        VqnExtr_1 = [VqnExtr_1, GeoDist(iGroup)+VqnExtr_1(iGroup)];
     end
     
-    
-    
-    VqnExtr_2_ = ones(NGroups_Excit_2-1,1);
-    iTry       = 0;
-    TotVqn     = 0;
-    while (TotVqn < MaxSplit2-NGroups_Excit_2)
-        iTry   = iTry + 1;
-        TotVqn = iTry^2;
+
+    clear NBins maxvqn x Deltap p SumValues GeoDist
+    NBins     = NGroups_Excit_2;
+    maxvqn    = double(MaxSplit2);
+    x         = [1:1:NBins];
+    Deltap    = 1.e-3;
+    p         = 0.7-Deltap;
+    SumValues = 0;
+    while SumValues ~= maxvqn
+        p         = p + Deltap;
+        GeoDist   = 1 + round(p*(1-p).^(max(x)-x) .* (maxvqn - NBins));
+        SumValues = sum(GeoDist);
     end
-    iTry = iTry-1;
-    VqnExtr_2_ = [1; VqnExtr_2_];
-    ii=0;
-    for jTry=iTry:-1:1
-        VqnExtr_2_(end-ii) = VqnExtr_2_(end-ii) + (2*jTry-1); 
-        ii=ii+1;
+    fprintf(['      Region 2, p                    = ' num2str(p) '\n'] );
+    fprintf(['      Region 2, Nb of vqns per Group = ' num2str(GeoDist) '\n'] );
+    if (DbgFlg)
+        figure(4321)
+        hold on
+        plot(x,GeoDist)
     end
-    VqnExtr_2_(end)   = VqnExtr_2_(end)   + floor(2/3*(MaxSplit2 - sum(VqnExtr_2_))); 
-    VqnExtr_2_(end-1) = VqnExtr_2_(end-1) +           (MaxSplit2 - sum(VqnExtr_2_)); 
     VqnExtr_2  = [0];
     for iGroup = 1:NGroups_Excit_2
-        VqnExtr_2 = [VqnExtr_2, VqnExtr_2(iGroup)+VqnExtr_2_(iGroup)];
+        VqnExtr_2 = [VqnExtr_2, GeoDist(iGroup)+VqnExtr_2(iGroup)];
     end
     
     
-    
-    if (NGroups_Excit_3 > 1)    
-        VqnExtr_3_ = ones(NGroups_Excit_3,1);
-        iTry       = 0;
-        TotVqn     = 0;
-        while (TotVqn < MaxSplit3-NGroups_Excit_3)
-            iTry   = iTry + 1;
-            TotVqn = iTry^2;
-        end
-        iTry = iTry-1;
-        ii=0;
-        for jTry=iTry:-1:1
-            VqnExtr_3_(end-ii) = VqnExtr_3_(end-ii) + (2*jTry-1); 
-            ii=ii+1;
-        end
-        VqnExtr_3_(end)   = VqnExtr_3_(end)   + floor(2/3*(MaxSplit3 - sum(VqnExtr_3_))); 
-        VqnExtr_3_(end-1) = VqnExtr_3_(end-1) +           (MaxSplit3 - sum(VqnExtr_3_)); 
-        VqnExtr_3  = [0];
-        for iGroup = 1:NGroups_Excit_3
-            VqnExtr_3 = [VqnExtr_3, VqnExtr_3(iGroup)+VqnExtr_3_(iGroup)];
-        end
-    else
-       VqnExtr_3 = [0, MaxSplit3];
+    clear NBins maxvqn x Deltap p SumValues GeoDist
+    NBins     = NGroups_Excit_3;
+    maxvqn    = double(MaxSplit3);
+    x         = [1:1:NBins];
+    Deltap    = 1.e-3;
+    p         = 0.7-Deltap;
+    SumValues = 0;
+    while SumValues ~= maxvqn
+        p         = p + Deltap;
+        GeoDist   = 1 + round(p*(1-p).^(max(x)-x) .* (maxvqn - NBins));
+        SumValues = sum(GeoDist);
     end
- 
-    
+    fprintf(['      Region 3, p                    = ' num2str(p) '\n'] );
+    fprintf(['      Region 3, Nb of vqns per Group = ' num2str(GeoDist) '\n'] );
+    if (DbgFlg)
+        figure(4321)
+        hold on
+        plot(x,GeoDist)
+        hold off
+    end
+    VqnExtr_3  = [0];
+    for iGroup = 1:NGroups_Excit_3
+        VqnExtr_3 = [VqnExtr_3, GeoDist(iGroup)+VqnExtr_3(iGroup)];
+    end
+
     
     PreGroups(1) = 0;
     PreGroups(2) = NGroups_Excit_1;

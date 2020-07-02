@@ -147,26 +147,6 @@ function PostTrajectoriesHERE
 
 
     ###########################################################################################################
-    ## If We are Splitting Trajectories, then we need new Definitions of TrajFile, NTrajFile, and TrajErrorFile
-    ## 
-    # if [ ${SplitPESsFlg} -eq 1 ]; then 
-    #   echo "      [PostTrajectoriesHERE]: ------- PES "${iPES}" ----------------------- "    
-    #   #TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.out.${iPES} # FOR COMPATIBILITY WITH CG-QCT CODE
-    #   TrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/trajectories.csv.${iPES}
-    #   NTrajFile=${COARSEAIR_BIN_OUTPUT_DIR}/'NConvTraj.dat'.${iPES}
-    #   TrajErrorFile=${COARSEAIR_OUTPUT_DIR}/"RatesErrors_Node"${iNode}"_Proc"${iProc}".dat".${iPES}
-    #   if [ -f ${TrajFile} ]; then                                                              
-    #     NTraj=$(wc -l < ${TrajFile})                                                        
-    #     NTraj=$((NTraj-1))
-    #   else 
-    #     NTraj=0
-    #   fi
-    #   echo ${NTraj} > ${NTrajFile}
-    #   echo "      [PostTrajectoriesHERE]:         Tot Nb of Trajectories for PES "${iPES}": "${NTraj}
-    # fi
-        
-
-    ###########################################################################################################
     ## Checking Whether the Run Folder Exists
     ## 
     if [ -e "$COARSEAIR_BIN_OUTPUT_DIR" ]; then
@@ -185,8 +165,8 @@ function PostTrajectoriesHERE
           ## If the Trajectory File actually contains Trajectories, then Compute Cross Sections and Rate Coefficients
           ## 
 
-          #echo "      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      "${TrajectoriesStatsCommand}
-          #eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
+          echo "      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      "${TrajectoriesStatsCommand}
+          eval ${TrajectoriesStatsCommand} ${Tran} ${Tint} ${BinaryTrajFlg} ${iPES}
 
           echo "      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: "${TrajectoriesStatsCommand}
           rm -rf ${COARSEAIR_BIN_OUTPUT_DIR}/"Post.log"
@@ -406,45 +386,27 @@ else
   ###########################################################################################################
   ## Going in Increasing Order (Paying Attention to System Symmetries e.g., AB_i + AB_j is the same as AB_j + AB_i) and Deciding if the Current Process is OK for this Processor
   ##
-  # iProcessesTot=0
-  # for iLevel1 in `seq 1 ${NLevels1}`; do
-  # #for (( iLevel1=1; iLevel1<=${NLevels1}; iLevel1++ )); do    
-  #   iLevel2Start=0
-  #   MinLevel2Temp=0
-  #   if [ ${NMolecules} -eq 2 ]; then 
-  #     iLevel2Start=1
-  #     MinLevel2Temp=1
-  #   fi
-  #   if [ ${SymmFlg} -eq 1 ]; then
-  #     iLevel2Start=${iLevel1}
-  #     MinLevel2Temp=${MinLevel1}
-  #   fi
-  #   for iLevel2 in `seq ${iLevel2Start} ${NLevels2}`; do
-  #   #for (( iLevel2=${iLevel2Start}; iLevel2<=${NLevels2}; iLevel2++ )); do
-  #     iProcessesTot=$(( ${iProcessesTot} + 1 ))
-  #     if [ ${iProcessesTot} -ge ${MinProcessInProc} ] && [ ${iProcessesTot} -le ${MaxProcessInProc} ]; then
-
-  #       ############################################################################################################################################################################## <= PostTrajectoriesHERE
-  #       PostTrajectoriesHERE
-  #       ############################################################################################################################################################################## <= PostTrajectoriesHERE
-
-  #     fi
-  #   done
-  # done
-  
   for (( iProcessesTot=${MinProcessInProc}; iProcessesTot<=${MaxProcessInProc}; iProcessesTot++ )); do
     if [ ${NMolecules} -eq 1 ]; then 
       iLevel1=${iProcessesTot}
       iLevel2=0
     else
       if [ ${SymmFlg} -eq 1 ]; then
-        echo "TO IMPLEMENT SymmFlg=1"
-        stop
+          NBetw=0
+          iLevel1=1
+          while [ ${NBetw} -lt ${iProcessesTot} ] && [ $iLevel1 -le ${NLevels1} ]; do  
+            NMin=$(( ${NLevels1} - (${iLevel1}+1) + 1 ))
+            NMax=${NLevels1}
+            NBetw=$(( (${NMax}+1)*(${NMax})/2 - (${NMin}+1)*(${NMin})/2 ))
+            iLevel1=$((${iLevel1} + 1))
+          done
+          iLevel1=$(( ${iLevel1} - 1))
+          iLevel2=$(( ${NLevels1} - (${NBetw} - ${iProcessesTot}) ))
       else
-        iLevel1=$( printf "%.0f" $((${iProcessesTot} / ${NLevels2} )) )
-        #iLevel1=$((${iLevel1} + 1))
-        Temp=$(( $((${iLevel1} - 1)) * ${NLevels2} ))
-        iLevel2=$((${iProcessesTot} - ${Temp}))
+        iLevel1=$(( (${iProcessesTot}-1) / ${NLevels2} + 1 ))
+        iLevel1=${iLevel1%.*}
+        Temp=$(( (${iLevel1} - 1) * ${NLevels2} ))
+        iLevel2=$(( ${iProcessesTot} - ${Temp} ))
       fi
     fi
 

@@ -32,7 +32,7 @@ function Compute_QSS()
     fprintf('====================================================\n')
     
 
-    DebugFlag = false;
+    DebugFlag = true;
     
     KQSS_Eps = 1.e-9;
     EpsT     = 1.e-4;%5.e-8;
@@ -252,7 +252,7 @@ function Compute_QSS()
                 end
                 fprintf(fileID1,HeaderStr);
             end
-            if NProc == 3
+            if NProc == 2
                 fprintf(fileID1,'%e,%e,%e\n',             Temp.TNow, KDissEq, KDissQSS );
             elseif NProc == 3
                 fprintf(fileID1,'%e,%e,%e,%e,%e\n',       Temp.TNow, KDissEq, KExch1Eq, KDissQSS, KExch1QSS );

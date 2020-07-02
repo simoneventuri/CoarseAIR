@@ -943,8 +943,8 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             end if 
             if (i_Debug_Loc) call Logger%Write( "Sample Parameters for Stochastic PES?:       This%SampleParamsStochPES = ", This%SampleParamsStochPES )
             
-
-    	    case("Distinguish between PESs?")
+            
+          case("Distinguish between PESs?")
             if ((trim(line_input(i_eq+2:150)) .eq. "yes") .or. (trim(line_input(i_eq+2:150)) .eq. "YES")) then
               This%SplitPESsFlg = .true.
             end if 

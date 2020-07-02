@@ -114,8 +114,9 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
   if (i_Debug_Loc) call Logger%Write( "This%IniMolecules = ", This%IniMolecules )
   allocate(This%InBins(2)); This%InBins = Input%BinOI
   if (i_Debug_Loc) call Logger%Write( "This%InBins = ", This%InBins )
-  This%InBinsChar   = adjustl(trim( adjustl(trim(Input%BinOI_char(1))) // ',' // adjustl(trim(Input%BinOI_char(2))) ))
-  
+  This%InBinsChar     = adjustl(trim( adjustl(trim(Input%BinOI_char(1))) // ',' // adjustl(trim(Input%BinOI_char(2))) ))
+  This%InBinsCharName = adjustl(trim( 'i' // adjustl(trim(Input%BinOI_char(1))) // '_j' // adjustl(trim(Input%BinOI_char(2))) ))
+
   NLevelsOpp        = Collision%MoleculesContainer(iMolOpp)%Molecule%BinsContainer%NBins
   This%InProc       = ( This%InBins(1) - 1) * NLevelsOpp + This%InBins(2)
   if (i_Debug_Loc) call Logger%Write( "This%InProc = ", This%InProc )

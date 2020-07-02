@@ -180,11 +180,19 @@ Subroutine Output_N4_NASA_PES( This, Unit )
 
   class(N4_NASA_PES_Type)                 ,intent(in)     ::    This
   integer                                 ,intent(in)     ::    Unit
-  
+
+  logical                                                 ::    i_Debug_Loc
+
+  i_Debug_Loc = i_Debug_Global;
+  if (i_Debug_Loc) call Logger%Entering( "Output_N4_NASA_PES" )
+  !i_Debug_Loc   =     Logger%On()
+
   write(Unit,"('PES Name: ',g0)") This%Name
   write(Unit,"('N4 PES with cta bug fixed')")
   write(Unit,"('acpf energies, 1s2s core and leroy n2 with hyper radius repulsion')")
-  
+ 
+  if (i_Debug_Loc) call Logger%Exiting()
+
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 

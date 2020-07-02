@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [10000]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.TranVec                   = [5000, 10000, 20000];%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong              = 'O3_UMN';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -55,8 +55,12 @@ Input.Kin.PathToMappingOut      = [   {''}];
 Input.Kin.CGM_Strategy          = [{'DPM'}];
 Input.Kin.ParamsGroupsOut       = [    0.5];
 Input.Kin.NGroupsOut            = [     20]; %45
+% Input.Kin.CGM_Strategy          = [{'Energy'}];
+% Input.Kin.ParamsGroupsOut       = [     30];
+% Input.Kin.NGroupsOut            = [     45]; %45
+
 Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
-Input.Kin.Proc.DissFlg          = 2;
+Input.Kin.Proc.DissFlg          = 0;
 Input.Kin.NBinsSuffix           = 0;
 Input.Kin.DissCorrFactor        = 16.0/3.0;
 Input.Kin.Proc.DissInelFlg      = 0;
@@ -75,7 +79,7 @@ Input.ReLoad                    = 1;
 
 %% Inputs for Plotting
 Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 0;
+Input.SaveFigsFlgInt     = 2;
 Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
@@ -124,7 +128,7 @@ Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 Input.Tasks.Plot_GlobalRates.Flg                       = false;
 Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1,2];
 % Plotting Mole Fractions and Global Rates
-Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = true;
+Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompStart   = 2;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.CompEnd     = 2;
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.MoleculesOI = [1];
@@ -138,11 +142,11 @@ Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1e-12, 1e-10, 1e-8]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = false;
+Input.Tasks.Plot_Energies.Flg                          = true;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = false;
 % Plotting Energy Depletions
-Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
+Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
 Input.Tasks.Plot_EnergyDepletions.MoleculesOI          = [1];
 Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
@@ -186,7 +190,7 @@ for iT = 1:length(Temp.TranVec)
     Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, Input.RunSuffix, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
     
     if Input.ReLoad > 0 
-        %close all
+        close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -379,5 +383,5 @@ for iT = 1:length(Temp.TranVec)
     
     
     %pause
-    %clear Rates Kin
+    clear Rates Kin
 end

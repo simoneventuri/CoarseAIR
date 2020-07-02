@@ -123,9 +123,10 @@ function [Rates] = Read_Rates_FromPLATO(Rates, Syst, RatesFldr)
             
             iNLevels=size(Rates.T(Temp.iT).ExchType(iExch).Exch,1);
             jNLevels=size(Rates.T(Temp.iT).ExchType(iExch).Exch,2);
+            fprintf(['  Matrix Size: (' num2str(iNLevels) ',' num2str(jNLevels) ')\n'] )
             for jLevel=1:jNLevels
                 for iLevel=1:iNLevels
-                    if (Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iLevel) < Syst.Molecule(jMol).T(Temp.iT).GroupsIn.EeV(jLevel))
+                    if (Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV(iLevel) < Syst.Molecule(jMol).T(Temp.iT).GroupsIn.EeV(jLevel)) && (max(iLevel,jLevel)<=min(iNLevels,jNLevels))
                         Rates.T(Temp.iT).ExchType(iExch).Exch(iLevel,jLevel) = Rates.T(Temp.iT).ExchType(iExch).Exch(jLevel,iLevel) * Syst.Molecule(jMol).T(Temp.iT).GroupsIn.Q(jLevel) / Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q(iLevel);
                     end
                 end
