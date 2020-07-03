@@ -36,13 +36,13 @@ if [ ${FC} == "gfortran" ]; then
   export COMPILER_CGQCT="gnu"
   export COMPILER_CGQCT_VER=$(gcc -dumpversion)
   export USE_OPENBLAS_FLAG="YES"
-  export NB_PROC=4
+  export NB_PROC=8
 elif [ ${FC} == "ifort" ]; then
   export COMPILER_CGQCT="intel"
-  #export COMPILER_CGQCT_VER=18.0.3 #$COMPILER_VERSION_MICRO
-  export COMPILER_CGQCT_VER=19.1.1 #$COMPILER_VERSION_MICRO
+  export COMPILER_CGQCT_VER=18.0.3 #$COMPILER_VERSION_MICRO      #### PLEIADES
+  #export COMPILER_CGQCT_VER=19.1.1 #$COMPILER_VERSION_MICRO     #### LAB
   export USE_OPENBLAS_FLAG="NO"
-  export NB_PROC=4
+  export NB_PROC=8
 fi
 echo "Compiler        : "$COMPILER_CGQCT
 echo "Compiler Version: "$COMPILER_CGQCT_VER
