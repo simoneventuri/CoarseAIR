@@ -1312,6 +1312,9 @@ subroutine evbas
   integer                   :: i
   real(rkp) ,dimension(466) :: b1 
 
+  b1 = Zero
+  b  = Zero
+
   ! Pass P(0:465) to BM1(1:466)
   do i=1,466
     b1(i)=p(i-1)
@@ -1879,6 +1882,8 @@ subroutine evdbdr
 
   integer                     :: i,j
   real(rkp) ,dimension(6,466) :: db1dr
+
+  dbdr = Zero
 
   ! Pass P(0:465) to BM1(1:466)
   do j=1,6
