@@ -101,6 +101,13 @@ Module O4_UMN_PES_Class
 
   logical                 ,parameter      :: i_Debug_Global = .False.
 
+  real(rkp) ,dimension(0:111)   :: rM       ! Array to store monomials
+  real(rkp) ,dimension(0:465)   :: P        ! Array to store polynomials
+  real(rkp) ,dimension(430)     :: B        ! Array to store basis functions
+  real(rkp) ,dimension(6,0:111) :: dMdR     ! The derivative of monomials w.r.t. R
+  real(rkp) ,dimension(6,0:465) :: dPdR     ! The derivative of basis functions w.r.t. R
+  real(rkp) ,dimension(6,430)   :: dBdR     ! The derivative of B w.r.t. R 
+
   contains
 
 ! **************************************************************************************************************
@@ -187,7 +194,6 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "This%rb      = ", This%rb  )
     if (i_Debug_Loc) call Logger%Write( "This%Eref    = ", This%Eref  )
     if (i_Debug_Loc) call Logger%Write( "This%totdiss = ", This%totdiss  )
-    This%C = Zero
     do i=1,143
       read(Unit,*) This%C((i-1)*3+1), This%C((i-1)*3+2), This%C((i-1)*3+3)
     end do
@@ -383,26 +389,20 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
 ! P(0:305): Array to store polynomials
 ! B(1:276):     Array to store basis functions
 !**********************************************************************
-  real(rkp)                ,intent(in)  :: a
-  real(rkp)                ,intent(in)  :: ab
-  real(rkp)                ,intent(in)  :: ra
-  real(rkp)                ,intent(in)  :: rb
-  real(rkp) ,dimension(430),intent(in)  :: C
-  real(rkp) ,dimension(6)  ,intent(in)  :: R
-  real(rkp)                ,intent(out) :: V
+  real(rkp)               ,intent(in)  :: a
+  real(rkp)               ,intent(in)  :: ab
+  real(rkp)               ,intent(in)  :: ra
+  real(rkp)               ,intent(in)  :: rb
+  real(rkp) ,dimension(430),intent(in) :: C
+  real(rkp) ,dimension(6) ,intent(in)  :: R
+  real(rkp)               ,intent(out) :: V
 
   integer                              :: i, j, k
   real(rkp)                            :: dist
   real(rkp)                            :: dV2dR
   real(rkp)                            :: V2
   real(rkp) ,dimension(6)              :: rms
-  real(rkp) ,dimension(0:111)          :: rM       ! Array to store monomials
-  real(rkp) ,dimension(0:465)          :: P        ! Array to store polynomials
-  real(rkp) ,dimension(430)            :: B        ! Array to store basis functions
 
-
-  V = Zero
-  B = Zero
 
   ! Evaluate 2-body interactions
   ! do i=1,6
@@ -411,20 +411,21 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
   !   V    = V + V2
   ! enddo
 
+
   ! Calculate the six MEG terms for each point
   call evmorse(a, ab, ra, rb, R, rms)
 
   ! Calculate the monomials for each point by using six MEG terms
-  call evmono(rms, rM)
+  call evmono(rms)
 
   ! Calculate the polynomials (basis functions) by using monomials
-  call evpoly( rM, P )
+  call evpoly 
 
   ! Calculate the basis functions by removing unconnected and 2-body terms
-  call evbas( P, B )
+  call evbas
 
   ! Evaluate V by taken the product of C and Basis function array
-  
+  V = Zero
   do i=1,430
     V = V + C(i)*b(i)
   enddo
@@ -467,15 +468,12 @@ subroutine EvdVdR(a, ab, ra, rb, C, R, dVdR)
   real(rkp)                            :: V2
   real(rkp)                            :: dV2dR
   real(rkp) ,dimension(6,6)            :: dmsdr
-  real(rkp) ,dimension(0:111)          :: rM       ! Array to store monomials
-  real(rkp) ,dimension(0:465)          :: P        ! Array to store polynomials
-  real(rkp) ,dimension(6,0:111)        :: dMdR     ! The derivative of monomials w.r.t. R
-  real(rkp) ,dimension(6,0:465)        :: dPdR     ! The derivative of basis functions w.r.t. R
-  real(rkp) ,dimension(6,430)          :: dBdR     ! The derivative of B w.r.t. R 
 
   ! Initialize dVdR(6)
-  dVdR = Zero
-  dBdR = Zero
+  do i=1,6
+    dVdR(i) = Zero
+  enddo
+
 
   ! Add dV2dR(i) to dVdR
   ! do i=1,6
@@ -484,17 +482,18 @@ subroutine EvdVdR(a, ab, ra, rb, C, R, dVdR)
   !   dVdR(i) = dV2dR
   ! enddo
 
+
   ! Calculate dMEG/dr(6,6) for giving R(6)
   call evdmsdr(a, ab, ra, rb, R, dmsdr)
 
   ! Calculate the monomials for each point by using six MEG terms
-  call EvdMdR( dmsdr, rM, dMdR )
+  call evdmdr(dmsdr)
 
   ! Calculate the polynomials by using monomials
-  call EvdPdr( P, dMdR, dPdR )
+  call evdpdr 
 
   ! Remove 2-body interactions and unconnected terms from polynomials
-  call evdbdr( dPdR, dBdR )
+  call evdbdr
 
   ! Evaluate dVdR(6) by taken the product of C(j) and dPdR(i,j)
   do i=1,6      
@@ -569,15 +568,14 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine EvMono( rms, rm )
+Subroutine EvMono(rms)
 !**********************************************************************
 !  The subroutine reads six MEG variables(X) and calculates the
 !  monomials(M) that do not have usable decomposition.
 !  For A4 with max. degree 9, the number of monomials is nom.
 !**********************************************************************
 
-  real(rkp) ,dimension(6)     ,intent(in)  :: rms
-  real(rkp) ,dimension(0:111) ,intent(out) :: rm     ! Array to store monomials
+  real(rkp) ,dimension(6) ,intent(in) :: rms
 
   rm(0) = One
   rm(1) = rms(6)
@@ -697,16 +695,14 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine EvdMdR( dmsdr, rM, dMdR )
+Subroutine EvdMdR(dmsdr)
 !**********************************************************************
 !  The subroutine reads M(nom) and dMSdR(6,6) and calculates the
 !  dMdR(6,nom) that do not have usable decomposition.
 !  For A4 with max. degree 9, the number of monomials is nom.
 !**********************************************************************
 
-  real(rkp) ,dimension(6,6)     ,intent(in)  :: dmsdr
-  real(rkp) ,dimension(0:111)   ,intent(in)  :: rM       ! Array to store monomials
-  real(rkp) ,dimension(6,0:111) ,intent(out) :: dMdR     ! The derivative of monomials w.r.t. R
+  real(rkp) ,dimension(6,6) ,intent(in) :: dmsdr
 
   integer :: i
 
@@ -830,15 +826,12 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine EvPoly( rM, P )
+Subroutine EvPoly
 !**********************************************************************
 !  The subroutine reads monomials(m) and calculates the
 !  permutation-invariant polynomials(p)
 !  For A4 with max. degree 9, the number of polynomials is nob.
 !**********************************************************************
-  
-  real(rkp) ,dimension(0:111) ,intent(in)  :: rM       ! Array to store monomials
-  real(rkp) ,dimension(0:465) ,intent(out) :: P        ! Array to store polynomials
 
   p(0) = rm(0)
   p(1) = rm(1) + rm(2) + rm(3) + rm(4) + rm(5) + rm(6)
@@ -1312,13 +1305,10 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-subroutine evbas( P, B )
+subroutine evbas
 !**********************************************************************
 !  The subroutine eliminates the 2-body terms in Bowman's approach
 !**********************************************************************
-
-  real(rkp) ,dimension(0:465) ,intent(in)  :: P        ! Array to store polynomials
-  real(rkp) ,dimension(430)   ,intent(out) :: B        ! Array to store basis functions
 
   integer                   :: i
   real(rkp) ,dimension(466) :: b1 
@@ -1400,16 +1390,12 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-subroutine EvdPdr( P, dMdR, dPdR )
+subroutine EvdPdr
 !**********************************************************************
 !  The subroutine reads monomials(m) and calculates the
 !  permutation-invariant polynomials(p)
 !  For A4 with max. degree 9, the number of polynomials is nob.
 !**********************************************************************
-
-  real(rkp) ,dimension(0:465)   ,intent(in)    :: P        ! Array to store polynomials
-  real(rkp) ,dimension(6,0:111) ,intent(in)    :: dMdR     ! The derivative of monomials w.r.t. R
-  real(rkp) ,dimension(6,0:465) ,intent(inout) :: dPdR     ! The derivative of basis functions w.r.t. R
 
   integer i
 
@@ -1887,18 +1873,13 @@ end subroutine EvdPdR
 
 
 !________________________________________________________________________________________________________________________________!
-subroutine evdbdr( dPdR, dBdR )
+subroutine evdbdr
 !**********************************************************************
 !  The subroutine elminates the 2-body terms in Bowman's approach
-!**********************************************************************  
-
-  real(rkp) ,dimension(6,0:465) ,intent(in)  :: dPdR     ! The derivative of basis functions w.r.t. R
-  real(rkp) ,dimension(6,430)   ,intent(out) :: dBdR     ! The derivative of B w.r.t. R 
+!**********************************************************************
 
   integer                     :: i,j
   real(rkp) ,dimension(6,466) :: db1dr
-
-  dbdr = Zero
 
   ! Pass P(0:465) to BM1(1:466)
   do j=1,6
