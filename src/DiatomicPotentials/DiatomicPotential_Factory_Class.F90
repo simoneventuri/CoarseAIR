@@ -50,7 +50,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
   use DiatomicPotential_Class                ,only:  DiatomicPotential_Type
   use Null_DiatomicPotential_Class           ,only:  Null_DiatomicPotential_Type
   use Morse_DiatomicPotential_Class          ,only:  Morse_DiatomicPotential_Type
-  use Modified_Morse_DiatomicPotential_Class ,only:  Modified_Morse_DiatomicPotential_Type
+  use ModMorse_DiatomicPotential_Class       ,only:  ModMorse_DiatomicPotential_Type
   use N2_LeRoy_DiatomicPotential_Class       ,only:  N2_LeRoy_DiatomicPotential_Type
   use O2_UMN_DiatomicPotential_Class         ,only:  O2_UMN_DiatomicPotential_Type
   use O2_Basel_DiatomicPotential_Class       ,only:  O2_Basel_DiatomicPotential_Type
@@ -104,8 +104,8 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
         allocate( Morse_DiatomicPotential_Type :: DiatPot )
 
       elseif (adjustl(trim(Input%Diatomic_Model(iMol))) == 'Modified_Morse') then
-        if (i_Debug_Loc) call Logger%Write( "Constructing a Modified_Morse_DiatomicPotential_Type object" )
-        allocate( Modified_Morse_DiatomicPotential_Type :: DiatPot )
+        if (i_Debug_Loc) call Logger%Write( "Constructing a ModMorse_DiatomicPotential_Type object" )
+        allocate( ModMorse_DiatomicPotential_Type :: DiatPot )
       
       else
 

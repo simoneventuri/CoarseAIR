@@ -20,7 +20,7 @@
 !---------------------------------------------------------------------------------------------------------------
 !===============================================================================================================
 
-Module Modified_Morse_DiatomicPotential_Class
+Module ModMorse_DiatomicPotential_Class
 
 ! The LeRoy model is used.
 
@@ -33,15 +33,15 @@ Module Modified_Morse_DiatomicPotential_Class
   implicit none
 
   private
-  public  ::    Modified_Morse_DiatomicPotential_Type
+  public  ::    ModMorse_DiatomicPotential_Type
 
-  Type  ,extends(DiatomicPotential_Type)    :: Modified_Morse_DiatomicPotential_Type
+  Type  ,extends(DiatomicPotential_Type)    :: ModMorse_DiatomicPotential_Type
     real(rkp)                               :: re
     real(rkp)                               :: De
     integer                                 :: PolyOrder
     real(rkp), allocatable, dimension(:)    :: cPol
   contains
-    procedure         ::    Initialize        =>    Initialize_Modified_Morse_DiatomicPotential
+    procedure         ::    Initialize        =>    Initialize_ModMorse_DiatomicPotential
     procedure         ::    Compute_Vd_dVd    =>    Compute_Vd_dVd_Modified_Morse
     procedure         ::    DiatomicPotential =>    DiatomicPotential_Modified_Morse
   End Type
@@ -53,11 +53,11 @@ Module Modified_Morse_DiatomicPotential_Class
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine Initialize_Modified_Morse_DiatomicPotential( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
+Subroutine Initialize_ModMorse_DiatomicPotential( This, Input, SpeciesName, iMol, Mass1, Mass2, i_Debug )
 
   use Input_Class               ,only:  Input_Type
 
-  class(Modified_Morse_DiatomicPotential_Type)    ,intent(out)       ::    This
+  class(ModMorse_DiatomicPotential_Type)    ,intent(out)       ::    This
   type(Input_Type)                       ,intent(in)        ::    Input
   character(:) ,allocatable              ,intent(in)        ::    SpeciesName
   integer                                ,intent(in)        ::    iMol
@@ -66,7 +66,7 @@ Subroutine Initialize_Modified_Morse_DiatomicPotential( This, Input, SpeciesName
   logical ,optional                      ,intent(in)        ::    i_Debug
 
   logical                                                   ::    i_Debug_Loc
-  character(:)                    ,allocatable              ::    Modified_Morse_file
+  character(:)                    ,allocatable              ::    ModMorse_file
   integer                                                   ::    Status
   integer                                                   ::    Unit, idum
   
@@ -93,17 +93,17 @@ Subroutine Initialize_Modified_Morse_DiatomicPotential( This, Input, SpeciesName
   !     READING MODIFIED MORSE INPUT FILE
   ! ==============================================================================================================
   if (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'NONE') then
-    Modified_Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/Modified_Morse.dat'
+    ModMorse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/Modified_Morse.dat'
   elseif (trim(adjustl(Input%DiatPot_ParamsFile(iMol))) == 'Local') then
-    Modified_Morse_file = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/Modified_Morse.dat'
+    ModMorse_file = trim(adjustl(Input%OutputDir))  // '/' // trim(adjustl(Input%System)) // '/Modified_Morse.dat'
   else
-    Modified_Morse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/' // trim(adjustl(Input%DiatPot_ParamsFile(iMol)))
+    ModMorse_file = trim(adjustl(Input%DtbPath))  // '/Molecules/' // trim(adjustl(This%SpeciesName)) // '/Modified_Morse/' // trim(adjustl(Input%DiatPot_ParamsFile(iMol)))
   end if
 
   if (i_Debug_Loc) call Logger%Write( "Reading the Modified Morse Parameters file" )
-  if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", Modified_Morse_file )
-  open( File=Modified_Morse_file, NewUnit=Unit, status='OLD', iostat=Status )
-  if (Status/=0) call Error( "Error opening file: " // Modified_Morse_file )
+  if (i_Debug_Loc) call Logger%Write( "-> Opening file: ", ModMorse_file )
+  open( File=ModMorse_file, NewUnit=Unit, status='OLD', iostat=Status )
+  if (Status/=0) call Error( "Error opening file: " // ModMorse_file )
       
     read(Unit,'(A)',iostat=Status) line_input
 
@@ -133,7 +133,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Elemental Subroutine Compute_Vd_dVd_Modified_Morse( This, R, V, dV )
 
-  class(Modified_Morse_DiatomicPotential_Type) ,intent(in)     ::    This
+  class(ModMorse_DiatomicPotential_Type) ,intent(in)     ::    This
   real(rkp)                                    ,intent(in)     ::    R                         ! Distances between nuclear centers [bohr]
   real(rkp)                                    ,intent(out)    ::    V                         ! Potential energy [hartree]
   real(rkp)                                    ,intent(out)    ::    dV                        ! First derivative of the potential energy wrt the distance [hartree/bohr]
@@ -174,7 +174,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Elemental Function DiatomicPotential_Modified_Morse( This, R ) result( V )
 
-  class(Modified_Morse_DiatomicPotential_Type) ,intent(in)     ::    This
+  class(ModMorse_DiatomicPotential_Type) ,intent(in)     ::    This
   real(rkp)                                    ,intent(in)     ::    R                         ! Distances between nuclear centers [bohr]
   real(rkp)                                                    ::    V                         ! Potential energy [hartree]
   
