@@ -187,6 +187,7 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "This%rb      = ", This%rb  )
     if (i_Debug_Loc) call Logger%Write( "This%Eref    = ", This%Eref  )
     if (i_Debug_Loc) call Logger%Write( "This%totdiss = ", This%totdiss  )
+    This%C = Zero
     do i=1,143
       read(Unit,*) This%C((i-1)*3+1), This%C((i-1)*3+2), This%C((i-1)*3+3)
     end do
@@ -382,13 +383,13 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
 ! P(0:305): Array to store polynomials
 ! B(1:276):     Array to store basis functions
 !**********************************************************************
-  real(rkp)               ,intent(in)  :: a
-  real(rkp)               ,intent(in)  :: ab
-  real(rkp)               ,intent(in)  :: ra
-  real(rkp)               ,intent(in)  :: rb
-  real(rkp) ,dimension(430),intent(in) :: C
-  real(rkp) ,dimension(6) ,intent(in)  :: R
-  real(rkp)               ,intent(out) :: V
+  real(rkp)                ,intent(in)  :: a
+  real(rkp)                ,intent(in)  :: ab
+  real(rkp)                ,intent(in)  :: ra
+  real(rkp)                ,intent(in)  :: rb
+  real(rkp) ,dimension(430),intent(in)  :: C
+  real(rkp) ,dimension(6)  ,intent(in)  :: R
+  real(rkp)                ,intent(out) :: V
 
   integer                              :: i, j, k
   real(rkp)                            :: dist
@@ -406,6 +407,8 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
   !   call ev2gm2(dist, V2, dV2dR, 1, 0)
   !   V    = V + V2
   ! enddo
+
+  B = Zero
 
   ! Calculate the six MEG terms for each point
   call evmorse(a, ab, ra, rb, R, rms)
@@ -482,6 +485,7 @@ subroutine EvdVdR(a, ab, ra, rb, C, R, dVdR)
   !   dVdR(i) = dV2dR
   ! enddo
 
+  dBdR = Zero
 
   ! Calculate dMEG/dr(6,6) for giving R(6)
   call evdmsdr(a, ab, ra, rb, R, dmsdr)
