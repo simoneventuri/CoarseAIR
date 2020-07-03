@@ -476,6 +476,8 @@ Subroutine Compute_N2O_Basel_PES_1d( This, R, Q, V, dVdR, dVdQ )
   ! dVdQ(9) = DZ(3)
   ! dVdQ    = dVdQ * Kcm_To_Hartree / B_To_Ang
 
+  dVdR = Zero
+
   dVdQ = Zero
   call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   

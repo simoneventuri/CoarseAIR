@@ -438,7 +438,7 @@ Subroutine WriteQNsFirst_BinsContainer( This, LevelsContainer, i_Debug )
     end do   
   close(Unit) 
 
-  1 format (I5, A, I4, A, I10, A, es10.4)
+  1 format (I5, A, I4, A, I10, A, es11.4)
 
   if (i_Debug_Loc) call Logger%Exiting
 
@@ -657,7 +657,7 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
     end do   
   close(Unit) 
 
-  1 format (es17.10E3,A,es17.10E3,A,es17.10E3)
+  1 format (es18.10E3,A,es18.10E3,A,es18.10E3)
 
   
   if (i_Debug_Loc) call Logger%Exiting

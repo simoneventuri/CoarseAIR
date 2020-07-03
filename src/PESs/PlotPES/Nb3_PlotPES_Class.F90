@@ -75,7 +75,7 @@ Module Nb3_PlotPES_Class
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -117,7 +117,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -344,7 +344,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_GridForStochPES( This, Input, Collision, NPairs, NAtoms,  i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -510,7 +510,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_DoubleGrid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -713,7 +713,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_TripleGrid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -969,7 +969,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_ReadPoints( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -1238,7 +1238,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_GridForScatter( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -1393,7 +1393,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_StochPESStats( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -1568,7 +1568,7 @@ End Subroutine
 ! !________________________________________________________________________________________________________________________________!
 ! Subroutine GridForStochPES( This, Input, Collision, i_Debug )
 
-!   class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+!   class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
 !  type(Input_Type)                          ,intent(in)     ::    Input
 !   type(Collision_Type)                      ,intent(in)     ::    Collision
 !   logical                         ,optional ,intent(in)     ::    i_Debug
@@ -1737,7 +1737,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_PlotsVargasPaper( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -2020,7 +2020,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_EvaluatePoints( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -2169,7 +2169,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_ComputeCuts( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -2363,7 +2363,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_Rot3rd( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -2532,7 +2532,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb3_PlotPES_IsoTri( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb3_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb3_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs

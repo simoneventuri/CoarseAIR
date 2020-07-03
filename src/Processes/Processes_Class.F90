@@ -322,7 +322,7 @@ Subroutine WritingRates( This, iTTra, iTInt, i_Debug )
     write(Unit,'(A)') '#  Process,            Rate,         Rate SD'
     do iP = 1,This%NProc_Cleaned
       jP = This%IdxVecSorted(iP)
-      write(Unit,'(I10,A1,es16.10,A1,es16.10)') This%ProcessesVecCleaned(jP)%Idx, ',', This%ProcessesVecCleaned(jP)%Temperature(iTTra)%Rate, ',', sqrt( This%ProcessesVecCleaned(jP)%Temperature(iTTra)%RateSD )
+      write(Unit,'(I10,A1,es17.10,A1,es17.10)') This%ProcessesVecCleaned(jP)%Idx, ',', This%ProcessesVecCleaned(jP)%Temperature(iTTra)%Rate, ',', sqrt( This%ProcessesVecCleaned(jP)%Temperature(iTTra)%RateSD )
     end do
   
   close(Unit)

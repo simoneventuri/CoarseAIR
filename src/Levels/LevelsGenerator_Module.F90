@@ -84,6 +84,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
   real(rkp) ,dimension(2)                                                ::    EStart 
   real(rkp) ,dimension(500)                                              ::    Err
   integer   ,dimension(500)                                              ::    NChngsSign
+  real(rkp)                                                 ,parameter   ::    MinValue = 9.999999e-99
   logical                                                                ::    i_Debug_Loc 
   logical                                                                ::    i_Debug_Loc_Deep
 
@@ -295,8 +296,8 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
               write(*,'(a,i2,i4)')'WARNING:: State%egam is NAN or INF for (v,J) pair: ',ivqn,iJqn    
               print*,State%Egam 
               State%egam = Zero
-            elseif (State%egam < 9.999999e-99) then
-              State%egam = 9.999999e-99
+            elseif (State%egam < MinValue) then
+              State%egam = MinValue
             end if
           end if
           ! ! ============================================================================================================== 

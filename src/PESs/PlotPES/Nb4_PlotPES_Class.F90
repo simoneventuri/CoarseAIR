@@ -75,7 +75,7 @@ Module Nb4_PlotPES_Class
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_Initialize( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -121,7 +121,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -266,10 +266,10 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
                 Theta4 = Input%AnglesPlot(iA) / 180.d0 * Pi
                 Rp(4)  = sqrt( Rp(1)**2 + Rp(2)**2 - 2.d0 * Rp(1) * Rp(2) * dcos(Theta4) ) * RConverter 
 
-                Qp =[              0.0,               0.0, 0.0, &
-                                 Rp(1),               0.0, 0.0, &
-                     Rp(2)*cos(Theta4), Rp(2)*sin(Theta4), 0.0, &
-                                   0.0,              RInf, 0.0] 
+                Qp =[          0.0_rkp,               0.0_rkp, 0.0_rkp, &
+                                 Rp(1),               0.0_rkp, 0.0_rkp, &
+                     Rp(2)*cos(Theta4),     Rp(2)*sin(Theta4), 0.0_rkp, &
+                               0.0_rkp,                  RInf, 0.0_rkp] 
 
 
                 if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
@@ -473,7 +473,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_GridForStochPES( This, Input, Collision, NPairs, NAtoms,  i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -495,7 +495,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_DoubleGrid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -518,7 +518,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_TripleGrid( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -540,7 +540,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_ReadPoints( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -761,7 +761,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_GridForScatter( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -783,7 +783,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_StochPESStats( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -805,7 +805,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_PlotsVargasPaper( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -827,7 +827,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_EvaluatePoints( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -849,7 +849,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_ComputeCuts( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -871,7 +871,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_Rot3rd( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
@@ -893,7 +893,7 @@ End Subroutine
 !________________________________________________________________________________________________________________________________!
 Subroutine Nb4_PlotPES_IsoTri( This, Input, Collision, NPairs, NAtoms, i_Debug )
 
-  class(Nb4_PlotPES_Type)                   ,intent(out)    ::    This
+  class(Nb4_PlotPES_Type)                   ,intent(in)     ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Collision_Type)                      ,intent(in)     ::    Collision
   integer                                   ,intent(in)     ::    NPairs
