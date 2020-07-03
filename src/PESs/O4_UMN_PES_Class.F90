@@ -401,14 +401,15 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
   real(rkp) ,dimension(430)            :: B        ! Array to store basis functions
 
 
+  V = Zero
+  B = Zero
+
   ! Evaluate 2-body interactions
   ! do i=1,6
   !   dist = R(i)
   !   call ev2gm2(dist, V2, dV2dR, 1, 0)
   !   V    = V + V2
   ! enddo
-
-  B = Zero
 
   ! Calculate the six MEG terms for each point
   call evmorse(a, ab, ra, rb, R, rms)
@@ -423,6 +424,7 @@ Subroutine EvV(a, ab, ra, rb, C, R, V)
   call evbas( P, B )
 
   ! Evaluate V by taken the product of C and Basis function array
+  
   do i=1,430
     V = V + C(i)*b(i)
   enddo
@@ -471,12 +473,9 @@ subroutine EvdVdR(a, ab, ra, rb, C, R, dVdR)
   real(rkp) ,dimension(6,0:465)        :: dPdR     ! The derivative of basis functions w.r.t. R
   real(rkp) ,dimension(6,430)          :: dBdR     ! The derivative of B w.r.t. R 
 
-
   ! Initialize dVdR(6)
-  do i=1,6
-    dVdR(i) = Zero
-  enddo
-
+  dVdR = Zero
+  dBdR = Zero
 
   ! Add dV2dR(i) to dVdR
   ! do i=1,6
@@ -484,8 +483,6 @@ subroutine EvdVdR(a, ab, ra, rb, C, R, dVdR)
   !   call ev2gm2(dist, V2, dV2dR, 1, 1)
   !   dVdR(i) = dV2dR
   ! enddo
-
-  dBdR = Zero
 
   ! Calculate dMEG/dr(6,6) for giving R(6)
   call evdmsdr(a, ab, ra, rb, R, dmsdr)
