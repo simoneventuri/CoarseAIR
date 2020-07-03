@@ -189,7 +189,7 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
       !  CHECKING LEVEL PROPERTIES
       ! ==============================================================================================================
         do iState = 1,This%NStates
-          if (jqn == This%States(iState)%jqn) then
+          if (0 == This%States(iState)%jqn) then
             call DiatPot%CheckMaxAndMin( This%States(iState), iState, Zero, i_Debug=i_Debug_Loc)
             EShiftNew = This%States(iState)%VMaxNew - This%States(iState)%VMax 
             if (i_Debug_Loc) call Logger%Write( "EShiftNew = ", EShiftNew, "Eh" )
