@@ -84,7 +84,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
   real(rkp) ,dimension(2)                                                ::    EStart 
   real(rkp) ,dimension(500)                                              ::    Err
   integer   ,dimension(500)                                              ::    NChngsSign
-  real(rkp)                                                 ,parameter   ::    MinValue = 9.999999e-99
+  real(rkp)                                                 ,parameter   ::    MinValue = 9.999999e-99_rkp
   logical                                                                ::    i_Debug_Loc 
   logical                                                                ::    i_Debug_Loc_Deep
 

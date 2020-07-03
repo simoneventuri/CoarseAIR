@@ -571,12 +571,12 @@ Subroutine Convert_CrossSect_To_Rates_Nb3Atoms( This, Input, Collision, Velocity
               if (Proc_To_Line < 1) then
                 !!! New Process! Allocating it !!!!
                 This%NProc_Cleaned        = This%NProc_Cleaned + 1
-                call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+                call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 1, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0_rkp, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
                 This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
                 if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
               else
                 !!! Old Process! Adding Cross Section !!!!
-                call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
+                call This%ProcessesVecTemp(Proc_To_Line)%Shelving( iTtra, CorrFactor=1.0_rkp, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
                 if (i_Debug_Loc_Deep) call Logger%Write( "    This%ProcessesVecTemp(iProc)%Idx = ", This%ProcessesVecTemp(iLine)%Idx )  
               end if
 
@@ -737,7 +737,7 @@ Subroutine Mask4FinProc_Nb3Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, 
 
   iPFin    = int(ArrFin / 16)
   iTypeFin = mod(ArrFin , 16)
-  if (CrossSect(1) < 1.e-100) then
+  if (CrossSect(1) < 1.e-100_rkp) then
     Issue = 12 ! Current Trajectory has a Final Condition that has 0.0 Cross Section
   else
     if (iPFin > 0) then
