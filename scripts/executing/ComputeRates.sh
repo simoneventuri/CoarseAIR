@@ -591,6 +591,9 @@ function PostTrajectoriesPBS {
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesAll} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
+    if [ ${NProcessesPerNode} -eq 0 ]; then
+      NProcessesPerNode=1
+    fi
     echo "  [PostTrajectoriesPBS]: -> Nb of Processes Per Node = "${NProcessesPerNode}
 
   fi
@@ -729,9 +732,7 @@ function PostTrajectoriesAtNode {
           NMin=$(( ${NLevels1} - ${MaxLevel1} ))
           NMax=$(( ${NLevels1} - ${MinLevel1} + 1 ))
           NBetw=$(( (${NMax}+1)*(${NMax})/2 - (${NMin}+1)*(${NMin})/2 ))
-          echo "  [PostTrajectoriesAtNode]: NBetw = "${NBetw}
           NProcessesPerNode=${NBetw}
-          echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
           MaxProcessInNode=$(( ${MinProcessInNode} + ${NProcessesPerNode} - 1 ))
         else
           MinProcessInNode=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
