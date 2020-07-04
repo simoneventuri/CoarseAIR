@@ -89,9 +89,9 @@ function ComputeTrajsPBS {
       else
         MinProcessAll=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
         MaxProcessAll=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
-        NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
       fi
     fi
+    NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
     echo "  [ComputeTrajsPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesAll} / ${NNode}")"
@@ -243,10 +243,10 @@ function ComputeTrajs {
         else
           MinProcessInNode=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
           MaxProcessInNode=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
-          NProcessesAll=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
         fi
 
       fi
+      NProcessesAll=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
       echo "  [ComputeTrajs]: -> Total Nb of Processes to Run = "${NProcessesAll}
     fi
     echo "  [ComputeTrajs]: For Node "${iNode}", the first Process to be computed is the "${MinProcessInNode}"-th"
@@ -584,16 +584,13 @@ function PostTrajectoriesPBS {
       else
         MinProcessAll=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
         MaxProcessAll=$(( $((${MaxLevel1} - 1)) * ${NLevels2} + ${MaxLevel2} ))
-        NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
       fi
     fi
+    NProcessesAll=$(( ${MaxProcessAll} - ${MinProcessAll} + 1 ))
     echo "  [PostTrajectoriesPBS]: -> Total Nb of Processes to Run = "${NProcessesAll}
 
     NProcessesPerNode="$(bc <<< "scale = 10; ${NProcessesAll} / ${NNode}")"
     NProcessesPerNode="$(echo ${NProcessesPerNode} | awk '{print ($0-int($0)>0)?int($0)+1:int($0)}')"
-    if [ ${NProcessesPerNode} -eq 0 ]; then
-      NProcessesPerNode=1
-    fi
     echo "  [PostTrajectoriesPBS]: -> Nb of Processes Per Node = "${NProcessesPerNode}
 
   fi
@@ -741,6 +738,7 @@ function PostTrajectoriesAtNode {
         fi
       fi
     fi
+    NProcessesPerNode=$(( ${MaxProcessInNode} - ${MinProcessInNode} + 1 ))
     echo "  [PostTrajectoriesAtNode]: NProcessesPerNode = "${NProcessesPerNode}
     echo "  [PostTrajectoriesAtNode]: MinProcessInNode  = "${MinProcessInNode}
     echo "  [PostTrajectoriesAtNode]: MaxProcessInNode  = "${MaxProcessInNode}
