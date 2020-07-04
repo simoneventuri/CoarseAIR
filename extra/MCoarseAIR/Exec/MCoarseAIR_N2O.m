@@ -55,6 +55,9 @@ Input.Kin.PathToMappingOut      = [   {''},   {''}];
 Input.Kin.CGM_Strategy          = [{'DPM'},{'DPM'}];
 Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
 Input.Kin.NGroupsOut            = [     20,     20]; %54, 46
+% Input.Kin.CGM_Strategy          = [{'RVE'},{'RVE'}];
+% Input.Kin.ParamsGroupsOut       = [     36,     31];
+% Input.Kin.NGroupsOut            = [     54,     46]; %54, 46
 Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
 Input.Kin.Proc.DissFlg          = 0;
@@ -174,7 +177,6 @@ if Input.ReLoad > 0
     Group_Out()
 
 end
-pause
 
 
 iFigStart = Input.iFig;

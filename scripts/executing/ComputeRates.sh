@@ -84,7 +84,7 @@ function ComputeTrajsPBS {
         NMin=$(( ${NLevels1} - ${MaxLevel1} ))
         NMax=$(( ${NLevels1} - ${MinLevel1} + 1 ))
         NBetw=$(( (${NMax}+1)*(${NMax})/2 - (${NMin}+1)*(${NMin})/2 ))
-        NProcessesAll=$(( ${NBetw} ))
+        NProcessesAll=${NBetw}
         MaxProcessAll=$(( ${MinProcessAll} + ${NProcessesAll} - 1 ))
       else
         MinProcessAll=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))
@@ -729,7 +729,7 @@ function PostTrajectoriesAtNode {
           NMin=$(( ${NLevels1} - ${MaxLevel1} ))
           NMax=$(( ${NLevels1} - ${MinLevel1} + 1 ))
           NBetw=$(( (${NMax}+1)*(${NMax})/2 - (${NMin}+1)*(${NMin})/2 ))
-          NProcessesPerNode=$(( ${NBetw} ))
+          NProcessesPerNode=${NBetw}
           MaxProcessInNode=$(( ${MinProcessInNode} + ${NProcessesPerNode} - 1 ))
         else
           MinProcessInNode=$(( $((${MinLevel1} - 1)) * ${NLevels2} + ${MinLevel2} ))

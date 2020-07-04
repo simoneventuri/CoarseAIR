@@ -38,12 +38,21 @@ function Initialize_0D_Database {
 
 echo "Units=cm^3/s" > $PathToDtbFldr"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
+
+
+#######################################################################################################3
+#### Adding Dissociation Processes
+#### 
 if [ $DissFlg -eq 1 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
+############################################################## For O2+O 
 elif [ $DissFlg -eq 2 ]; then
 	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
+############################################################## For Dissociation Grouping Paper
 elif [ $DissFlg -eq 3 ]; then
 	echo "  [Initialize_0D_Database]: Adding VS Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_VS.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System		
@@ -53,6 +62,8 @@ elif [ $DissFlg -eq 4 ]; then
 elif [ $DissFlg -eq 5 ]; then
 	echo "  [Initialize_0D_Database]: Adding Fitted Phys-Based Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Phys_Fitted_"${NBins}"Bins.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System	
+
+############################################################## For Reproducing DMS
 elif [ $DissFlg -eq 6 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	echo "  [Initialize_0D_Database]: MANINDER'S CASE: NO CORRECTION and NO RECOMBINATION"
@@ -61,6 +72,8 @@ elif [ $DissFlg -eq 7 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	echo "  [Initialize_0D_Database]: MANINDER'S CASE: NO CORRECTION but RECOMBINATION"
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System	
+
+############################################################## For Taking into Account Systems Composed by More Than 1 Molecule
 elif [ $DissFlg -eq 8 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
@@ -76,26 +89,9 @@ elif [ $DissFlg -eq 9 ]; then
 	echo "  [Initialize_0D_Database]: Adding Ineastic from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
-	# if [ $DissExchFlg -eq 1 ]; then
-	# 	echo "  [Initialize_0D_Database]: Adding Exchange 1 from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	# 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Exch_Comb_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	# fi
-
-elif [ $DissFlg -eq 11 ]; then
-	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	echo "  [Initialize_0D_Database]: NO CORRECTION and NO RECOMBINATION"
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System	
-elif [ $DissFlg -eq 12 ]; then
-	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	echo "  [Initialize_0D_Database]: NO RECOMBINATION"
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System	
-
-
-elif [ $DissFlg -eq 13 ]; then
-	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 fi
 
+############################################################## For 4-Atoms Systems
 # iDissInel=${DissInelFlg}
 # if [ ${iDissInel} -eq 1 ]; then
 # 	echo "  [Initialize_0D_Database]: Adding Inelastic + Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
@@ -105,6 +101,11 @@ fi
 # # 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 # fi
 
+
+
+#######################################################################################################3
+#### Adding Inelastic Processes
+#### 
 iInel=${InelFlg}
 if [ ${iInel} -eq 1 ]; then
 	echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
@@ -114,6 +115,10 @@ elif [ ${iInel} -eq 2 ]; then
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 fi
 
+
+#######################################################################################################3
+#### Adding Exchange Processes
+#### 
 iExch=${ExchFlg1}
 if [ ${iExch} -eq 1 ]; then
 	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
@@ -127,8 +132,18 @@ iExch=${ExchFlg2}
 if [ ${iExch} -eq 1 ]; then
 	echo "  [Initialize_0D_Database]: Adding Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Exch_Type2.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+elif [ ${iExch} -eq 2 ]; then
+	echo "  [Initialize_0D_Database]: Adding Window-Averaged Exchange Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Exch_Type2_WindAvrg.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 fi
 
+
+
+
+
+#######################################################################################################3
+#### Adding Molecules Info
+#### 
 for Molecule in "${Molecule_vec[@]}"; do :
 
 	echo "  [Initialize_0D_Database]: Copying Thermo File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"

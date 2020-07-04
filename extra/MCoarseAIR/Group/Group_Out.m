@@ -50,8 +50,8 @@ function Group_Out()
                 fprintf('  Gropuing based on RoVibrational Energy\n\n')
 
                 Controls.NGroups_E(iMol) = Input.Kin.NGroupsOut(iMol);
-                Controls.DissEn(iMol)    = 0.0;
-                Controls.NGroups_Bound   = Input.Kin.ParamsGroupsOut(iMol);
+                Controls.DissEn(iMol)        = 0.0;
+                Controls.NGroups_Bound(iMol) = Input.Kin.ParamsGroupsOut(iMol);
                 LevelToGroup = Group_BasedOnEnergy(Syst, Controls, iMol);  
             
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))

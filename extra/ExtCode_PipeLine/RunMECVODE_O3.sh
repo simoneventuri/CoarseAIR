@@ -41,9 +41,9 @@ PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule_vec=('O2')
-export FldrName='_RVE45' #'_12Inel_8CB'
+export FldrName=''
 export Tran_vec=(5000 10000 20000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
-export T0=300 #300
+export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
@@ -53,7 +53,6 @@ export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0
 
-export NBins=0
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/extra/ExtCode_PipeLine/"
 
@@ -90,11 +89,7 @@ function Load_Initialize_0D() {
 function Call_MeCvode() {
   cd ${PathToRunFldr}
   
-  if [ ${NBins} -ge 1 ]; then
-    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}'_'${NBins}'Bins'
-  else
-    export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
-  fi
+  export OutputFldr='output_'${System}${FldrName}'_T'${TTran}'K_'${DissFlg}'_'${InelFlg}'_'${ExchFlg1}'_'${ExchFlg2}
   mkdir -p ./${OutputFldr}
   cd ./${OutputFldr} 
 
@@ -128,5 +123,7 @@ for TTran in "${Tran_vec[@]}"; do :
   echo "[RunMECCVODE]: Calling Call_MeCvode"
   Call_MeCvode
   echo " "
+
+  rm -rf $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
 done

@@ -41,20 +41,19 @@ PLATO_gnu_release
 
 export System='N4_NASA'
 export Molecule_vec=(N2)
-export FldrName='_VS'
+export FldrName=''
 export Tran_vec=(20000) 
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Mars_Database/Run_0D/
 
-export DissFlg=0
+export DissFlg=1
 export DissInelFlg=1
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0
 
-export NBins=0
 
 ExtCode_SH_DIR=${COARSEAIR_SOURCE_DIR}"/extra/ExtCode_PipeLine/"
 
@@ -116,5 +115,7 @@ for TTran in "${Tran_vec[@]}"; do :
 	echo "[RunMECCVODE]: Calling Call_MeCvode"
 	Call_MeCvode
 	echo " "
+
+  rm -rf $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
 done

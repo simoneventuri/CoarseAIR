@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/CO2_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [5000 10000 20000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
+Input.TranVec                   = [10000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
 Input.SystNameLong              = 'CO2_NASA';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -55,6 +55,9 @@ Input.Kin.PathToMappingOut      = [   {''},   {''}];
 Input.Kin.CGM_Strategy          = [{'DPM'},{'DPM'}];
 Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
 Input.Kin.NGroupsOut            = [     20,     20]; % 83, 49
+% Input.Kin.CGM_Strategy          = [{'RVE'},{'RVE'}];
+% Input.Kin.ParamsGroupsOut       = [     55,     32];
+% Input.Kin.NGroupsOut            = [     83,     49]; % 83, 49
 Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
 Input.Kin.Proc.DissFlg          = 1;
@@ -176,7 +179,6 @@ if Input.ReLoad > 0
     Group_Out()
 
 end
-pause
 
 
 iFigStart = Input.iFig;
@@ -220,6 +222,7 @@ for iT = 1:length(Temp.TranVec)
             Read_Rates()
             
         end
+        pause
         
         if (Input.Tasks.Plot_MoleFracs.Flg                 || ...
             Input.Tasks.Plot_GlobalRates.Flg               || ...

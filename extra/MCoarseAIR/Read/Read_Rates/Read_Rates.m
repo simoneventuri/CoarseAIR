@@ -156,8 +156,16 @@ function [Rates] = Read_RatesLocal(Rates, Syst, OtherSyst, iSyst)
         
     else
         
-        RatesFldr = strcat(Input.Paths.ToKinMainFldr, '/database/kinetics/', Syst.NameLong, Input.RunSuffix, '/T', Temp.TNowChar, 'K/');  
-        [Rates]   = Read_Rates_FromPLATO(Rates, Syst, RatesFldr);   
+        if strcmp(Input.Kin.RateSource, 'HDF5')
+
+            [Rates] = Read_Rates_FromHDF5(Rates, Syst, OtherSyst, iSyst);
+
+        elseif strcmp(Input.Kin.RateSource, 'PLATO')
+
+            RatesFldr = strcat(Input.Paths.ToKinMainFldr, '/database/kinetics/', Syst.NameLong, Input.RunSuffix, '/T', Temp.TNowChar, 'K/');  
+            [Rates]   = Read_Rates_FromPLATO(Rates, Syst, RatesFldr);  
+        
+        end
         
     end
 
