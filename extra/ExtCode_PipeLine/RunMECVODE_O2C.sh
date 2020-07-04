@@ -41,6 +41,7 @@ PLATO_gnu_release
 
 export System='O2C_NASA'
 export SystemBis='CO2_NASA'
+export ExchBis=1
 export Molecule_vec=('CO' 'O2')
 export FldrName=''
 export Tran_vec=(5000 10000 20000) # (1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)

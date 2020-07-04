@@ -89,6 +89,10 @@ elif [ $DissFlg -eq 9 ]; then
 	echo "  [Initialize_0D_Database]: Adding Ineastic from Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
+	if [ ${ExchBis} -gt 0 ]; then
+		echo "  [Initialize_0D_Database]: Adding Exchange Kinetics from "${SystemBis}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+		cat $PathToDtbFldr"/kinetics/"${SystemBis}${FldrName}"/T"$TTran"K/Exch_Type"${ExchBis}".dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+	fi
 fi
 
 ############################################################## For 4-Atoms Systems
