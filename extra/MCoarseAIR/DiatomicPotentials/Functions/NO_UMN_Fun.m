@@ -1,6 +1,6 @@
-%% Centrifugal Contribution to Effective Diatomic Potential
+%% NO Diatomic Potential from UMN (..., 2016)
 %
-function [Vc, dVc] = CentPot(r, jqn, iMol)
+function [V, dV] = NO_UMN_Fun(R)    
 
     %%==============================================================================================================
     % 
@@ -22,18 +22,33 @@ function [Vc, dVc] = CentPot(r, jqn, iMol)
     % 
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
+    
+    
+% NO UMN Min @ 2.17661 (V=-6.617426)
 
-    global Syst Param
-    
-    iA    = Syst.Molecule(iMol).ToAtoms(1);
-    jA    = Syst.Molecule(iMol).ToAtoms(2);
-    
-    mass  = [Syst.Atom(iA).Mass, Syst.Atom(jA).Mass] / Param.AMUToKg;
-    mu    = mass(1) * mass(2) / ( mass(1) + mass(2) );
-    
-    Vc_R2 = 1.d0 / mu * 0.5d0 * (jqn+0.5d0)^2;
+    cs   = [ 0.322338e0, 5.878590e0, -12.790761e0, 13.320811e0, -7.516309e0, 1.875839e0, -0.052723e0, -0.037783e0, 0.48294e0, 1.98697e0]; 
+    red  = 1.1508;
+    de   = 152.6;
+    VRef = 0.0;%0.191619504727d0;
 
-    Vc    = Vc_R2 ./ r.^2;  
-    dVc   = - 2.d0 .* Vc ./ r;  
-  
+    RAng = R * Param.BToAng;
+
+    u    = exp( -(RAng-red) / cs(9) - (RAng-red) ^2.0 / (cs(10)) );
+
+    dfdr =  ( -2.0 * (RAng-red)/cs(10) - 1.0/cs(9) );
+
+    V    =  - de*(cs(1) * u + cs(2) * u^2 + cs(3) * u^3 + cs(4) * u^4 + cs(5) * u^5.0 + cs(6) * u^6 + cs(7) * u^7 + cs(8) * u^8);
+    V    = (V' * Param.KcmToEh + VRef) * Param.EhToeV;
+
+    dV   =  - de * (cs(1) *          dfdr * u        + ...
+                   cs(2) * 2.0d0 * dfdr * u^2     + ...
+                   cs(3) * 3.0d0 * dfdr * u^3     + ...
+                   cs(4) * 4.0d0 * dfdr * u^4     + ...
+                   cs(5) * 5.0d0 * dfdr * u^5     + ...
+                   cs(6) * 6.0d0 * dfdr * u^6     + ...
+                   cs(7) * 7.0d0 * dfdr * u^7     + ...
+                   cs(8) * 8.0d0 * dfdr * u^8);
+
+    dV = dV' * Param.KcmToEh * Param.EhToeV * Param.BToAng;
+
 end

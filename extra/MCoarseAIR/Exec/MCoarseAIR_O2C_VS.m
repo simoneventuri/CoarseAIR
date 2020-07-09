@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O2C_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [5000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
+Input.TranVec                   = [5000, 10000, 20000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
 Input.SystNameLong              = 'O2C_NASA';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -57,7 +57,7 @@ Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
 Input.Kin.NGroupsOut            = [     20,     20]; % 83, 49
 Input.Kin.PathToWriteMappingOut = [{''}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
-Input.Kin.Proc.DissFlg          = 1;
+Input.Kin.Proc.DissFlg          = 9;
 Input.Kin.NBinsSuffix           = 0;
 Input.Kin.DissCorrFactor        = 1.0;
 Input.Kin.Proc.DissInelFlg      = 0;
@@ -65,7 +65,7 @@ Input.Kin.Proc.InelFlg          = 1;
 Input.Kin.Proc.ExchFlg1         = 1;
 Input.Kin.Proc.ExchFlg2         = 0;
 
-Input.Kin.ReadRatesProc         = [2, 2, 2]
+Input.Kin.ReadRatesProc         = [3, 3, 3]
 Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst         = []
 Input.Kin.OtherSystInHDF5       = []
@@ -75,8 +75,8 @@ Input.ReLoad                    = 1;
 
 
 %% Inputs for Plotting
-Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 0;
+Input.iFig               = 201;
+Input.SaveFigsFlgInt     = 2;
 Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
@@ -85,6 +85,7 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 
 %% Tasks Inputs
+Input.Tasks.All = false
 
 %% CoarseAIR
 % Plotting Diatomic Potential
@@ -119,6 +120,7 @@ Input.Tasks.Plot_ReconstructedRates.Flg                = false
 Input.Tasks.Plot_MoleFracs.Flg                         = true;
 Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 4;
+Input.Tasks.Plot_MoleFracs.Normalize                   = 0;
 % Plotting Global Rates
 Input.Tasks.Plot_GlobalRates.Flg                       = true;
 Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1];
@@ -139,7 +141,7 @@ Input.Tasks.Plot_Populations.GroupColors               = 0;
 Input.Tasks.Plot_Populations.ProcOI                    = [3,4];
 % Plotting Energies
 Input.Tasks.Plot_Energies.Flg                          = false;
-Input.Tasks.Plot_Energies.MoleculesOI                  = [1,2];
+Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
 Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
@@ -148,13 +150,49 @@ Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [2,2];
 Input.Tasks.Plot_EnergyDepletions.Targ                 = [  4];
 
+if (Input.Tasks.All)
+    Input.Kin.Proc.DissFlg          = 9;
+    Input.Kin.NBinsSuffix           = 0;
+    Input.Kin.DissCorrFactor        = 1.0;
+    Input.Kin.Proc.DissInelFlg      = 0;
+    Input.Kin.Proc.InelFlg          = 1;
+    Input.Kin.Proc.ExchFlg1         = 1;
+    Input.Kin.Proc.ExchFlg2         = 0;
+
+    Input.Kin.ReadRatesProc         = [3, 3, 3, 0]
+
+    Input.Tasks.Plot_Populations.Flg                       = true;
+    Input.Tasks.Plot_Energies.Flg                          = false;
+
+    Input.Tasks.Plot_MoleFracs.Flg                         = true;
+    Input.Tasks.Plot_GlobalRates.Flg                       = true;
+    Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
+else
+    Input.Kin.Proc.DissFlg          = 0;
+    Input.Kin.NBinsSuffix           = 0;
+    Input.Kin.DissCorrFactor        = 1.0;
+    Input.Kin.Proc.DissInelFlg      = 0;
+    Input.Kin.Proc.InelFlg          = 1;
+    Input.Kin.Proc.ExchFlg1         = 0;
+    Input.Kin.Proc.ExchFlg2         = 0;
+    
+    Input.Kin.ReadRatesProc         = [0, 3, 0, 0]
+
+    Input.Tasks.Plot_Populations.Flg                       = true;
+    Input.Tasks.Plot_Energies.Flg                          = true;
+
+    Input.Tasks.Plot_MoleFracs.Flg                         = false;
+    Input.Tasks.Plot_GlobalRates.Flg                       = false;
+    Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing
 Syst.NameLong = Input.SystNameLong;
 Syst          = Initialize_ChemicalSyst(Syst)
-Initialize_Input()
 Initialize_Parameters()
+Initialize_Input()
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,7 +223,7 @@ for iT = 1:length(Temp.TranVec)
     Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, Input.RunSuffix, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
     
     if Input.ReLoad > 0 
-        %close all
+        close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -374,5 +412,5 @@ for iT = 1:length(Temp.TranVec)
     
     
     %pause
-    %clear Rates Kin
+    clear Rates Kin
 end

@@ -32,7 +32,7 @@ function Compute_QSS()
     fprintf('====================================================\n')
     
 
-    DebugFlag = true;
+    DebugFlag = false;
     
     KQSS_Eps = 1.e-9;
     EpsT     = 1.e-4;%5.e-8;
@@ -51,7 +51,7 @@ function Compute_QSS()
     end
 
     it = NSteps;
-    while ( abs(log10(yy(it)) - log10(yy(end)))     < 1.e-2 )
+    while ( abs(log10(yy(it)) - log10(yy(end)))     < 1.e-2 ) && (it>1)
        it = it - 1;
     end
     itFinal = it;
@@ -63,7 +63,7 @@ function Compute_QSS()
        ExitFlg = true; 
     end
     
-    while ( abs(log10(yy(it)) - log10(yy(itFinal))) < 1.e-1 )
+    while ( abs(log10(yy(it)) - log10(yy(itFinal))) < 1.e-1 ) && (it>1)
         it = it - 1;
     end
     itEnd   = it;
@@ -215,25 +215,26 @@ function Compute_QSS()
             Kin.T(Temp.iT).QSS.Molecule(iMol).Diss      = KDissQSS;
 
 
+            if (Syst.NAtoms == 3)
+                if NProc > 2
+                    KExch1Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1);
+                    KExch1QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,1);
+                    Kin.T(Temp.iT).QSS.Molecule(iMol).Exch1     = KExch1QSS;
+                end
+                if NProc > 3
+                    KExch2Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,2);
+                    KExch2QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,2);
+                    Kin.T(Temp.iT).QSS.Molecule(iMol).Exch2 = KExch2QSS;
+                end
 
-            if NProc > 2
-                KExch1Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,1);
-                KExch1QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,1);
-                Kin.T(Temp.iT).QSS.Molecule(iMol).Exch1     = KExch1QSS;
+
+                fprintf('QSS KDiss            = %e [cm^3/s]\n', Kin.T(Temp.iT).QSS.Molecule(iMol).Diss );
+                for iExch = 1:NProc-2
+                    fprintf('QSS KExch, Exch Nb %i = %e [cm^3/s] \n', iExch,  Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,iExch) );
+                end
+                fprintf('\n')
             end
-            if NProc > 3
-                KExch2Eq  = Rates.T(Temp.iT).Molecule(iMol).ExchTh(1,2);
-                KExch2QSS = Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,2);
-                Kin.T(Temp.iT).QSS.Molecule(iMol).Exch2 = KExch2QSS;
-            end
-
-
-            fprintf('QSS KDiss            = %e [cm^3/s]\n', Kin.T(Temp.iT).QSS.Molecule(iMol).Diss );
-            for iExch = 1:NProc-2
-                fprintf('QSS KExch, Exch Nb %i = %e [cm^3/s] \n', iExch,  Rates.T(Temp.iT).Molecule(iMol).ExchGlobal(itQSS,iExch) );
-            end
-            fprintf('\n')
-
+            
 
             %% Writing Dissociation and Exchange Values at Equilibrium and QSS 
             %
@@ -243,16 +244,16 @@ function Compute_QSS()
                 fileID1  = fopen(FileName,'a');
             else
                 fileID1  = fopen(FileName,'w');
-                if NProc == 3
+                if (NProc == 2) || (Syst.NAtoms == 4)
                     HeaderStr = strcat('# T [K], K^D Eq, K^D QSS \n');
-                else if NProc == 3
+                elseif NProc == 3
                     HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K^D QSS, K_1^E QSS \n');
                 else
                     HeaderStr = strcat('# T [K], K^D Eq, K_1^E Eq, K_2^E Eq, K^D QSS, K_1^E QSS, K_2^E QSS \n');
                 end
                 fprintf(fileID1,HeaderStr);
             end
-            if NProc == 2
+            if (NProc == 2) || (Syst.NAtoms == 4)
                 fprintf(fileID1,'%e,%e,%e\n',             Temp.TNow, KDissEq, KDissQSS );
             elseif NProc == 3
                 fprintf(fileID1,'%e,%e,%e,%e,%e\n',       Temp.TNow, KDissEq, KExch1Eq, KDissQSS, KExch1QSS );

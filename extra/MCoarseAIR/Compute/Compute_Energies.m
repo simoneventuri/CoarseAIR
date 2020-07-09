@@ -29,6 +29,7 @@ function Compute_Energies(Controls)
     fprintf('= Compute_Energies ===================== T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
     
+    DebugFlg = false
 
     Pressure = Kin.T(Temp.iT).MolFracs(end, Syst.ColPartToComp) * Kin.T(Temp.iT).P(end) / 101325.0;
     
@@ -87,13 +88,17 @@ function Compute_Energies(Controls)
 
         
         eIntLim = (eInt(end) - eInt(1)) * 0.632 + eInt(1);
-        iInt=1;
-        while eInt(iInt) < eIntLim
+        iInt=2;
+        while eInt(iInt) < eIntLim && (iInt<length(eInt))
           iInt = iInt+1;
         end
-        %semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eInt(iInt),'o')
+        if (DebugFlg)
+            semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eInt(iInt),'o')
+        end
         tauInt = (Kin.T(Temp.iT).t(iInt) + Kin.T(Temp.iT).t(iInt-1)) / 2.d0;
         tt = Kin.T(Temp.iT).t(2:end-1);
+        size( Kin.T(Temp.iT).t(2:end-1))
+        size(eInt(2:end-1))
         [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eInt(2:end-1) - eIntLim );
         ft = 'splineinterp';
         [fitresult, gof] = fit( xData, yData, ft );
@@ -104,9 +109,12 @@ function Compute_Energies(Controls)
         if eRot(end) < eRot(1)
             TempCoeff = -1;
         end
-        iRot=1;
-        while TempCoeff*eRot(iRot) < TempCoeff*eRotLim
+        iRot=2;
+        while TempCoeff*eRot(iRot) < TempCoeff*eRotLim && (iRot<length(eRot))
           iRot = iRot+1;
+        end
+        if (DebugFlg)
+            semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eRot(iInt),'o')
         end
         tauRot = (Kin.T(Temp.iT).t(iRot) + Kin.T(Temp.iT).t(iRot-1)) / 2.d0;
         [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eRot(2:end-1) - eRotLim );
@@ -115,9 +123,12 @@ function Compute_Energies(Controls)
         Kin.T(Temp.iT).Molecule(iMol).tauRot = fzero(fitresult, tauRot);
         
         eVibLim = (eVib(end) - eVib(1)) * 0.632 + eVib(1);
-        iVib=1;
-        while eVib(iVib) < eVibLim
+        iVib=2;
+        while eVib(iVib) < eVibLim && (iVib<length(eVib))
           iVib = iVib+1;
+        end
+        if (DebugFlg)
+            semilogx(Kin.T(Temp.iT).t(iInt), Kin.T(Temp.iT).Molecule(iMol).eVib(iInt),'o')
         end
         tauVib = (Kin.T(Temp.iT).t(iVib) + Kin.T(Temp.iT).t(iVib-1)) / 2.d0;
         [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eVib(2:end-1) - eVibLim );

@@ -931,7 +931,7 @@ Subroutine AnalysisTrajPoints( This, iTraj, iTrajStart, Collision, Traj, i_Debug
   !1 format(i8, 3x, i4, 3x, 2(es12.5,3x), *(es15.8,3x) )
   !2 format(i8, 3x, i4, 3x, 2(es12.5,3x), *(es15.8,3x) )
   1 format(I10, A, I5, 2(A, es11.5), *(A, es14.8) )
-  
+  2 format(I10, A, I5, 2(A, es11.5), *(A, es15.8) )
 
 
 !  if (i_Debug_Loc) then

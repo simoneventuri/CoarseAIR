@@ -46,6 +46,7 @@ Module TrajectoryPoint_Class
     real(rkp) ,dimension(3)                 ::    Vrel        =   Zero  !< Relative velocity components
     logical                                 ::    WriteData   =  .False.!< Flag for Writing the Trajectory 
     type(MolecularState_Type) ,dimension(2) ::    Molecules             !< Array of MolecularState objects. Note: Harded-codded dimensions to avoid allocation for each trajectory. Number of effective molecuels is given by component NMolecules.
+    real(rkp)                               ::    rmaxCluster =   Zero
   contains
     private
     procedure ,public   ::    Initialize  =>  InitializeTrajectoryPoint
@@ -86,6 +87,7 @@ Subroutine InitializeTrajectoryPoint( This, Input, Collision, i_Debug )
   allocate( This%Rbs  (This%NPairs)  ); This%Rbs   =   Zero
   allocate( This%iRbs (This%NPairs)  ); This%iRbs  =   0
 
+  This%rmaxCluster = Input%rmaxCluster
 
 ! ==============================================================================================================
 !     SETTING VARIABLES FROM THE INPUT OBJECT
@@ -451,7 +453,7 @@ Subroutine SetPairs( This, Collision, i_Debug )
         case ( 5); iP  =   2
         case ( 6); iP  =   1
       end select
-    else if ( This%Rbs(3) < 30.0_rkp ) then      ! If the atom-atom distance between 2 atoms from different species is smaller than a predifined threshold, then a cluster has been formed
+    else if ( This%Rbs(3) < This%rmaxCluster ) then      ! If the atom-atom distance between 2 atoms from different species is smaller than a predifined threshold, then a cluster has been formed
       write(Logger%Unit,"(10x,'[SetPairs]: Cluster formed')")
       write(Logger%Unit,"(10x,'[SetPairs]: -> Sorted bond lengths:')")
       do iP = 1,Collision%NPairs

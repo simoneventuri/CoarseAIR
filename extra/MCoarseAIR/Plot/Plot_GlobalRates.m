@@ -38,11 +38,15 @@ function Plot_GlobalRates(Controls)
     iC        = 1;
     ProcNames = [];
     for iMol = Controls.MoleculesOI
-        if (iMol == 1)
-            NExch = Syst.NProc-2;
+        if (Syst.NAtoms == 4)
+            NExch = 0;
         else
-            NExch = OtherSyst(iMol-1).Syst.NProc-2;
-        end
+            if (iMol == 1)
+                NExch = Syst.NProc-2;
+            else
+                NExch = OtherSyst(iMol-1).Syst.NProc-2;
+            end
+        end    
         loglog(Kin.T(Temp.iT).t, Rates.T(Temp.iT).Molecule(iMol).DissGlobal(:,1), 'Color', Param.CMat(iC,:), 'linestyle', char(Param.linS(1)), 'LineWidth', Param.LineWidth)
         iC        = iC + 1;
         ProcNames = [ProcNames, {[Syst.Molecule(iMol).Name, ', $k_{Global}^D$']}];

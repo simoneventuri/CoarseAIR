@@ -163,6 +163,7 @@ Module Input_Class
     logical                                   ::    IncStpSzFlg =   .True.
     real(rkp)                                 ::    Relax       =   Zero                !< stepsize increase damping factor.
     real(rkp)                                 ::    rmax        =   Zero                !< if any atom pair distance exceeds rmax, the trajectory is assumed finished.
+    real(rkp)                                 ::    rmaxCluster =   25.0_rkp
     real(rkp)                                 ::    tmax        =   Zero                !< if any trajectory lives longer the tmax, it will be stoped.
 !   Relative kinetic energy and impact parameter variables
     character(:)               ,allocatable   ::    TtraModel                           !< Model for Translational Mode
@@ -1225,6 +1226,11 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             line_input = line_input(i_eq+2:150)
             READ(line_input, '(d20.10)') This%rmax
             if (i_Debug_Loc) call Logger%Write( "Max distance between atom pair [bohr]:      This%rmax  = ", This%rmax )
+
+          case("MMax distance between atoms in a cluster [bohr]")
+            line_input = line_input(i_eq+2:150)
+            READ(line_input, '(d20.10)') This%rmaxCluster
+            if (i_Debug_Loc) call Logger%Write( "Max distance between atoms in a cluster [bohr]:      This%rmaxCluster  = ", This%rmaxCluster )
 
           case("Max trajectory time [a.u.]")
             line_input = line_input(i_eq+2:150)

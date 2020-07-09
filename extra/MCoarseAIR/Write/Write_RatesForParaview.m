@@ -33,7 +33,7 @@ function Write_RatesForParaview(Controls)
         fprintf(['Molecule Nb ' num2str(iMol) ', ' Syst.Molecule(iMol).Name '\n'] );
         
         if (Controls.Proc(1))
-        
+
             [status,msg,msgID] = mkdir(Input.Paths.SaveDataFldr);
             FileName           = strcat(Input.Paths.SaveDataFldr, '/DissRates.csv.', Temp.TNowChar);
             fileID = fopen(FileName,'w');
@@ -50,11 +50,11 @@ function Write_RatesForParaview(Controls)
                 KDiss1 = Rates.T(Temp.iT).Diss(iLevel,2);
                 KDiss2 = Rates.T(Temp.iT).Diss(iLevel,3);
                 KDiss3 = Rates.T(Temp.iT).Diss(iLevel,2) .* 0.0;
-                KExch1 = Rates.T(Temp.iT).Overall(iLevel,3);
-                KExch2 = Rates.T(Temp.iT).Overall(iLevel,3) .* 0.0;
+                KExch1 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3);
+                KExch2 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3) .* 0.0;
                 if Syst.NProc > 3
                     KDiss3 = Rates.T(Temp.iT).Diss(iLevel,4);
-                    KExch2 = Rates.T(Temp.iT).Overall(iLevel,4);
+                    KExch2 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,4);
                 end
                 fprintf(fileID,'%i,%i,%i,%e,%e,%e,%e,%e,%e,%e,%e,%e,%e,%e,%e,%e\n', iLevel, 	                        ...
                                                                               Syst.Molecule(iMol).Levelvqn(iLevel),     ...

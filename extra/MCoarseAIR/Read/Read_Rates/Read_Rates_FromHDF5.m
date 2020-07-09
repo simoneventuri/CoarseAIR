@@ -57,7 +57,8 @@ function [Rates] = Read_Rates_FromHDF5(Rates, Syst, OtherSyst, iSyst)
             fprintf(['  Rates.T(' num2str(Temp.iT) ').Recomb, size: (' num2str(size(Rates.T(Temp.iT).Recomb)) ') \n'])
         
         elseif (Input.Kin.ReadRatesProc(iSyst, 1) == 3)
-            DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates_', Input.RunSuffix, '/Diss/');
+            DissChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates', Input.RunSuffix, '/Diss/');
+            DissChar
             %h5disp(Syst.HDF5_File, DissChar)
             RatesTemp                 = h5read(Syst.HDF5_File, DissChar);
             Rates.T(Temp.iT).Diss     = permute(RatesTemp, [2,1]);
@@ -82,7 +83,7 @@ function [Rates] = Read_Rates_FromHDF5(Rates, Syst, OtherSyst, iSyst)
             fprintf(['  Rates.T(' num2str(Temp.iT) ').Inel  respecting Micro Reversibility; size: (' num2str(size(Rates.T(Temp.iT).Inel)) ') \n'])
         
         elseif (Input.Kin.ReadRatesProc(iSyst, 2) == 3)
-            InelChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates_', Input.RunSuffix, '/Inel/');
+            InelChar       = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates', Input.RunSuffix, '/Inel/');
             %h5disp(Syst.HDF5_File, InelChar)
             RatesTemp             = h5read(Syst.HDF5_File, InelChar);
             Rates.T(Temp.iT).Inel = permute(RatesTemp, [2,1]);
@@ -108,7 +109,7 @@ function [Rates] = Read_Rates_FromHDF5(Rates, Syst, OtherSyst, iSyst)
                 fprintf(['  Rates.T(' num2str(Temp.iT) ').ExchType(' num2str(iExch) ').Exch respecting Micro Reversibility; size: (' num2str(size(Rates.T(Temp.iT).ExchType(iExch).Exch)) ') \n'])    
             
             elseif (Input.Kin.ReadRatesProc(iSyst, 2+iExch) == 3)
-                ExchChar  = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates_', Input.RunSuffix, '/Exch_', num2str(iExch), '/');
+                ExchChar  = strcat('/T_', Temp.TNowChar, '_', Temp.TNowChar, '/Rates', Input.RunSuffix, '/Exch_', num2str(iExch), '/');
                 RatesTemp = h5read(Syst.HDF5_File, ExchChar);
                 Rates.T(Temp.iT).ExchType(iExch).Exch = permute(RatesTemp, [2,1]);
                 fprintf(['  Grouped Rates.T(' num2str(Temp.iT) ').ExchType(' num2str(iExch) ').Exch; size: (' num2str(size(Rates.T(Temp.iT).ExchType(iExch).Exch)) ') \n'])        

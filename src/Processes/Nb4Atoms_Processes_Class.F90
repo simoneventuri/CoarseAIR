@@ -921,14 +921,14 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, 
 
       if (iTypeFin < 2) then
         if ( iBinTemp .eq. -1 ) then
-          if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
-            Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-            vqnFin(1) = 0
-            jqnFin(1) = 0
-            iTypeFin  = 2
-          else
+          ! if ( Collision%MoleculesContainer(iMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(1),jqnFin(1)-1) .eq. -1 ) then
+          !   Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+          !   vqnFin(1) = 0
+          !   jqnFin(1) = 0
+          !   iTypeFin  = 2
+          ! else
             Issue = 11 ! Current Trajectory has a Final Condition that should not exist
-          endif
+          !endif
         else
           ! Current Trajectory has a Final Condition that is accettable!
           iBinFin   = iBinTemp
@@ -939,14 +939,14 @@ Subroutine Mask4FinProc_Nb4Atoms( Collision, CrossSect, vqnFin, jqnFin, ArrFin, 
 
       if (jTypeFin < 2) then
         if ( jBinTemp .eq. -1 ) then
-          if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
-            Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
-            vqnFin(2) = 0
-            jqnFin(2) = 0
-            jTypeFin  = 2
-          else
+          ! if ( Collision%MoleculesContainer(jMolFin)%Molecule%BinsContainer%qns_to_Bin(vqnFin(2),jqnFin(2)-1) .eq. -1 ) then
+          !   Issue = 0 ! Current Trajectory has a Final Condition that is very close to the Centrifugal Barrier. Its lifetime will be very short and for this reason the Final State is considered DISSOCIATED
+          !   vqnFin(2) = 0
+          !   jqnFin(2) = 0
+          !   jTypeFin  = 2
+          !else
             Issue = 12 ! Current Trajectory has a Final Condition that should not exist
-          endif
+          !endif
         else
           ! Current Trajectory has a Final Condition that is accettable!
           jBinFin   = jBinTemp

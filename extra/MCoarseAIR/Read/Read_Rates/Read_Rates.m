@@ -76,9 +76,7 @@ function Read_Rates()
 
         
     end
-    
-    Rates
-        
+           
         
     fprintf('====================================================\n\n')  
     
@@ -142,16 +140,6 @@ function [Rates] = Read_RatesLocal(Rates, Syst, OtherSyst, iSyst)
             [Rates] = Read_Rates_FromCGQCT(Rates, Syst, OtherSyst);
 
         end
-        
-        
-        if (Input.Kin.DissCorrFactor ~= 1)
-            fprintf(['Correcting Dissociation Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
-            Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
-            if (Input.Kin.ReadRatesProc(1, 1) == 2)
-                fprintf(['Correcting Recombination Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
-                Rates.T(Temp.iT).Recomb = Rates.T(Temp.iT).Recomb .* Input.Kin.DissCorrFactor;           
-            end
-        end
     
         
     else
@@ -169,4 +157,15 @@ function [Rates] = Read_RatesLocal(Rates, Syst, OtherSyst, iSyst)
         
     end
 
+    
+     if (Input.Kin.DissCorrFactor ~= 1)
+        fprintf(['Correcting Dissociation Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
+        Rates.T(Temp.iT).Diss = Rates.T(Temp.iT).Diss .* Input.Kin.DissCorrFactor;
+        if (Input.Kin.ReadRatesProc(1, 1) == 2)
+            fprintf(['Correcting Recombination Rates by a Factor: ' num2str(Input.Kin.DissCorrFactor) '\n'] )
+            Rates.T(Temp.iT).Recomb = Rates.T(Temp.iT).Recomb .* Input.Kin.DissCorrFactor;           
+        end
+     end
+    
+    
 end

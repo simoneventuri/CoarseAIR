@@ -104,26 +104,26 @@ function Compute_Rates_Thermal()
         iQTemp = Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(iMol).T(Temp.iT).GroupsIn.QTot;
         jQTemp = Syst.Molecule(jMol).T(Temp.iT).GroupsIn.Q ./ Syst.Molecule(jMol).T(Temp.iT).GroupsIn.QTot;
 
-        Rates.T(Temp.iT).DissTh          = 0.0;
-        Rates.T(Temp.iT).DissTh_Diss     = 0.0;
-        Rates.T(Temp.iT).DissTh_DissInel = 0.0;
+        Rates.T(Temp.iT).Molecule(iMol).DissTh          = 0.0;
+        Rates.T(Temp.iT).Molecule(iMol).DissTh_Diss     = 0.0;
+        Rates.T(Temp.iT).Molecule(iMol).DissTh_DissInel = 0.0;
 
         for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
             for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                Rates.T(Temp.iT).DissTh_Diss     = Rates.T(Temp.iT).DissTh_Diss     + 2.0 * Rates.T(Temp.iT).Diss(iBin,jBin,1)           * iQTemp(iBin) * jQTemp(jBin); 
+                Rates.T(Temp.iT).Molecule(iMol).DissTh_Diss     = Rates.T(Temp.iT).Molecule(iMol).DissTh_Diss     + 2.0 * Rates.T(Temp.iT).Diss(iBin,jBin,1)           * iQTemp(iBin) * jQTemp(jBin); 
             end
         end
 
         for iBin = 1:Syst.Molecule(iMol).EqNStatesIn
             for jBin = iBin:Syst.Molecule(jMol).EqNStatesIn
-                Rates.T(Temp.iT).DissTh_DissInel = Rates.T(Temp.iT).DissTh_DissInel + sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1))) * iQTemp(iBin) * jQTemp(jBin); 
+                Rates.T(Temp.iT).Molecule(iMol).DissTh_DissInel = Rates.T(Temp.iT).Molecule(iMol).DissTh_DissInel + sum(sum(Rates.T(Temp.iT).DissInel(iBin,jBin,:,1))) * iQTemp(iBin) * jQTemp(jBin); 
             end
         end
         
-        Rates.T(Temp.iT).DissTh = Rates.T(Temp.iT).DissTh_Diss + Rates.T(Temp.iT).DissTh_DissInel;
+        Rates.T(Temp.iT).Molecule(iMol).DissTh = Rates.T(Temp.iT).Molecule(iMol).DissTh_Diss + Rates.T(Temp.iT).Molecule(iMol).DissTh_DissInel;
         
         
-        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).DissTh )
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n',  Rates.T(Temp.iT).Molecule(iMol).DissTh )
 %         for iExch = 1:Syst.NProc-2
 %             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchTh(iExch) ) 
 %         end

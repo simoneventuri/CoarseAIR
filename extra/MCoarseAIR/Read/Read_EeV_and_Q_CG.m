@@ -52,7 +52,7 @@ function [Syst] = Read_EeV_and_Q_CG(Syst)
    
 
         %% Compute Group Energy and Part Function
-        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* exp( -  Syst.Molecule(iMol).LevelEeV .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
+        Syst.Molecule(iMol).T(Temp.iT).Levelq = Syst.Molecule(iMol).Levelg .* exp( -  Syst.Molecule(iMol).LevelEeV0 .* Param.Ue ./ (Temp.TNow .* Param.UKb) );
         
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.Q   = zeros(Syst.Molecule(iMol).EqNStatesIn,1);
         Syst.Molecule(iMol).T(Temp.iT).GroupsIn.EeV = zeros(Syst.Molecule(iMol).EqNStatesIn,1);

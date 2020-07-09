@@ -111,7 +111,7 @@ function Compute_Rates_Global()
         end
         
 
-        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).DissGlobal(end) ) 
+        fprintf('Eq. Dissociation    Rate = %e cm^3/s\n', Rates.T(Temp.iT).Molecule(iMol).DissGlobal(end) ) 
 %         for iExch = 1:Syst.NProc-2
 %             fprintf('Eq. Exchange (Nb %i) Rate = %e cm^3/s\n', iExch, Rates.T(Temp.iT).ExchGlobal(end,iExch) ) 
 %         end

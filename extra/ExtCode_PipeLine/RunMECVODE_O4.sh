@@ -38,16 +38,16 @@ COARSEAIR_UPDATE
 COARSEAIR_release
 PLATO_gnu_release
 
-export System='N4_NASA'
-export Molecule_vec=('N2')
-export FldrName='_DP61'
+export System='O4_UMN'
+export Molecule_vec=('O2')
+export FldrName='_VSM'
 export Tran_vec=(10000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
-export T0=300
+export T0=1400
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
 
-export DissFlg=1
+export DissFlg=0
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0
@@ -142,9 +142,9 @@ function Call_MeCvode() {
   elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
     export InputFile=${PathToDtbFldr}'/input/'${System}'/OnlyDiss/T'${TTran}'K.inp'
   elif [ $DissFlg -eq 5 ]; then
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/DMS/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/Maninder/T'${TTran}'K.inp'
   else
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/Robyn/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/All/T'${TTran}'K.inp'
   fi  
   echo "[RunMECVODE]: Input File: "${InputFile}
   

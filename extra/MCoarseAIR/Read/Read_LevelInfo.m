@@ -71,7 +71,7 @@ function [Syst] = Read_LevelInfo(Syst)
             
             VarChar                            = strcat('/', Syst.Molecule(iMol).Name, '/Levelg');
             Syst.Molecule(iMol).Levelg         = h5read(Syst.HDF5_File, VarChar);
-            VarChar                            = strcat('/', Syst.Molecule(iMol).Name, '/LevelToGroupIn');
+            VarChar                            = strcat('/', Syst.Molecule(iMol).Name, '/LevelToGroupIn', Input.Suffix);
             Syst.Molecule(iMol).LevelToGroupIn = h5read(Syst.HDF5_File, VarChar);
             
         else

@@ -38,11 +38,16 @@ COARSEAIR_UPDATE
 COARSEAIR_release
 PLATO_gnu_release
 
-export System='N4_NASA'
-export Molecule_vec=('N2')
-export FldrName='_DP61'
+export System='O3O4_UMN'
+export FldrName='_DP10'
+export System1='O3_UMN'
+export Molecule_vec1=('O2')
+export FldrName1='_DP10'
+export System2='O4_UMN'
+export Molecule_vec2=('O2')
+export FldrName2='_DP10'
 export Tran_vec=(10000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
-export T0=300
+export T0=1400
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
@@ -142,9 +147,9 @@ function Call_MeCvode() {
   elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
     export InputFile=${PathToDtbFldr}'/input/'${System}'/OnlyDiss/T'${TTran}'K.inp'
   elif [ $DissFlg -eq 5 ]; then
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/DMS/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/Maninder/T'${TTran}'K.inp'
   else
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/Robyn/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/All/T'${TTran}'K.inp'
   fi  
   echo "[RunMECVODE]: Input File: "${InputFile}
   
@@ -167,8 +172,14 @@ for TTran in "${Tran_vec[@]}"; do :
   #### 
   if [ $DissFlg -gt 0 ]; then 
 
-    echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics for "${System}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-    cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/DissInel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics for "${System1}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System1}${FldrName1}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    # #
+    # echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics for "${System1}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    # cat $PathToDtbFldr"/kinetics/"${System1}${FldrName1}"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
+    echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics for "${System2}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System2}${FldrName2}"/T"$TTran"K/DissInel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
   fi
 
@@ -178,8 +189,11 @@ for TTran in "${Tran_vec[@]}"; do :
   #### 
   iInel=${InelFlg}
   if [ ${iInel} -eq 1 ]; then
-    echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics for "${System}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-    cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics for "${System1}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System1}${FldrName1}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    
+    echo "  [Initialize_0D_Database]: Adding Inelastic Kinetics for "${System2}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System2}${FldrName2}"/T"$TTran"K/Inel.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
   fi
 
 
@@ -189,25 +203,50 @@ for TTran in "${Tran_vec[@]}"; do :
   #### 
   iExch=${ExchFlg1}
   if [ ${iExch} -eq 1 ]; then
-    echo "  [Initialize_0D_Database]: Adding Exchange Kinetics for "${System}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
-    cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    echo "  [Initialize_0D_Database]: Adding Exchange Kinetics for "${System1}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System1}${FldrName1}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
+    echo "  [Initialize_0D_Database]: Adding Exchange Kinetics for "${System2}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System2}${FldrName2}"/T"$TTran"K/Exch_Type1.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
   fi
+
+  iExch=${ExchFlg2}
+  if [ ${iExch} -eq 1 ]; then
+    echo "  [Initialize_0D_Database]: Adding Exchange Kinetics for "${System1}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System1}${FldrName1}"/T"$TTran"K/Exch_Type2.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+
+    echo "  [Initialize_0D_Database]: Adding Exchange Kinetics for "${System2}" to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+    cat $PathToDtbFldr"/kinetics/"${System2}${FldrName2}"/T"$TTran"K/Exch_Type2.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+  fi
+
 
 
   #######################################################################################################3
   #### Adding Molecules Info
   #### 
-  for Molecule in "${Molecule_vec[@]}"; do :
+  for Molecule in "${Molecule_vec1[@]}"; do :
 
     echo "  [Initialize_0D_Database]: Copying Thermo File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
     #cat $PathToDtbFldr/"/thermo/"${System}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
-    cat $PathToDtbFldr/"/thermo/"${System}${FldrName}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+    cat $PathToDtbFldr/"/thermo/"${System1}${FldrName1}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
 
     echo "  [Initialize_0D_Database]: Copying Initial Mole Fraction File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${T0}"K"
     #cat $PathToDtbFldr/"/thermo/"${System}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
-    cat $PathToDtbFldr/"/thermo/"${System}${FldrName}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
+    cat $PathToDtbFldr/"/thermo/"${System1}${FldrName1}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
 
   done
+
+  # for Molecule in "${Molecule_vec2[@]}"; do :
+
+  #   echo "  [Initialize_0D_Database]: Copying Thermo File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+  #   #cat $PathToDtbFldr/"/thermo/"${System}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+  #   cat $PathToDtbFldr/"/thermo/"${System2}${FldrName2}"/"${Molecule}"_T"${TTran}"K" > $PathToDtbFldr/"/thermo/"${Molecule}"_T"${TTran}"K"
+
+  #   echo "  [Initialize_0D_Database]: Copying Initial Mole Fraction File "$PathToDtbFldr/"/thermo/"${Molecule}"_T"${T0}"K"
+  #   #cat $PathToDtbFldr/"/thermo/"${System}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
+  #   cat $PathToDtbFldr/"/thermo/"${System2}${FldrName2}"/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat" > $PathToDtbFldr/"/thermo/"${Molecule}"_InitialMoleFracs_T"${T0}"K.dat"
+
+  # done
   #########################################################################################################################################################
   #########################################################################################################################################################
 

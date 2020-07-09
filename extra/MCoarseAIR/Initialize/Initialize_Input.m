@@ -37,14 +37,17 @@ function Initialize_Input()
     
     Syst.NameLong   = Input.SystNameLong;
     
-    for iMol = 1:size(Input.Kin.MolResolutionIn,1)
-        Syst.Molecule(iMol).KinMthdIn(:) = Input.Kin.MolResolutionIn(iMol,:);
+    for iMol = 1:size(Input.Kin.MolResolutionIn,2)
+        Syst.Molecule(iMol).KinMthdIn    = Input.Kin.MolResolutionIn(iMol);
         Syst.Molecule(iMol).EqNStatesIn  = Input.Kin.EqNStatesIn(iMol);
         
         Syst.Molecule(iMol).MinStateIn   = Input.Kin.MinStateIn(iMol);
         Syst.Molecule(iMol).MaxStateIn   = Input.Kin.MaxStateIn(iMol);
         
         Syst.Molecule(iMol).NGroupsIn    = Input.Kin.NGroupsIn(iMol);
+        
+        clear( Syst.Molecule(iMol).DiatPot );
+        Syst.Molecule(iMol).DissEn       = feval(Syst.Molecule(iMol).DiatPot, fminsearch(Syst.Molecule(iMol).DiatPot, 1.5));
     end
     
     
@@ -59,12 +62,7 @@ function Initialize_Input()
     if (Input.Kin.NBinsSuffix > 0)
         TempStr = strcat('_', num2str(Input.Kin.NBinsSuffix), 'Bins');
     end
-    if (Syst.NAtoms == 3)
-        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2), TempStr);
-    else
-        Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.DissInelFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2), TempStr);
-    end
-    
+    Input.Kin.Proc.OverallFlg = strcat(num2str(Input.Kin.Proc.DissFlg),'_',num2str(Input.Kin.Proc.InelFlg),'_',num2str(Input.Kin.Proc.ExchFlg1),'_',num2str(Input.Kin.Proc.ExchFlg2), TempStr);
     
     Syst.iPES = ''
     if (Input.iPES > 0)
@@ -85,7 +83,7 @@ function Initialize_Input()
         OtherSyst(iSyst).Syst.HDF5_File = strcat(Input.Paths.ToHDF5Fldr, OtherSyst(iSyst).Syst.NameLong, Input.Suffix, Syst.iPES, '.hdf5');
     
         for iMol = 1:OtherSyst(iSyst).Syst.NMolecules
-            OtherSyst(iSyst).Syst.Molecule(iMol).KinMthdIn(:) = 'StS';
+            OtherSyst(iSyst).Syst.Molecule(iMol).KinMthdIn    = {'StS'};
             OtherSyst(iSyst).Syst.Molecule(iMol).MinStateIn   = 1;
             OtherSyst(iSyst).Syst.Molecule(iMol).MaxStateIn   = 100000;
             OtherSyst(iSyst).Syst.Molecule(iMol).NGroupsIn    = 1;
