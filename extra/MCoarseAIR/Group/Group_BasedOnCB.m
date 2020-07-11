@@ -37,15 +37,15 @@ function [LevelToGroup] = Group_BasedOnCB(Syst, Controls, iMol)
     fprintf('    Maximum Distance from Centrifugal Barrier = %e eV\n', MinEeV)
 
     Extr(1) = MinEeV;
-    for i=1:NGroups
-       Extr(i+1) =  (1.0 - (i/NGroups)^(alpha)) * Extr(1);
+    for i=1:NGroups-1
+       Extr(i+1) =  ((1.0 - i/(NGroups-1))^(1/alpha)) * Extr(1);
     end
-%     figure
-%     plot(Extr,'o-')
-%     
+    figure
+    plot(Extr,'o-')
+    
     LevelToGroup = zeros(Syst.Molecule(iMol).NLevels,1);
     for iLevels = 1:Syst.Molecule(iMol).NLevels
-        if (Syst.Molecule(iMol).LevelECB(iLevels) < MinEeV)
+        if (Syst.Molecule(iMol).LevelECB(iLevels) <= MinEeV)
             iGroup = 1;
             while (-Syst.Molecule(iMol).LevelECB(iLevels) >= -Extr(iGroup)+1e-20)
                 iGroup = iGroup + 1;

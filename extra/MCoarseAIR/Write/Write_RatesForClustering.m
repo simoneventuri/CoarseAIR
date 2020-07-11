@@ -47,11 +47,11 @@ function Write_RatesForClustering(Controls)
         MinState = max(Controls.MinState, 1);
         MaxState = min(Controls.MaxState, Syst.Molecule(iMol).NLevels);
 
-        
-        Controls.MinEeV(iMol)  = abs(Syst.Molecule(iMol).DissEn) / 2.0;
-        Controls.NGroups(iMol) = 21;
-        Controls.alpha(iMol)   = 1.0/2.0; 
-        LevelToGroup           = Group_BasedOnCB(Syst, Controls, iMol);
+        LevelToGroup = 0.*[1:1:Syst.Molecule(iMol).NLevels];
+%         Controls.MinEeV(iMol)  = abs(Syst.Molecule(iMol).DissEn) / 2.0;
+%         Controls.NGroups(iMol) = 21;
+%         Controls.alpha(iMol)   = 1.0/2.0; 
+%         LevelToGroup           = Group_BasedOnCB(Syst, Controls, iMol);
   
         
         fprintf('Writing Level Properties\n')

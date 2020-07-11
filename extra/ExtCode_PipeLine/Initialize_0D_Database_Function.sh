@@ -43,7 +43,7 @@ echo "Units=cm^3/s" > $PathToDtbFldr"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 #######################################################################################################3
 #### Adding Dissociation Processes
 #### 
-if [ $DissFlg -eq 1 ]; then
+if [ $DissFlg -eq 1 ] || [ $DissFlg -eq 13 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 

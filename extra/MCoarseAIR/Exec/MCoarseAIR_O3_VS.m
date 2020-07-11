@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [5000, 10000, 20000]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.TranVec                   = [10000]%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong              = 'O3_UMN';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -57,9 +57,9 @@ Input.Kin.CGM_Strategy          = [   {''}];
 Input.Kin.ParamsGroupsOut       = [    1.0];
 Input.Kin.NGroupsOut            = [     45];
 
-Input.Kin.Proc.DissFlg          = 2;
+Input.Kin.Proc.DissFlg          = 13;
 Input.Kin.NBinsSuffix           = 0;
-Input.Kin.DissCorrFactor        = 16.0/3.0;
+Input.Kin.DissCorrFactor        = 1.0%16.0/3.0;
 Input.Kin.Proc.DissInelFlg      = 0;
 Input.Kin.Proc.InelFlg          = 1;
 Input.Kin.Proc.ExchFlg1         = 1;
@@ -84,7 +84,7 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 
 %% Tasks Inputs
-Input.Tasks.All = false
+Input.Tasks.All = true
 
 %% CoarseAIR
 % Plotting Diatomic Potential
@@ -146,9 +146,9 @@ Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
 Input.Tasks.Plot_EnergyDepletions.Targ                 = [2];
 
 if (Input.Tasks.All)
-    Input.Kin.Proc.DissFlg          = 2;
+    Input.Kin.Proc.DissFlg          = 13;
     Input.Kin.NBinsSuffix           = 0;
-    Input.Kin.DissCorrFactor        = 16.0/3.0;
+    Input.Kin.DissCorrFactor        = 1.0%16.0/3.0;
     Input.Kin.Proc.DissInelFlg      = 0;
     Input.Kin.Proc.InelFlg          = 1;
     Input.Kin.Proc.ExchFlg1         = 1;

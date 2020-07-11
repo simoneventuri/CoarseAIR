@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O3_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [5000, 10000, 20000];%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
+Input.TranVec                   = [10000];%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong              = 'O3_UMN';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -50,17 +50,17 @@ Input.Kin.MaxStateIn            = [   6115];
 Input.Kin.PathToMappingIn       = [   {''}];
 Input.Kin.PathToWriteMappingIn  = [   {''}];
 Input.Kin.NGroupsIn             = [      0];
-Input.Kin.MolResolutionOut      = [{'VSM'}];
+Input.Kin.MolResolutionOut      = [{'CGM'}];
 Input.Kin.PathToMappingOut      = [   {''}];
-Input.Kin.CGM_Strategy          = [{'DPM'}];
-Input.Kin.ParamsGroupsOut       = [    0.5];
+Input.Kin.CGM_Strategy          = [{'CBM'}];
+Input.Kin.ParamsGroupsOut       = [    0.5  ];
 Input.Kin.NGroupsOut            = [     20]; %45
 % Input.Kin.CGM_Strategy          = [{'RVE'}];
 % Input.Kin.ParamsGroupsOut       = [     30];
 % Input.Kin.NGroupsOut            = [     45]; %45
 Input.Kin.PathToWriteMappingOut = [{''}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
-Input.Kin.Proc.DissFlg          = 2;
+Input.Kin.Proc.DissFlg          = 1;
 Input.Kin.NBinsSuffix           = 0;
 Input.Kin.DissCorrFactor        = 16.0/3.0;
 Input.Kin.Proc.DissInelFlg      = 0;
@@ -68,7 +68,7 @@ Input.Kin.Proc.InelFlg          = 1;
 Input.Kin.Proc.ExchFlg1         = 1;
 Input.Kin.Proc.ExchFlg2         = 0;
 
-Input.Kin.ReadRatesProc         = [1, 1, 1]
+Input.Kin.ReadRatesProc         = [2, 2, 2]
 Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst         = []
 Input.Kin.OtherSystInHDF5       = []
@@ -92,7 +92,7 @@ Input.Tasks.All = true
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = true;
+Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0; 1.5, 6.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
@@ -101,7 +101,7 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 % Plotting Pair Contributions to Dissociation Rate Coefficients
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
-Input.Tasks.Write_RatesParaview.Flg                    = true;
+Input.Tasks.Write_RatesParaview.Flg                    = false;
 Input.Tasks.Write_RatesParaview.MinRate                = [5e-11, 1e-12, 1.e-15]
 Input.Tasks.Write_RatesParaview.Proc                   = [true, true, true]
 % Input.Tasks.Write_RatesParaview.vqns                   = [0, 10,  0,20,40, 30,60, 30, 20, 20,  7, 10, 30, 25, 45, 5, 10, 10]
@@ -109,7 +109,7 @@ Input.Tasks.Write_RatesParaview.Proc                   = [true, true, true]
 Input.Tasks.Write_RatesParaview.vqns                   = [0,  0,  0,  0,  0,  0, 10, 10, 10, 10, 10, 10, 25,25, 25, 25, 25, 40,40, 40, 40, 60,60]
 Input.Tasks.Write_RatesParaview.jqns                   = [0,120,180,210,240,280, 30,100,150,180,210,240,  0,90,130,160,190, 30,90,130,160, 15,60]
 % Writing Rates for Clustering
-Input.Tasks.Write_RatesForClustering.Flg               = false;
+Input.Tasks.Write_RatesForClustering.Flg               = true;
 Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
 Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
 Input.Tasks.Write_RatesForClustering.MinState          = 1;
@@ -154,15 +154,15 @@ Input.Tasks.Plot_EnergyDepletions.RemovalProc          = [1];
 Input.Tasks.Plot_EnergyDepletions.Proj                 = [1,1];
 Input.Tasks.Plot_EnergyDepletions.Targ                 = [2];
 
-if (Input.Tasks.All)
-    Input.Kin.Proc.DissFlg          = 2;
-    Input.Kin.NBinsSuffix           = 0;
-    Input.Kin.DissCorrFactor        = 16.0/3.0;
-    Input.Kin.Proc.DissInelFlg      = 0;
-    Input.Kin.Proc.InelFlg          = 1;
-    Input.Kin.Proc.ExchFlg1         = 1;
-    Input.Kin.Proc.ExchFlg2         = 0;
-
+% if (Input.Tasks.All)
+%     Input.Kin.Proc.DissFlg          = 13;
+%     Input.Kin.NBinsSuffix           = 0;
+%     Input.Kin.DissCorrFactor        = 16.0/3.0;
+%     Input.Kin.Proc.DissInelFlg      = 0;
+%     Input.Kin.Proc.InelFlg          = 1;
+%     Input.Kin.Proc.ExchFlg1         = 1;
+%     Input.Kin.Proc.ExchFlg2         = 0;
+% 
 %     Input.Kin.ReadRatesProc         = [2, 2, 2, 0]
 % 
 %     Input.Tasks.Plot_Populations.Flg                       = true;
@@ -171,24 +171,24 @@ if (Input.Tasks.All)
 %     Input.Tasks.Plot_MoleFracs.Flg                         = true;
 %     Input.Tasks.Plot_GlobalRates.Flg                       = true;
 %     Input.Tasks.Plot_EnergyDepletions.Flg                  = true;
-else
-    Input.Kin.Proc.DissFlg          = 0;
-    Input.Kin.NBinsSuffix           = 0;
-    Input.Kin.DissCorrFactor        = 16.0/3.0;
-    Input.Kin.Proc.DissInelFlg      = 0;
-    Input.Kin.Proc.InelFlg          = 1;
-    Input.Kin.Proc.ExchFlg1         = 1;
-    Input.Kin.Proc.ExchFlg2         = 0;
-    
-    Input.Kin.ReadRatesProc         = [0, 2, 2, 0]
-
+% else
+%     Input.Kin.Proc.DissFlg          = 0;
+%     Input.Kin.NBinsSuffix           = 0;
+%     Input.Kin.DissCorrFactor        = 16.0/3.0;
+%     Input.Kin.Proc.DissInelFlg      = 0;
+%     Input.Kin.Proc.InelFlg          = 1;
+%     Input.Kin.Proc.ExchFlg1         = 1;
+%     Input.Kin.Proc.ExchFlg2         = 0;
+%     
+%     Input.Kin.ReadRatesProc         = [0, 2, 2, 0]
+% 
 %     Input.Tasks.Plot_Populations.Flg                       = true;
 %     Input.Tasks.Plot_Energies.Flg                          = true;
 % 
 %     Input.Tasks.Plot_MoleFracs.Flg                         = false;
 %     Input.Tasks.Plot_GlobalRates.Flg                       = false;
 %     Input.Tasks.Plot_EnergyDepletions.Flg                  = false;
-end
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Initializing

@@ -56,9 +56,10 @@ function [Syst] = Group_In(Syst)
             
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'CBM'))
                 fprintf('  Gropuing based on Energy-Distance from Centrifugal Barrier\n\n')
-
+            
                 Controls.NGroups_CB(iMol) = Input.Kin.NGroupsIn(iMol);
                 Controls.alpha(iMol)      = Input.Kin.ParamsGroupsIn(iMol);
+                Controls.MinEeV(iMol)     = 1e10;
                 LevelToGroup = Group_BasedOnCB(Syst, Controls, iMol);  
                 
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'DPM'))

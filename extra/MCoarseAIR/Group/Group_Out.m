@@ -59,6 +59,7 @@ function Group_Out()
 
                 Controls.NGroups_CB(iMol) = Input.Kin.NGroupsOut(iMol);
                 Controls.alpha(iMol)      = Input.Kin.ParamsGroupsOut(iMol);
+                Controls.MinEeV(iMol)     = 1e10;
                 LevelToGroup = Group_BasedOnCB(Syst, Controls, iMol);  
                 
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'DPM'))

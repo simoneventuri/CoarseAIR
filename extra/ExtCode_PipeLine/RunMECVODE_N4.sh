@@ -142,9 +142,9 @@ function Call_MeCvode() {
   elif [ $InelFlg -eq 0 ] && [ $ExchFlg1 -eq 0 ] && [ $ExchFlg2 -eq 0 ]; then
     export InputFile=${PathToDtbFldr}'/input/'${System}'/OnlyDiss/T'${TTran}'K.inp'
   elif [ $DissFlg -eq 5 ]; then
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/DMS/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/Maninder/T'${TTran}'K.inp'
   else
-    export InputFile=${PathToDtbFldr}'/input/'${System}'/Robyn/T'${TTran}'K.inp'
+    export InputFile=${PathToDtbFldr}'/input/'${System}'/All/T'${TTran}'K.inp'
   fi  
   echo "[RunMECVODE]: Input File: "${InputFile}
   
@@ -216,6 +216,6 @@ for TTran in "${Tran_vec[@]}"; do :
   Call_MeCvode
   echo " "
 
-  rm -rf $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
+  #rm -rf $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
 done
