@@ -246,11 +246,17 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
           FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/' // trim(adjustl(FolderName)) // '/PESFromGrid.csv.' // trim(adjustl(Input%AnglesPlotChar(iA)))
           open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
             if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
-              !write(Unit,'(A)') 'Variables = "A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E"'
-              write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E"'
+              if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+                write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E"'
+              else
+                write(Unit,'(A)') 'Variables = "A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E"'
+              end if
             else
-              !write(Unit,'(A)') 'Variables = "A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E", "dA1_x", "dA1_y", "dA1_z", "dA2_x", "dA2_y", "dA2_z", "dA3_x", "dA3_y", "dA3_z", "dA4_x", "dA4_y", "dA4_z"'
-              write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E", "dEdR1", "dEdR2", "dEdR3", "dEdR4", "dEdR5", "dEdR6"'
+              if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+                write(Unit,'(A)') 'Variables = "r1", "r2", "r3", "r4", "r5", "r6", "E", "dEdR1", "dEdR2", "dEdR3", "dEdR4", "dEdR5", "dEdR6"'
+              else
+                write(Unit,'(A)') 'Variables = "A1_x", "A1_y", "A1_z", "A2_x", "A2_y", "A2_z", "A3_x", "A3_y", "A3_z", "A4_x", "A4_y", "A4_z", "E", "dA1_x", "dA1_y", "dA1_z", "dA2_x", "dA2_y", "dA2_z", "dA3_x", "dA3_y", "dA3_z", "dA4_x", "dA4_y", "dA4_z"'
+              end if
             end if
             if (Status/=0) call Error( "Error opening file: " // FileName )
 
@@ -275,45 +281,50 @@ Subroutine Nb4_PlotPES_Grid( This, Input, Collision, NPairs, NAtoms, i_Debug )
                 if (trim(adjustl(Input%POTorFR)) .eq. 'Potential') then
 
                   if (Input%PlotPES_OnlyTriatFlg) then 
-                    !V = Collision%PESsContainer(iPES)%PES%DiatPotential( Rp * RConverter )
-                    V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp, Qp )
+                    V = Collision%PESsContainer(iPES)%PES%TriatPotential( Rp * RConverter, Qp * RConverter )
                   else
-                    V = Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp )
+                    V = Collision%PESsContainer(iPES)%PES%Potential( Rp * RConverter, Qp * RConverter )
                   end if
                     
                   call X_to_R(Qp, Rp)
 
                   !Temp = (V - VRef) * VConverter / abs((V - VRef) * VConverter)
                   if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then 
-                    ! write(Unit,'(es17.6E3,12(A,es17.6E3))')  Qp(1), ',',  Qp(2), ',',  Qp(3), ',', &
-                    !                                          Qp(4), ',',  Qp(5), ',',  Qp(6), ',', &
-                    !                                          Qp(7), ',',  Qp(8), ',',  Qp(9), ',', &
-                    !                                         Qp(10), ',', Qp(11), ',', Qp(12), ',', &
-                    !                                         (V - VRef) * VConverter
-                    write(Unit,'(es17.6E3,6(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
-                                                           (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
+                    if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+                      write(Unit,'(es17.6E3,6(A,es17.6E3))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
+                                                             (V - VRef) * VConverter!Temp*max(abs((V - VRef) * VConverter), 1.d-90 )
+                    else 
+                      write(Unit,'(es17.6E3,12(A,es17.6E3))')  Qp(1), ',',  Qp(2), ',',  Qp(3), ',', &
+                                                               Qp(4), ',',  Qp(5), ',',  Qp(6), ',', &
+                                                               Qp(7), ',',  Qp(8), ',',  Qp(9), ',', &
+                                                              Qp(10), ',', Qp(11), ',', Qp(12), ',', &
+                                                              (V - VRef) * VConverter
+                    end if
                   end if
                   
                 elseif (trim(adjustl(Input%POTorFR)) .eq. 'Force') then           
                   
-                  call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Zero*Rp, V, dVdR, dVdQ )  
+                  call Collision%PESsContainer(iPES)%PES%Compute( Rp * RConverter, Qp * RConverter, V, dVdR, dVdQ )  
 
                   call X_to_R(Qp, Rp)
                   dVdQ = dVdQ * dVConverter
                   
                   if ( (V - Vinf)*VConverter <= Input%EnergyCutOff ) then                                           
-                    ! write(Unit,'(es15.6,24(A,es15.6))') Qp(1), ',',  Qp(2), ',',  Qp(3), ',',       &
-                    !                                     Qp(4), ',',  Qp(5), ',',  Qp(6), ',',       &
-                    !                                     Qp(7), ',',  Qp(8), ',',  Qp(9), ',',       &
-                    !                                    Qp(10), ',', Qp(11), ',', Qp(12), ',',       &
-                    !                                    (V - VRef) * VConverter, ',',                &
-                    !                                     dVdQ(1), ',',  dVdQ(2), ',',  dVdQ(3), ',', &
-                    !                                     dVdQ(4), ',',  dVdQ(5), ',',  dVdQ(6), ',', &
-                    !                                     dVdQ(7), ',',  dVdQ(8), ',',  dVdQ(9), ',', &
-                    !                                    dVdQ(10), ',', dVdQ(11), ',', dVdQ(12)
-                    write(Unit,'(es15.6,12(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
-                                                        (V - VRef) * VConverter, ',',                                           &
-                                                        (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter, ',', (dVdR(4)) * dVConverter, ',', (dVdR(5)) * dVConverter, ',', (dVdR(6)) * dVConverter 
+                    if (Collision%PESsContainer(iPES)%PES%CartCoordFlg) then
+                      write(Unit,'(es15.6,12(A,es15.6))') Rp(1), ',', Rp(2), ',', Rp(3), ',', Rp(4), ',', Rp(5), ',', Rp(6), ',', &
+                                                          (V - VRef) * VConverter, ',',                                           &
+                                                           (dVdR(1)) * dVConverter, ',', (dVdR(2)) * dVConverter, ',', (dVdR(3)) * dVConverter, ',', (dVdR(4)) * dVConverter, ',', (dVdR(5)) * dVConverter, ',', (dVdR(6)) * dVConverter 
+                    else
+                      write(Unit,'(es15.6,24(A,es15.6))') Qp(1), ',',  Qp(2), ',',  Qp(3), ',',       &
+                                    Qp(4), ',',  Qp(5), ',',  Qp(6), ',',       &
+                                    Qp(7), ',',  Qp(8), ',',  Qp(9), ',',       &
+                                   Qp(10), ',', Qp(11), ',', Qp(12), ',',       &
+                                   (V - VRef) * VConverter, ',',                &
+                                    dVdQ(1), ',',  dVdQ(2), ',',  dVdQ(3), ',', &
+                                    dVdQ(4), ',',  dVdQ(5), ',',  dVdQ(6), ',', &
+                                    dVdQ(7), ',',  dVdQ(8), ',',  dVdQ(9), ',', &
+                                   dVdQ(10), ',', dVdQ(11), ',', dVdQ(12)
+                    end if
                   end if
                   
                 end if  

@@ -223,6 +223,11 @@ Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
     do iPES = 1,Input%NPESs
       write(iPESChar,'(I4)') iPES
 
+      Rp = [RpLong, RpLong, RpLong, RpLong, RpLong, RpLong]
+      Qp = [Zero, Zero, Zero, RpLong, Zero, Zero, RpLong, RpLong, Zero, Zero, RpLong, Zero]
+      call Collision%PESsContainer(iPES)%PES%Compute( Rp, Qp, VInf, dVdR, dVdQ )    
+      write(*,*) 'VInf = ', VInf*VConverter, ' eV'
+
 
       FileName = trim(adjustl(Input%OutputDir)) // '/PlotPES/dVDiat_From_PES' // trim(adjustl(iPESChar)) // '.csv.' // trim(adjustl(iPChar))
       open( File=FileName, NewUnit=Unit1, status='REPLACE', iostat=Status )
@@ -253,6 +258,7 @@ Subroutine PlotPES_DiatPot( This, Input, Collision, NPairs, NAtoms,  i_Debug )
           end if
 
 
+          !V = Collision%PESsContainer(iPES)%PES%Potential( Rp, Qp )
           call Collision%PESsContainer(iPES)%PES%Compute( Rp, Qp, V, dVdR, dVdQ )    
           write(Unit1,'(f15.6,*(A,f15.6))') Rp(iP), ',', (V - VRef) * VConverter, ',', (dVdR(iP)) * dVConverter     
               

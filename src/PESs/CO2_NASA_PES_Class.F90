@@ -115,7 +115,7 @@ Subroutine Initialize_CO2_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   use CO_DiatomicPotential_Class       ,only:  CO_DiatomicPotential_Type
   use O2_NASA_DiatomicPotential_Class  ,only:  O2_NASA_DiatomicPotential_Type
   
-  class(CO2_NASA_PES_Type)                  ,intent(out)    ::    This
+  class(CO2_NASA_PES_Type)                  ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms 
   integer                                   ,intent(in)     ::    iPES

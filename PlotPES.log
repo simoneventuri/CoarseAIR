@@ -1,0 +1,19 @@
+  [PlotPES]: LevelOutputDir = /home/venturi/WORKSPACE/CoarseAIR/coarseair/Test                                                                                                      
+
+  [PlotPES]: Reading the input. Calling Input%Initialize
+    [InitializeCGQCTInput]: Entering
+      [InitializeIOpaths]: Entering
+      [InitializeIOpaths]: Inquiring for $COARSEAIR_INPUT_DIR Environment Variable
+      [InitializeIOpaths]: Input Directory Path, This%InputDir = /home/venturi/WORKSPACE/CoarseAIR/coarseair/input                                                                                                     
+      [InitializeIOpaths]: Inquiring for $COARSEAIR_INPUT_FILE Environment Variable
+      [InitializeIOpaths]: Input File Path, This%InputFile = /home/venturi/WORKSPACE/CoarseAIR/coarseair/input/CoarseAIR.inp                                                                                       
+      [InitializeIOpaths]: Inquiring for $COARSEAIR_OUTPUT_DIR Environment Variable
+      [InitializeIOpaths]: Output Directory Path, This%OutputDir = /home/venturi/WORKSPACE/CoarseAIR/coarseair/Test                                                                                                      
+      [InitializeIOpaths]: Inquiring for $COARSEAIR_BIN_OUTPUT_DIR Environment Variable
+      [InitializeIOpaths]: Bin Output Directory Path, This%OutputDir = /home/venturi/WORKSPACE/CoarseAIR/coarseair/Test                                                                                                      
+      [InitializeIOpaths]: Exiting
+    [InitializeCGQCTInput]: Reading the Input Parameter file
+    [InitializeCGQCTInput]: -> Opening file: /home/venturi/WORKSPACE/CoarseAIR/coarseair/input/CoarseAIR.inp
+***** ERROR *****
+Error opening file: /home/venturi/WORKSPACE/CoarseAIR/coarseair/input/CoarseAIR.inp
+***** ERROR *****

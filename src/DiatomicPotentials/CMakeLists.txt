@@ -7,6 +7,7 @@ add_sources (
   ModMorse_DiatomicPotential_Class.F90
   N2_MyLeRoy_DiatomicPotential_Class.F90
   N2_UMN_ForN4_DiatomicPotential_Class.F90
+  N2_UMN_PIPNN_ForN4_DiatomicPotential_Class.F90
   N2_UMN_ForN2O2_DiatomicPotential_Class.F90
   O2_UMN_DiatomicPotential_Class.F90
   O2_NASA_DiatomicPotential_Class.F90

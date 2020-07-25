@@ -45,29 +45,29 @@ Module PES_Factory_Class
 !________________________________________________________________________________________________________________________________!
 Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
 
-  use Input_Class          ,only:    Input_Type
-  use Atom_Class           ,only:    Atom_Type
-  use PES_Class            ,only:    PES_Type
-  use O3_NN_PES_Class      ,only:    O3_NN_PES_Type
-  use N3_NASA_PES_Class    ,only:    N3_NASA_PES_Type                                                                      
-  use N3_UMN_PES_Class     ,only:    N3_UMN_PES_Type  
-  use N3Half_NASA_PES_Class,only:    N3Half_NASA_PES_Type                                                                      
-  use CO2_NASA_PES_Class   ,only:    CO2_NASA_PES_Type
-  use COAr_NASA_PES_Class  ,only:    COAr_NASA_PES_Type
-  use O3_UMN_PES_Class     ,only:    O3_UMN_PES_Type
-  use O4_UMN_PES_Class     ,only:    O4_UMN_PES_Type
-  use N2O_UMN_PES_Class    ,only:    N2O_UMN_PES_Type
-  use N2O_Basel_PES_Class  ,only:    N2O_Basel_PES_Type
-  use NO2_Basel_PES_Class  ,only:    NO2_Basel_PES_Type
-  use N4_NASA_PES_Class    ,only:    N4_NASA_PES_Type
-  use N4_UMN_PES_Class     ,only:    N4_UMN_PES_Type
-  use CHN_UIUC_PES_Class   ,only:    CHN_UIUC_PES_Type
-  use CNO_Basel_PES_Class  ,only:    CNO_Basel_PES_Type
-
-  use LEPS_PES_Class       ,only:    LEPS_PES_Type
-  use NN_PES_Class         ,only:    NN_PES_Type
-  use GP_PES_Class         ,only:    GP_PES_Type
-  use BNN_PES_Class        ,only:    BNN_PES_Type
+  use Input_Class               ,only:    Input_Type
+  use Atom_Class                ,only:    Atom_Type
+  use PES_Class                 ,only:    PES_Type
+  use O3_NN_PES_Class           ,only:    O3_NN_PES_Type
+  use N3_NASA_PES_Class         ,only:    N3_NASA_PES_Type                                                                      
+  use N3_UMN_PES_Class          ,only:    N3_UMN_PES_Type  
+  use N3Half_NASA_PES_Class     ,only:    N3Half_NASA_PES_Type                                                                      
+  use CO2_NASA_PES_Class        ,only:    CO2_NASA_PES_Type
+  use COAr_NASA_PES_Class       ,only:    COAr_NASA_PES_Type
+  use O3_UMN_PES_Class          ,only:    O3_UMN_PES_Type
+  use O4_UMN_PES_Class          ,only:    O4_UMN_PES_Type
+  use N2O_UMN_PES_Class         ,only:    N2O_UMN_PES_Type
+  use N2O_Basel_PES_Class       ,only:    N2O_Basel_PES_Type
+  use NO2_Basel_PES_Class       ,only:    NO2_Basel_PES_Type
+  use N4_NASA_PES_Class         ,only:    N4_NASA_PES_Type
+  use N4_UMN_PES_Class          ,only:    N4_UMN_PES_Type
+  use N4_UMN_PIPNN_PES_Class    ,only:    N4_UMN_PIPNN_PES_Type
+  use CHN_UIUC_PES_Class        ,only:    CHN_UIUC_PES_Type
+  use CNO_Basel_PES_Class       ,only:    CNO_Basel_PES_Type
+  use LEPS_PES_Class            ,only:    LEPS_PES_Type
+  use NN_PES_Class              ,only:    NN_PES_Type
+  use GP_PES_Class              ,only:    GP_PES_Type
+  use BNN_PES_Class             ,only:    BNN_PES_Type
 
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms
@@ -272,6 +272,28 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
           case ('UMN')                                                                                                              
             if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PES_Type object" )
             allocate( N4_UMN_PES_Type :: PES )
+
+          case ('UMN_PIPNN')                                                                                                              
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PIPNN_PES_Type object" )
+            allocate( N4_UMN_PIPNN_PES_Type :: PES )
+            PES%UseSurface = [1,1,1]
+            if (i_Debug_Loc) call Logger%Write( "PES%UseSurface = ", PES%UseSurface )
+          case ('UMN_PIPNN_A')                                                                                                              
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PIPNN_PES_Type object" )
+            allocate( N4_UMN_PIPNN_PES_Type :: PES )
+            PES%UseSurface = [1,0,0]
+            if (i_Debug_Loc) call Logger%Write( "PES%UseSurface = ", PES%UseSurface )
+          case ('UMN_PIPNN_B')                                                                                                              
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PIPNN_PES_Type object" )
+            allocate( N4_UMN_PIPNN_PES_Type :: PES )
+            PES%UseSurface = [0,1,0]
+            if (i_Debug_Loc) call Logger%Write( "PES%UseSurface = ", PES%UseSurface )
+          case ('UMN_PIPNN_C')                                                                                                              
+            if (i_Debug_Loc) call Logger%Write( "Constructing a N4_UMN_PIPNN_PES_Type object" )
+            allocate( N4_UMN_PIPNN_PES_Type :: PES )
+            PES%UseSurface = [0,0,1]
+            if (i_Debug_Loc) call Logger%Write( "PES%UseSurface = ", PES%UseSurface )
+
           case default
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select

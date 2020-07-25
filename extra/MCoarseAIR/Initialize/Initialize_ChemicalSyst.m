@@ -32,9 +32,9 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         
         %%% System
         Syst.Name          = 'N3';
-
-        Syst.NProc         = 2; %(Diss+Inel&Exch)
-%         Syst.NProc         = 3; %(Diss+Inel+Exch)
+% 
+%         Syst.NProc         = 2; %(Diss+Inel&Exch)
+        Syst.NProc         = 3; %(Diss+Inel+Exch)
         
         %%% Atoms
         Syst.NAtoms        = 3;
@@ -107,23 +107,23 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.MolToCFDComp       = [2];
 
         
-        Syst.RxLxIdx = [ 2,-1;   % Diss;
-                         0, 0];  % Inel+Exch1
-
-        %% Exchange Properties
-        Syst.ExchToMol          = [];
-        Syst.ExchToAtom         = [];        
-        Syst.PairToExch         = [];
+%         Syst.RxLxIdx = [ 2,-1;   % Diss;
+%                          0, 0];  % Inel+Exch1
+% 
+%         %% Exchange Properties
+%         Syst.ExchToMol          = [];
+%         Syst.ExchToAtom         = [];        
+%         Syst.PairToExch         = [];
 
                      
-%         Syst.RxLxIdx = [-2, 1;   % Diss
-%                          0, 0;   % Inel
-%                          0, 0];  % Exch1                        
+        Syst.RxLxIdx = [-2, 1;   % Diss
+                         0, 0;   % Inel
+                         0, 0];  % Exch1                        
 
-%         %% Exchange Properties
-%         Syst.ExchToMol          = [1];
-%         Syst.ExchToAtom         = [3];
-%         Syst.PairToExch         = [1];
+        %% Exchange Properties
+        Syst.ExchToMol          = [1];
+        Syst.ExchToAtom         = [3];
+        Syst.PairToExch         = [1];
         
         Syst.ToOtherExch        = []    ;
         

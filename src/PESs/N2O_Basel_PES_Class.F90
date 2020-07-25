@@ -120,7 +120,7 @@ Subroutine Initialize_N2O_Basel_PES( This, Input, Atoms, iPES, i_Debug )
   use DiatomicPotential_Factory_Class  ,only:  DiatomicPotential_Factory_Type
 
 
-  class(N2O_Basel_PES_Type), intent(out)    :: This
+  class(N2O_Basel_PES_Type), intent(inout)  :: This
   type(Input_Type), intent(in)              :: Input
   type(Atom_Type) ,dimension(:), intent(in) :: Atoms
   integer, intent(in)                       :: iPES

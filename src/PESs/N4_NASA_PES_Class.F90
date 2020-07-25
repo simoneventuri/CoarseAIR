@@ -49,8 +49,6 @@ Module N4_NASA_PES_Class
     procedure ::  TriatPotential =>    N4_NASA_Potential_From_R_OnlyTriat
   End Type
 
-  logical                                 ,parameter      :: i_Debug_Global = .False.
-
   integer                                 ,parameter      :: lwork  = 50
 
   real(rkp)                               ,parameter      :: retd   = 2.76149524d0
@@ -105,7 +103,9 @@ Module N4_NASA_PES_Class
   real(rkp)                               ,parameter      :: dp2   = dp1
   real(rkp)                               ,parameter      :: preqq = 1.5d0*dsqrt(Two)
   real(rkp)                               ,parameter      :: db2td = -Two*detd*betatd !-0.205492086153018d0 
- 
+
+  logical                                 ,parameter      :: i_Debug_Global = .False.
+
   contains
 
 ! **************************************************************************************************************
@@ -119,7 +119,7 @@ Subroutine Initialize_N4_NASA_PES( This, Input, Atoms, iPES, i_Debug )
   use Atom_Class                         ,only:  Atom_Type
   use N2_LeRoy_DiatomicPotential_Class   ,only:  N2_LeRoy_DiatomicPotential_Type
   
-  class(N4_NASA_PES_Type)                   ,intent(out)    ::    This
+  class(N4_NASA_PES_Type)                   ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms  
   integer                                   ,intent(in)     ::    iPES

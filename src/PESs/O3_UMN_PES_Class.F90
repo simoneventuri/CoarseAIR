@@ -70,7 +70,7 @@ Subroutine Initialize_O3_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   use Input_Class                     ,only:  Input_Type
   use Atom_Class                      ,only:  Atom_Type
   
-  class(O3_UMN_PES_Type)                    ,intent(out)    ::    This
+  class(O3_UMN_PES_Type)                    ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms
   integer                                   ,intent(in)     ::    iPES

@@ -48,7 +48,8 @@ function Initialize_Parameters
     Param.BToCm    = 5.2918e-11 * 1e2;
     Param.DSWtoKg  = 1.d-3/1.8208e+03;
     Param.ATMToPa  = 101325.d0;
-
+    Param.Ru       = Param.AvN * Param.KJK;
+    
     if Syst.NAtoms == 3
         Param.Pair_to_Atoms = [1,2;1,3;2,3];
     else

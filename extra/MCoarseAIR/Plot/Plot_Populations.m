@@ -68,7 +68,8 @@ function Plot_Populations(Controls)
 
                 scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
                 hold on
-                
+                ylim([1.d5, 1.d23]);
+
             elseif Controls.GroupColors == 1
 
                 scatter(LevelEeV, LevelPop, 20, LevelToBin, 'Filled');
@@ -80,6 +81,7 @@ function Plot_Populations(Controls)
                 ylab.Interpreter = 'latex';
                 set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
                 cb.Label.Interpreter = 'latex';
+                ylim([1.d5, 1.d23]);
 
              elseif Controls.GroupColors == 2
 
@@ -102,7 +104,8 @@ function Plot_Populations(Controls)
                     hold on
                     clear LevelEeVTemp LevelPopTemp
                 end
-                
+                ylim([1.d5, 1.d23]);
+
              elseif Controls.GroupColors == 3
                 
                 clear DissRates
@@ -119,6 +122,14 @@ function Plot_Populations(Controls)
                 ylabel(cb, '$log_{10}(k_i^D)$')
                 set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
                 cb.Label.Interpreter = 'latex';
+                ylim([1.d5, 1.d23]);
+                
+            elseif Controls.GroupColors == 4
+                
+                %scatter(LevelEeV - LevelEeV(1), LevelPop ./ LevelPop(1), 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+                scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+                hold on
+                %ylim([1.d-20, 1.d0]);
 
             end
 
@@ -136,7 +147,6 @@ function Plot_Populations(Controls)
             str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
             ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
             ylab.Interpreter = 'latex';
-            ylim([1.d5, 1.d23]);
             set(gca, 'YScale', 'log')
                         
             pbaspect([1 1 1])
@@ -183,6 +193,7 @@ function Plot_Populations(Controls)
 
                 scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
                 hold on
+                ylim([1.d5, 1.d23]);
 
             elseif Controls.GroupColors == 1
 
@@ -195,6 +206,7 @@ function Plot_Populations(Controls)
                 ylab.Interpreter = 'latex';
                 set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
                 cb.Label.Interpreter = 'latex';
+                ylim([1.d5, 1.d23]);
 
              elseif Controls.GroupColors == 2
 
@@ -217,6 +229,7 @@ function Plot_Populations(Controls)
                     hold on
                     clear LevelEeVTemp LevelPopTemp
                 end
+                ylim([1.d5, 1.d23]);
 
              elseif Controls.GroupColors == 3
 
@@ -234,6 +247,14 @@ function Plot_Populations(Controls)
                 ylabel(cb, '$log_{10}(k_i^D)$')
                 set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
                 cb.Label.Interpreter = 'latex';
+                ylim([1.d5, 1.d23]);
+                
+            elseif Controls.GroupColors == 4
+
+                %scatter(LevelEeV - LevelEeV(1), LevelPop ./ LevelPop(1), 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+                scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+                hold on
+                %ylim([1.d-20, 1.d0]);
 
             end
 
@@ -250,7 +271,6 @@ function Plot_Populations(Controls)
             str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
             ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
             ylab.Interpreter = 'latex';
-            ylim([1.d5, 1.d23]);
             set(gca, 'YScale', 'log')
 
             pbaspect([1 1 1])
@@ -296,6 +316,7 @@ function Plot_Populations(Controls)
 
             scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Syst.CFDComp(iComp).Color, 'MarkerFaceColor', Syst.CFDComp(iComp).Color, 'LineWidth', 1.5)
             hold on
+            ylim([1.d5, 1.d23]);
 
         elseif Controls.GroupColors == 1
 
@@ -308,6 +329,7 @@ function Plot_Populations(Controls)
             ylab.Interpreter = 'latex';
             set(cb,'FontSize', Param.LegendFontSz,'FontName', Param.LegendFontNm,'TickLabelInterpreter','latex');
             cb.Label.Interpreter = 'latex';
+            ylim([1.d5, 1.d23]);
 
          elseif Controls.GroupColors == 2
 
@@ -330,6 +352,7 @@ function Plot_Populations(Controls)
                 hold on
                 clear LevelEeVTemp LevelPopTemp
             end
+            ylim([1.d5, 1.d23]);
 
          elseif Controls.GroupColors == 3
 
@@ -347,6 +370,14 @@ function Plot_Populations(Controls)
             ylabel(cb, '$log_{10}(k_i^D)$')
             set(cb, 'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'TickLabelInterpreter', 'latex');
             cb.Label.Interpreter = 'latex';
+            ylim([1.d5, 1.d23]);
+            
+        elseif Controls.GroupColors == 4
+
+            %scatter(LevelEeV - LevelEeV(1), LevelPop ./ LevelPop(1), 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+            scatter(LevelEeV, LevelPop, 80, '.', 'MarkerEdgeColor', Param.CMat(Controls.ColorIdx,:), 'MarkerFaceColor', Param.CMat(Controls.ColorIdx,:), 'LineWidth', 1.5)
+            hold on
+            %ylim([1.d-20, 1.d0]);
 
         end
 
@@ -363,7 +394,6 @@ function Plot_Populations(Controls)
         str_y = ['$N_{i} / g_{i}$ $[m^{-3}]$'];
         ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
         ylab.Interpreter = 'latex';
-        ylim([1.d5, 1.d23]);
         set(gca, 'YScale', 'log')
 
         

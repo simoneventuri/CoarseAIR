@@ -76,7 +76,7 @@ Subroutine Initialize_CHN_UIUC_PES( This, Input, Atoms, iPES, i_Debug )
   use Atom_Class                         ,only:  Atom_Type
   use DiatomicPotential_Factory_Class     ,only:  DiatomicPotential_Factory_Type
   
-  class(CHN_UIUC_PES_Type)                  ,intent(out)    ::    This
+  class(CHN_UIUC_PES_Type)                  ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms  
   integer                                   ,intent(in)     ::    iPES

@@ -137,6 +137,7 @@ function [Syst] = Read_LevelInfo(Syst)
             if (Syst.Molecule(iMol).Leveljqn(iLevels) == 0) 
                 vToLevel(Syst.Molecule(iMol).Levelvqn(iLevels)+1,1)                   = iLevels; 
                 Syst.Molecule(iMol).vEeVVib0(Syst.Molecule(iMol).Levelvqn(iLevels)+1) = Syst.Molecule(iMol).LevelEeV0(iLevels);         
+                Syst.Molecule(iMol).vEeVVib(Syst.Molecule(iMol).Levelvqn(iLevels)+1)  = Syst.Molecule(iMol).LevelEeV(iLevels);         
             end
         end
                 

@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates OtherSyst OtherRates
@@ -60,15 +60,15 @@ Input.Kin.ParamsGroupsOut       = [     40];
 Input.Kin.NGroupsOut            = [     60]; %61
 Input.Kin.PathToWriteMappingOut = [{''}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}]
 
-Input.Kin.Proc.DissFlg          = 1;
+Input.Kin.Proc.DissFlg          = 0;
 Input.Kin.NBinsSuffix           = 0;
 Input.Kin.DissCorrFactor        = 1.0;
 Input.Kin.Proc.DissInelFlg      = 0;
 Input.Kin.Proc.InelFlg          = 1;
-Input.Kin.Proc.ExchFlg1         = 0;
+Input.Kin.Proc.ExchFlg1         = 1;
 Input.Kin.Proc.ExchFlg2         = 0;
 
-Input.Kin.ReadRatesProc         = [2, 2]
+Input.Kin.ReadRatesProc         = [2, 2, 2]
 Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst         = []
 Input.Kin.OtherSystInHDF5       = []
@@ -79,7 +79,7 @@ Input.ReLoad                    = 1;
 
 %% Inputs for Plotting
 Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 2;
+Input.SaveFigsFlgInt     = 0;
 Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
@@ -88,11 +88,11 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 
 
 %% Tasks Inputs
-Input.Tasks.All = true
+Input.Tasks.All = false
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = false;
+Input.Tasks.Plot_DiatPot.Flg                           = true;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
@@ -102,19 +102,28 @@ Input.Tasks.Plot_OverallRates.Flg                      = false;
 Input.Tasks.Plot_DifferentDissRates.Flg                = false;
 % Writing Rates for Paraview
 Input.Tasks.Write_RatesParaview.Flg                    = false;
-Input.Tasks.Write_RatesParaview.MinRate                = [5e-13, 1e-12]
-Input.Tasks.Write_RatesParaview.Proc                   = [false, true]
+Input.Tasks.Write_RatesParaview.MinRate                = [1e-12, 1e-12, 1e-12]
+Input.Tasks.Write_RatesParaview.Proc                   = [true, true, true]
 % Input.Tasks.Write_RatesParaview.vqns                   = [0, 10,  0,20,40, 30,60, 30, 20, 20,  7, 10, 30, 25, 45, 5, 10, 10]
 % Input.Tasks.Write_RatesParaview.jqns                   = [0,150,240,30,60,120,10,180,150,170,120, 50,  0, 90,110,90,210,250]
 Input.Tasks.Write_RatesParaview.vqns                   = [0,  0,  0,  0,  0,  0, 10, 10, 10, 10, 10, 10, 25,25, 25, 25, 25, 40,40, 40, 40, 60,60]
 Input.Tasks.Write_RatesParaview.jqns                   = [0,120,180,210,240,280, 30,100,150,180,210,240,  0,90,130,160,190, 30,90,130,160, 15,60]
+Input.Tasks.Write_RatesParaview.IncludeExch            = true
 % Writing Rates for Clustering
-Input.Tasks.Write_RatesForClustering.Flg               = true;
+Input.Tasks.Write_RatesForClustering.Flg               = false;
 Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
 Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
 Input.Tasks.Write_RatesForClustering.MinState          = 1;
 Input.Tasks.Write_RatesForClustering.MaxState          = 100000;
 Input.Tasks.Write_RatesForClustering.IncludeExch       = false;
+Input.Tasks.Write_RatesForClustering.IncludeExch       = true;
+% Writing Rates as A Network
+Input.Tasks.Write_RatesAsNetwork.Flg                   = false;
+Input.Tasks.Write_RatesAsNetwork.MinRate               = 5.e-13;
+Input.Tasks.Write_RatesAsNetwork.WriteFldr             = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
+Input.Tasks.Write_RatesAsNetwork.MinState              = 1;
+Input.Tasks.Write_RatesAsNetwork.MaxState              = 100000;
+Input.Tasks.Write_RatesAsNetwork.IncludeExch           = true;
 % Compute Grouped Rate Coefficients
 Input.Tasks.Compute_GroupedRates.Flg                   = false;
 % Plotting Reconstructed Rate Coefficients
@@ -139,10 +148,16 @@ Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = false;
+Input.Tasks.Plot_Populations.Flg                       = true;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
-Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1e-12, 1e-10, 1e-8]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
-Input.Tasks.Plot_Populations.GroupColors               = 2;
+Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
+Input.Tasks.Plot_Populations.GroupColors               = 4;
+Input.Tasks.Plot_Populations.ColorIdx                  = 2;
+% Plotting RVS Populations Vqn Specific
+Input.Tasks.Plot_PopulationsVqnSpecific.Flg            = false;
+Input.Tasks.Plot_PopulationsVqnSpecific.MoleculesOI    = [1];
+Input.Tasks.Plot_PopulationsVqnSpecific.tSteps         = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
+Input.Tasks.Plot_PopulationsVqnSpecific.GroupColors    = 2;
 % Plotting Energies
 Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
@@ -195,8 +210,8 @@ Input.Tasks.Plot_EnergyDepletions.Targ                 = [2];
 %%%% Initializing
 Syst.NameLong = Input.SystNameLong;
 Syst          = Initialize_ChemicalSyst(Syst)
-Initialize_Input()
 Initialize_Parameters()
+Initialize_Input()
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -217,7 +232,6 @@ if Input.ReLoad > 0
 end
 
 
-
 iFigStart = Input.iFig;
 %% Looping On Translational Temperatures
 for iT = 1:length(Temp.TranVec)
@@ -225,10 +239,10 @@ for iT = 1:length(Temp.TranVec)
     Temp.TNow     = Temp.TranVec(iT);
     Temp.TNowChar = num2str(Temp.TranVec(iT));
     Input.iFig    = iFigStart;
-    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg, Input.RunSuffix);
+    Input.Paths.ToKinRunFldr = strcat(Input.Paths.ToKinMainFldr, '/output_', Syst.NameLong, Input.RunSuffix, '_T', Temp.TNowChar, 'K_', Input.Kin.Proc.OverallFlg);
     
     if Input.ReLoad > 0 
-        close all
+        %close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,8 +263,10 @@ for iT = 1:length(Temp.TranVec)
             Input.Tasks.Plot_DifferentDissRates.Flg        || ...
             Input.Tasks.Write_RatesParaview.Flg            || ...
             Input.Tasks.Write_RatesForClustering.Flg       || ...
+            Input.Tasks.Write_RatesAsNetwork.Flg           || ...
             Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_PopulationsVqnSpecific.Flg    || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg          || ...
@@ -266,6 +282,7 @@ for iT = 1:length(Temp.TranVec)
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_VDF.Flg                       || ...
             Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_PopulationsVqnSpecific.Flg    || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
         
@@ -278,6 +295,7 @@ for iT = 1:length(Temp.TranVec)
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_VDF.Flg                       || ...
             Input.Tasks.Plot_Populations.Flg               || ...
+            Input.Tasks.Plot_PopulationsVqnSpecific.Flg    || ...
             Input.Tasks.Plot_Energies.Flg                  || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
         
@@ -305,7 +323,8 @@ for iT = 1:length(Temp.TranVec)
         
         end
         
-        if ((Input.Tasks.Plot_Populations.Flg && Input.Kin.Proc.DissFlg > 0) || ...
+        if ((Input.Tasks.Plot_Populations.Flg            && Input.Kin.Proc.DissFlg > 0) || ...
+            (Input.Tasks.Plot_PopulationsVqnSpecific.Flg && Input.Kin.Proc.DissFlg > 0) || ...
             Input.Tasks.Plot_GlobalRates.Flg               || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
@@ -315,7 +334,8 @@ for iT = 1:length(Temp.TranVec)
         
         end
         
-        if ((Input.Tasks.Plot_Populations.Flg && Input.Kin.Proc.DissFlg > 0) || ...
+        if ((Input.Tasks.Plot_Populations.Flg            && Input.Kin.Proc.DissFlg > 0) || ...
+            (Input.Tasks.Plot_PopulationsVqnSpecific.Flg && Input.Kin.Proc.DissFlg > 0) || ...
             Input.Tasks.Plot_GlobalRates.Flg                                 || ...
             Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg                   || ...
             Input.Tasks.Plot_EnergyDepletions.Flg)
@@ -352,6 +372,11 @@ for iT = 1:length(Temp.TranVec)
         Write_RatesForParaview(Input.Tasks.Write_RatesParaview)
     end
     
+    %% Writing Rate Coefficients for Paraview
+    if (Input.Tasks.Write_RatesAsNetwork.Flg)
+        Write_RatesAsNetwork(Input.Tasks.Write_RatesAsNetwork)
+    end
+        
     %% Writing Rate Coefficients for Clustering
     if (Input.Tasks.Write_RatesForClustering.Flg)
         Write_RatesForClustering(Input.Tasks.Write_RatesForClustering)
@@ -407,6 +432,11 @@ for iT = 1:length(Temp.TranVec)
        Plot_Populations(Input.Tasks.Plot_Populations) 
     end
     
+    %% Plotting RVS Populations
+    if (Input.Tasks.Plot_PopulationsVqnSpecific.Flg)
+       Plot_PopulationsVqnSpecific(Input.Tasks.Plot_PopulationsVqnSpecific) 
+    end
+            
     %% Plotting Energies
     if (Input.Tasks.Plot_Energies.Flg)
         Plot_Energies(Input.Tasks.Plot_Energies)

@@ -40,9 +40,9 @@ PLATO_gnu_release
 
 export System='N4_NASA'
 export Molecule_vec=('N2')
-export FldrName='_DP61'
+export FldrName='_VSM'
 export Tran_vec=(10000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
-export T0=300
+export T0=2000
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/

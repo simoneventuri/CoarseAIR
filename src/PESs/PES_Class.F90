@@ -49,6 +49,8 @@ Module PES_Class
                                                                                       !< the last atoms: -Mi(1:N-1)/M(N). Dim=(NAtoms-1)
     type(DiatPotContainer_Type)  ,dimension(:) ,allocatable ::    Pairs               !< Vector of Pair objects. Each pair can have a different diatomic-potential object
     logical                                                 ::    CartCoordFlg
+
+    integer   ,dimension(3)                                 ::    UseSurface
   contains
     private
     procedure              ,public                          ::    Initialize       =>    Initialize_PES
@@ -84,7 +86,7 @@ Subroutine Initialize_PES( This, Input, Atoms, iPES, i_Debug )
   use Input_Class                 ,only:  Input_Type
   use Atom_Class                  ,only:  Atom_Type
   
-  class(PES_Type)                           ,intent(out)    ::    This
+  class(PES_Type)                           ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms
   integer                                   ,intent(in)     ::    iPES

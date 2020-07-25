@@ -10,6 +10,7 @@ add_sources (
   N3Half_NASA_PES_Class.F90
   N4_NASA_PES_Class.F90
   N4_UMN_PES_Class.F90
+  N4_UMN_PIPNN_PES_Class.F90
   CO2_NASA_PES_Class.F90
   RS_for_CO2_NASA.f
   COAr_NASA_PES_Class.F90

@@ -1,4 +1,4 @@
-%% NO Diatomic Potential from UMN (..., 2016) for N2O2 PES
+%% N2 Diatomic Potential from UMN N2O2 PES
 %
 function [V, dV] = N2_UMN_ForN2O2(R)    
 

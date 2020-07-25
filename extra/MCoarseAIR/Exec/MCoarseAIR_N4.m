@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates OtherSyst OtherRates
@@ -34,7 +34,7 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 %% System Inputs
 Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 
-Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/N4_NASA_CGM/Test/');
+Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/N4_NASA_VS/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
 Input.TranVec                   = [10000];%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
@@ -45,9 +45,9 @@ Input.RunSuffix                 = '_DP61';
 % Input.Suffix                    = '_VSM';
 % Input.RunSuffix                 = '_VSM';
 
-Input.Kin.EqNStatesIn           = [   9399];
+Input.Kin.EqNStatesIn           = [   61];
 Input.Kin.MinStateIn            = [      1];
-Input.Kin.MaxStateIn            = [   9399];
+Input.Kin.MaxStateIn            = [   61];
 
 Input.Kin.MolResolutionIn       = [{'CGM'}];
 Input.Kin.PathToMappingIn       = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/N4_NASA/N2/LevelsMap_DPM61.csv'}];
@@ -205,7 +205,7 @@ for iT = 1:length(Temp.TranVec)
 
     
     if Input.ReLoad > 0 
-        close all
+        %close all
         
         
         %%%% Reading Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

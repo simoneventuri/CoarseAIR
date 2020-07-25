@@ -121,7 +121,7 @@ Subroutine Initialize_O4_UMN_PES( This, Input, Atoms, iPES, i_Debug )
   use Atom_Class                         ,only:  Atom_Type
   use DiatomicPotential_Factory_Class     ,only:  DiatomicPotential_Factory_Type
   
-  class(O4_UMN_PES_Type)                    ,intent(out)    ::    This
+  class(O4_UMN_PES_Type)                    ,intent(inout)  ::    This
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms  
   integer                                   ,intent(in)     ::    iPES

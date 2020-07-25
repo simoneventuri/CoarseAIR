@@ -50,8 +50,8 @@ function Write_RatesForParaview(Controls)
                 KDiss1 = Rates.T(Temp.iT).Diss(iLevel,2);
                 KDiss2 = Rates.T(Temp.iT).Diss(iLevel,3);
                 KDiss3 = Rates.T(Temp.iT).Diss(iLevel,2) .* 0.0;
-                KExch1 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3);
-                KExch2 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3) .* 0.0;
+                KExch1 = Rates.T(Temp.iT).Diss(iLevel,2) .* 0.0;%Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3);
+                KExch2 = Rates.T(Temp.iT).Diss(iLevel,2) .* 0.0;%Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,3) .* 0.0;
                 if Syst.NProc > 3
                     KDiss3 = Rates.T(Temp.iT).Diss(iLevel,4);
                     KExch2 = Rates.T(Temp.iT).Molecule(iMol).Overall(iLevel,4);
@@ -83,6 +83,17 @@ function Write_RatesForParaview(Controls)
         
         if (Controls.Proc(2))
             
+            AddedInelFlg = false;
+            Kij          = Rates.T(Temp.iT).Inel;
+            for iExch = 1:Syst.NProc-2
+                jMol = Syst.ExchToMol(iExch);
+                if (jMol==1) && (Controls.IncludeExch)
+                    fprintf('Adding homogeneous Exchange to the Inelastic Processes\n')
+                    Kij          = Kij + Rates.T(Temp.iT).ExchType(iExch).Exch;
+                    AddedInelFlg = true;
+                end
+            end
+            
             for iProc = 1:length(Controls.vqns)
                 vqn = Controls.vqns(iProc);
                 jqn = Controls.jqns(iProc);
@@ -98,7 +109,7 @@ function Write_RatesForParaview(Controls)
                         for jLevel = 1:Syst.Molecule(iMol).NLevels
                             
 %                             if (Syst.Molecule(iMol).LevelEeV(iLevel) >= Syst.Molecule(iMol).LevelEeV(jLevel))
-                                KInel = Rates.T(Temp.iT).Inel(iLevel,jLevel);
+                                KInel = Kij(iLevel,jLevel);
 %                             else
 %                                 KInel = Rates.T(Temp.iT).Inel(jLevel,iLevel) * Syst.Molecule(iMol).T(Temp.iT).Levelq(jLevel) / Syst.Molecule(iMol).T(Temp.iT).Levelq(iLevel);
 %                             end

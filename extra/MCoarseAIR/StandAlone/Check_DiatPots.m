@@ -2,8 +2,8 @@ close all
 clear all
 clc
 
-RunFldr      = '/home/venturi/WORKSPACE/CoarseAIR/CNH_UIUC/'
-MoleculesVec = [{'CN'}, {'CH'}, {'NH'}]
+RunFldr      = '/home/venturi/WORKSPACE/CoarseAIR/N4_UMN_PIPNN/'
+MoleculesVec = [{'NaNb'}, {'NaNc'}, {'NaNd'}, {'NbNc'}, {'NbNd'}, {'NcNd'}]
 
 iMol = 1;
 for Molecule = MoleculesVec
@@ -71,24 +71,24 @@ end
 
 
 
-
-FileName = strcat(RunFldr, "/Test/PlotPES/VDiat_From_VDiat_", Molecule, ".csv")
-opts = delimitedTextImportOptions("NumVariables", 2);
-opts.DataLines = [2, Inf];
-opts.Delimiter = ",";
-opts.VariableNames = ["r1", "V"];
-opts.VariableTypes = ["double", "double"];
-opts.ExtraColumnsRule = "ignore";
-opts.EmptyLineRule = "read";
-tbl = readtable(FileName, opts);
-r1  = tbl.r1;
-V   = tbl.V;
-clear opts tbl
-    
-figure(20+1)
-plot(r1,V,   '-k')
-hold on
-plot(r1_,V_,  ':r')
-    
+% 
+% FileName = strcat(RunFldr, "/Test/PlotPES/VDiat_From_VDiat_", Molecule, ".csv")
+% opts = delimitedTextImportOptions("NumVariables", 2);
+% opts.DataLines = [2, Inf];
+% opts.Delimiter = ",";
+% opts.VariableNames = ["r1", "V"];
+% opts.VariableTypes = ["double", "double"];
+% opts.ExtraColumnsRule = "ignore";
+% opts.EmptyLineRule = "read";
+% tbl = readtable(FileName, opts);
+% r1  = tbl.r1;
+% V   = tbl.V;
+% clear opts tbl
+%     
+% figure(20+1)
+% plot(r1,V,   '-k')
+% hold on
+% plot(r1_,V_,  ':r')
+%     
 
 
