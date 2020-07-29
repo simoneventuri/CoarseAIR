@@ -47,14 +47,14 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
 
 
     fprintf(['    For Dissociation: \n'] );
-    Controls.MinEeV(iMol)     = abs(Syst.Molecule(iMol).DissEn) / 2.0;
+    Controls.MinEeV(iMol)     = abs(Syst.Molecule(iMol).DissEn) * 2.0 / 3.0;
     Controls.NGroups_CB(iMol) = NGroups_CB;
-    Controls.alpha(iMol)      = 1.0/2.0; 
+    Controls.alpha(iMol)      = 2.0; 
     LevelToGroupCB            = Group_BasedOnCB(Syst, Controls, iMol);
 
 
     vPlus_1 = 3;
-    vPlus_2 = 12;
+    vPlus_2 = 8;
 
     EeV_J0 = ones(200,1) .* 100.0;
     MaxVqn = 0;

@@ -54,11 +54,11 @@ Input.Kin.MolResolutionOut      = [{'CGM'},{'CGM'}];
 Input.Kin.PathToMappingOut      = [   {''},   {''}];
 Input.Kin.CGM_Strategy          = [{'DPM'},{'DPM'}];
 Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
-Input.Kin.NGroupsOut            = [     20,     20]; % 83, 49
+Input.Kin.NGroupsOut            = [     83,     49]; % 83, 49
 % Input.Kin.CGM_Strategy          = [{'RVE'},{'RVE'}];
 % Input.Kin.ParamsGroupsOut       = [     55,     32];
 % Input.Kin.NGroupsOut            = [     83,     49]; % 83, 49
-Input.Kin.PathToWriteMappingOut = [{''}]%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
+Input.Kin.PathToWriteMappingOut = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
 
 Input.Kin.RateSource            = 'HDF5'; % CoarseAIR / CG-QCT / HDF5 / PLATO
 Input.Kin.ReadOtherSyst         = []
@@ -112,7 +112,7 @@ Input.Tasks.Write_RatesParaview.vqns                   = [0,  0,  0,  0,  0,  0,
 Input.Tasks.Write_RatesParaview.jqns                   = [0,120,180,210,240,280, 30,100,150,180,210,240,  0,90,130,160,190, 30,90,130,160, 15,60]
 Input.Tasks.Write_RatesParaview.IncludeExch            = true
 % Writing Rates for Clustering
-Input.Tasks.Write_RatesForClustering.Flg               = false;
+Input.Tasks.Write_RatesForClustering.Flg               = true;
 Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
 Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
 Input.Tasks.Write_RatesForClustering.MinState          = 1;
@@ -149,7 +149,7 @@ Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = true;
+Input.Tasks.Plot_Populations.Flg                       = false;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 4;

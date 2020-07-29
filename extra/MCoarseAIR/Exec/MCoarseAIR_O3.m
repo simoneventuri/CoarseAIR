@@ -53,8 +53,8 @@ Input.Kin.NGroupsIn             = [      0];
 Input.Kin.MolResolutionOut      = [{'CGM'}];
 Input.Kin.PathToMappingOut      = [   {''}];
 Input.Kin.CGM_Strategy          = [{'CBM'}];
-Input.Kin.ParamsGroupsOut       = [     2];
-Input.Kin.NGroupsOut            = [     20]; %45
+Input.Kin.ParamsGroupsOut       = [    2.0];
+Input.Kin.NGroupsOut            = [     45]; %45
 % Input.Kin.CGM_Strategy          = [{'RVE'}];
 % Input.Kin.ParamsGroupsOut       = [     30];
 % Input.Kin.NGroupsOut            = [     45]; %45
@@ -92,7 +92,7 @@ Input.Tasks.All = false
 
 %% CoarseAIR
 % Plotting Diatomic Potential
-Input.Tasks.Plot_DiatPot.Flg                           = false;
+Input.Tasks.Plot_DiatPot.Flg                           = true;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
 Input.Tasks.Plot_DiatPot.Extremes                      = [1.5, 8.0; 1.5, 6.0];
 Input.Tasks.Plot_DiatPot.jqnVec                        = [0, 100, 200];
@@ -147,7 +147,7 @@ Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [1.e-14, 1e-12, 1e-10, 1e-8, 1e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = true;
+Input.Tasks.Plot_Populations.Flg                       = false;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 0;
@@ -228,7 +228,7 @@ if Input.ReLoad > 0
     Group_Out()
 
 end
-pause
+
 
 iFigStart = Input.iFig;
 %% Looping On Translational Temperatures

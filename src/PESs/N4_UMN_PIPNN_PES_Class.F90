@@ -235,7 +235,7 @@ Module N4_UMN_PIPNN_PES_Class
         write(*,*)'provided number of parameters ',This%NWe
         write(*,*)'actual number of parameters ',iwe
         write(*,*)'This%NWe not equal to iwe, check input files or code'
-        stop
+        pause
       endif
 
 
@@ -283,7 +283,7 @@ Module N4_UMN_PIPNN_PES_Class
         write(*,*) 'provided number of parameters ',This%NWe
         write(*,*) 'actual number of parameters ',iwe
         write(*,*) 'This%NWe not equal to iwe, check input files or code'
-        stop
+        pause
       endif
       
 
@@ -332,7 +332,7 @@ Module N4_UMN_PIPNN_PES_Class
         write(*,*) 'provided number of parameters ',This%NWe
         write(*,*) 'actual number of parameters ',iwe
         write(*,*) 'This%NWe not equal to iwe, check input files or code'
-        stop
+        pause
       endif
 
 
@@ -1605,7 +1605,7 @@ Module N4_UMN_PIPNN_PES_Class
       c6 = 19.7d0
     else
       ! currently imol = 1 is used
-      stop
+      pause
     endif
 
     ! Calculate dispersion correction
