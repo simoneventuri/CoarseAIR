@@ -40,8 +40,8 @@ function [LevelToGroup] = Group_BasedOnCB(Syst, Controls, iMol)
     for i=1:NGroups
        Extr(i+1) = (1.0 - i/(NGroups))^(alpha) * MinEeV;
     end
-    figure
-    plot(Extr,'o-')
+%     figure
+%     plot(Extr,'o-')
     
     LevelToGroup = zeros(Syst.Molecule(iMol).NLevels,1);
     for iLevels = 1:Syst.Molecule(iMol).NLevels

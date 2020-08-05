@@ -24,7 +24,7 @@
   
   
   ### Potential / Force
-  Potential or Force = Potential
+  Potential or Force = Force
   
   ### PES / Diatomic
   PES or Diatomic = PES
@@ -41,52 +41,57 @@
   ### Hartree / KcalMol / ElectronVolt
   Unit of measure for Potential = ElectronVolt
   
-  Nb of Grid Points, Axis 1 = 200
-  Nb of Grid Points, Axis 2 = 200
+  Nb of Grid Points, Axis 1 = 300
+  Nb of Grid Points, Axis 2 = 300
  
-  Grid Min, Axis 1 = 1.5d0
-  Grid Min, Axis 2 = 1.5d0
+  Grid Min, Axis 1 = 1.2d0
+  Grid Min, Axis 2 = 1.2d0
  
-  Grid Max, Axis 1 = 8.0d0
-  Grid Max, Axis 2 = 8.0d0
+  Grid Max, Axis 1 = 10.0d0
+  Grid Max, Axis 2 = 10.0d0
   
-  Nb of Angles = 32
-     Angle 1 = 35.d0
-     Angle 2 = 40.d0
-     Angle 3 = 45.d0
-     Angle 4 = 50.d0
-     Angle 5 = 55.d0
-     Angle 6 = 60.d0
-     Angle 7 = 65.d0
-     Angle 8 = 70.d0
-     Angle 9 = 75.d0
-     Angle 10 = 80.d0
-     Angle 11 = 85.d0
-     Angle 12 = 90.d0
-     Angle 13 = 95.d0
-     Angle 14 = 100.d0
-     Angle 15 = 105.d0
-     Angle 16 = 110.d0
-     Angle 17 = 115.d0
-     Angle 18 = 120.d0
-     Angle 19 = 125.d0
-     Angle 20 = 130.d0
-     Angle 21 = 135.d0
-     Angle 22 = 140.d0
-     Angle 23 = 145.d0
-     Angle 24 = 150.d0
-     Angle 25 = 155.d0
-     Angle 26 = 160.d0
-     Angle 27 = 165.d0
-     Angle 28 = 170.d0
-     Angle 29 = 175.d0
-     Angle 30 = 106.75d0
-     Angle 31 = 116.75d0
-     Angle 32 = 126.75d0
-
+  Nb of Angles = 38
+     Angle 1 = 0.d0
+     Angle 2 = 5.d0
+     Angle 3 = 10.d0
+     Angle 4 = 15.d0
+     Angle 5 = 20.d0
+     Angle 6 = 25.d0
+     Angle 7 = 30.d0
+     Angle 8 = 35.d0
+     Angle 9 = 40.d0
+     Angle 10 = 45.d0
+     Angle 11 = 50.d0
+     Angle 12 = 55.d0
+     Angle 13 = 60.d0
+     Angle 14 = 65.d0
+     Angle 15 = 70.d0
+     Angle 16 = 75.d0
+     Angle 17 = 80.d0
+     Angle 18 = 85.d0
+     Angle 19 = 100.d0
+     Angle 20 = 105.d0
+     Angle 21 = 110.d0
+     Angle 22 = 115.d0
+     Angle 23 = 120.d0
+     Angle 24 = 125.d0
+     Angle 25 = 130.d0
+     Angle 26 = 135.d0
+     Angle 27 = 140.d0
+     Angle 28 = 145.d0
+     Angle 29 = 150.d0
+     Angle 30 = 155.d0
+     Angle 31 = 160.d0
+     Angle 32 = 165.d0
+     Angle 33 = 170.d0
+     Angle 34 = 175.d0
+     Angle 35 = 180.d0
+     Angle 36 = 106.75d0
+     Angle 37 = 116.75d0
+     Angle 38 = 126.75d0
      
   Energy Cut-Off (From Dissociation Energy) = 20.d10
   
-  Flag for Energy Reference
+  Flag for Energy Reference = 0
   
   Plotting Only Triatomic Component of PES? = no

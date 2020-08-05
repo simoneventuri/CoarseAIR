@@ -2,52 +2,56 @@
 %
 function [ V, dV ] = NH_UIUC( r )
 
-  %%==============================================================================================================
-  % 
-  % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
-  % 
-  % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
-  %
-  % Based on "VVTC" (Vectorized Variable stepsize Trajectory Code) by David Schwenke (NASA Ames Research Center). 
-  % 
-  % This program is free software; you can redistribute it and/or modify it under the terms of the 
-  % Version 2.1 GNU Lesser General Public License as published by the Free Software Foundation. 
-  % 
-  % This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-  % without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-  % See the GNU Lesser General Public License for more details. 
-  % 
-  % You should have received a copy of the GNU Lesser General Public License along with this library; 
-  % if not, write to the Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA 
-  % 
-  %---------------------------------------------------------------------------------------------------------------
-  %%==============================================================================================================
-
-  re = 1.9649781989e+00;
-  De = 3.4455471790e+00;
-  PolyOrder = 15;  
-  cPol =  [ 1.2128196677e+00, 1.8908520194e-02,  2.7865639614e-01,  3.6143520665e-01, -1.7444568219e+00, ...
+    %%==============================================================================================================
+    % 
+    % Coarse-Grained method for Quasi-Classical Trajectories (CG-QCT) 
+    % 
+    % Copyright (C) 2018 Simone Venturi and Bruno Lopez (University of Illinois at Urbana-Champaign). 
+    %
+    % Based on "VVTC" (Vectorized Variable stepsize Trajectory Code) by David Schwenke (NASA Ames Research Center). 
+    % 
+    % This program is free software; you can redistribute it and/or modify it under the terms of the 
+    % Version 2.1 GNU Lesser General Public License as published by the Free Software Foundation. 
+    % 
+    % This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+    % without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    % See the GNU Lesser General Public License for more details. 
+    % 
+    % You should have received a copy of the GNU Lesser General Public License along with this library; 
+    % if not, write to the Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA 
+    % 
+    %---------------------------------------------------------------------------------------------------------------
+    %%==============================================================================================================
+    
+    VRef       = 0.0;%0.1915103559;
+    BToAng     = 0.52917721067d0;
+    EhToeV     = 27.2113839712790;
+    
+    re = 1.9649781989e+00;
+    De = 3.4455471790e+00;
+    PolyOrder = 15;  
+    cPol =  [ 1.2128196677e+00, 1.8908520194e-02,  2.7865639614e-01,  3.6143520665e-01, -1.7444568219e+00, ...
            -2.5983895734e+00, 7.2767318822e+00,  1.0295408354e+01, -1.4615071144e+01, -2.0363840851e+01, ...
             1.4509521352e+01, 2.0042829463e+01, -5.4042462949e+00, -7.6883675086e+00, -1.1467222454e-01, 0.0000000000e+00];
- 
-  RTemp4 =  r.^4;
-  re4    = re.^4;
-  y      = (RTemp4-re4) ./ (RTemp4+re4);
-  y2     = y   .* y;
-  y3     = y2  .* y;
-  y4     = y3  .* y;
-  y5     = y4  .* y;
-  y6     = y5  .* y;
-  y7     = y6  .* y;
-  y8     = y7  .* y;
-  y9     = y8  .* y;
-  y10    = y9  .* y;
-  y11    = y10 .* y;
-  y12    = y11 .* y;
-  y13    = y12 .* y;
-  y14    = y13 .* y;
-   
-  poly   = cPol(1)       + ... 
+
+    RTemp4 =  r.^4;
+    re4    = re.^4;
+    y      = (RTemp4-re4) ./ (RTemp4+re4);
+    y2     = y   .* y;
+    y3     = y2  .* y;
+    y4     = y3  .* y;
+    y5     = y4  .* y;
+    y6     = y5  .* y;
+    y7     = y6  .* y;
+    y8     = y7  .* y;
+    y9     = y8  .* y;
+    y10    = y9  .* y;
+    y11    = y10 .* y;
+    y12    = y11 .* y;
+    y13    = y12 .* y;
+    y14    = y13 .* y;
+
+    poly   = cPol(1)       + ... 
            cPol(2).*y    + ... 
            cPol(3).*y2   + ... 
            cPol(4).*y3   + ... 
@@ -63,7 +67,7 @@ function [ V, dV ] = NH_UIUC( r )
            cPol(14).*y13 + ...
            cPol(15).*y14;
 
-  dpoly  =      cPol(2)       + ...
+    dpoly  =      cPol(2)       + ...
             2.0*cPol(3).*y    + ...
             3.0*cPol(4).*y2   + ...
             4.0*cPol(5).*y3   + ...
@@ -78,13 +82,13 @@ function [ V, dV ] = NH_UIUC( r )
           13.d0*cPol(14).*y12 + ...
           14.d0*cPol(15).*y13;
 
-      
-  dydR    =  4.d0 .* r.^3 .* ((RTemp4+re4)-(RTemp4-re4))./(RTemp4+re4).^2;
-      
-  V       =         De .* (1.d0 - exp(-poly .* (r-re))).^2  - De + cPol(16);
-  dV      = 2.d0 .* De .* (1.d0 - exp(-poly .* (r-re))) .* (-exp(-poly  .* (r-re))) .* (-dpoly .* dydR .* (r-re) - poly);
 
-%   V       = V  ;%./27.2113839712790;
-%   dV      = dV ;%./27.2113839712790;
+    dydR    =  4.d0 .* r.^3 .* ((RTemp4+re4)-(RTemp4-re4))./(RTemp4+re4).^2;
+
+    V       =         De .* (1.d0 - exp(-poly .* (r-re))).^2  - De + cPol(16);
+    dV      = 2.d0 .* De .* (1.d0 - exp(-poly .* (r-re))) .* (-exp(-poly  .* (r-re))) .* (-dpoly .* dydR .* (r-re) - poly);
+
+    %V       = V  ./ EhToeV;
+    %dV      = dV ./ EhToeV;
 
 end

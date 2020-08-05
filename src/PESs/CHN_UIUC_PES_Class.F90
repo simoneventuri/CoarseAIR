@@ -205,6 +205,8 @@ Subroutine Compute_CHN_UIUC_PES_1d( This, R, Q, V, dVdR, dVdQ )
   real(rkp) ,dimension(3)                                    ::    dVDiat, dVTriat
   integer                                                    ::    iP 
   
+  VDiat  = Zero
+  dVDiat = Zero
   do iP=1,3
     call This%Pairs(iP)%Vd%Compute_Vd_dVd( R(iP), VDiat(iP), dVDiat(iP) )
   end do

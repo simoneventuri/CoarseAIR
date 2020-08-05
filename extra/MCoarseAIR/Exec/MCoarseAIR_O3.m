@@ -449,5 +449,5 @@ for iT = 1:length(Temp.TranVec)
     
     
     %pause
-    clear Rates Kin
+    %clear Rates Kin
 end
