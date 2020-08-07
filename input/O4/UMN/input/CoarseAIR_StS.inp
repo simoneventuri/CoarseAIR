@@ -12,6 +12,10 @@
    
 ###########################################################################################
 
+   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
+
+###########################################################################################
+
    System = OaObOcOd
    
    Nb of Species = 2
@@ -37,24 +41,21 @@
        Mass [a.u.] of Atom 3 = 29148.94559d0
      Atom 4 = Od
        Mass [a.u.] of Atom 4 = 29148.94559d0
-   
-   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
-   
+     
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 = 
    ###   Boltzmann       ->   Translational Temperature [K] 1 = 
    ###   FixedTotEn      ->   Total Energy [Eh] = 
    Relative Translational Energy Model = Boltzmann
-   
-   Nb of Translational Temperatures = 1
-     Translational Temperature [K] 1 = 10000.d0
-   #Nb of Internal Temperatures = 1
-   # Internal Temperature [K] 1 = 10000.d0
-   
-   #Nb of Translational Energies = 2
-   #  Translational Energy [Eh] 1 = 10.d0
-   #  Translational Energy [Eh] 2 = 20.d0
+     Nb of Translational Temperatures = 1
+       Translational Temperature [K] 1 = 10000.d0
+   #Relative Translational Energy Model = Uniform
+   #  Nb of Translational Energies = 1
+   #    Translational Energy [Eh] 1 = 10.d0
+   #Relative Translational Energy Model = Gaussian
+   #  Average Translational Energy [Eh] = 1.3704969e-1
+   #  Translational Energy SD      [Eh] = 9.5616066e-3
 
 
 ###########################################################################################
@@ -106,6 +107,7 @@
    # Molecule 2: sampled from a Boltzmann distribution (include all levels) - OcOd
    Sorting Method, Molecule 2 = RoVib-CG                                    
      File with Bins Energy Minima, Molecule 2 = E_low.dat
+     Fixed Internal Temperature, Molecule 1 = 300.d0
      Nb of Bins, Molecule 2 = 1
      Starting Bin, Molecule 2 = 1
      Final    Bin, Molecule 2 = 1
@@ -117,10 +119,12 @@
 
    Sorting Method, Molecule 5 = RoVib-CG   
      File with Bins Energy Minima, Molecule 5 = E_low.dat
+     Fixed Internal Temperature, Molecule 5 = 300.d0
      Nb of Bins, Molecule 5 = 1
   
    Sorting Method, Molecule 6 = RoVib-CG   
      File with Bins Energy Minima, Molecule 6 = E_low.dat
+     Fixed Internal Temperature, Molecule 6 = 300.d0
      Nb of Bins, Molecule 6 = 1
 
 
