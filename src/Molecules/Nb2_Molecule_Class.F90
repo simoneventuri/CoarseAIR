@@ -77,6 +77,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
   type(BinsContainer_Factory_Type)                          ::    BinsContainer_Factory
   character(150)                                            ::    FileName
   logical                                                   ::    WriteFlg
+  integer                                                   ::    ToSpecies
   logical                                                   ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
@@ -142,10 +143,21 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
     do iP=1,6
       if ( To_Pairs_Temp(iP) == 1 ) then
         This%To_Pairs(i) = iP
-        i = i+1
         if (i_Debug_Loc) call Logger%Write( "Pair Nb ", iP, " Contains Molecule ", This%Name )
+        if   ( (Input%NAtoms == 3) .and. (This%To_Pairs(i) == 1) ) then
+          ToSpecies = 1
+          if (i_Debug_Loc) call Logger%Write( "Molecule ", This%Name, " Correspond to the Initial Target Molecule" )
+        elseif ( (Input%NAtoms == 4) .and. (This%To_Pairs(i) == 1) ) then 
+          ToSpecies = 1
+          if (i_Debug_Loc) call Logger%Write( "Molecule ", This%Name, " Correspond to the Initial Target Molecule" )
+        elseif ( (Input%NAtoms == 4) .and. (This%To_Pairs(i) == 6) ) then 
+          ToSpecies = 2
+          if (i_Debug_Loc) call Logger%Write( "Molecule ", This%Name, " Correspond to the Initial Projectile Molecule" )
+        end if 
+        i = i+1
       end if
     end do
+
   end if
   ! ==============================================================================================================
 
@@ -237,7 +249,7 @@ Subroutine Initialize_Nb2_Molecule( This, Input, NPairs, Pairs, Atoms, iMol, i_D
     FileName  = This%PathToMolFldr // '/levels_cut.inp'
 
     if (i_Debug_Loc) call Logger%Write( "Calling This%Levels_Container%InitializeLevelsContainer" )
-    allocate(This%LevelsContainer); call This%LevelsContainer%Initialize( Input, This%DiatPot, iMol, FileName=FileName, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
+    allocate(This%LevelsContainer); call This%LevelsContainer%Initialize( Input, This%DiatPot, iMol, ToSpecies, FileName=FileName, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "-> This%Levels_Container%InitializeLevelsContainer" )
     ! ==============================================================================================================
 

@@ -36,8 +36,8 @@ function [Syst] = Read_LevelInfo(Syst)
         
         LevelsFile = strcat(Syst.HDF5_File);
         fprintf(['  Checking if HDF5 File is Present: ' LevelsFile '\n'] )
-                
-        if isfile(strcat(LevelsFile)) %(1==2)
+        
+        if (isfile(strcat(LevelsFile))) && (~ Syst.ThCollPart)%(1==2)%
             
             %% Reading HDF5 File
             fprintf(['  Reading From File: ' LevelsFile '\n'] )

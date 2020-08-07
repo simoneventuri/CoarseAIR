@@ -73,7 +73,7 @@ Subroutine InitializeLevels_DiatomDiatom( Input, Species, i_Debug )
     FileName = './levels_' // trim(adjustl(Input%Molecules_Name(iMol)))// trim(iMol_char) // '.inp'
 
     if (i_Debug_Loc) write(Logger%Unit,"(6x,'[InitializeLevels_DiatomDiatom]: Calling Species(',a,')%ListStates%Initialize with FileName = ',a)")trim(iMol_char),FileName
-    call Species(iSpec)%ListStates%Initialize( Input, Species(iSpec)%DiatPot, iMol, FileName=FileName, i_Debug=i_Debug_Loc )                                                  
+    call Species(iSpec)%ListStates%Initialize( Input, Species(iSpec)%DiatPot, iMol, iSpec, FileName=FileName, i_Debug=i_Debug_Loc )                                                  
     if (i_Debug_Loc) write(Logger%Unit,"(6x,'[InitializeLevels_DiatomDiatom]: -> Done initializing the Species(',a,')%ListStates object')") trim(iMol_char)
 
   enddo

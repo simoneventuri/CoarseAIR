@@ -34,18 +34,16 @@ global Input Syst Temp Param Kin Rates OtherSyst OtherRates
 %% System Inputs
 Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE/'
 
-Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O4_UMN_StS/Test/');
+Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O4_UMN_St/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
 Input.TranVec                   = [10000];%[1500, 2500, 5000, 6000, 8000, 10000, 12000, 14000, 15000, 20000];
 Input.SystNameLong              = 'OaObOcOd_UMN';
 Input.iPES                      = 0;
-Input.Suffix                    = '';
+Input.Suffix                    = '_StS';
 Input.RunSuffix                 = '_StS';
 % Input.Suffix                    = '_VSM';
 % Input.RunSuffix                 = '_VSM';
-
-Input.Kin.ThCollPart            = true;
 
 Input.Kin.EqNStatesIn           = [   6115,6115,6115,1,1,1];
 Input.Kin.MinStateIn            = [            1,1,1,1,1,1];
@@ -55,7 +53,6 @@ Input.Kin.MolResolutionIn       = [{'StS'},{'StS'},{'StS'},{'CGM'},{'CGM'},{'CGM
 Input.Kin.CGM_Strategy          = [{''},{''},{''},{'File'},{'File'},{'File'}];
 Input.Kin.PathToMappingIn       = [{''},{''},{''},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'}];
 Input.Kin.NGroupsIn             = [   6115,6115,6115,1,1,1]; %45
-Input.Kin.PathToWriteMappingIn  = [   {''},{''},{''},{''},{''},{''}];
 % Input.Kin.MolResolutionIn       = [{'CGM'}];
 % Input.Kin.PathToMappingIn       = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DPM45.csv'}];
 % Input.Kin.PathToWriteMappingIn  = [   {''}];
@@ -69,7 +66,6 @@ Input.Kin.MolResolutionOut      = [{'StS'},{'StS'},{'StS'},{'CGM'},{'CGM'},{'CGM
 Input.Kin.CGM_Strategy          = [{''},{''},{''},{'File'},{'File'},{'File'}];
 Input.Kin.PathToMappingOut      = [{''},{''},{''},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'},{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE1.csv'}];
 Input.Kin.NGroupsOut            = [   6115,6115,6115,1,1,1]; %45
-Input.Kin.PathToWriteMappingOut = [   {''},{''},{''},{''},{''},{''}];
 % Input.Kin.MolResolutionOut      = [{'CGM'}];
 % Input.Kin.CGM_Strategy          = [{'File'}];
 % Input.Kin.PathToMappingOut      = [   {'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DPM45.csv'}];
@@ -152,7 +148,7 @@ Input.Tasks.Plot_MoleFracs.CompStart                   = 1;
 Input.Tasks.Plot_MoleFracs.CompEnd                     = 2;
 Input.Tasks.Plot_MoleFracs.Normalize                   = 2;
 % Plotting Global Rates
-Input.Tasks.Plot_GlobalRates.Flg                       = false;
+Input.Tasks.Plot_GlobalRates.Flg                       = true;
 Input.Tasks.Plot_GlobalRates.MoleculesOI               = [1];
 % Plotting Mole Fractions and Global Rates
 Input.Tasks.Plot_MoleFracs_and_GlobalRates.Flg         = false;
@@ -169,7 +165,7 @@ Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1e-12, 1e-10, 1e-8]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = true;
+Input.Tasks.Plot_Energies.Flg                          = false;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions

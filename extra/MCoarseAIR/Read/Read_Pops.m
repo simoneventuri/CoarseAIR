@@ -32,13 +32,14 @@ function Read_Pops()
     fprintf('====================================================\n')
     fprintf('Reading Level/Group Populations from KONIG\n' )
     
+    NMolecules = max(Syst.CFDComp(:).ToMol);
     
-    for iMol=1:Syst.NMolecules        
+    for iMol=1:NMolecules
         fprintf(['Reading For Molecule Nb: ' num2str(iMol) '\n'] )
         iNBins = Syst.Molecule(iMol).EqNStatesIn;
         
-        
-        PopFileMat = strcat(Input.Paths.ToKinRunFldr, '/Pop_', Syst.Molecule(iMol).Name);
+        iComp      = Syst.MolToCFDComp(iMol);
+        PopFileMat = strcat(Input.Paths.ToKinRunFldr, '/Pop_', Syst.CFDComp(iComp).Name);
         fprintf(['Checking if .mat File is Already Present: ' PopFileMat '.mat \n'] )
 
         
@@ -50,7 +51,7 @@ function Read_Pops()
             Kin.T(Temp.iT).Molecule(iMol).PopOverg = PopOverg; 
             
         else
-            PopFile = strcat(Input.Paths.ToKinRunFldr, '/pop_', Syst.Molecule(iMol).Name, '.dat');
+            PopFile = strcat(Input.Paths.ToKinRunFldr, '/pop_', Syst.CFDComp(iComp).Name, '.dat');
             fprintf(['Reading From File: ' PopFile '\n'] )
     
             

@@ -577,7 +577,8 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
   if (i_Debug_Loc) call Logger%Entering( "ComputePartFunEnergy_BinsContainer")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
       
-  
+  if (i_Debug_Loc)  call Logger%Write( "iMol = ", iMol )  
+
   ! Computing Bins Effective Energy Minima (the Minima specified by the User could differ from actual Molecule Levels Energies)
   LevelsContainer%States%einteV_scaled = LevelsContainer%States%einteV - LevelsContainer%MineinteV
   This%Bin%MineinteV = 1000.d0
@@ -597,7 +598,7 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
 
   do iLevels = 1,LevelsContainer%NStates
     LevelsContainer%States(iLevels)%QInit = Compute_PartFunc_State( LevelsContainer%States(iLevels)%g, LevelsContainer%States(iLevels)%einteV_scaled, Input%TInit )
-    LevelsContainer%States(iLevels)%Q     = Compute_PartFunc_State( LevelsContainer%States(iLevels)%g, LevelsContainer%States(iLevels)%einteV_scaled, Input%Tint  )
+    LevelsContainer%States(iLevels)%Q     = Compute_PartFunc_State( LevelsContainer%States(iLevels)%g, LevelsContainer%States(iLevels)%einteV_scaled, Input%TInt(iMol)  )
 
     iBin = LevelsContainer%States(iLevels)%To_Bin
 
@@ -633,7 +634,7 @@ Subroutine ComputePartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMo
   
   
   ! Writing the Mapping Bins -> First Quantum Numbers
-  write(T_char,"(I10)") floor(Input%Tint)
+  write(T_char,"(I10)") floor(Input%Tint(iMol))
   if (i_Debug_Loc)  call Logger%Write( "Write the Mapping Bins -> First Quantum Numbers" )  
   FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   open( File=FileName, NewUnit=Unit, status='REPLACE', iostat=Status )
@@ -700,7 +701,7 @@ Subroutine ReadPartFunEnergy_BinsContainer( This, Input, LevelsContainer, iMol, 
   This%Bin(:)%QInit         = Zero
   
   ! Writing the Mapping Bins -> First Quantum Numbers
-  write(T_char,"(I10)") floor(Input%Tint)
+  write(T_char,"(I10)") floor(Input%Tint(iMol))
   if (i_Debug_Loc)  call Logger%Write( "Reading the Mapping Bins -> First Quantum Numbers" )  
   FileName = This%PathToBinMolFldr // '/T' // trim(adjustl(T_char))// '.csv'
   if (i_Debug_Loc)  call Logger%Write( "Open File ", FileName ) 

@@ -1357,6 +1357,127 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.ToOtherExch        = [0];
         
         Syst.ColPartToComp      = 2; 
+        
+    
+    elseif strcmp(Syst.NameLong, 'OaObOcOd_UMN')
+        
+        %%% System
+        Syst.Name              = 'O4';
+
+        Syst.NProc = 3; %(Diss+Inel+Exch)
+        
+        %%% PESs
+        Syst.PESName       = [string('PES1')];
+        Syst.NPESs         = size(Syst.PESName,2);
+        
+        %%% Atoms
+        Syst.NAtoms        = 4;
+        
+        Syst.Atom(1).Name  = 'O';
+        Syst.Atom(2).Name  = 'O';
+        Syst.Atom(3).Name  = 'O';
+        Syst.Atom(4).Name  = 'O';
+
+        Syst.Atom(1).Color = [0, 0, 1];
+        Syst.Atom(2).Color = [0, 0, 1];
+        Syst.Atom(3).Color = [0, 0, 1];
+        Syst.Atom(4).Color = [0, 0, 1];
+
+        Syst.Atom(1).Size  = 200;
+        Syst.Atom(2).Size  = 200;
+        Syst.Atom(3).Size  = 200;
+        Syst.Atom(4).Size  = 200;
+
+        Syst.Atom(1).Mass  = 15.9994e-3;
+        Syst.Atom(2).Mass  = 15.9994e-3;
+        Syst.Atom(3).Mass  = 15.9994e-3;
+        Syst.Atom(4).Mass  = 15.9994e-3;
+        
+        %%% Molecules
+        Syst.NMolecules                   = 6;
+        Syst.Molecule(1).Name             = 'OaOb';
+        %Syst.Molecule(1).DissEn           = -5.211;
+        Syst.Molecule(1).DegeneracyFactor = [1/2, 1/2];
+        Syst.Molecule(1).Mu               = Syst.Atom(1).Mass*2.0;
+        Syst.Molecule(1).NLevelsOrig      = 6115;
+        Syst.Molecule(1).ToAtoms          = [1,2];
+        Syst.Molecule(1).DiatPot          = 'O2_UMN';
+        Syst.MolToOtherSyst(1)            = 0;
+        
+        Syst.Molecule(2)                  = Syst.Molecule(1);
+        Syst.Molecule(2).Name             = 'OaOc';
+        Syst.Molecule(3)                  = Syst.Molecule(1);
+        Syst.Molecule(3).Name             = 'OaOd';
+        Syst.Molecule(4)                  = Syst.Molecule(1);
+        Syst.Molecule(4).Name             = 'ObOc';
+        Syst.Molecule(5)                  = Syst.Molecule(1);
+        Syst.Molecule(5).Name             = 'ObOd';
+        Syst.Molecule(6)                  = Syst.Molecule(1);
+        Syst.Molecule(6).Name             = 'OcOd';
+        
+        
+        Syst.OtherSyst_NameLong           = '';
+
+        %%% Pairs
+        Syst.Pair(1).Name  = 'O2';
+        Syst.Pair(2).Name  = 'O2';
+        Syst.Pair(3).Name  = 'O2';
+        Syst.Pair(4).Name  = 'O2';
+        Syst.Pair(5).Name  = 'O2';
+        Syst.Pair(6).Name  = 'O2';
+
+        Syst.Pair(1).ToMol = 1;
+        Syst.Pair(2).ToMol = 2;
+        Syst.Pair(3).ToMol = 3;
+        Syst.Pair(4).ToMol = 4;
+        Syst.Pair(5).ToMol = 5;
+        Syst.Pair(6).ToMol = 6;
+
+        Syst.Pair(1).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(2).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(3).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(4).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(5).Color = [17, 17, 17] ./ 256;
+        Syst.Pair(6).Color = [17, 17, 17] ./ 256;
+
+        
+        %% CFD Components (For PLATO and KONIG)
+        Syst.NComp             =  2;
+        
+        Syst.CFDComp(1).Name   = 'O';
+        Syst.CFDComp(2).Name   = 'O2';
+
+        Syst.CFDComp(1).ToMol   = 0;
+        Syst.CFDComp(2).ToMol   = 1;
+
+        Syst.CFDComp(1).Mass    = Syst.Atom(1).Mass;
+        Syst.CFDComp(2).Mass    = 2.0 * Syst.Atom(1).Mass;
+
+        Syst.CFDComp(1).Qe      = 9;
+        Syst.CFDComp(2).Qe      = 3;
+
+        Syst.CFDComp(1).Color   = [ 102, 102, 102] ./ 256;
+        Syst.CFDComp(2).Color   = [   0,   0,   0] ./ 256;
+        
+        Syst.CFDComp(1).LineStyle = ':';
+        Syst.CFDComp(2).LineStyle = '-';
+        
+        Syst.RxLxIdx = [ 2,-1;   % Diss
+                         0, 0;   % Inel 
+                         0, 0];  % Exch1
+                        
+        Syst.MolToCFDComp       = [2,2,2,2,2,2];
+
+        
+        %% Exchange Properties
+        Syst.ExchToMol          = [1,6;2,5;3,4];
+        Syst.ExchToAtom         = [1,2;1,3;1,4];
+        
+        Syst.PairToExch         = [1,2,3];
+        
+        Syst.ToOtherExch        = [0];
+        
+        Syst.ColPartToComp      = 2; 
     end
     
     Syst

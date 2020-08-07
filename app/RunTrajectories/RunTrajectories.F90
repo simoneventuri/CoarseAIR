@@ -63,6 +63,8 @@ Program RunTrajectories
   character(:)  ,allocatable            ::    FileName
   real(rkp)                             ::    Tran
   character(10)                         ::    Tran_char
+  real(rkp)                             ::    TempVal
+  character(10)                         ::    TempVal_char
 !  real(rkp)                             ::    StartTime, EndTime
   
   logical                ,parameter     ::    i_Debug_RT        = .False.
@@ -87,11 +89,11 @@ Program RunTrajectories
   read(Tran_char, "(d20.10)", iostat=Status) Tran
   if (Status/=0) call Error( "Error reading the argument Tran_char" )
   if (i_Debug_RT) call Logger%Write( "Tran_char = ", Tran_char, "; Tran = ", Tran  )
-  
-  call getarg( 3, Input%Tint_char )
-  read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
-  if (Status/=0) call Error( "Error reading the argument Input%Tint" )
-  if (i_Debug_RT) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint)
+ 
+  call getarg( 3, TempVal_char )
+  read(TempVal_char, "(d20.10)", iostat=Status) Input%TintTemp
+  if (Status/=0) call Error( "Error reading the argument Input%TintTemp" )
+  if (i_Debug_RT) call Logger%Write( "TempVal_char = ", TempVal_char, "; Input%TintTemp = ", Input%TintTemp)
 
   call getarg( 4, Input%NProc_char )
   if (trim(adjustl(Input%NProc_char)) .eq. '') then
@@ -164,17 +166,6 @@ Program RunTrajectories
     if (i_Debug_RT) call Logger%Write( "Level/Bin of Interest for Molecule Nb", iMol, ":     Input%BinOI(iMol) = ", Input%BinOI(iMol))
   
   end do
-
-
-  if (Input%TIntFixed > Zero) then
-    
-    Input%Tint = Input%TIntFixed
-    if (i_Debug_RT) call Logger%Write( "Fixed TInt: ", Input%TIntFixed)
-    write(Input%Tint_char, "(d10.5)", iostat=Status) Input%Tint
-    if (Status/=0) call Error( "Error writing Input%Tint_char" )
-    if (i_Debug_RT) call Logger%Write( "Fixed TInt: Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint)
-  
-  end if
 ! ==============================================================================================================
 
 

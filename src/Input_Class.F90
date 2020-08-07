@@ -174,9 +174,9 @@ Module Input_Class
     real(rkp)                                 ::    Erel        =   Zero                !< Translational Energy [Eh]
     character(10)                             ::    Erel_char
     character(:)               ,allocatable   ::    TintModel                           !< Model for Internal Modes
-    real(rkp)                                 ::    Tint        =   Zero                !< Internal temperature [K]
-    real(rkp)                                 ::    TIntFixed   =   Zero                !< Temporary Internal temperature [K]
-    character(10)                             ::    Tint_char
+    character(10),dimension(:) ,allocatable   ::    TInt_char
+    real(rkp)                                 ::    TIntTemp
+    real(rkp)    ,dimension(:) ,allocatable   ::    Tint                                !< Internal temperature [K]
     character(:)               ,allocatable   ::    ImpParModel                         !< Model for Sampling the Impact Parameter
     character(:)               ,allocatable   ::    ImpParStrataType
     real(rkp)                                 ::    Etot        =   Zero                !< Total energy for trajectories
@@ -514,6 +514,7 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
 
   integer                                                   ::    iSp
   character(2)                                              ::    iSp_char
+  character(:) ,allocatable                                 ::    SpT_case
   character(:) ,allocatable                                 ::    Sp_case
 
   integer                                                   ::    iMol
@@ -692,6 +693,13 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             allocate( This%DiatPot_ParamsFile(This%NMolecules), Stat=Status)
             if (Status/=0) call Error( "Error allocating This%DiatPot_ParamsFile" )
             This%DiatPot_ParamsFile = 'NONE'
+            allocate( This%TInt(This%NMolecules), Stat=Status )
+            if (Status/=0) call Error( "Error allocating This%TInt" )
+            if (i_Debug_Loc) call Logger%Write( "-> Allocating This%TInt to This%NMolecules = ", This%NMolecules )
+            This%TInt = This%TintTemp
+            allocate( This%Tint_char(This%NMolecules), Stat=Status )
+            if (Status/=0) call Error( "Error allocating This%Tint_char" )
+            if (i_Debug_Loc) call Logger%Write( "-> Allocating This%Tint_char to This%NMolecules = ", This%NMolecules )
 
 
         case("Nb of Initial Molecules")
@@ -775,11 +783,6 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (Status/=0) call Error( "Error allocating This%TtraVecIntChar" )
             if (i_Debug_Loc) call Logger%Write( "-> Allocating This%TtraVecIntChar to This%NTtra = ", This%NTtra )
             
-
-          case("Internal Temperature")
-            READ(line_input(i_eq+2:150), '(d20.10)') This%TIntFixed
-            if (i_Debug_Loc) call Logger%Write( "Fixed Internal Temperature = ", This%TIntFixed )
-
 
           case("Nb of Internal Temperatures")
             This%NTint_char = trim(adjustl(line_input(i_eq+2:150)))
@@ -1469,6 +1472,13 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
             if (i_Debug_Loc) call Logger%Write( "Diatomic Potential Parameters File Name:      This%DiatPot_ParamsFile(iMol)  = ", This%DiatPot_ParamsFile(iMol) )
           end if
           
+          TInt_case = "Fixed Internal Temperature, Molecule" // iMol_char
+          if (adjustl(trim(i_case)) == TRIM(TInt_case)) then
+            READ(line_input(i_eq+2:150), '(d20.10)') This%TInt(iMol)
+            if (i_Debug_Loc) call Logger%Write( "Molecule Nb", iMol, "; Fixed Internal Temperature = ", This%TInt(iMol) )
+          end if
+          
+
         end do
         
         
@@ -1689,7 +1699,10 @@ Subroutine InitializeCGQCTInput( This, i_Debug)
   end if
 
   do iMol = 1,This%NMolecules
-  
+
+    write(This%TInt_char(iMol), '(f10.1)') This%TInt(iMol)
+    if (i_Debug_Loc) call Logger%Write( "Molecule Nb ", iMol, "; This%TInt_char(iMol) = ", This%TInt_char(iMol))
+
     if (This%NBins(iMol) == 0) then
       if (i_Debug_Loc) call Logger%Write( "Found the ", iMol, "-th Molecule with 0 Levels / Bins. Going to read the overall Nb of Levels.")
             

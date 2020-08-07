@@ -499,7 +499,7 @@ Subroutine ReadEnergyLevels( Input, Collision, iMol, i_Debug )
   !   7.4. CONSTRUCTING THE LEVEL CONTAINER
   ! ==============================================================================================================
   if (i_Debug_Loc) call Logger%Write( "Calling LevelsContainer%Initialize" )
-  call LevelsContainer%Initialize( Input, Collision%MoleculesContainer(iMol)%Molecule%DiatPot, iMol, NStates=NStates, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
+  call LevelsContainer%Initialize( Input, Collision%MoleculesContainer(iMol)%Molecule%DiatPot, iMol, 0, NStates=NStates, ReCheckFlg=.True., i_Debug=i_Debug_Loc )
   if (i_Debug_Loc) call Logger%Write( "-> Done with LevelsContainer%Initialize" )
   ! ==============================================================================================================  
 

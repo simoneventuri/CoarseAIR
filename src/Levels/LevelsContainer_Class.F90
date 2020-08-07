@@ -83,7 +83,7 @@ Module LevelsContainer_Class
   contains
 
 !________________________________________________________________________________________________________________________________!
-Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NStates, ReCheckFlg, i_Debug )  !This%NStates,maxst,eint,egam,rmin,vmin,vmax,tau,jqn,vqn,ri,ro,rmax,iunit,iodd,inv,inj)
+Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, ToSpecies, FileName, NStates, ReCheckFlg, i_Debug )  !This%NStates,maxst,eint,egam,rmin,vmin,vmax,tau,jqn,vqn,ri,ro,rmax,iunit,iodd,inv,inj)
 ! This procedure reads the data associated to the vibrational-rotational states.
 ! This procedure was originally called 'statin' and was stored in the 'preini.f' file.
 !     input variables:
@@ -112,6 +112,7 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
   type(Input_Type)                          ,intent(in)     ::    Input
   class(DiatomicPotential_Type)             ,intent(in)     ::    DiatPot           ! Intra-molecular diatomic potential object
   integer                                   ,intent(in)     ::    iMol
+  integer                                   ,intent(in)     ::    ToSpecies
   character(*)                    ,optional ,intent(in)     ::    FileName         !> Name of the file containing the state data
   integer                         ,optional ,intent(in)     ::    NStates
   logical                         ,optional ,intent(in)     ::    ReCheckFlg
@@ -129,6 +130,7 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
   if (i_Debug_Loc) call Logger%Entering( "InitializeLevelsContainer")  !, Active = i_Debug_Loc )
   !i_Debug_Loc   =     Logger%On()
 
+
   ReCheckFlg_Loc = .False.; if ( present(ReCheckFlg) ) ReCheckFlg_Loc = ReCheckFlg
 
 ! ! ==============================================================================================================
@@ -136,8 +138,12 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
 ! ! ==============================================================================================================
   This%jIn          =   Input%jIn
   This%vIn          =   Input%vIn
-  This%Tint         =   Input%Tint
   This%iodd         =   Input%iodd
+  This%Tint         =   Input%Tint(iMol)
+  if (i_Debug_Loc) call Logger%Write( "iMol = ", iMol, "; ToSpecies = ", ToSpecies )
+  if (i_Debug_Loc) call Logger%Write( "Input%Tint = ", Input%Tint )
+  if (i_Debug_Loc) call Logger%Write( "This%Tint  = ", This%Tint )
+
   if (allocated(Input%jInMethod)) then
      This%jInMethod = Input%jInMethod
   else
@@ -231,15 +237,16 @@ Subroutine InitializeLevelsContainer( This, Input, DiatPot, iMol, FileName, NSta
       ! ==============================================================================================================
     end if
 
-
-    ! ==============================================================================================================
-    !   SETTING THE STATE DATA DEPENDING ON WHETHER IT IS A REAL OR PSEUDO-STATE
-    ! ==============================================================================================================
-      if (i_Debug_Loc) call Logger%Write( "Calling This%SetLevelsData" )
-      call This%SetLevelsData( i_Debug=i_Debug_Loc )
-      if (i_Debug_Loc) call Logger%Write( "-> Done" )
-      if (i_Debug_Loc) call Logger%Write( "-> This%NStates = ", This%NStates )
-    ! ==============================================================================================================
+    if (ToSpecies > 0) then
+      ! ==============================================================================================================
+      !   SETTING THE STATE DATA DEPENDING ON WHETHER IT IS A REAL OR PSEUDO-STATE
+      ! ==============================================================================================================
+        if (i_Debug_Loc) call Logger%Write( "Calling This%SetLevelsData" )
+        call This%SetLevelsData( ToSpecies, i_Debug=i_Debug_Loc )
+        if (i_Debug_Loc) call Logger%Write( "-> Done" )
+        if (i_Debug_Loc) call Logger%Write( "-> This%NStates = ", This%NStates )
+      ! ==============================================================================================================
+    end if
 
   else
 
@@ -512,9 +519,10 @@ End Subroutine
 
 
 !________________________________________________________________________________________________________________________________!
-Subroutine SetLevelsData( This, i_Debug )
+Subroutine SetLevelsData( This, ToSpecies, i_Debug )
 
   class(LevelsContainer_Type)               ,intent(inout)  ::    This
+  integer                                   ,intent(in)     ::    ToSpecies
   logical                         ,optional ,intent(in)     ::    i_Debug
 
   logical                                                   ::    i_Debug_Loc
@@ -562,7 +570,7 @@ Subroutine SetLevelsData( This, i_Debug )
       call This%SetUniformDistribution( iState, i_Debug=i_Debug_Loc )
     
     elseif ( ( trim(adjustl(This%vInMethod)) .eq. "Boltzmann" ) .or. ( trim(adjustl(This%vInMethod)) .eq. "MostProbable" ) ) then
-      if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) selected from a Boltzmann Distribution @ T [K] = ", This%Tint )
+      if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) selected for Species Nb ", ToSpecies, " from a Boltzmann Distribution @ TInt [K] = ", This%Tint )
       
       Beta =   Factor / abs(This%Tint)
       
@@ -570,7 +578,7 @@ Subroutine SetLevelsData( This, i_Debug )
       call This%SetBoltmannDistribution( Beta, iState, i_Debug=i_Debug_Loc )
 
       if ( trim(adjustl(This%vInMethod)) .eq. "MostProbable" ) then
-        if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) fixed to the most probable state of the Boltzmann Distribution @ T [K] = ", This%Tint )
+        if (i_Debug_Loc) call Logger%Write( "Initial (v,j) or (j) fixed to the most probable state of the Boltzmann Distribution @ TInt [K] = ", This%Tint )
         
         This%vIn     =   This%States(iState)%vqn
         This%jIn     =   This%States(iState)%jqn
@@ -831,13 +839,13 @@ Subroutine Compute_PartitionRatios( Input, iMol, LevelsContainer_Orig, LevelsCon
     
     LevelsContainer_Orig%Q = Zero
     do iLevels = 1,LevelsContainer_Orig%NStates
-      LevelsContainer_Orig%Q = LevelsContainer_Orig%Q + LevelsContainer_Orig%States(iLevels)%g * dexp( - (LevelsContainer_Orig%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint) )
+      LevelsContainer_Orig%Q = LevelsContainer_Orig%Q + LevelsContainer_Orig%States(iLevels)%g * dexp( - (LevelsContainer_Orig%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint(iMol)) )
     end do
     if (i_Debug_Loc) call Logger%Write( "Partition Function of the Original States Molecule:         LevelsContainer_Orig%Q = ", LevelsContainer_Orig%Q )   
     
     LevelsContainer_Cut%Q = Zero
     do iLevels = 1,LevelsContainer_Cut%NStates
-      LevelsContainer_Cut%Q = LevelsContainer_Cut%Q + LevelsContainer_Cut%States(iLevels)%g * dexp( - (LevelsContainer_Cut%States(iLevels)%eintev_scaled * Ue) / (UKb * Input%Tint) )
+      LevelsContainer_Cut%Q = LevelsContainer_Cut%Q + LevelsContainer_Cut%States(iLevels)%g * dexp( - (LevelsContainer_Cut%States(iLevels)%eintev_scaled * Ue) / (UKb * Input%Tint(iMol)) )
     end do
     if (i_Debug_Loc) call Logger%Write( "Partition Function of the Cut States Molecule:         LevelsContainer_Cut%Q = ", LevelsContainer_Cut%Q )     
   
@@ -911,13 +919,13 @@ Subroutine Compute_PartitionRatios( Input, iMol, LevelsContainer_Orig, LevelsCon
     
     BLevels%Q = Zero
     do iLevels = 1,BLevels%NStates
-      BLevels%Q = BLevels%Q + BLevels%States(iLevels)%g * dexp( - (BLevels%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint) )
+      BLevels%Q = BLevels%Q + BLevels%States(iLevels)%g * dexp( - (BLevels%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint(iMol)) )
     end do
     if (i_Debug_Loc) call Logger%Write( "Bound Levels Degeneracy,            BLevels%Q = ", BLevels%Q ) 
     
     QBLevels%Q = Zero
     do iLevels = 1,QBLevels%NStates
-      QBLevels%Q = QBLevels%Q + QBLevels%States(iLevels)%g * dexp( - (QBLevels%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint) )
+      QBLevels%Q = QBLevels%Q + QBLevels%States(iLevels)%g * dexp( - (QBLevels%States(iLevels)%einteV_scaled * Ue) / (UKb * Input%Tint(iMol)) )
     end do
     if (i_Debug_Loc) call Logger%Write( "Quasi-Bound Levels Degeneracy,            QBLevels%Q = ", QBLevels%Q ) 
     

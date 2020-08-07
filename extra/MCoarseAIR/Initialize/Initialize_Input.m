@@ -37,6 +37,11 @@ function Initialize_Input()
     
     Syst.NameLong   = Input.SystNameLong;
     
+    Syst.ThCollPart = false;
+    if (Input.Kin.ThCollPart)
+        Syst.ThCollPart = true;
+    end
+    
     for iMol = 1:size(Input.Kin.MolResolutionIn,2)
         Syst.Molecule(iMol).KinMthdIn    = Input.Kin.MolResolutionIn(iMol);
         Syst.Molecule(iMol).EqNStatesIn  = Input.Kin.EqNStatesIn(iMol);

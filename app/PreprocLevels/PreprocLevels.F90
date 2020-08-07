@@ -46,7 +46,9 @@ Program PreprocLevels
   integer                                              :: iMol
   integer                                              :: Status
   real(rkp)                                            :: StartTime, EndTime
-  
+  real(rkp)                                            :: TempVal
+  character(10)                                        :: TempVal_char
+
   logical   ,parameter                                 :: i_Debug_PL        = .True.
   logical   ,parameter                                 :: i_Debug_PL_Deep   = .True.
 
@@ -66,11 +68,12 @@ Program PreprocLevels
   if (Status/=0) call Error( "Error reading the argument Input%Ttra" )
   if (i_Debug_PL) call Logger%Write( "Input%Ttra_char = ", Input%Ttra_char, "; Input%Ttra = ", Input%Ttra  )
 
-  call getarg( 2, Input%Tint_char )
-  read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
-  if (Status/=0) call Error( "Error reading the argument Input%Tint" )
-  if (i_Debug_PL) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint)
+  call getarg( 2, TempVal_char )
+  read(TempVal_char, "(d20.10)", iostat=Status) Input%TIntTemp
+  if (Status/=0) call Error( "Error reading the argument Input%TIntTemp" )
+  if (i_Debug_PL) call Logger%Write( "TempVal_char = ", TempVal_char, "; Input%TIntTemp = ", Input%TIntTemp)
 ! ==============================================================================================================
+
 
 
 ! ==============================================================================================================

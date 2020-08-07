@@ -77,7 +77,7 @@ Subroutine InitializeLevels_DiatomAtom( Input, Species, i_Debug )
 
   if (i_Debug_Loc) call Logger%Write( "Initializing the set of levels for a 'Diatom-Atom' collision" )
   if (i_Debug_Loc) call Logger%Write( " Calling Species(1)%ListStates%Initialize with FileName = ", FileName )
-  call Species(1)%ListStates%Initialize( Input, Species(1)%DiatPot, 1, FileName=FileName, i_Debug=i_Debug_Loc )                                                
+  call Species(1)%ListStates%Initialize( Input, Species(1)%DiatPot, 1, 1, FileName=FileName, i_Debug=i_Debug_Loc )                                                
   if (i_Debug_Loc) call Logger%Write( " Done initializing the Species(1)%ListStates object" )
 
   if (i_Debug_Loc) call Logger%Exiting

@@ -44,9 +44,12 @@ Program TrajectoriesStats
 
   real(rkp)                               ::    Tran
   character(10)                           ::    Tran_char
+  real(rkp)                               ::    TempVal
+  character(10)                           ::    TempVal_char
   integer                                 ::    Status
   integer                                 ::    StatReadsBinary
   character(1)                            ::    StatReadsBinaryChar
+  
   logical                                 ::    i_Debug_TS      = .False.
   logical                                 ::    i_Debug_TS_Deep = .False.
 !  real(rkp)                               ::    StartTime, EndTime
@@ -68,10 +71,10 @@ Program TrajectoriesStats
   if (Status/=0) call Error( "Error reading the argument Tran_char" )
   if (i_Debug_TS) call Logger%Write( "Tran_char = ", Tran_char, "; Tran = ", Tran  )
   
-  call getarg( 2, Input%Tint_char )
-  read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
-  if (Status/=0) call Error( "Error reading the argument Input%Tint" )
-  if (i_Debug_TS) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint )
+  call getarg( 2, TempVal_char)
+  read(TempVal_char, "(d20.10)", iostat=Status) Input%TintTemp
+  if (Status/=0) call Error( "Error reading the argument Input%TintTemp" )
+  if (i_Debug_TS) call Logger%Write( "TempVal_char = ", TempVal_char, "; Input%TintTemp = ", Input%TintTemp )
 
   call getarg( 3, StatReadsBinaryChar )
   read(StatReadsBinaryChar, "(I1)", iostat=Status) StatReadsBinary

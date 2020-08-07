@@ -57,7 +57,8 @@ Program PostTrajectories
   real(rkp)                                             :: Velocity
   integer                                               :: iMol
   integer                                               :: NTraj_temp
-  character(10)                                         :: Tint_char
+  real(rkp)                                             :: TempVal
+  character(10)                                         :: TempVal_char
   integer                                               :: Status
   real(rkp)                                             :: StartTime, EndTime
 
@@ -83,13 +84,12 @@ Program PostTrajectories
   write(TranInt_char, "(I10)", iostat=Status) TranInt
   if (Status/=0) call Error( "Error writing the argument TranInt_char" )
   if (i_Debug_PT) call Logger%Write( "TranInt_char = ", TranInt_char, "; Tran = ", Tran  )
-  
-  call getarg( 2, Input%Tint_char )
-  read(Input%Tint_char, "(d20.10)", iostat=Status) Input%Tint
-  if (Status/=0) call Error( "Error reading the argument Input%Tint" )
-  write(Tint_char,"(I10)") int(Input%Tint)
-  if (i_Debug_PT) call Logger%Write( "Input%Tint_char = ", Input%Tint_char, "; Input%Tint = ", Input%Tint, "Tint_char = ", Tint_char )
-  
+
+  call getarg( 2, TempVal_char )
+  read(TempVal_char, "(d20.10)", iostat=Status) Input%TintTemp
+  if (Status/=0) call Error( "Error reading the argument Input%TintTemp" )
+  if (i_Debug_PT) call Logger%Write( "TempVal_char = ", TempVal_char, "; Input%TintTemp = ", Input%TintTemp )
+
   call getarg( 3, Input%NTraj_char )
   read( Input%NTraj_char, '(I10)' ) NTraj_temp
   if (i_Debug_PT) call Logger%Write( "Input%NTraj_char = ", Input%NTraj_char, "; NTraj_temp = ", NTraj_temp )
