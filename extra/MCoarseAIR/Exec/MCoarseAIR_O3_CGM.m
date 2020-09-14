@@ -42,41 +42,28 @@ Input.SystNameLong              = 'O3_UMN';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
 %Input.RunSuffix                 = '_RVE45';
-Input.RunSuffix                 = '_CBM';
+Input.RunSuffix                 = '_RVE';
 
 
-Input.Kin.MolResolutionIn       = [ {'StS'}];
-Input.Kin.CGM_Strategy          = [{'CBM'}];
+Input.Kin.MolResolutionIn       = [{'CGM'}];
+Input.Kin.CGM_Strategy          = [{'RVE'}];
+
 Input.Kin.EqNStatesIn           = [    6115];
 Input.Kin.MinStateIn            = [       1];
 Input.Kin.MaxStateIn            = [    6115];
 Input.Kin.PathToWriteMappingIn  = [    {''}];
+Input.Kin.PathToMappingIn       = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE45.csv'}];
+Input.Kin.ParamsGroupsIn        = [    0.5];
+Input.Kin.NGroupsIn             = [     45]; % 49,     83
+Input.Kin.PathToMappingIn       = [{''}];
+Input.Kin.ParamsGroupsIn        = [   0.5];
+Input.Kin.NGroupsIn             = [    15]; % 49,     83
 
 Input.Kin.MolResolutionOut      = [{'CGM'}];
 Input.Kin.PathToWriteMappingOut = [{''}];%[{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/'}];
-
-if     strcmp(Input.RunSuffix, '_DP10')
-    Input.Kin.PathToMappingIn       = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DPM10.csv'}];
-    Input.Kin.NGroupsIn             = [     10]; % 49,     83
-elseif strcmp(Input.RunSuffix, '_DP20')
-    Input.Kin.PathToMappingIn       = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DPM20.csv'}];
-    Input.Kin.NGroupsIn             = [     20]; % 49,     83
-elseif strcmp(Input.RunSuffix, '_DP45')
-    Input.Kin.PathToMappingIn       = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_DPM45.csv'}];
-    Input.Kin.NGroupsIn             = [     45]; % 49,     83
-elseif strcmp(Input.RunSuffix, '_RVE45')
-    Input.Kin.PathToMappingIn       = [{'/home/venturi/WORKSPACE/Air_Database/Run_0D/database/grouping/O3_UMN/O2/LevelsMap_RVE45.csv'}];
-    Input.Kin.ParamsGroupsIn        = [    0.5];
-    Input.Kin.NGroupsIn             = [     45]; % 49,     83
-elseif strcmp(Input.RunSuffix, '_CBM')
-    Input.Kin.PathToMappingIn       = [{''}];
-    Input.Kin.ParamsGroupsIn        = [   0.5];
-    Input.Kin.NGroupsIn             = [    15]; % 49,     83
-end
-
-Input.Kin.PathToMappingOut = Input.Kin.PathToMappingIn;
-Input.Kin.ParamsGroupsOut  = Input.Kin.ParamsGroupsIn;
-Input.Kin.NGroupsOut       = Input.Kin.NGroupsIn;
+Input.Kin.PathToMappingOut      = Input.Kin.PathToMappingIn;
+Input.Kin.ParamsGroupsOut       = Input.Kin.ParamsGroupsIn;
+Input.Kin.NGroupsOut            = Input.Kin.NGroupsIn;
 
 Input.Kin.Proc.DissFlg          = 2;
 Input.Kin.NBinsSuffix           = 0;
