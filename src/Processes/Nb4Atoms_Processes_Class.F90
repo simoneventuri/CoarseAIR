@@ -610,7 +610,7 @@ Subroutine FindingFinalLevel_Nb4Atoms( This, Input, Collision, vqn, jqn, Arr, Na
     allocate(Name, source = adjustl(trim( Collision%Atoms(1)%Name // '+' // Collision%Atoms(2)%Name // '+' // Collision%Atoms(3)%Name // '+' // Collision%Atoms(4)%Name )) )
     iLevelFin     = [  0,   0]
     iLevelFinChar = ['0', '0']
-    Idx           = 0
+    Idx           = 1
     Pairs         = [0, 0]
   end if
  
