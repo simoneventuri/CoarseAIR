@@ -155,7 +155,7 @@ Subroutine Initialize_Nb4Atoms( This, Input, Collision, i_Debug )
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP)                                  
   end do
   This%NProc_Tot = This%NProc_Tot + 1
-  allocate( This%Proc_To_LineVec(0:This%NProc_Tot-1), Stat=Status  )
+  allocate( This%Proc_To_LineVec(This%NProc_Tot), Stat=Status  )
   if (Status/=0) call Error( "Error allocating Proc_To_LineVec in FindEqExchanges_Nb3_Processes" )
   if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,")" )
   This%Proc_To_LineVec = 0
@@ -408,7 +408,7 @@ Subroutine ConstructVecOfProcs_Nb4Atoms( This, Input, Collision, i_Debug )
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP) 
   end do
   This%NProc_Tot = This%NProc_Tot + 1
-  allocate(This%ProcessesVec(0:This%NProc_Tot-1), Stat=Status)
+  allocate(This%ProcessesVec(This%NProc_Tot), Stat=Status)
   if (Status/=0) call Error( "Error allocating This%ProcessesVec in InitializeProcesses_Nb4Atoms_Processes" )
   if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,")" )
 
@@ -729,12 +729,12 @@ Subroutine Convert_CrossSect_To_Rates_Nb4Atoms( This, Input, Collision, Velocity
               call This%FindingFinalLevel( Input, Collision, vqnFin, jqnFin, ArrFin, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, Idx, i_Debug=i_Debug_Loc )
 
               !!! New Process ??? !!!!
-              Proc_To_Line = This%Proc_To_LineVec(Idx-1)
+              Proc_To_Line = This%Proc_To_LineVec(Idx)
               if (Proc_To_Line < 1) then
                 !!! New Process! Allocating it !!!!
                 This%NProc_Cleaned          = This%NProc_Cleaned + 1
                 call This%ProcessesVecTemp(This%NProc_Cleaned)%Shelving_1stTime( 2, NTtra, Idx, Name, ProcType, ExcType, iP, iLevelFin, iLevelFinChar, CorrFactor=1.0_rkp, CrossSect=CrossSectTemp, Velocity=Velocity(iTtra), i_Debug=i_Debug_Loc )
-                This%Proc_To_LineVec(Idx-1) = This%NProc_Cleaned
+                This%Proc_To_LineVec(Idx) = This%NProc_Cleaned
                 
               else
                 !!! Old Process! Adding Cross Section !!!!

@@ -135,7 +135,7 @@ Subroutine Initialize_Nb3Atoms( This, Input, Collision, i_Debug )
     This%NProc_Tot         = This%NProc_Tot + This%NProc_iP(iP)
   end do
   This%NProc_Tot = This%NProc_Tot + 1
-  allocate( This%Proc_To_LineVec(0:This%NProc_Tot-1), Stat=Status  )
+  allocate( This%Proc_To_LineVec(This%NProc_Tot), Stat=Status  )
   if (Status/=0) call Error( "Error allocating Proc_To_LineVec in Initialize_Nb3Atoms" )
   if (i_Debug_Loc) call Logger%Write( "Allocated Proc_To_LineVec with Dimension = (",This%NProc_Tot,")" )
   This%Proc_To_LineVec = 0
@@ -315,7 +315,7 @@ Subroutine ConstructVecOfProcs_Nb3Atoms( This, Input, Collision, i_Debug )
   !i_Debug_Loc   =     Logger%On()
 
 
-  allocate(This%ProcessesVec(0:This%NProc_Tot-1), Stat=Status)
+  allocate(This%ProcessesVec(This%NProc_Tot), Stat=Status)
   if (Status/=0) call Error( "Error allocating This%ProcessesVec in InitializeProcesses_Nb3Atoms_Processes" )
   if (i_Debug_Loc) call Logger%Write( "Allocated This%ProcessesVec with Dimension = (",This%NProc_Tot,")" )
 
