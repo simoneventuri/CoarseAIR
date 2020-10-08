@@ -12,10 +12,6 @@
    
 ###########################################################################################
 
-   Database Path = /home/venturi/WORKSPACE/CoarseAIR/coarseair/dtb   
-
-###########################################################################################
-
    System = OaObOcOd
    
    Nb of Species = 2
@@ -41,7 +37,9 @@
        Mass [a.u.] of Atom 3 = 29148.94559d0
      Atom 4 = Od
        Mass [a.u.] of Atom 4 = 29148.94559d0
-     
+   
+   Database Path = /home/mpanesi/WORKSPACE/CoarseAIR/coarseair/dtb   
+   
    
    ### Relative Translational Energy Model ( Uniform / Boltzmann / FixedTotEn )
    ###   Uniform         ->   Translational Energy [Eh] 1 = 
@@ -50,6 +48,7 @@
    Relative Translational Energy Model = Boltzmann
      Nb of Translational Temperatures = 1
        Translational Temperature [K] 1 = 10000.d0
+
    #Relative Translational Energy Model = Uniform
    #  Nb of Translational Energies = 1
    #    Translational Energy [Eh] 1 = 10.d0
@@ -107,7 +106,7 @@
    # Molecule 2: sampled from a Boltzmann distribution (include all levels) - OcOd
    Sorting Method, Molecule 2 = RoVib-CG                                    
      File with Bins Energy Minima, Molecule 2 = E_low.dat
-     Fixed Internal Temperature, Molecule 1 = 300.d0
+     Fixed Internal Temperature, Molecule 2 = 300.d0
      Nb of Bins, Molecule 2 = 1
      Starting Bin, Molecule 2 = 1
      Final    Bin, Molecule 2 = 1
@@ -135,7 +134,7 @@
    ### Using Proportional Allocation? If "no" => (Nb of Trajectories per Level / Bin = ). If "yes" => (Nb of Total Trajectories = )
    Using Proportional Allocation? = no
    #Nb of Total Trajectories = 100
-   Nb of Trajectories per Level / Bin = 100000
+   Nb of Trajectories per Level / Bin = 30000
    
    Generate a CPU-Clock Dependent Seed? = no
    Initial Random Nb Seed = 3

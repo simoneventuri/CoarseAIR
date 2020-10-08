@@ -29,22 +29,29 @@ function Plot_ReconstructedRates()
     fprintf('====================================================\n')
  
     
+    if strcmp(Input.Kin.MolResolutionOut(1), 'CGM')
+        ColorGroups = Param.CMat(3,:);
+    else
+        ColorGroups = Param.CMat(2,:);
+    end
+    
+    
     figure(Input.iFig)
     fig = gcf;
     screensize   = get( groot, 'Screensize' );
     %fig.Position = screensize;
     %fig.Color='None';
     
-    scatter(Syst.Molecule(1).LevelEeV, Rates.T(Temp.iT).Diss(:,1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(1,:)  );
-    ProcNames = {'$k^D$'};
+    h1 = scatter(Syst.Molecule(1).LevelEeV, Rates.T(Temp.iT).Diss(:,1), 20, 'Filled', 'MarkerFaceColor', Param.CMat(1,:)  );
+    ProcNames = {'$\textit{Ab Initio}$ Data Set'};
     
     hold on
     
-    scatter(Syst.Molecule(1).LevelEeV, Rates.T(Temp.iT).DissOutRecon(:), 20, 'Filled', 'MarkerFaceColor', Param.CMat(2,:)  );
-    ProcNames = {'$\bar{k}^D$'};
+    h2 = scatter(Syst.Molecule(1).LevelEeV, Rates.T(Temp.iT).DissOutRecon(:), 20, 'Filled', 'MarkerFaceColor', ColorGroups  );
+    ProcNames = [ProcNames, {'Averaged Data Set'}];
   
 
-    clab             = legend(ProcNames, 'Location', 'Best');
+    clab             = legend([h1,h2], ProcNames, 'Location', 'Best');
     clab.Interpreter = 'latex';
     set(clab,'FontSize', Param.LegendFontSz, 'FontName', Param.LegendFontNm, 'Interpreter', 'latex');    
 
@@ -53,12 +60,12 @@ function Plot_ReconstructedRates()
     yt = get(gca, 'YTick');
     set(gca,'FontSize', Param.AxisFontSz, 'FontName', Param.AxisFontNm, 'TickDir', 'out', 'TickLabelInterpreter', 'latex');
 
-    str_x = ['$\epsilon_i$ [eV]'];
+    str_x = ['$\varepsilon_i$ [eV]'];
     xlab             = xlabel(str_x, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     xlab.Interpreter = 'latex';
     %xlim([max(min(LevelEeV)), MinEvPlot, min(max(LevelEeV)), MaxEvPlot]);
 
-    str_y = ['$k_i$ $[cm^{3}/s]$'];
+    str_y = ['$k_i^D$ $[cm^{3}/s]$'];
     ylab             = ylabel(str_y, 'Fontsize', Param.AxisLabelSz, 'FontName', Param.AxisLabelNm);
     ylab.Interpreter = 'latex';
     %ylim([1.d5, 1.d23]);

@@ -32,23 +32,24 @@ echo '   PipeLine for Running External Codes                                    
 echo '------------------------------------------------------------------------------------------'
 echo ' '
 
-source ~/.bashrc
-#module purge
-COARSEAIR_UPDATE
-COARSEAIR_release
-#PLATONORECOMB_gnu_release
-PLATO_gnu_release
+# source ~/.bashrc
+# #module purge
+# COARSEAIR_UPDATE
+# COARSEAIR_release
+# #PLATONORECOMB_gnu_release
+# PLATO_gnu_release
 
 export System='O3_UMN'
 export Molecule_vec=('O2')
 export FldrName=''
-export Tran_vec=(10000) #(1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
+export ExchBis=0
+export Tran_vec=(5000 10000 20000) # (1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
 export T0=300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
 
-export DissFlg=0
+export DissFlg=2
 export InelFlg=1
 export ExchFlg1=1
 export ExchFlg2=0

@@ -39,25 +39,25 @@ function [VVec, dVVec] = O2_UMN(RVec)
 
     VVec  = [];
     dVVec = [];
-    for iSample = 1:length(RVec)
+    %for iSample = 1:length(RVec)
 
         %######################################################################################################     <--- Compute_Vd_dVd_O2
         %### 
-        R    = RVec(iSample);
-        RAng = R*BToAng;
+        R    = RVec;%RVec(iSample);
+        RAng = R.*BToAng;
 
 
         %##############################################################################################     <--- Ev2gm2_Grad
         %###
         V = 0.0;
         for k=1:8
-            V = V + a(k) * exp(-alpha * beta^(k-1) * RAng^2);
+            V = V + a(k) .* exp(-alpha .* beta^(k-1) .* RAng.^2);
         end
         V = V*1.e-3;
 
         dV = 0.0;
         for k=1:8
-            dV = dV - 2.0 * a(k) * alpha * beta^(k-1) * RAng * exp(-alpha * beta^(k-1) * RAng^2);
+            dV = dV - 2.0 .* a(k) .* alpha .* beta^(k-1) .* RAng .* exp(-alpha .* beta^(k-1) .* RAng.^2);
         end
         dV = dV*1.e-3;
         %######################################################################################     <--- d3disp_Grad
@@ -69,16 +69,16 @@ function [VVec, dVVec] = O2_UMN(RVec)
         c8Step = 3.0 * c6 * r2r4Scalar^2;
 
         tmp = sqrt(c8Step / c6); 
-        e6  = c6     / (R^6 + (rs6*tmp + rs8)^6);
-        e8  = c8Step / (R^8 + (rs6*tmp + rs8)^8);
+        e6  = c6     ./ (R.^6 + (rs6*tmp + rs8).^6);
+        e8  = c8Step ./ (R.^8 + (rs6*tmp + rs8).^8);
 
-        e6dr =     c6 * (-6.0 * R^5) / (R^6 + (rs6*tmp + rs8)^6)^2;
-        e8dr = c8Step * (-8.0 * R^7) / (R^8 + (rs6*tmp + rs8)^8)^2;
+        e6dr =     c6 .* (-6.0 * R.^5) / (R.^6 + (rs6*tmp + rs8).^6).^2;
+        e8dr = c8Step .* (-8.0 * R.^7) / (R.^8 + (rs6*tmp + rs8).^8).^2;
         %##############################################################################       ---> edisp_Grad
 
 
-        VDisp  = (-e6   -2.0*e8);
-        dVDisp = (-e6dr -2.0*e8dr) / BToAng;
+        VDisp  = (-e6   -2.0.*e8);
+        dVDisp = (-e6dr -2.0.*e8dr) ./ BToAng;
         %######################################################################################     ---> d3disp_Grad
 
 
@@ -87,13 +87,13 @@ function [VVec, dVVec] = O2_UMN(RVec)
         %##############################################################################################     ---> Ev2gm2_Grad
 
 
-        V  = (VDiat + VRef)    * EhToeV;   
-        dV = (dVDiat * BToAng) * EhToeV;                                                                                  
+        V  = (VDiat + VRef)     .* EhToeV;   
+        dV = (dVDiat .* BToAng) .* EhToeV;                                                                                  
         %######################################################################################################     ---> Compute_Vd_dVd_O2
 
-        VVec  = [VVec;   V];
-        dVVec = [dVVec; dV];
+        VVec  = V;  %[VVec,   V];
+        dVVec = dV; %[dVVec, dV];
 
-    end      
+    %end      
 
 end

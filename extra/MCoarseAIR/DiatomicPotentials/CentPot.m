@@ -28,7 +28,7 @@ function [Vc, dVc] = CentPot(r, jqn, iMol)
     iA    = Syst.Molecule(iMol).ToAtoms(1);
     jA    = Syst.Molecule(iMol).ToAtoms(2);
     
-    mass  = [Syst.Atom(iA).Mass, Syst.Atom(jA).Mass] / Param.AMUToKg;
+    mass  = [Syst.Atom(iA).MassQCT, Syst.Atom(jA).MassQCT];% ./ Param.AMUToKg;
     mu    = mass(1) * mass(2) / ( mass(1) + mass(2) );
     
     Vc_R2 = 1.d0 / mu * 0.5d0 * (jqn+0.5d0)^2;

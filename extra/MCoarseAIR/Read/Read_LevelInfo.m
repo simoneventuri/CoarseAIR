@@ -23,15 +23,18 @@ function [Syst] = Read_LevelInfo(Syst)
     % 
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
-
-    
+        
     global Input Param
 
     fprintf('= Read_LevelInfo ===================================\n')
     fprintf('====================================================\n')
     
     
+    DebugFlg = false;
+    
+    
     for iMol = 1:Syst.NMolecules       
+        Syst.Molecule(iMol).iMol = iMol;
         fprintf('Reading Level Quantities for Molecule Nb %i \n',  iMol )
         
         LevelsFile = strcat(Syst.HDF5_File);
@@ -120,17 +123,41 @@ function [Syst] = Read_LevelInfo(Syst)
         end
         
         Syst.Molecule(iMol).NLevels   = length(Syst.Molecule(iMol).LevelEEh);
+        Syst.Molecule(iMol).Nvqn      = max(Syst.Molecule(iMol).Levelvqn(:)) + 1;
+        Syst.Molecule(iMol).Njqn      = max(Syst.Molecule(iMol).Leveljqn(:)) + 1;        
+       
         Syst.Molecule(iMol).LevelEeV  = Syst.Molecule(iMol).LevelEEh  * Param.EhToeV;
         Syst.Molecule(iMol).LevelVMin = Syst.Molecule(iMol).LevelVMin * Param.EhToeV;
         Syst.Molecule(iMol).LevelVMax = Syst.Molecule(iMol).LevelVMax * Param.EhToeV;
-        Syst.Molecule(iMol).EEhRef    = min(Syst.Molecule(iMol).LevelEEh(1));
-        Syst.Molecule(iMol).EeVRef    = min(Syst.Molecule(iMol).LevelEeV(1));
-        Syst.Molecule(iMol).LevelEEh0 = Syst.Molecule(iMol).LevelEEh - min(Syst.Molecule(iMol).LevelEEh(1));
-        Syst.Molecule(iMol).LevelEeV0 = Syst.Molecule(iMol).LevelEeV - min(Syst.Molecule(iMol).LevelEeV(1));
-        Syst.Molecule(iMol).Nvqn      = max(Syst.Molecule(iMol).Levelvqn) + 1;
-        Syst.Molecule(iMol).Njqn      = max(Syst.Molecule(iMol).Leveljqn) + 1;
         
-        Syst.Molecule(iMol).LevelECB  = Syst.Molecule(iMol).LevelVMax - Syst.Molecule(iMol).LevelEeV; 
+        if (DebugFlg)
+            figure(1010+iMol)
+            plot(Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).LevelrIn, 'ko')
+            hold on
+            figure(1020+iMol)
+            plot(Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).LevelrOut, 'ko')
+            hold on
+        end
+            
+        if (Input.Tasks.ComputeLevelProps.Flg)
+            Syst = LevelProperties(Syst, iMol)
+        end
+    
+        if (DebugFlg)
+            figure(1010+iMol)
+            plot(Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).LevelrIn)
+            hold on
+            figure(1020+iMol)
+            plot(Syst.Molecule(iMol).LevelEeV, Syst.Molecule(iMol).LevelrOut)
+            hold on
+        end
+        
+        Syst.Molecule(iMol).EEhRef    = min(Syst.Molecule(iMol).LevelEEh);
+        Syst.Molecule(iMol).EeVRef    = min(Syst.Molecule(iMol).LevelEeV);
+        Syst.Molecule(iMol).LevelEEh0 = Syst.Molecule(iMol).LevelEEh - Syst.Molecule(iMol).EEhRef;
+        Syst.Molecule(iMol).LevelEeV0 = Syst.Molecule(iMol).LevelEeV - Syst.Molecule(iMol).EeVRef;
+        
+        Syst.Molecule(iMol).LevelECB  = max(0.0, Syst.Molecule(iMol).LevelVMax - Syst.Molecule(iMol).LevelEeV); 
 
         vToLevel = zeros(Syst.Molecule(iMol).Nvqn,1);
         for iLevels = 1:Syst.Molecule(iMol).NLevels

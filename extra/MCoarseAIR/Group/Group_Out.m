@@ -62,6 +62,13 @@ function Group_Out()
                 Controls.MinEeV(iMol)     = 1e10;
                 LevelToGroup = Group_BasedOnCB(Syst, Controls, iMol);  
                 
+                
+            elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'DPI'))
+                fprintf('Gropuing Excitation based on Diatomic Potential\n\n')
+
+                Controls.NGroups(iMol) = Input.Kin.NGroupsOut(iMol);
+                LevelToGroup           = Group_BasedOnDPInel(Syst, Controls, iMol);  
+                
             elseif (strcmp(Input.Kin.CGM_Strategy(iMol), 'DPM'))
                 fprintf('Gropuing based on Diatomic Potential\n\n')
 
