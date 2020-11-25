@@ -103,7 +103,7 @@ Pure Elemental Function Compute_O2_Degeneracy_State( jqn ) result(g)
        
   ! end if
 
-  g = Half * (Two * jqn + One)
+  g = (Two * jqn + One)
   
 End Function
 
