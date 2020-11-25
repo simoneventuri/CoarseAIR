@@ -37,7 +37,7 @@ Input.WORKSPACE_PATH            = '/home/venturi/WORKSPACE'
 Input.Paths.ToQCTFldr           = strcat(Input.WORKSPACE_PATH, '/CoarseAIR/O2C_ALL/Test/');
 Input.Paths.ToKinMainFldr       = strcat(Input.WORKSPACE_PATH, '/Air_Database/Run_0D/');
 Input.Paths.ToHDF5Fldr          = strcat(Input.WORKSPACE_PATH, '/Air_Database/HDF5_Database/');
-Input.TranVec                   = [10000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
+Input.TranVec                   = [20000]%[2500 5000 7500 10000 12500 15000 20000];%[5000 10000 20000] [12500 15000 20000]% 
 Input.SystNameLong              = 'O2C_NASA';
 Input.iPES                      = 0;
 Input.Suffix                    = ''
@@ -50,11 +50,11 @@ Input.Kin.MaxStateIn            = [  6078,   13521];
 Input.Kin.PathToMappingIn       = [   {''},   {''}];
 Input.Kin.PathToWriteMappingIn  = [   {''},   {''}];
 Input.Kin.NGroupsIn             = [      0,      0];
-Input.Kin.MolResolutionOut      = [{'CGM'},{'CGM'}];
+Input.Kin.MolResolutionOut      = [{'StS'},{'StS'}];
 Input.Kin.PathToMappingOut      = [   {''},   {''}];
-Input.Kin.CGM_Strategy          = [{'DPM'},{'DPM'}];
-Input.Kin.ParamsGroupsOut       = [    0.5,    0.5];
-Input.Kin.NGroupsOut            = [     20,     20]; % 49, 83
+Input.Kin.CGM_Strategy          = [{'CBM'},{'CBM'}];
+Input.Kin.ParamsGroupsOut       = [    1.0,    1.0];
+Input.Kin.NGroupsOut            = [     49,     83]; % 49, 83
 % Input.Kin.CGM_Strategy          = [{'RVE'},{'RVE'}];
 % Input.Kin.ParamsGroupsOut       = [     32,     55];
 % Input.Kin.NGroupsOut            = [     49,     83]; % 83, 49
@@ -79,7 +79,7 @@ Input.ReLoad                    = 1;
 
 %% Inputs for Plotting
 Input.iFig               = 101;
-Input.SaveFigsFlgInt     = 0;
+Input.SaveFigsFlgInt     = 2;
 Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Figures/');
 
 
@@ -91,6 +91,11 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 Input.Tasks.All = false
 
 %% CoarseAIR
+% Recomputing Levels' Properties
+Input.Tasks.ComputeLevelProps.Flg                      = false
+% Writing Levels' Properties
+Input.Tasks.Write_LevelInfo.Flg                        = false
+Input.Tasks.Write_LevelInfo.Path                       = [{'/home/venturi/Desktop/RAbInitio.dat'}]
 % Plotting Diatomic Potential
 Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];
@@ -111,7 +116,7 @@ Input.Tasks.Write_RatesParaview.jqns                   = [0,120,180,210,240,280,
 Input.Tasks.Write_RatesParaview.IncludeExch            = false
 % Writing Rates for Clustering
 Input.Tasks.Write_RatesForClustering.Flg               = false;
-Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-16;
+Input.Tasks.Write_RatesForClustering.MinRate           = 1.e-15;
 Input.Tasks.Write_RatesForClustering.WriteFldr         = strcat('/home/venturi/WORKSPACE/SpectralCluster/data/');
 Input.Tasks.Write_RatesForClustering.MinState          = 1;
 Input.Tasks.Write_RatesForClustering.MaxState          = 100000;
@@ -126,7 +131,7 @@ Input.Tasks.Write_RatesAsNetwork.IncludeExch           = true;
 % Compute Grouped Rate Coefficients
 Input.Tasks.Compute_GroupedRates.Flg                   = false;
 % Plotting Reconstructed Rate Coefficients
-Input.Tasks.Plot_ReconstructedRates.Flg                = false
+Input.Tasks.Plot_ReconstructedRates.Flg                = false;
 
 %% KONIG and PLATO
 % Plotting Mole Fractions
@@ -147,7 +152,7 @@ Input.Tasks.Plot_VDF.Flg                               = false;
 Input.Tasks.Plot_VDF.MoleculesOI                       = [1];
 Input.Tasks.Plot_VDF.tSteps                            = [8.0e-7]%[1.23e-6]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 % Plotting RVS Populations
-Input.Tasks.Plot_Populations.Flg                       = true;
+Input.Tasks.Plot_Populations.Flg                       = false;
 Input.Tasks.Plot_Populations.MoleculesOI               = [1];
 Input.Tasks.Plot_Populations.tSteps                    = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_Populations.GroupColors               = 4;
@@ -158,7 +163,7 @@ Input.Tasks.Plot_PopulationsVqnSpecific.MoleculesOI    = [1];
 Input.Tasks.Plot_PopulationsVqnSpecific.tSteps         = [1.e-14, 1.e-13, 1e-12, 1.e-11, 1e-10, 1.e-9, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4]%[8.94e-7]%[7.e-6, 30e-6, 100e-6, 5.e-3];
 Input.Tasks.Plot_PopulationsVqnSpecific.GroupColors    = 2;
 % Plotting Energies
-Input.Tasks.Plot_Energies.Flg                          = false;
+Input.Tasks.Plot_Energies.Flg                          = true;
 Input.Tasks.Plot_Energies.MoleculesOI                  = [1];
 Input.Tasks.Plot_Energies.LTFlag                       = true;
 % Plotting Energy Depletions
@@ -223,6 +228,10 @@ if Input.ReLoad > 0
         if (Input.Kin.ReadOtherSyst(iSyst))
             OtherSyst(iSyst).Syst = Read_LevelInfo(OtherSyst(iSyst).Syst);
         end
+    end
+    
+    if (Input.Tasks.Write_LevelInfo.Flg)
+        Write_LevelInfo(Input.Tasks.Write_LevelInfo)
     end
 
     %% Grouping the Levels in Output
@@ -308,7 +317,7 @@ for iT = 1:length(Temp.TranVec)
         %%%% Computing Quantities %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
         
-        if (Input.Tasks.Compute_GroupedRates.Flg)
+        if (Input.Tasks.Compute_GroupedRates.Flg || Input.Tasks.Plot_ReconstructedRates.Flg)
            
            %% Grouping the Rate Coefficients
            Compute_GroupedRates()

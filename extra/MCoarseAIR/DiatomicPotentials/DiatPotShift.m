@@ -1,6 +1,6 @@
-%% Shifted Effective Diatomic Potential and its Derivative (for Root Finding)
+%% Shifted Effective Diatomic Potential (for Root Finding)
 %
-function Ve = DiatPotShift(r, jqn, iMol, Shift)
+function [Ve] = DiatPotShift(r, jqn, iMol, Shift)
     
     %%==============================================================================================================
     % 

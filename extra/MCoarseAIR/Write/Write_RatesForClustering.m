@@ -102,7 +102,7 @@ function Write_RatesForClustering(Controls)
         
         
         KDiss = Rates.T(Temp.iT).Diss(:,1)   .* cm3_To_m3;
-        KRec  = Rates.T(Temp.iT).Recomb(:,1) .* cm3_To_m3;
+        KRec  = Rates.T(Temp.iT).Diss(:,1)   .* 0.0;
         
         fprintf('Writing Dissociation Rate Coefficients\n')
         FileName2 = strcat(WriteFldr, '/DissRates.dat');
@@ -114,30 +114,6 @@ function Write_RatesForClustering(Controls)
         end
         fclose(fileID2);
 
-        
-        
-        Kij   = Rates.T(Temp.iT).Inel;
-        Kij   = Kij .* cm3_To_m3;
-        Kji   = Kij'; 
-
-        tic;
-        fprintf('Writing Inelastic Rate Coefficients\n')
-        FileName3 = strcat(WriteFldr, '/InelRates_WOExch.dat');
-        fileID3    = fopen(FileName3,'w');
-        for jLevel = MinState:MaxState
-            for iLevel = MinState:jLevel-1
-                if (Kji(iLevel,jLevel) > MinRate) && (Mapping(iLevel) > -1) && (Mapping(jLevel) > -1)
-                    fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
-                    %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
-                                                   %        i,        j,                Kij,                Kji 
-                                                   %        where dni/dt  = - sum_j Kij ni nC + sum_j kji nj nC
-                end
-            end
-        end
-        fclose(fileID3);
-        timee = toc;
-        fprintf('Inelastic Rates Matrix written in %e s\n', timee)
-        
         
         
         AddedInelFlg = false;
@@ -154,6 +130,8 @@ function Write_RatesForClustering(Controls)
         Kji   = Kij'; 
     
         if (AddedInelFlg)
+            
+            
             tic;
             fprintf('Writing Inelastic + Exchange Rate Coefficients\n')
             FileName3 = strcat(WriteFldr, '/InelRates_WExch.dat');
@@ -171,6 +149,35 @@ function Write_RatesForClustering(Controls)
             fclose(fileID3);
             timee = toc;
             fprintf('Inelastic + Exchange Rates Matrix written in %e s\n', timee)
+            
+            
+        else
+            
+        
+            Kij   = Rates.T(Temp.iT).Inel;
+            Kij   = Kij .* cm3_To_m3;
+            Kji   = Kij'; 
+
+            tic;
+            fprintf('Writing Inelastic Rate Coefficients\n')
+            FileName3 = strcat(WriteFldr, '/InelRates_WOExch.dat');
+            fileID3    = fopen(FileName3,'w');
+            for jLevel = MinState:MaxState
+                for iLevel = MinState:jLevel-1
+                    if (Kji(iLevel,jLevel) > MinRate) && (Mapping(iLevel) > -1) && (Mapping(jLevel) > -1)
+                        fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kji(iLevel,jLevel), Kij(iLevel,jLevel)); 
+                        %fprintf(fileID3,'%i %i %e %e\n', Mapping(iLevel), Mapping(jLevel), Kij(iLevel,jLevel), Kji(iLevel,jLevel)); 
+                                                       %        i,        j,                Kij,                Kji 
+                                                       %        where dni/dt  = - sum_j Kij ni nC + sum_j kji nj nC
+                    end
+                end
+            end
+            fclose(fileID3);
+            timee = toc;
+            fprintf('Inelastic Rates Matrix written in %e s\n', timee)
+
+
+
         end
 
         

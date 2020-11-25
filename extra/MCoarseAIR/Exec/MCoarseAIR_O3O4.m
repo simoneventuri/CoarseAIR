@@ -21,7 +21,7 @@
 %%==============================================================================================================
 
 clear all
-close all
+%close all
 clc
 
 global Input Syst Temp Param Kin Rates OtherSyst OtherRates
@@ -76,7 +76,7 @@ Input.Kin.PathToWriteMappingOut = [   {''}];
 % Input.Kin.NGroupsOut            = [     45]; %45
 % Input.Kin.PathToWriteMappingOut = [   {''}];
 
-Input.Kin.Proc.DissFlg          = 1;
+Input.Kin.Proc.DissFlg          = 5;
 Input.Kin.NBinsSuffix           = 0;
 Input.Kin.DissCorrFactor        = 1.0%16.0/3.0;
 Input.Kin.Proc.DissInelFlg      = 0;
@@ -106,6 +106,11 @@ Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Air_Paper/Data/');
 %% Tasks Inputs
 
 %% CoarseAIR
+% Recomputing Levels' Properties
+Input.Tasks.ComputeLevelProps.Flg                      = false
+% Writing Levels' Properties
+Input.Tasks.Write_LevelInfo.Flg                        = false
+Input.Tasks.Write_LevelInfo.Path                       = [{'/home/venturi/Desktop/O2_.dat'}]
 % Plotting Diatomic Potential
 Input.Tasks.Plot_DiatPot.Flg                           = false;
 Input.Tasks.Plot_DiatPot.MoleculesOI                   = [1];

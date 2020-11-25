@@ -59,6 +59,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(2).Mass  = 14.0067e-3;
         Syst.Atom(3).Mass  = 14.0067e-3;
         
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        
         
         %%% Molecules
         Syst.NMolecules                   = 1;
@@ -163,7 +167,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 15.9994e-3;
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
-        
+
+        Syst.Atom(1).MassQCT  = 29148.94559e0;
+        Syst.Atom(2).MassQCT  = 29148.94559e0;
+        Syst.Atom(3).MassQCT  = 29148.94559e0;
         
         %%% Molecules
         Syst.NMolecules                   = 1;
@@ -260,6 +267,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 12.0110e-3;
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
         
         
         %%% Molecules
@@ -386,6 +397,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 15.9994e-3;
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = Syst.Atom(1).Mass;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
         
         
         %%% Molecules
@@ -512,6 +527,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(2).Mass  = 14.0067e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
         
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        
         
         %%% Molecules
         Syst.NMolecules                   = 2;
@@ -637,6 +656,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 14.0067e-3;
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 14.0067e-3;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
         
         
         %%% Molecules
@@ -763,6 +786,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 15.9994e-3;
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 14.0067e-3;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
         
         
         %%% Molecules
@@ -890,6 +917,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
         
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        
         
         %%% Molecules
         Syst.NMolecules                   = 2;
@@ -1015,6 +1046,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(1).Mass  = 12.0110e-3;
         Syst.Atom(2).Mass  = 14.0067e-3
         Syst.Atom(3).Mass  = 1.00790e-3;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
         
         
         %%% Molecules
@@ -1166,6 +1201,10 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(3).Mass  = 14.0067e-3;
         Syst.Atom(4).Mass  = 14.0067e-3;
 
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        Syst.Atom(4).MassQCT  = 25526.04298e0;
         
         %%% Molecules
         Syst.NMolecules                   = 1;
@@ -1283,6 +1322,11 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
         Syst.Atom(4).Mass  = 15.9994e-3;
+
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        Syst.Atom(4).MassQCT  = 25526.04298e0;
         
         %%% Molecules
         Syst.NMolecules                   = 1;
@@ -1392,6 +1436,11 @@ function [Syst] = Initialize_ChemicalSyst(Syst)
         Syst.Atom(2).Mass  = 15.9994e-3;
         Syst.Atom(3).Mass  = 15.9994e-3;
         Syst.Atom(4).Mass  = 15.9994e-3;
+        
+        Syst.Atom(1).MassQCT  = 25526.04298e0;
+        Syst.Atom(2).MassQCT  = 25526.04298e0;
+        Syst.Atom(3).MassQCT  = 25526.04298e0;
+        Syst.Atom(4).MassQCT  = 25526.04298e0;
         
         %%% Molecules
         Syst.NMolecules                   = 6;

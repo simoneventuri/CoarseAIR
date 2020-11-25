@@ -8,8 +8,9 @@ global Input Syst Param
 Input.WORKSPACE_PATH = '/home/venturi/WORKSPACE/'
 Input.DATA_PATH      = '/Spebus/PESConstruction/AbInitio_Data/CNH/';%'/Spebus/PESConstruction/AbInitio_Data/O3/UMN_AbInitio/';
 
+Input.SystNameLong = 'O3_UMN';
 %Input.SystNameLong = 'N4_NASA';
-Input.SystNameLong   = 'CNH_UIUC';
+%Input.SystNameLong   = 'CNH_UIUC';
 Input.FigureFormat   = 'PrePrint';
 Input.iFig           = 101;
 
@@ -27,7 +28,7 @@ Initialize_Parameters()
 figure(Input.iFig)
 RVec = linspace(1e-10, 8.0, 3000);
 for iP=1:3
-    [Ve, dVe] = DiatPot(RVec, 0, iP);
+    [Ve, dVe] = DiatPot(RVec, 0, 1);
     plot(RVec, Ve)
     hold on
     clear Ve dVe

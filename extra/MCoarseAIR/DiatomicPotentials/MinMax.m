@@ -1,6 +1,6 @@
-%% NO Diatomic Potential from UMN (..., 2016)
-%
-function [V, dV] = NO_UMN_Fun(R)    
+%% Finding the Minimum and the Maximum of the Diatomic Potential for a given jqn
+%     
+function [rMin, VMin, rMax, VMax] = MinMax(rMinOld, rMaxOld, jqn, iMol)
 
     %%==============================================================================================================
     % 
@@ -22,33 +22,26 @@ function [V, dV] = NO_UMN_Fun(R)
     % 
     %---------------------------------------------------------------------------------------------------------------
     %%==============================================================================================================
+
+    global Syst Param
+
+    jqnreal = jqn+0.0;
     
-    
-% NO UMN Min @ 2.17661 (V=-6.617426)
-
-    cs   = [ 0.322338e0, 5.878590e0, -12.790761e0, 13.320811e0, -7.516309e0, 1.875839e0, -0.052723e0, -0.037783e0, 0.48294e0, 1.98697e0]; 
-    red  = 1.1508;
-    de   = 152.6;
-    VRef = 0.0;%0.191619504727d0;
-
-    RAng = R * Param.BToAng;
-
-    u    = exp( -(RAng-red) / cs(9) - (RAng-red) ^2.0 / (cs(10)) );
-
-    dfdr =  ( -2.0 * (RAng-red)/cs(10) - 1.0/cs(9) );
-
-    V    =  - de*(cs(1) * u + cs(2) * u^2 + cs(3) * u^3 + cs(4) * u^4 + cs(5) * u^5.0 + cs(6) * u^6 + cs(7) * u^7 + cs(8) * u^8);
-    V    = (V' * Param.KcmToEh + VRef) * Param.EhToeV;
-
-    dV   =  - de * (cs(1) *          dfdr * u        + ...
-                   cs(2) * 2.0d0 * dfdr * u^2     + ...
-                   cs(3) * 3.0d0 * dfdr * u^3     + ...
-                   cs(4) * 4.0d0 * dfdr * u^4     + ...
-                   cs(5) * 5.0d0 * dfdr * u^5     + ...
-                   cs(6) * 6.0d0 * dfdr * u^6     + ...
-                   cs(7) * 7.0d0 * dfdr * u^7     + ...
-                   cs(8) * 8.0d0 * dfdr * u^8);
-
-    dV = dV' * Param.KcmToEh * Param.EhToeV * Param.BToAng;
+    rMin = fzero(@(x) DiatPotdV(x, jqnreal, iMol), rMinOld);
+    if isnan(rMin)
+        rMin = 100.0;
+    end
+    VMin = DiatPot(rMin, jqnreal, iMol);
+   
+    if (jqn > 0)
+        rMax = fzero(@(x) DiatPotdV(x, jqnreal, iMol), rMaxOld);
+        if isnan(rMax)
+            rMax = 1.0;
+        end
+        VMax = DiatPot(rMax, jqnreal, iMol);
+    else
+        rMax = 100.0;
+        VMax = 0.0;
+    end
 
 end

@@ -38,8 +38,8 @@ function Initialize_Input()
     Syst.NameLong   = Input.SystNameLong;
     
     Syst.ThCollPart = false;
-    if (Input.Kin.ThCollPart)
-        Syst.ThCollPart = true;
+    if exist('Input.Kin.ThCollPart', 'var')
+        Syst.ThCollPart = Input.Kin.ThCollPart;
     end
     
     for iMol = 1:size(Input.Kin.MolResolutionIn,2)

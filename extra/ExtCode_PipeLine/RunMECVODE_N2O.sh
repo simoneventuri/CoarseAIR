@@ -41,18 +41,18 @@ PLATO_gnu_release
 
 export System='N2O_UMN'
 export SystemBis='NON_UMN'
-export ExchBis=2
+export ExchBis=0
 export Molecule_vec=('N2' 'NO')
-export FldrName=''
+export FldrName='_ADA54'
 export Tran_vec=(5000 10000 20000) # (1500 2500 5000 6000 8000 10000 12000 14000 15000 20000)
 export T0=300 #300
 export PathToMECVODEFldr=$WORKSPACE_PATH/neqplasma_QCT/ME_CVODE
 export PathToDtbFldr=$WORKSPACE_PATH/Air_Database/Run_0D/database/
 export PathToRunFldr=$WORKSPACE_PATH/Air_Database/Run_0D/
 
-export DissFlg=9
+export DissFlg=0
 export InelFlg=1
-export ExchFlg1=1
+export ExchFlg1=0
 export ExchFlg2=0
 
 

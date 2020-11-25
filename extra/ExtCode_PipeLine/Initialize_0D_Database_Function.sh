@@ -47,7 +47,7 @@ if [ $DissFlg -eq 1 ] || [ $DissFlg -eq 13 ]; then
 	echo "  [Initialize_0D_Database]: Adding Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 
-############################################################## For O2+O 
+############################################################## For O2+O 		
 elif [ $DissFlg -eq 2 ]; then
 	echo "  [Initialize_0D_Database]: Adding Corrected Dissociation Kinetics to File "$PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System
 	cat $PathToDtbFldr"/kinetics/"${System}${FldrName}"/T"$TTran"K/Diss_Corrected.dat" >> $PathToDtbFldr/"/kinetics/KineticsTEMP_T"$TTran"K_"$System

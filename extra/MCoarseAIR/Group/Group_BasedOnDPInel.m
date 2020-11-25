@@ -1,6 +1,6 @@
 %% The Function writes the Rates in the Format for being read by Amal's Clustering Algorithm
 %
-function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
+function [LevelToGroup] = Group_BasedOnDPInel(Syst, Controls, iMol)
 
     %%==============================================================================================================
     % 
@@ -27,14 +27,13 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
 
     DbgFlg = false;
     
-    fprintf('    = Group_BasedOnDP ==================================\n')
+    fprintf('    = Group_BasedOnDPInel ==============================\n')
     fprintf('    ====================================================\n')
 
 
     NGroups       = Controls.NGroups(iMol); 
-    NGroups_Excit = Controls.NGroups_Excit(iMol);
-    NGroups_CB    = NGroups - NGroups_Excit;
-    fprintf(['    Nb Groups: ' num2str(NGroups) ', of which: ' num2str(NGroups_Excit) ' for Excitation and ' num2str(NGroups_CB) ' for Dissociation \n\n'] );
+    NGroups_Excit = NGroups;
+    fprintf(['    Nb Groups: ' num2str(NGroups) ', of which: ' num2str(NGroups_Excit) ' for Excitation \n\n'] );
 
     Nvqn     = Syst.Molecule(iMol).Nvqn; 
     NLevels  = Syst.Molecule(iMol).NLevels; 
@@ -45,29 +44,17 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
     MinState = 1; %max(Controls.MinState, 1);
     MaxState = NLevels; %min(Controls.MaxState, Syst.Molecule(iMol).NLevels);
 
-
-    fprintf(['    For Dissociation: \n'] );
-    Controls.MinEeV(iMol)     = abs(Syst.Molecule(iMol).DissEn) * 2.0 / 3.0;
-    Controls.NGroups_CB(iMol) = NGroups_CB;
-    Controls.alpha(iMol)      = 2.0; 
-    LevelToGroupCB            = Group_BasedOnCB(Syst, Controls, iMol);
-
-
-    vPlus_1 = 5;
-    vPlus_2 = 10;
-
     EeV_J0 = ones(200,1) .* 100.0;
     MaxVqn = 0;
     for iLevel = 1:NLevels
         if (Leveljqn(iLevel) == 0) 
             EeV_J0(Levelvqn(iLevel)+1) = LevelEeV(iLevel);
-            if (LevelToGroupCB(iLevel) == 0)
-                MaxVqn = max(MaxVqn,Levelvqn(iLevel)+1);
-            end
+            MaxVqn = max(MaxVqn,Levelvqn(iLevel)+1);
         end
     end
 
-    
+    vPlus_1 = 3;
+    vPlus_2 = 8;
     
     fprintf(['    For Excitation: \n'] );
 
@@ -76,7 +63,7 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
     MaxSplit3 = 0;
     for iv=0:MaxVqn
         for iLevel = 1:NLevels
-            if (Levelvqn(iLevel) == iv) && (LevelToGroupCB(iLevel) == 0)
+            if (Levelvqn(iLevel) == iv)
                if LevelEeV(iLevel)     < EeV_J0(iv+1+vPlus_1)
                    Split(iLevel,:) = [iv+1, 1];
                    MaxSplit1 = max(MaxSplit1,iv+1);
@@ -179,18 +166,14 @@ function [LevelToGroup] = Group_BasedOnDP(Syst, Controls, iMol)
     PreGroups(4) = NGroups_Excit_1 + NGroups_Excit_2 + NGroups_Excit_3;
     LevelToGroup = zeros(NLevels,1);
     for iLevel = 1:NLevels
-        if (LevelToGroupCB(iLevel) == 0)
-            if Split(iLevel,2)     == 1
-                iGroup = sum(Split(iLevel,1) > VqnExtr_1);
-            elseif Split(iLevel,2) == 2
-                iGroup = sum(Split(iLevel,1) > VqnExtr_2);
-            elseif Split(iLevel,2) == 3
-                iGroup = sum(Split(iLevel,1) > VqnExtr_3);
-            end
-            LevelToGroup(iLevel) = iGroup + PreGroups(Split(iLevel,2));
-        else
-            LevelToGroup(iLevel) = PreGroups(4)    + LevelToGroupCB(iLevel);
+        if Split(iLevel,2)     == 1
+            iGroup = sum(Split(iLevel,1) > VqnExtr_1);
+        elseif Split(iLevel,2) == 2
+            iGroup = sum(Split(iLevel,1) > VqnExtr_2);
+        elseif Split(iLevel,2) == 3
+            iGroup = sum(Split(iLevel,1) > VqnExtr_3);
         end
+        LevelToGroup(iLevel) = iGroup + PreGroups(Split(iLevel,2));
     end
     
     

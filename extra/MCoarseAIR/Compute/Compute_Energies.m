@@ -97,8 +97,6 @@ function Compute_Energies(Controls)
         end
         tauInt = (Kin.T(Temp.iT).t(iInt) + Kin.T(Temp.iT).t(iInt-1)) / 2.d0;
         tt = Kin.T(Temp.iT).t(2:end-1);
-        size( Kin.T(Temp.iT).t(2:end-1))
-        size(eInt(2:end-1))
         [xData, yData] = prepareCurveData( Kin.T(Temp.iT).t(2:end-1), eInt(2:end-1) - eIntLim );
         ft = 'splineinterp';
         [fitresult, gof] = fit( xData, yData, ft );

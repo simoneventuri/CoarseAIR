@@ -31,13 +31,18 @@ function Read_Pops()
     fprintf('= Read_Pops ============================ T = %i K\n', Temp.TNow)
     fprintf('====================================================\n')
     fprintf('Reading Level/Group Populations from KONIG\n' )
-    
-    NMolecules = max(Syst.CFDComp(:).ToMol);
+   
+    Tempp = [];
+    for iComp=1:Syst.NComp
+        Tempp(iComp) = Syst.CFDComp(iComp).ToMol;
+    end
+    NMolecules = max(Tempp);
     
     for iMol=1:NMolecules
         fprintf(['Reading For Molecule Nb: ' num2str(iMol) '\n'] )
         iNBins = Syst.Molecule(iMol).EqNStatesIn;
-        
+        %iNBins = Syst.Molecule(iMol).EqNStatesOut;
+
         iComp      = Syst.MolToCFDComp(iMol);
         PopFileMat = strcat(Input.Paths.ToKinRunFldr, '/Pop_', Syst.CFDComp(iComp).Name);
         fprintf(['Checking if .mat File is Already Present: ' PopFileMat '.mat \n'] )
@@ -67,7 +72,6 @@ function Read_Pops()
             PopVec(1:temp,iMol) = dataArray{:, 1};
             clearvars delimiter startRow formatSpec fileID dataArray ans;
 
-
             Kin.T(Temp.iT).Molecule(iMol).PopOverQ = [];
             iStep   = 1;
             iBin    = 1;
@@ -82,6 +86,39 @@ function Read_Pops()
             end
             Kin.T(Temp.iT).NSteps = iStep-1;
             fprintf('Found %i Steps in the 0-D Solution', Kin.T(Temp.iT).NSteps) 
+            
+%             opts = delimitedTextImportOptions("NumVariables", 3);
+%             opts.DataLines = [3, Inf];
+%             opts.Delimiter = " ";
+%             opts.VariableNames = ["Population", "file", "Var3"];
+%             opts.SelectedVariableNames = ["Population", "file"];
+%             opts.VariableTypes = ["double", "double", "string"];
+%             opts.ExtraColumnsRule = "ignore";
+%             opts.EmptyLineRule = "read";
+%             opts.ConsecutiveDelimitersRule = "join";
+%             opts.LeadingDelimitersRule = "ignore";
+%             opts = setvaropts(opts, "Var3", "WhitespaceRule", "preserve");
+%             opts = setvaropts(opts, "Var3", "EmptyFieldRule", "auto");
+%             opts = setvaropts(opts, ["Population", "file"], "FillValue", 1e-99);
+%             tbl = readtable(PopFile, opts);
+%             TempNone = tbl.Population;
+%             TempPop  = tbl.file;
+%             clear opts tbl
+% 
+%             Kin.T(Temp.iT).Molecule(iMol).PopOverQ = [];
+%             iStep   = 1;
+%             iBin    = 1;
+%             for iVec=1:length(TempPop)
+%                 if iBin == iNBins+1
+%                     iStep       = iStep + 1;
+%                     iBin        = 1;
+%                 else
+%                     Kin.T(Temp.iT).Molecule(iMol).PopOverg(iStep,iBin) = TempPop(iVec,iMol);
+%                     iBin        = iBin + 1;
+%                 end
+%             end
+%             Kin.T(Temp.iT).NSteps = iStep-1;
+%             fprintf('Found %i Steps in the 0-D Solution', Kin.T(Temp.iT).NSteps) 
             
             
             fprintf(['Saving Population in .mat File: ' PopFileMat '.mat \n'] )
