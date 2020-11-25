@@ -29,15 +29,12 @@ FileOrig = '/Users/sventuri/WORKSPACE/CoarseAIR/dtb/Molecules/O2/UMN/FromUMN_Sor
 FileNew  = '/Users/sventuri/WORKSPACE/CoarseAIR/dtb/Molecules/O2/UMN/FromUMN_OnlyOdd.inp';
 
 
-filename = FileOrig;
+
+filename = '/Users/sventuri/WORKSPACE/CoarseAIR/dtb/Molecules/O2/UMN/FromUMN_Sorted.inp';
 startRow = 16;
-formatSpec = '%6f%5f%15s%15C%15C%15C%15C%15C%15s%15s%s%[^\n\r]';
+formatSpec = '%6f%5f%15f%15f%15f%15f%15f%15f%15f%15f%f%[^\n\r]';
 fileID = fopen(filename,'r');
 dataArray = textscan(fileID, formatSpec, 'Delimiter', '', 'WhiteSpace', '', 'TextType', 'string', 'EmptyValue', NaN, 'HeaderLines' ,startRow-1, 'ReturnOnError', false, 'EndOfLine', '\r\n');
-dataArray{3} = strtrim(dataArray{3});
-dataArray{9} = strtrim(dataArray{9});
-dataArray{10} = strtrim(dataArray{10});
-dataArray{11} = strtrim(dataArray{11});
 fclose(fileID);
 vv = dataArray{:, 1};
 jj = dataArray{:, 2};
