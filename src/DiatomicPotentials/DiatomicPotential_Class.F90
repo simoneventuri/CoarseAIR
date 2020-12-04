@@ -563,10 +563,10 @@ Subroutine WriteErrors( This, State, iState, NStates, LevelsFldr, Unit, i_Debug 
   iErrorFlg = 0
   if  ( State%VMaxNew < State%EInt ) then
     iErrorFlg = 2 
-    write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!   Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
+    !write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!   Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy larger than the Centrifugal Barrier!'
   elseif ( State%VMaxNew - 1.e-10 < State%EInt ) then
     iErrorFlg = 1
-    write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!!! Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
+    !write(*,'(A,I5,A,I2,A,I3,A)') '        [DiatomicPotential_Class.F90 - WriteErrors]: WARNING!!! Level Nb ', iState, ' (', State%vqn, ',', State%jqn, ') has Internal Energy significantly close to the Centrifugal Barrier!'
   end if
 
 
