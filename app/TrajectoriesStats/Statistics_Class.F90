@@ -44,6 +44,13 @@ Module Statistics_Class
     integer(rkp)                                  ::    NRings                                                                        !< Nb of Impact Parameters' Rings.
     real(rkp)       ,dimension(:)   ,allocatable  ::    bSampled                                      !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories.
     real(rkp)       ,dimension(:)   ,allocatable  ::    bMax                                          !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories.
+    real(rkp)       ,dimension(:)   ,allocatable  ::    Exo                                           !Dim[NTraj]                     !< Vector of Energy Direction. ! SUNGMIN
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bMax_bak                                      !Dim[NRings] -> Dim[<= NRings]  !< Vector of Impact Parameters' Maxima for Sampling at the Begininning of Trajectories. ! SUNGMIN
+    real(rkp)       ,dimension(:)   ,allocatable  ::    bSampled_bak                                  !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories. ! SUNGMIN
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qini_bak                                      !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions. ! SUNGMIN
+    real(rkp)       ,dimension(:,:) ,allocatable  ::    Qfin_bak                                      !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions. ! SUNGMIN
+
+
     real(rkp)       ,dimension(:,:) ,allocatable  ::    Qini                                          !Dim[NCond,NTraj]               !< Set of Overall Initial Conditions.
     real(rkp)       ,dimension(:,:) ,allocatable  ::    Qfin                                          !Dim[NCond,NTraj]               !< Set of Overall Fin Conditions.
     real(rkp)       ,dimension(:)   ,allocatable  ::    bSampled_TEMP                                 !Dim[NTraj]                     !< Vector of Impact Parameters Sampled at the Begininning of Trajectories.
@@ -137,7 +144,7 @@ Subroutine InitializeStatistics( This, Input, i_Debug, i_Debug_Deep )
   if (This%StatReadsBinaryFlg) then
     call This%ReadInputsUnformatted(i_Debug_Loc)
   else
-    call This%ReadInputs(i_Debug_Loc)
+    call This%ReadInputs(i_Debug_Loc) ! smjo note : read trajectory data from trajectories.csv
   end if
   if (i_Debug_Loc) call Logger%Write( "-> Done reading the statistics input data" )
 ! ==============================================================================================================
@@ -198,11 +205,12 @@ Subroutine ReadInputs( This, i_Debug )
   character(150)                                                        ::    FileName
   integer(rkp)                                                          ::    iTemp1, iTemp2, PESoI
   real(rkp)                                                             ::    Temp1, Temp2
+  real(rkp)                                                             ::    Temp3 ! SUNGMIN
   real(rkp)             ,dimension(:) ,allocatable                      ::    TempVec1, TempVec2 
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
-  !i_Debug_Loc   =     Logger%On()
+  !i_Debug_Loc   =     Logger%On() ! smjo, originally off
 
 
 ! ==============================================================================================================
@@ -212,6 +220,7 @@ Subroutine ReadInputs( This, i_Debug )
   !!!!if (This%PESoI == 0) then
     !DataFile%Name     =   'trajectories.out'                                                                                        !# FOR COMPATIBILITY WITH CG-QCT CODE
     DataFile%Name     =   'trajectories.csv'                                                                                         !#
+  if (i_Debug_Loc) call Logger%Write( "Data file name: " // DataFile%Name ) ! smjo
   !!!!else
   !!!! !DataFile%Name     =   trim(adjustl( 'trajectories.out.' // trim(adjustl(This%PESoI_char)) ))                                     !# FOR COMPATIBILITY WITH CG-QCT CODE
   !!!!  DataFile%Name     =   trim(adjustl( 'trajectories.csv.' // trim(adjustl(This%PESoI_char)) ))                                     !#
@@ -234,7 +243,8 @@ Subroutine ReadInputs( This, i_Debug )
   iTraj         =   0
   iTrajExcluded =   0
   do
-    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2 
+    !read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2, Temp3 ! SUNGMIN
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2  ! original
     
     PESoI = iPES
     if (This%PESoI /= 0) PESoI = This%PESoI
@@ -266,6 +276,15 @@ Subroutine ReadInputs( This, i_Debug )
 
   allocate( This%Qini(This%NCond,This%NTraj) )
   allocate( This%Qfin(This%NCond,This%NTraj) )
+
+
+  ! SUNGMIN
+!  allocate( This%bMax_bak(This%NTraj) )
+!  allocate( This%bSampled_bak(This%NTraj) )
+!  allocate( This%Exo(This%NTraj) ) 
+!  allocate( This%Qini_bak(This%NCond,This%NTraj) )
+!  allocate( This%Qfin_bak(This%NCond,This%NTraj) )
+!
 ! ==============================================================================================================
 
 
@@ -295,7 +314,9 @@ Subroutine ReadInputs( This, i_Debug )
   read(DataFile%Unit,*)                                                                                     
   iTraj=0
   do                                                                                     
-    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2 
+    !read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2, Temp3 ! SUNGMIN
+    read(DataFile%Unit,*,iostat=DataFile%Status) iTemp1, iPES, Temp1, Temp2, TempVec1, TempVec2 ! original
+
     !if (DataFile%Status/=0) call Error( "Error reading the data file for statistics: " // DataFile%Name  )  
     
     PESoI = iPES
@@ -309,6 +330,13 @@ Subroutine ReadInputs( This, i_Debug )
       This%bSampled(iTraj)  = Temp2
       This%Qini(:,iTraj)    = TempVec1
       This%Qfin(:,iTraj)    = TempVec2
+
+      ! SUNGMIN
+!      This%Exo(iTraj)       = Temp3 
+!      This%bMax_bak(iTraj)      = Temp1
+!      This%bSampled_bak(iTraj)  = Temp2
+!      This%Qini_bak(:,iTraj)    = TempVec1
+!      This%Qfin_bak(:,iTraj)    = TempVec2
 
       if (This%StatWritesBinaryFlg) then
         write(UnitWrite) int(Idx,  rkp)
@@ -330,6 +358,12 @@ Subroutine ReadInputs( This, i_Debug )
   if (i_Debug_Loc) then
     call Logger%Write( "-> Done reading the trajectory data" )
     call Logger%Write( "-> Last line: iTraj = ", "This%bMax(iTraj) = ", This%bMax(This%NTraj), "This%bSampled(iTraj) = ", This%bSampled(This%NTraj), Fi="i9", Fr="es15.8")
+    call Logger%Write( "-> Last line: iTraj = ", "This%Exo(iTraj) = ", This%Exo(This%NTraj), Fi="i9", Fr="es15.8") ! smjo
+    call Logger%Write( "-> Last line: iTraj = ", "This%Qini(1,iTraj) = ", This%Qini(1,This%NTraj), "This%Qfin(1,iTraj) = ", This%Qfin(1,This%NTraj), Fi="i9", Fr="es15.8") ! smjo
+    call Logger%Write( "-> Last line: iTraj = ", "This%Qini(2,iTraj) = ", This%Qini(2,This%NTraj), "This%Qfin(2,iTraj) = ", This%Qfin(2,This%NTraj), Fi="i9", Fr="es15.8") ! smjo
+    call Logger%Write( "-> Last line: iTraj = ", "This%Qini(3,iTraj) = ", This%Qini(3,This%NTraj), "This%Qfin(3,iTraj) = ", This%Qfin(3,This%NTraj), Fi="i9", Fr="es15.8") ! smjo
+    call Logger%Write( "-> Last line: iTraj = ", "This%Qini(4,iTraj) = ", This%Qini(4,This%NTraj), "This%Qfin(4,iTraj) = ", This%Qfin(4,This%NTraj), Fi="i9", Fr="es15.8") ! smjo
+    call Logger%Write( "-> Last line: iTraj = ", "This%Qini(N,iTraj) = ", This%Qini(This%NCond,This%NTraj), "This%Qfin(N,iTraj) = ", This%Qfin(This%NCond,This%NTraj), Fi="i9", Fr="es15.8") ! smjo
   end if
   call DataFile%Close()
 
@@ -362,7 +396,7 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
-  !i_Debug_Loc   =     Logger%On()
+  !i_Debug_Loc   =     Logger%On() ! smjo, originally off
 
 
 ! ==============================================================================================================
@@ -461,6 +495,7 @@ Subroutine ReadInputsUnformatted( This, i_Debug )
         end if
 
       end if
+
     end do
     
   call DataFile%Close()
@@ -606,7 +641,8 @@ Subroutine IdentifyInitialStates( This, i_Debug, i_Debug_Deep )
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "IdentifyInitialStates" )
-  !i_Debug_Loc   =     Logger%On()
+  !i_Debug_Loc      =     Logger%On() ! smjo, originally off
+  !i_Debug_Deep_Loc =     Logger%On() ! smjo, originally off
   i_Debug_Deep_Loc = .false.; if ( present(i_Debug_Deep) )i_Debug_Deep_Loc = i_Debug_Deep
   
 
@@ -617,6 +653,7 @@ Subroutine IdentifyInitialStates( This, i_Debug, i_Debug_Deep )
 
 
   if (i_Debug_Loc) call Logger%Write( "This%Qini = ", This%Qini )
+  if (i_Debug_Loc) call Logger%Write( "This%Qfin = ", This%Qfin ) ! smjo
 
   do iTraj = 1,This%NTraj
 
@@ -665,6 +702,8 @@ Subroutine IdentifyInitialStates( This, i_Debug, i_Debug_Deep )
       end if
       This%ifact = This%ifact * This%QuantumNumberMax
      
+      if (i_Debug_Loc) call Logger%Write( "-> iTraj = ", iTraj, ", iCond  = ", iCond, ", IniCond   = ", IniCond ) ! smjo add
+
     end do
     
     This%IniStateCode(iTraj) = isum                                                                                                    
@@ -694,7 +733,7 @@ Subroutine PrepareOutputFiles( This, i_Debug )
   character(:)  ,allocatable                                            ::    Ni, Nr
   
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "ReadInputs" )
+  if (i_Debug_Loc) call Logger%Entering( "PrepareOutputFiles" ) ! smjo
   !i_Debug_Loc   =     Logger%On()
 
 
@@ -810,7 +849,7 @@ Subroutine ProcessStatistics( This, i_Debug, i_Debug_Deep )
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "ProcessStatistics" )
-  !i_Debug_Loc   =     Logger%On()
+  !i_Debug_Loc   =     Logger%On() ! smjo, originally off
   i_Debug_Deep_Loc = .false.; if ( present(i_Debug_Deep) )i_Debug_Deep_Loc = i_Debug_Deep
   
 
@@ -1110,19 +1149,19 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
 
         elseif (NCond == 5) then
         
-          ! if (ArrDiff == 10) then                                                                                         ! # UnComment for Matching CG-QCT Rates
-          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Both the Fin States are Unbound" )
-          !   iquse = 10
-          ! else if (ipart1 == 2) then
-          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 1st Fin States is Unbound" )
-          !   iquse = ipart2
-          ! else if (ipart2 == 2) then
-          !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 2nd Fin States is Unbound" )
-          !   iquse = ipart1
-          ! else
-          !   iquse = iquse * This%iskip(iCond)
-          ! end if                                                                                                          ! # UnComment for Matching CG-QCT Rates
-          iquse = iquse * This%iskip(iCond)                                                                                 ! # Comment for Matching CG-QCT Rates
+           !if (ArrDiff == 10) then                                                                                         ! # UnComment for Matching CG-QCT Rates
+           !  if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Both the Fin States are Unbound" )
+           !  iquse = 10
+           !else if (ipart1 == 2) then
+           !  if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 1st Fin States is Unbound" )
+           !  iquse = ipart2
+           !else if (ipart2 == 2) then
+           !  if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; The 2nd Fin States is Unbound" )
+           !  iquse = ipart1
+           !else
+           !  iquse = iquse * This%iskip(iCond)
+           !end if                                                                                                          ! # UnComment for Matching CG-QCT Rates
+           iquse = iquse * This%iskip(iCond)                                                                                 ! # Comment for Matching CG-QCT Rates
 
         end if
 
@@ -1176,29 +1215,29 @@ Subroutine AddFinState( This, jIter, TrajsPerb, iFinStates, FinWeight, FinStateC
             
           if (NCond == 3) then
         
-            ! if (ArrDiff == 2) then                                                                                        ! # UnComment for Matching CG-QCT Rates
-            !   if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )       ! #
-            !   iquse = 2                                                                                                   ! #
-            ! else                                                                                                          ! #
-            !   iquse = iquse * This%iskip(iCond)                                                                           ! #
-            ! end if                                                                                                        ! # UnComment for Matching CG-QCT Rates
-            iquse = iquse * This%iskip(iCond)                                                                               ! # Comment for Matching CG-QCT Rates
+             !if (ArrDiff == 2) then                                                                                        ! # UnComment for Matching CG-QCT Rates
+             !  if (i_Debug_Loc) call Logger%Write( "Only1 1 Molecule in the Collision; Found an Unbound Fin State" )       ! #
+             !  iquse = 2                                                                                                   ! #
+             !else                                                                                                          ! #
+             !  iquse = iquse * This%iskip(iCond)                                                                           ! #
+             !end if                                                                                                        ! # UnComment for Matching CG-QCT Rates
+             iquse = iquse * This%iskip(iCond)                                                                               ! # Comment for Matching CG-QCT Rates
             
           elseif (NCond == 5) then
           
-            ! if (ArrDiff == 10) then                                                                                       ! # UnComment for Matching CG-QCT Rates
-            !   if (i_Debug_Loc) call Logger%Write( "1 Molecule in the Collision; Found an Unbound Fin State" )
-            !   iquse = 10
-            ! else if (ipart1 == 2) then
-            !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-            !   iquse = ipart2
-            ! else if (ipart2 == 2) then
-            !   if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
-            !   iquse = ipart1
-            ! else
-            !   iquse = iquse * This%iskip(iCond)
-            ! end if                                                                                                       ! # UnComment for Matching CG-QCT Rates
-            iquse = iquse * This%iskip(iCond)                                                                              ! # Comment for Matching CG-QCT Rates
+             !if (ArrDiff == 10) then                                                                                       ! # UnComment for Matching CG-QCT Rates
+             !  if (i_Debug_Loc) call Logger%Write( "1 Molecule in the Collision; Found an Unbound Fin State" )
+             !  iquse = 10
+             !else if (ipart1 == 2) then
+             !  if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
+             !  iquse = ipart2
+             !else if (ipart2 == 2) then
+             !  if (i_Debug_Loc) call Logger%Write( "2 Molecules in the Collision; Found an Unbound Fin State" )
+             !  iquse = ipart1
+             !else
+             !  iquse = iquse * This%iskip(iCond)
+             !end if                                                                                                       ! # UnComment for Matching CG-QCT Rates
+             iquse = iquse * This%iskip(iCond)                                                                              ! # Comment for Matching CG-QCT Rates
             
           end if
           
@@ -1320,11 +1359,14 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
   logical                                                   ::    i_Debug_Loc 
   logical                                                   ::    i_Debug_Deep_Loc
 
+  integer                                                   ::    iType, jType, Temp ! SUNGMIN
+
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
   if (i_Debug_Loc) call Logger%Entering( "WriteFinStateProbabilities" )
-  !i_Debug_Loc   =     Logger%On()
   i_Debug_Deep_Loc = .false.; if ( present(i_Debug_Deep) )i_Debug_Deep_Loc = i_Debug_Deep
 
+  !i_Debug_Loc      =     Logger%On() ! smjo, originally off
+  !i_Debug_Deep_Loc =     Logger%On() ! smjo, originally off
 
   ! ==============================================================================================================
   !     WRITING THE RESIDUALS FILE
@@ -1333,6 +1375,7 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
   NRings = size(RingArea)
   NCond  = size(IniState)
   NTraj  = size(ToFinState)
+  if (i_Debug_Deep_Loc) call Logger%Write( "Number of Fin States:   NTraj = ", NTraj )
 
   ! Normalizing FinWeight
   do jFinStates = 1,iFinStates
@@ -1361,15 +1404,42 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
     ! ==============================================================================================================
     !     WRITING THE CURRENT Fin STATES TYPE IN THE MAIN FILE
     ! ==============================================================================================================
-    ! Computing Cross and CrossSD
+    ! Computing Cross and CrossSD : Crude Monte-Carlo + Stratified Sampling (Truhlar Theory Book pp.524, 529)
     Cross   = Zero
     CrossSD = Zero
     do iRings = 1,NRings
+
+      ! SUNGMIN
+!      if( This%Exo(jFinStates) .ne. 1.d0 ) then
+!        CrossRing   = RingArea(iRings) * FinWeight(iRings,jFinStates)
+!        Cross       = Cross   + CrossRing
+!        CrossSDRing = FinWeight(iRings,jFinStates) * (One-FinWeight(iRings,jFinStates)) * RingArea(iRings) * RingArea(iRings) / max(1,TrajsPerb(iRings))
+!        CrossSD     = CrossSD + CrossSDRing
+!        if (i_Debug_Deep_Loc) call Logger%Write( "jFinStates = ", jFinStates, ", iRings = ", iRings, ", CrossRing = ", CrossRing, ", CrossVarRing = ", CrossSDRing )
+!      else  
+!        if (i_Debug_Deep_Loc) call Logger%Write( " Endothermic Transition : Rejected in Probability Summation ")
+!
+!        if (i_Debug_Deep_Loc) call Logger%Write( " bak Arrays : ", This%bSampled_bak(jFinStates), &
+!                                                This%Qini_bak(1,jFinStates), This%Qini_bak(2,jFinStates),This%Qini_bak(3,jFinStates),This%Qini_bak(4,jFinStates),This%Qini_bak(5,jFinStates), &
+!                                                This%Qfin_bak(1,jFinStates), This%Qfin_bak(2,jFinStates),This%Qfin_bak(3,jFinStates),This%Qfin_bak(4,jFinStates),This%Qfin_bak(5,jFinStates), &
+!                                                This%Exo(jFinStates), Fr="es14.5" )
+!
+!        if (i_Debug_Deep_Loc) call Logger%Write( " Original Arrays : ", This%bSampled(jFinStates), &
+!                                                This%Qini(1,jFinStates), This%Qini(2,jFinStates),This%Qini(3,jFinStates),This%Qini(4,jFinStates),This%Qini(5,jFinStates), &
+!                                                This%Qfin(1,jFinStates), This%Qfin(2,jFinStates),This%Qfin(3,jFinStates),This%Qfin(4,jFinStates),This%Qfin(5,jFinStates), &
+!                                                This%Exo(jFinStates), Fr="es14.5" )
+!      endif
+      ! SUNGMIN
+
+
+      ! original
       CrossRing   = RingArea(iRings) * FinWeight(iRings,jFinStates)
       Cross       = Cross   + CrossRing
       CrossSDRing = FinWeight(iRings,jFinStates) * (One-FinWeight(iRings,jFinStates)) * RingArea(iRings) * RingArea(iRings) / max(1,TrajsPerb(iRings))
       CrossSD     = CrossSD + CrossSDRing
       if (i_Debug_Deep_Loc) call Logger%Write( "jFinStates = ", jFinStates, ", iRings = ", iRings, ", CrossRing = ", CrossRing, ", CrossVarRing = ", CrossSDRing )
+
+
     end do
     CrossSD = sqrt(CrossSD)
     
@@ -1389,21 +1459,84 @@ Subroutine WriteFinStateProbabilities( This, RingArea, TrajsPerb, iFinStates, Fi
       
       FinCond = FinCond - 2
       if (i_Debug) call Logger%Write( "FinCond = ", FinCond )
-      
+     
+
       ! IF jqnIn is ODD, jqnFn stays ODD
-      if ( (PresEvOdd(iCond) ) .and. (IniArr == FinArr)  ) then        
+      if ( (PresEvOdd(iCond) ) .and. (IniArr == FinArr)  ) then       
         FinCond = FinCond * 2
         if ( mod(IniState(iCond),2) /= 0 ) FinCond = FinCond + 1   
         if (i_Debug) call Logger%Write( "PresEvOdd(iCond) -> FinCond = ", FinCond )                                                                                 
       end if
-    
+
       FinCondVec(iCond) = FinCond
-      
     end do
+
+
+
+    ! SUNGMIN, only for O2 odd/even splitting TEST
+    if(    NCond.eq.3) then ! O2+O
+
+      FinArr = FinCondVec(NCond)
+      Temp   = int(FinArr/16)
+      if(Temp > 0) then
+        iType = mod(FinArr,16)
+        if(iType > 1) then
+          ! Dissociated 
+          ! Nothing to do
+        else
+          if( mod(FinCondVec(1),2) .eq. 0 ) then
+            FinCondVec(1) = FinCondVec(1) + 1 ! Fix Even J to Odd J
+          endif
+        endif
+      endif
+
+    elseif(NCond.eq.5) then ! O2+O2
+
+      FinArr = FinCondVec(NCond)
+      if( int(FinArr/16) > 0 ) then
+        Temp   = mod(FinArr,16)
+        iType  = mod(Temp  ,4)
+        jType  = int(Temp  /4)
+        if(iType > 1) then
+          if(jType > 1) then
+          ! Double Dissociation
+          ! Nothing to do
+          else
+          ! 1st Pair Dissociated, 2nd Bound
+            if( mod(FinCondVec(3),2) .eq. 0 ) then
+              FinCondVec(3) = FinCondVec(3) + 1 ! Fix Even J to Odd J
+            endif
+          endif
+        elseif(jType > 1) then
+          ! 1st Pair Bound, 2nd Dissociated
+          if( mod(FinCondVec(1),2) .eq. 0 ) then
+            FinCondVec(1) = FinCondVec(1) + 1 ! Fix Even J to Odd J
+          endif
+        else 
+          ! Either Inelastic or Exchange
+          if( mod(FinCondVec(1),2) .eq. 0 ) then
+            FinCondVec(1) = FinCondVec(1) + 1 ! Fix Even J to Odd J
+          endif
+          if( mod(FinCondVec(3),2) .eq. 0 ) then
+            FinCondVec(3) = FinCondVec(3) + 1 ! Fix Even J to Odd J
+          endif
+        endif 
+      endif
+
+    endif
+
+
     
     !write(This%bSensitivityFile%Unit,This%bSensitivityFile%Format) FinCondVec, IniState, [(RingArea(iRings) * FinWeight(iRings,jFinStates), iRings=1,NRings)], [(FinWeight(iRings,jFinStates) * (One-FinWeight(iRings,jFinStates)) * RingArea(iRings) * RingArea(iRings) / max(1,TrajsPerb(iRings)), iRings=1,NRings)]
-   
+  
+    ! SUNGMIN
+!    if( Cross .gt. 0.d0 ) then 
+!      write(This%StatOutFile%Unit,This%StatOutFile%Format) FinCondVec, IniState, Cross, CrossSD
+!    endif
+
+    ! original
     write(This%StatOutFile%Unit,This%StatOutFile%Format) FinCondVec, IniState, Cross, CrossSD
+
     ! ==============================================================================================================
     
 
