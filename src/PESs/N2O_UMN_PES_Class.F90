@@ -409,7 +409,6 @@ Subroutine Compute_N2O_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   end if
 
 
-
   ! Evaluate 2-body interactions
   Vd     = Zero
   dVDiat = Zero
@@ -417,9 +416,6 @@ Subroutine Compute_N2O_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   call This%Pairs(jNO)%Vd%Compute_Vd_dVd( R(jNO), Vd(5), dVDiat(5) )
   call This%Pairs(iN2)%Vd%Compute_Vd_dVd( R(iN2), Vd(6), dVDiat(6) )
   VDiat  = sum(Vd)
-
-
-
 
 
   ! Evaluate V by taken the product of C and Basis function array
@@ -469,6 +465,8 @@ Subroutine Compute_N2O_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   dVdR(iNO)    = dV0(4)
   dVdR(jNO)    = dV0(5)
   dVdR(iN2)    = dV0(6)
+
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
