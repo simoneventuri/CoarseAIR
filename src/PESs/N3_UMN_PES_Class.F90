@@ -377,6 +377,7 @@ Subroutine Compute_N3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   ! enddo atom_loop
 
   dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

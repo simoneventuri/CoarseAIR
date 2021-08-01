@@ -251,7 +251,10 @@ Subroutine Compute_N3_NASA_PES_1d( This, R, Q, V, dVdR, dVdQ )
     dVdR(:) =   dVdR(:)  + csr(i) * tpd(:,i)
   end do
   V = vrp + sum(Vd(:)) + ebn2
-                                                                           ! Terms 2 and 3 are the many-body interaction potential
+                                                                           ! Terms 2 and 3 are the many-body interaction potentials
+  dVdQ = Zero
+  call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
+
   !call cpu_time ( t2 )
   !write(*,*) 'Time for Potential Calculations = ', t2-t1
                                                                            

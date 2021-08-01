@@ -227,7 +227,7 @@
    Final States Assigment Mthd = Histogram
 
    ### Writing Trajectory Files in Binary Format? ( If yes, Statistics Program Reads ASCI File and Writes a Binary One)
-   Writing Trajectory Files in Binary Format? = yes
+   Writing Trajectory Files in Binary Format? = no
    
 ###########################################################################################
 

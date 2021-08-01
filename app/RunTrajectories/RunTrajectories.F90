@@ -67,8 +67,8 @@ Program RunTrajectories
   character(10)                         ::    TempVal_char
 !  real(rkp)                             ::    StartTime, EndTime
   
-  logical                ,parameter     ::    i_Debug_RT        = .False.
-  logical                ,parameter     ::    i_Debug_RT_Deep   = .False. 
+  logical                ,parameter     ::    i_Debug_RT        = .True.
+  logical                ,parameter     ::    i_Debug_RT_Deep   = .True. 
   logical                ,parameter     ::    i_Debug_RT_ODE    = .False. 
   
 !  call CPU_Time( StartTime )

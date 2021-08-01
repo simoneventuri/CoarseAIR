@@ -320,7 +320,6 @@ Subroutine Compute_O3_UMN_PES_1d( This, R, Q, V, dVdR, dVdQ )
   end do
   dVdR = dVdR * KcmAng_To_HartB + dVDiat
 
-
   dVdQ = Zero
   call This%TransToCart_3Atoms( R, Q, dVdR, dVdQ)
   
