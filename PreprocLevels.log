@@ -1,0 +1,308 @@
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  1
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 1
+  [ReadBashInput]:  Running Trajectories?              = 0
+  [ReadBashInput]:  Postprocessing Trajectories?       = 0
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Calling LoadPreprocLevels
+  [PreprocLevels]: Preprocessing Levels. Command: coarseair-preproclevels.x
+  [PreprocLevels]: Done with PreprocLevels
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 1s
+ 
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  1
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 1
+  [ReadBashInput]:  Running Trajectories?              = 0
+  [ReadBashInput]:  Postprocessing Trajectories?       = 0
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Calling LoadPreprocLevels
+  [PreprocLevels]: Preprocessing Levels. Command: coarseair-preproclevels.x
+  [PreprocLevels]: Done with PreprocLevels
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 2s
+ 
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  1
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 1
+  [ReadBashInput]:  Running Trajectories?              = 0
+  [ReadBashInput]:  Postprocessing Trajectories?       = 0
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Calling LoadPreprocLevels
+  [PreprocLevels]: Preprocessing Levels. Command: coarseair-preproclevels.x
+  [PreprocLevels]: Done with PreprocLevels
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 1s
+ 
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  1
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 1
+  [ReadBashInput]:  Running Trajectories?              = 0
+  [ReadBashInput]:  Postprocessing Trajectories?       = 0
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Calling LoadPreprocLevels
+  [PreprocLevels]: Preprocessing Levels. Command: coarseair-preproclevels.x
+  [PreprocLevels]: Done with PreprocLevels
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 1s
+ 

@@ -1,0 +1,1709 @@
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  4
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 0
+  [ReadBashInput]:  Running Trajectories?              = 1
+  [ReadBashInput]:  Postprocessing Trajectories?       = 1
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: Calling LoadComputeRates
+[CoarseAIR]: Calling ComputeTrajs
+ 
+ 
+  ======================== COMPUTING TRAJECTORIES ========================== 
+ 
+  [ComputeTrajs]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [ComputeTrajs]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [ComputeTrajs]: NNode                 = 1
+  [ComputeTrajs]: ParNodes              = 0
+  [ComputeTrajs]: iNode                 = 
+  [ComputeTrajs]: NProc                 = 4
+  [ComputeTrajs]: System                = O3
+  [ComputeTrajs]: Tran                  = 10000.0
+  [ComputeTrajs]: Tint                  = 10000.0
+  [ComputeTrajs]: NMolecules            = 1
+  [ComputeTrajs]: SymmFlg               = 0
+  [ComputeTrajs]: NLevels1              = 6115
+  [ComputeTrajs]: MinLevel1             = 0
+  [ComputeTrajs]: MaxLevel1             = 1
+  [ComputeTrajs]: NLevels2              = 0
+  [ComputeTrajs]: MinLevel2             = 0
+  [ComputeTrajs]: MaxLevel2             = 0
+  [ComputeTrajs]: MinProcessInNode      = 
+  [ComputeTrajs]: MaxProcessInNode      = 
+  [ComputeTrajs]: SplitPESsFlg          = 0
+  [ComputeTrajs]: NPESs                 = 9
+  [ComputeTrajs]: iPESStart             = 1
+  [ComputeTrajs]: RmTrajFlg             = 0
+  [ComputeTrajs]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [ComputeTrajs]: -> Total Nb of Processes to Run = 3
+  [ComputeTrajs]: For Node 1, the first Process to be read from file is the 1-th in the List
+  [ComputeTrajs]: For Node 1, the last  Process to be read from file is the 3-th in the List
+  [ComputeTrajs]: -> Found Process Nb 1: iLevel1 = 1; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  1
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 4s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 1; Molecule 2, Level/Bin 1: Tot Nb of Converged Trajectories: 108
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 2: iLevel1 = 10; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  10
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 6s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 10; Molecule 2, Level/Bin 10: Tot Nb of Converged Trajectories: 108
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 3: iLevel1 = 6115; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  6115
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 2s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 6115; Molecule 2, Level/Bin 6115: Tot Nb of Converged Trajectories: 108
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  ------------------------ DONE -- 
+ 
+ 
+[CoarseAIR]: Calling PostTrajectoriesAtNode
+ 
+ 
+  ==================== POSTPROCESSING TRAJECTORIES ========================= 
+ 
+  [PostTrajectoriesAtNode]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [PostTrajectoriesAtNode]: NNode                 = 1
+  [PostTrajectoriesAtNode]: ParNodes              = 0
+  [PostTrajectoriesAtNode]: iNode                 = 1
+  [PostTrajectoriesAtNode]: NProc                 = 4
+  [PostTrajectoriesAtNode]: System                = O3
+  [PostTrajectoriesAtNode]: Tran                  = 10000.0
+  [PostTrajectoriesAtNode]: Tint                  = 10000.0
+  [PostTrajectoriesAtNode]: NMolecules            = 1
+  [PostTrajectoriesAtNode]: SymmFlg               = 0
+  [PostTrajectoriesAtNode]: Molecule1             = O2
+  [PostTrajectoriesAtNode]: NLevels1              = 6115
+  [PostTrajectoriesAtNode]: MinLevel1             = 0
+  [PostTrajectoriesAtNode]: MaxLevel1             = 1
+  [PostTrajectoriesAtNode]: Molecule2             = None
+  [PostTrajectoriesAtNode]: NLevels2              = 0
+  [PostTrajectoriesAtNode]: MinLevel2             = 0
+  [PostTrajectoriesAtNode]: MaxLevel2             = 0
+  [PostTrajectoriesAtNode]: MinProcessInNode      = 1
+  [PostTrajectoriesAtNode]: MaxProcessInNode      = 3
+  [PostTrajectoriesAtNode]: SplitPESsFlg          = 0
+  [PostTrajectoriesAtNode]: NPESs                 = 9
+  [PostTrajectoriesAtNode]: iPESStart             = 1
+  [PostTrajectoriesAtNode]: RmTrajFlg             = 0
+  [PostTrajectoriesAtNode]: BinaryTrajFlg         = 0
+  [PostTrajectoriesAtNode]: Velocity =  0.1247967544D-10
+  [PostTrajectoriesAtNode]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [PostTrajectoriesAtNode]: NProcessesPerNode = 3
+  [PostTrajectoriesAtNode]: NProcessesPerProc = 1
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 1
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the first Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the last  Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 2
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the first Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the last  Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 3
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the first Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 1 and for iLevel2 = 0, @ iProc = 1. Command: coarseair-posttrajectories.x
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 4
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the first Process to be computed is the 4-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  10  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 10 and for iLevel2 = 0, @ iProc = 2. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 108
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 6115 and for iLevel2 = 0, @ iProc = 3. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 108
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 108
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  --------------------- DONE -- 
+ 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  --------------------- DONE -- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  10  --------------------- DONE -- 
+ 
+ 
+  [PostTrajectoriesAtNode]: Done Postprocessing Trajectories. RunTime = 1s
+ 
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 14s
+ 
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  4
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 0
+  [ReadBashInput]:  Running Trajectories?              = 1
+  [ReadBashInput]:  Postprocessing Trajectories?       = 1
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: Calling LoadComputeRates
+[CoarseAIR]: Calling ComputeTrajs
+ 
+ 
+  ======================== COMPUTING TRAJECTORIES ========================== 
+ 
+  [ComputeTrajs]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [ComputeTrajs]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [ComputeTrajs]: NNode                 = 1
+  [ComputeTrajs]: ParNodes              = 0
+  [ComputeTrajs]: iNode                 = 
+  [ComputeTrajs]: NProc                 = 4
+  [ComputeTrajs]: System                = O3
+  [ComputeTrajs]: Tran                  = 10000.0
+  [ComputeTrajs]: Tint                  = 10000.0
+  [ComputeTrajs]: NMolecules            = 1
+  [ComputeTrajs]: SymmFlg               = 0
+  [ComputeTrajs]: NLevels1              = 6115
+  [ComputeTrajs]: MinLevel1             = 0
+  [ComputeTrajs]: MaxLevel1             = 1
+  [ComputeTrajs]: NLevels2              = 0
+  [ComputeTrajs]: MinLevel2             = 0
+  [ComputeTrajs]: MaxLevel2             = 0
+  [ComputeTrajs]: MinProcessInNode      = 
+  [ComputeTrajs]: MaxProcessInNode      = 
+  [ComputeTrajs]: SplitPESsFlg          = 0
+  [ComputeTrajs]: NPESs                 = 9
+  [ComputeTrajs]: iPESStart             = 1
+  [ComputeTrajs]: RmTrajFlg             = 0
+  [ComputeTrajs]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [ComputeTrajs]: -> Total Nb of Processes to Run = 3
+  [ComputeTrajs]: For Node 1, the first Process to be read from file is the 1-th in the List
+  [ComputeTrajs]: For Node 1, the last  Process to be read from file is the 3-th in the List
+  [ComputeTrajs]: -> Found Process Nb 1: iLevel1 = 1; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  1
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 4s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 1; Molecule 2, Level/Bin 1: Tot Nb of Converged Trajectories: 216
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 2: iLevel1 = 10; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  10
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 6s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 10; Molecule 2, Level/Bin 10: Tot Nb of Converged Trajectories: 216
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 3: iLevel1 = 6115; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  6115
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 3s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 6115; Molecule 2, Level/Bin 6115: Tot Nb of Converged Trajectories: 216
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  ------------------------ DONE -- 
+ 
+ 
+[CoarseAIR]: Calling PostTrajectoriesAtNode
+ 
+ 
+  ==================== POSTPROCESSING TRAJECTORIES ========================= 
+ 
+  [PostTrajectoriesAtNode]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [PostTrajectoriesAtNode]: NNode                 = 1
+  [PostTrajectoriesAtNode]: ParNodes              = 0
+  [PostTrajectoriesAtNode]: iNode                 = 1
+  [PostTrajectoriesAtNode]: NProc                 = 4
+  [PostTrajectoriesAtNode]: System                = O3
+  [PostTrajectoriesAtNode]: Tran                  = 10000.0
+  [PostTrajectoriesAtNode]: Tint                  = 10000.0
+  [PostTrajectoriesAtNode]: NMolecules            = 1
+  [PostTrajectoriesAtNode]: SymmFlg               = 0
+  [PostTrajectoriesAtNode]: Molecule1             = O2
+  [PostTrajectoriesAtNode]: NLevels1              = 6115
+  [PostTrajectoriesAtNode]: MinLevel1             = 0
+  [PostTrajectoriesAtNode]: MaxLevel1             = 1
+  [PostTrajectoriesAtNode]: Molecule2             = None
+  [PostTrajectoriesAtNode]: NLevels2              = 0
+  [PostTrajectoriesAtNode]: MinLevel2             = 0
+  [PostTrajectoriesAtNode]: MaxLevel2             = 0
+  [PostTrajectoriesAtNode]: MinProcessInNode      = 1
+  [PostTrajectoriesAtNode]: MaxProcessInNode      = 3
+  [PostTrajectoriesAtNode]: SplitPESsFlg          = 0
+  [PostTrajectoriesAtNode]: NPESs                 = 9
+  [PostTrajectoriesAtNode]: iPESStart             = 1
+  [PostTrajectoriesAtNode]: RmTrajFlg             = 0
+  [PostTrajectoriesAtNode]: BinaryTrajFlg         = 0
+  [PostTrajectoriesAtNode]: Velocity =  0.1247967544D-10
+  [PostTrajectoriesAtNode]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [PostTrajectoriesAtNode]: NProcessesPerNode = 3
+  [PostTrajectoriesAtNode]: NProcessesPerProc = 1
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 1
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the first Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the last  Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 2
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the first Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the last  Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 3
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the first Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 1 and for iLevel2 = 0, @ iProc = 1. Command: coarseair-posttrajectories.x
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 4
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the first Process to be computed is the 4-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 216
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  10  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 10 and for iLevel2 = 0, @ iProc = 2. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 6115 and for iLevel2 = 0, @ iProc = 3. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 216
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 216
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  --------------------- DONE -- 
+ 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  --------------------- DONE -- 
+ 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  10  --------------------- DONE -- 
+ 
+  [PostTrajectoriesAtNode]: Done Postprocessing Trajectories. RunTime = 1s
+ 
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 14s
+ 
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  4
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 0
+  [ReadBashInput]:  Running Trajectories?              = 1
+  [ReadBashInput]:  Postprocessing Trajectories?       = 1
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: Calling LoadComputeRates
+[CoarseAIR]: Calling ComputeTrajs
+ 
+ 
+  ======================== COMPUTING TRAJECTORIES ========================== 
+ 
+  [ComputeTrajs]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [ComputeTrajs]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [ComputeTrajs]: NNode                 = 1
+  [ComputeTrajs]: ParNodes              = 0
+  [ComputeTrajs]: iNode                 = 
+  [ComputeTrajs]: NProc                 = 4
+  [ComputeTrajs]: System                = O3
+  [ComputeTrajs]: Tran                  = 10000.0
+  [ComputeTrajs]: Tint                  = 10000.0
+  [ComputeTrajs]: NMolecules            = 1
+  [ComputeTrajs]: SymmFlg               = 0
+  [ComputeTrajs]: NLevels1              = 6115
+  [ComputeTrajs]: MinLevel1             = 0
+  [ComputeTrajs]: MaxLevel1             = 1
+  [ComputeTrajs]: NLevels2              = 0
+  [ComputeTrajs]: MinLevel2             = 0
+  [ComputeTrajs]: MaxLevel2             = 0
+  [ComputeTrajs]: MinProcessInNode      = 
+  [ComputeTrajs]: MaxProcessInNode      = 
+  [ComputeTrajs]: SplitPESsFlg          = 0
+  [ComputeTrajs]: NPESs                 = 9
+  [ComputeTrajs]: iPESStart             = 1
+  [ComputeTrajs]: RmTrajFlg             = 0
+  [ComputeTrajs]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [ComputeTrajs]: -> Total Nb of Processes to Run = 3
+  [ComputeTrajs]: For Node 1, the first Process to be read from file is the 1-th in the List
+  [ComputeTrajs]: For Node 1, the last  Process to be read from file is the 3-th in the List
+  [ComputeTrajs]: -> Found Process Nb 1: iLevel1 = 1; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  1
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 5s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 1; Molecule 2, Level/Bin 1: Tot Nb of Converged Trajectories: 324
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 2: iLevel1 = 10; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  10
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 10
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_10_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 5s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 10; Molecule 2, Level/Bin 10: Tot Nb of Converged Trajectories: 318
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  10  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 3: iLevel1 = 6115; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+
+ 
+------------------------------------------------------------------------------------------
+ CoarseAIR: Coarse-Grained Quasi-Classical Trajectories 
+------------------------------------------------------------------------------------------
+ 
+ Nb of Nodes         =  1
+ Nb of Processors    =  4
+ 
+-----------------------
+ Loading CoarseAIR modulefile
+-----------------------
+  COARSEAIR_LIBRARY_NAME   =  coarseair
+  COARSEAIR_VERSION        =  1.1
+  COARSEAIR_BUILD_CONFIG   =  coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_SOURCE_DIR     =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair
+  COARSEAIR_BUILD_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/build/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_INSTALL_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0
+  COARSEAIR_EXECUTABLE_DIR =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/bin
+  COARSEAIR_CMAKE_DIR      =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/cmake
+  COARSEAIR_LIBRARY_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/lib
+  COARSEAIR_MODULES_DIR    =  /Users/sventuri/WORKSPACE//CoarseAIR/install/coarseair-1.1-release-gnu-10.2.0/mod
+  COARSEAIR_DTB_DIR        = 
+-----------------------
+ 
+-----------------------
+ Paths:
+-----------------------
+ Working directory    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+ Input directory      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000/
+ CoarseAIR Input file    =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//CoarseAIR.inp
+ CoarseAIR .sh directory =  /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+ Output directory     =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+-----------------------
+ 
+[CoarseAIR]: Calling LoadReadBashInput
+  [ReadBashInput]: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  Input Variables: 
+  [ReadBashInput]:  -----------------------
+  [ReadBashInput]:  System = O3
+  [ReadBashInput]:  
+  [ReadBashInput]:  TranFlg = 1
+  [ReadBashInput]:  Translational Temperature Specific. CoarseAIR will compute Rates!
+  [ReadBashInput]:  NTran = 1
+  [ReadBashInput]:  Tran_vec = 10000.0
+  [ReadBashInput]:  NTint = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  NMolecules = 1
+  [ReadBashInput]:    Molecule1 = O2
+  [ReadBashInput]:    Mthd1     = State-Specific
+  [ReadBashInput]:    VarA1     = 0
+  [ReadBashInput]:    VarB1     = 1
+  [ReadBashInput]:    VarC1     = 0
+  [ReadBashInput]:    MinLevel1 = 0
+  [ReadBashInput]:    MaxLevel1 = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  Generatig Energy Levels?           = 0
+  [ReadBashInput]:  Preprocessing Levels?              = 0
+  [ReadBashInput]:  Running Trajectories?              = 1
+  [ReadBashInput]:  Postprocessing Trajectories?       = 1
+  [ReadBashInput]:  Splitting PESs?                    = 0
+  [ReadBashInput]:  Nb of PESs                         = 9
+  [ReadBashInput]:  Starting Index for Stochastic PESs = 1
+  [ReadBashInput]:  
+  [ReadBashInput]:  -----------------------
+ 
+[CoarseAIR] 
+[CoarseAIR]: ===   Translational Temperature      =  10000.0  ============================ 
+[CoarseAIR]: Found 6115 Levels for Molecule 1
+[CoarseAIR]: Calling LoadComputeRates
+[CoarseAIR]: Calling ComputeTrajs
+ 
+ 
+  ======================== COMPUTING TRAJECTORIES ========================== 
+ 
+  [ComputeTrajs]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [ComputeTrajs]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [ComputeTrajs]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [ComputeTrajs]: NNode                 = 1
+  [ComputeTrajs]: ParNodes              = 0
+  [ComputeTrajs]: iNode                 = 
+  [ComputeTrajs]: NProc                 = 4
+  [ComputeTrajs]: System                = O3
+  [ComputeTrajs]: Tran                  = 10000.0
+  [ComputeTrajs]: Tint                  = 10000.0
+  [ComputeTrajs]: NMolecules            = 1
+  [ComputeTrajs]: SymmFlg               = 0
+  [ComputeTrajs]: NLevels1              = 6115
+  [ComputeTrajs]: MinLevel1             = 0
+  [ComputeTrajs]: MaxLevel1             = 1
+  [ComputeTrajs]: NLevels2              = 0
+  [ComputeTrajs]: MinLevel2             = 0
+  [ComputeTrajs]: MaxLevel2             = 0
+  [ComputeTrajs]: MinProcessInNode      = 
+  [ComputeTrajs]: MaxProcessInNode      = 
+  [ComputeTrajs]: SplitPESsFlg          = 0
+  [ComputeTrajs]: NPESs                 = 9
+  [ComputeTrajs]: iPESStart             = 1
+  [ComputeTrajs]: RmTrajFlg             = 0
+  [ComputeTrajs]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [ComputeTrajs]: -> Total Nb of Processes to Run = 3
+  [ComputeTrajs]: For Node 1, the first Process to be read from file is the 1-th in the List
+  [ComputeTrajs]: For Node 1, the last  Process to be read from file is the 3-th in the List
+  [ComputeTrajs]: -> Found Process Nb 1: iLevel1 = 1; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  1
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 1
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_1_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 4s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 1; Molecule 2, Level/Bin 1: Tot Nb of Converged Trajectories: 432
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  1  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 2: iLevel1 = 4581; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  4581  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_4581_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  4581
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 4581
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_4581_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 4581
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_4581_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 4581
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_4581_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 4581
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_4581_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 1s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 4581; Molecule 2, Level/Bin 4581: Tot Nb of Converged Trajectories: 108
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  4581  ------------------------ DONE -- 
+ 
+  [ComputeTrajs]: -> Found Process Nb 3: iLevel1 = 6115; iLevel2 = 0
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  -------------------------------- 
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ------------------------ 
+    [ComputeTrajsHERE]: Calling RunTrajectoriesAtNode
+    [RunTrajectoriesAtNode]: Parallelizing the Computation of Trajectories
+    [RunTrajectoriesAtNode]: Node 1
+      [SplitLevelsList.py]: LocalDir       =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0/Node_1
+      [SplitLevelsList.py]: OutputDir      =  /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [SplitLevelsList.py]: System         =  O3
+      [SplitLevelsList.py]: NInitMolecules =  1
+      [SplitLevelsList.py]: Molecules_Name =  O2
+      [SplitLevelsList.py]: NBins          =  6115
+      [SplitLevelsList.py]: BinOI          =  6115
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 4
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 4
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 3
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 3
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 2
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 2
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+      [RunTrajectoriesAtProc.sh]: iNode                = 1
+      [RunTrajectoriesAtProc.sh]: NProcTot             = 4
+      [RunTrajectoriesAtProc.sh]: iProc                = 1
+      [RunTrajectoriesAtProc.sh]: TranFlg              = 1
+      [RunTrajectoriesAtProc.sh]: Tran                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: Tint                 = 10000.0
+      [RunTrajectoriesAtProc.sh]: iLevels1             = 6115
+      [RunTrajectoriesAtProc.sh]: iLevels2             = 0
+      [RunTrajectoriesAtProc.sh]: COARSEAIR_BIN_OUTPUT_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000//T_10000_10000/Bins_6115_0
+      [RunTrajectoriesAtProc.sh]: Running Trajectories for Node 1 of 1, Processor 1
+      [RunTrajectoriesAtProc.sh]: Done Running Trajectories for Node 1, Processor 1
+    [RunTrajectoriesAtNode]: Done Running Trajectories. RunTime = 3s
+    [ComputeTrajsHERE]: Calling MergeTrajectories
+    [MergeTrajectories]: Merging Trajectories Output.
+    [MergeTrajectories]: Merging for iProc = 1
+    [MergeTrajectories]: Merging for iProc = 2
+    [MergeTrajectories]: Merging for iProc = 3
+    [MergeTrajectories]: Merging for iProc = 4
+    [MergeTrajectories]: -> Molecule 1, Level/Bin 6115; Molecule 2, Level/Bin 6115: Tot Nb of Converged Trajectories: 324
+    [ComputeTrajsHERE]: ----- Molecule 2, Level/Bin =  0  ---------------- DONE -- 
+    [ComputeTrajsHERE]: --- Molecule 1, Level/Bin  6115  ------------------------ DONE -- 
+ 
+ 
+[CoarseAIR]: Calling PostTrajectoriesAtNode
+ 
+ 
+  ==================== POSTPROCESSING TRAJECTORIES ========================= 
+ 
+  [PostTrajectoriesAtNode]: COARSEAIR_WORKING_DIR = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/
+  [PostTrajectoriesAtNode]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+  [PostTrajectoriesAtNode]: COARSEAIR_SH_DIR      = /Users/sventuri/WORKSPACE//CoarseAIR/coarseair/scripts/executing
+  [PostTrajectoriesAtNode]: NNode                 = 1
+  [PostTrajectoriesAtNode]: ParNodes              = 0
+  [PostTrajectoriesAtNode]: iNode                 = 1
+  [PostTrajectoriesAtNode]: NProc                 = 4
+  [PostTrajectoriesAtNode]: System                = O3
+  [PostTrajectoriesAtNode]: Tran                  = 10000.0
+  [PostTrajectoriesAtNode]: Tint                  = 10000.0
+  [PostTrajectoriesAtNode]: NMolecules            = 1
+  [PostTrajectoriesAtNode]: SymmFlg               = 0
+  [PostTrajectoriesAtNode]: Molecule1             = O2
+  [PostTrajectoriesAtNode]: NLevels1              = 6115
+  [PostTrajectoriesAtNode]: MinLevel1             = 0
+  [PostTrajectoriesAtNode]: MaxLevel1             = 1
+  [PostTrajectoriesAtNode]: Molecule2             = None
+  [PostTrajectoriesAtNode]: NLevels2              = 0
+  [PostTrajectoriesAtNode]: MinLevel2             = 0
+  [PostTrajectoriesAtNode]: MaxLevel2             = 0
+  [PostTrajectoriesAtNode]: MinProcessInNode      = 1
+  [PostTrajectoriesAtNode]: MaxProcessInNode      = 3
+  [PostTrajectoriesAtNode]: SplitPESsFlg          = 0
+  [PostTrajectoriesAtNode]: NPESs                 = 9
+  [PostTrajectoriesAtNode]: iPESStart             = 1
+  [PostTrajectoriesAtNode]: RmTrajFlg             = 0
+  [PostTrajectoriesAtNode]: BinaryTrajFlg         = 0
+  [PostTrajectoriesAtNode]: Velocity =  0.1247967544D-10
+  [PostTrajectoriesAtNode]: Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+  [PostTrajectoriesAtNode]: NProcessesPerNode = 3
+  [PostTrajectoriesAtNode]: NProcessesPerProc = 1
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 1
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the first Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 1, the last  Process to be computed is the 1-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 2
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the first Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 2, the last  Process to be computed is the 2-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 3
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the first Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 3, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 1 and for iLevel2 = 0, @ iProc = 1. Command: coarseair-posttrajectories.x
+    [PostTrajectoriesAtProc.sh]: COARSEAIR_OUTPUT_DIR  = /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR/Test_10000/
+    [PostTrajectoriesAtProc.sh]: SplitTrajsPESs        = 
+    [PostTrajectoriesAtProc.sh]: NPESs                 = 9
+    [PostTrajectoriesAtProc.sh]: iPESStart             = 1
+    [PostTrajectoriesAtProc.sh]: TranFlg               = 1
+    [PostTrajectoriesAtProc.sh]: Tran                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Tint                  = 10000.0
+    [PostTrajectoriesAtProc.sh]: Velocity              = 0.1247967544D-10
+    [PostTrajectoriesAtProc.sh]: iNode                 = 1
+    [PostTrajectoriesAtProc.sh]: iProc                 = 4
+    [PostTrajectoriesAtProc.sh]: NMolecules            = 1
+    [PostTrajectoriesAtProc.sh]: SymmFlg               = 0
+    [PostTrajectoriesAtProc.sh]: NLevels1              = 6115
+    [PostTrajectoriesAtProc.sh]: MinLevel1             = 0
+    [PostTrajectoriesAtProc.sh]: NLevels2              = 0
+    [PostTrajectoriesAtProc.sh]: MinLevel2             = 0
+    [PostTrajectoriesAtProc.sh]: RmTrajFlg             = 0
+    [PostTrajectoriesAtProc.sh]: BinaryTrajFlg         = 0
+    [PostTrajectoriesAtProc.sh]: MinProcessInNode      = 1
+    [PostTrajectoriesAtProc.sh]: MaxProcessInNode      = 3
+    [PostTrajectoriesAtProc.sh]: NProcessesPerProc     = 1
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the first Process to be computed is the 4-th in the List
+    [PostTrajectoriesAtProc.sh] For Node 1, Processor 4, the last  Process to be computed is the 3-th in the List
+    [PostTrajectoriesAtProc.sh] Reading Levels/Bins from File /Users/sventuri/WORKSPACE//SurQCT/Test_CoarseAIR//Input_10000//ProcessesToRunList.inp
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 432
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  4581  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 4581 and for iLevel2 = 0, @ iProc = 2. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]: 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  ----------------------------- 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  --------------------------- 
+      [PostTrajectoriesHERE]:         Postprocessing Trajectories for iLevel1 = 6115 and for iLevel2 = 0, @ iProc = 3. Command: coarseair-posttrajectories.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 108
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Tot Nb of Trajectories: 324
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Cross Sections from Trajectories. Command:      coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]:         Computing Rate Coefficients from Cross Sections. Command: coarseair-trajectoriesstats.x
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  4581  --------------------- DONE -- 
+ 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  1  --------------------- DONE -- 
+ 
+      [PostTrajectoriesHERE]: ----- Molecule 2, Level/Bin =  0  ------------------- DONE -- 
+      [PostTrajectoriesHERE]: --- Molecule 1, Level/Bin  6115  --------------------- DONE -- 
+ 
+  [PostTrajectoriesAtNode]: Done Postprocessing Trajectories. RunTime = 0s
+ 
+[CoarseAIR]: ======================================================================== 
+[CoarseAIR]: ============================================================================ 
+[CoarseAIR]: Done with CoarseAIR. Total RunTime = 9s
+ 
