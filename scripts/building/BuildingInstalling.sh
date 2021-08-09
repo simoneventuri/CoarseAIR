@@ -39,7 +39,7 @@ if [ ${FC} == "gfortran" ]; then
   export NB_PROC=8
 elif [ ${FC} == "ifort" ]; then
   export COMPILER_CGQCT="intel"
-  export COMPILER_CGQCT_VER=20.0.2 #$COMPILER_VERSION_MICRO      #### PLEIADES
+  export COMPILER_CGQCT_VER=20.2.2 #$COMPILER_VERSION_MICRO      #### PLEIADES
   #export COMPILER_CGQCT_VER=19.1.1 #$COMPILER_VERSION_MICRO     #### LAB
   export USE_OPENBLAS_FLAG="NO"
   export NB_PROC=8

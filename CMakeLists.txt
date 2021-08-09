@@ -41,9 +41,9 @@ LogMessage( "STATIC_LIBRARY:        ${STATIC_LIBRARY}" )
 # Set the build options
 option( BUILD_STATIC_LIBRARY  "Build static library"  ON  )
 option( BUILD_APPLICATIONS    "Build applications"    ON  )
-option( BUILD_SHARED_LIBRARY  "Build shared library"  OFF )
-option( BUILD_EXAMPLES        "Build examples"        OFF )
-option( BUILD_TESTS           "Build tests"           OFF )
+option( BUILD_SHARED_LIBRARY  "Build shared library"  ON  )
+option( BUILD_EXAMPLES        "Build examples"        ON  )
+option( BUILD_TESTS           "Build tests"           ON  )
 LogMessage( "BUILD_STATIC_LIBRARY:    ${BUILD_STATIC_LIBRARY}" )
 LogMessage( "BUILD_SHARED_LIBRARY:    ${BUILD_SHARED_LIBRARY}" )
 LogMessage( "BUILD_EXAMPLES      :    ${BUILD_EXAMPLES}" )
@@ -300,11 +300,11 @@ endif()
 ##############################################################
 # Installing the Fortran module files and the database files #
 ##############################################################
-# if ( BUILD_STATIC_LIBRARY OR BUILD_SHARED_LIBRARY )
-#   set( DATABASE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/dtb )                                          # Directory containing the database files within the sources
-#   install( DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/   DESTINATION ${MODULES_INSTALL_DIR}  ) # Installing the Fortran module files
-#   install( DIRECTORY ${DATABASE_SOURCE_DIR}/               DESTINATION ${DATABASE_INSTALL_DIR} ) # Installing the kinetic files
-# endif()
+if ( BUILD_STATIC_LIBRARY OR BUILD_SHARED_LIBRARY )
+  set( DATABASE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/dtb )                                          # Directory containing the database files within the sources
+  install( DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/   DESTINATION ${MODULES_INSTALL_DIR}  ) # Installing the Fortran module files
+  install( DIRECTORY ${DATABASE_SOURCE_DIR}/               DESTINATION ${DATABASE_INSTALL_DIR} ) # Installing the kinetic files
+endif()
 
 
 ##################################################
