@@ -53,6 +53,7 @@ Subroutine Define_Degeneracy( Input, Degeneracy, iMol, i_Debug )
   use CN_Degeneracy_Class  ,only:    CN_Degeneracy_Type
   use HN_Degeneracy_Class  ,only:    HN_Degeneracy_Type
   use G2_Degeneracy_Class  ,only:    G2_Degeneracy_Type
+  use OH_Degeneracy_Class  ,only:    OH_Degeneracy_Type
 
   type(Input_Type)                                  ,intent(in)     ::    Input
   class(Degeneracy_Type)               ,allocatable ,intent(out)    ::    Degeneracy
@@ -92,6 +93,9 @@ Subroutine Define_Degeneracy( Input, Degeneracy, iMol, i_Debug )
     case('GG')
       if (i_Debug_Loc) call Logger%Write( "Defining a G2_Degeneracy_Type object" )
       allocate( G2_Degeneracy_Type :: Degeneracy )
+    case('OH', 'HO')
+      if (i_Debug_Loc) call Logger%Write( "Defining a OH_Degeneracy_Type object" )
+      allocate( OH_Degeneracy_Type :: Degeneracy )
     case default
       call Error( "Molecule not supported yet for Degeneracy Definition: Input%Molecules_Name(i) = " // Input%Molecules_Name(iMol) )
   end select

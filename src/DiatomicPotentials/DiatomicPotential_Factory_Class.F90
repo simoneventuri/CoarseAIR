@@ -65,6 +65,7 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
   use CN_UIUC_DiatomicPotential_Class              ,only:  CN_UIUC_DiatomicPotential_Type
   use HN_UIUC_DiatomicPotential_Class              ,only:  HN_UIUC_DiatomicPotential_Type
   use CH_UIUC_DiatomicPotential_Class              ,only:  CH_UIUC_DiatomicPotential_Type
+  use OH_IIT_DiatomicPotential_Class               ,only:  OH_IIT_DiatomicPotential_Type
 
   type(Atom_Type) ,dimension(:)                 ,intent(in)     ::    Atoms
   integer         ,dimension(:)                 ,intent(in)     ::    iA
@@ -207,11 +208,18 @@ Subroutine Construct_DiatomicPotential( Atoms, iA, Input, DiatPot, i_Debug )
             call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
           case ('H2');  allocate( Null_DiatomicPotential_Type :: DiatPot )
             call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
-          case ('OH');  allocate( Null_DiatomicPotential_Type :: DiatPot )
-            call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
+
+          case ('OH','HO')
+            if( Input%Diatomic_Model(iMol) == 'IIT' ) then
+              allocate( OH_IIT_DiatomicPotential_Type :: DiatPot )
+            elseif (Input%Diatomic_Model(iMol) == 'NONE') then
+              allocate( Null_DiatomicPotential_Type :: DiatPot )
+            else
+              call Error( "Diatomic Potential Model for " // SpeciesName // " Molecule not implemented yet." )
+            end if
         
           case ('NULL');  allocate( Null_DiatomicPotential_Type :: DiatPot )
-            call Error( "Unrecognized Molcule." )
+            call Error( "Unrecognized Molecule." )
           
           case default; call Error( "Diatomic Potential Model not supported: Species Name = " // SpeciesName // '; Input%Diatomic_Model(iMol) = ' // Input%Diatomic_Model(iMol) )
           
@@ -285,6 +293,7 @@ Function GetSpeciesName( Atom1, Atom2 ) result(SpeciesName)
   Name = 'HN'; if ( (SpeciesName1==Name) .or. (SpeciesName2==Name) ) SpeciesName = trim(Name)
   Name = 'HO'; if ( (SpeciesName1==Name) .or. (SpeciesName2==Name) ) SpeciesName = trim(Name)
   Name = 'CH'; if ( (SpeciesName1==Name) .or. (SpeciesName2==Name) ) SpeciesName = trim(Name)
+  Name = 'OH'; if ( (SpeciesName1==Name) .or. (SpeciesName2==Name) ) SpeciesName = trim(Name)
 
 !   write(Logger%Unit,"(10x,'[GetSpeciesName]: SpeciesName = ',g0)") SpeciesName
 

@@ -10,4 +10,5 @@ add_sources (
   CH_Degeneracy_Class.F90
   HN_Degeneracy_Class.F90
   G2_Degeneracy_Class.F90
+  OH_Degeneracy_Class.F90
 )
