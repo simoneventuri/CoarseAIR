@@ -515,7 +515,7 @@ Subroutine ReadEnergyLevels( Input, Collision, iMol, i_Debug )
     
         levels_file  = Collision%MoleculesContainer(iMol)%Molecule%PathToMolFldr // '/Temp_' // trim(adjustl(iNode_char)) // '_' // trim(adjustl(iProc_char)) // '.inp'
         if (i_Debug_Loc) call Logger%Write( "Reading Levels from ", levels_file )
-        open( Unit=Unit_Levels, File=levels_file, status='OLD', iostat=Status)
+        open( NewUnit=Unit_Levels, File=levels_file, status='OLD', iostat=Status)
       
           ijqn = Input%ijqnMin
           do while ((Status == 0) .and. (ijqn <= ijqnMax))

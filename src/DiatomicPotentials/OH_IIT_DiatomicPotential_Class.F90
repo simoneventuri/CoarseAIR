@@ -84,7 +84,7 @@ Subroutine Initialize_OH_IIT_DiatomicPotential( This, Input, SpeciesName, iMol, 
   logical                                             ::    i_Debug_Loc
 
   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "Initialize_OH_Srivastava_DiatomicPotential" )
+  if (i_Debug_Loc) call Logger%Entering( "Initialize_OH_IIT_DiatomicPotential" )
   !i_Debug_Loc   =     Logger%On()
 
   allocate( This%Name        ,source = trim(Name_DiatPot) )
@@ -143,18 +143,6 @@ End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
 !________________________________________________________________________________________________________________________________!
 Pure Subroutine Ev2gm2( RAng, V)
-
-!**********************************************************************
-!
-! This subroutine evaulates the 2-body potential energy and gradient
-! for given r with two kinds of potentials:
-!
-! A polinomial based on MEG variables and a Lennard-Jones term
-! V(r) = 0 for r -> inifity
-! u=exp(-(r-red)/alpha-(r-red)^2/beta))
-! V(r)=-De*(cs1*u^1+cs2*u^2+cs3*u^3+cs4*u^4+cs5*u^5+cs6*u^6)
-!
-!**********************************************************************
 
   use Parameters_Module     ,only:  Zero, Two
 

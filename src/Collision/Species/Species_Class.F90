@@ -130,7 +130,7 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
     call Logger%Write( "This%RedMass      = ", This%RedMass , Fr="es15.8" )
     call Logger%Write( "This%To_Molecule  = ", This%To_Molecule   )
     call Logger%Write( "This%To_Atoms     = ", This%To_Atoms      )
-    call Logger%Write( "This%BSortMethod  = ", This%BSortMethod   )
+    if( size(This%To_Atoms) > 1 ) call Logger%Write( "This%BSortMethod  = ", This%BSortMethod   )
     do iA = 1,This%NAtoms
     associate( Ato => This%Atoms(iA) )
       call Logger%Write( "-> Ato%Idx = ", Ato%Idx, "Ato%Name = ", Ato%Name, "Ato%Mass = ", Ato%Mass, F2="i1", F4="a5", Fr=",s15.8" )

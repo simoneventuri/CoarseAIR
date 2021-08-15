@@ -830,7 +830,7 @@ Subroutine InitializeMolecules( This, Input, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "Molecule Nb", iMol )
 
     if (i_Debug_Loc) call Logger%Write( "Calling Molecule_Factory%Define_Molecule" )
-    call Molecule_Factory%Define_Molecule( Input, This%NPairs, This%Pairs, This%Atoms, iMol, This%MoleculesContainer(iMol)%Molecule, i_Debug=i_Debug_Loc )
+    if( Input%Molecule_NAtoms(iMol) > 1 ) call Molecule_Factory%Define_Molecule( Input, This%NPairs, This%Pairs, This%Atoms, iMol, This%MoleculesContainer(iMol)%Molecule, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "Done with Molecule_Factory%Define_Molecule" )
 
   end do
