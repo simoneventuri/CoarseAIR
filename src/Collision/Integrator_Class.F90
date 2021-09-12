@@ -1333,8 +1333,8 @@ Subroutine PrintingEvo( This, Input, Collision, Traj, TrajTemp, Converged, i_Deb
   integer   ,dimension(3,4)                                 ::    iPToAtom        
   real(rkp) ,dimension(12)                                  ::    PaQ 
 
-  i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
-  if (i_Debug_Loc) call Logger%Entering( "PrintingEvo" )
+!   i_Debug_Loc = i_Debug_Global; if ( present(i_Debug) )i_Debug_Loc = i_Debug
+!   if (i_Debug_Loc) call Logger%Entering( "PrintingEvo" )
   ! i_Debug_Loc   =     Logger%On()
   
   iPToAtom(1,:) = [1,2,3,4]
@@ -1478,7 +1478,7 @@ Subroutine PrintingEvo( This, Input, Collision, Traj, TrajTemp, Converged, i_Deb
     end if
   end do
   
-  if (i_Debug_Loc) call Logger%Exiting
+!   if (i_Debug_Loc) call Logger%Exiting
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!

@@ -23,20 +23,18 @@
 ! reported on "Ab initio potential energy curves for the ground and low-lying excited states of OH and OH- and
 ! a study of rotational fine structure in photodetachment" by Srivastava, S. and Sathyamurthy, N. in the
 ! Journal of Physical Chemistry A 118, 2014. The potential did not have an analytical form but was fitted
-! to the following expression with fixed equilibrium distance and dissociation energy reported in NIST:
+! to the following expression with fixed equilibrium distance and dissociation energy from the same potential:
 ! V(r) = De*( 1 - exp( -f*(r-re) ) )ˆ2
 ! f    = a + b*rd + c*rdˆ2 + d*rdˆ3 + e*rdˆ4 + f*rdˆ5 + g*rdˆ6
 ! rd   = (rˆ4 - reˆ4)/(rˆ4 + reˆ4)
-! with re = 0.96966 Angstrom and
-! De = 4.63 eV from Arnold, J.O.; Whiting, E.E.; Sharbaugh, L.F., J. Chem. Phys., 1976, 64, 3251
 ! The coefficient values obtained from the fit are:
-! a =  1.294987373533374
-! b = -0.12116470501146599
-! c = -0.7814954684504813
-! d =  0.4582199547136645
-! e =  2.2001736402873724
-! f = -0.36592711896172825
-! g = -1.4691984743053073
+! a =  2.50755885
+! b =  0.07026272
+! c = -1.39166672
+! d = -0.35695668
+! e =  3.26688265
+! f =  0.53026922
+! g = -1.70954376
 ! Module implemented by João Vargas (joao.francisco.vargas@gmail.com)
 !===============================================================================================================
 
@@ -61,8 +59,8 @@ Module OH_IIT_DiatomicPotential_Class
   character(*)  ,parameter  ::    Name_DiatPot    = 'IIT'
   logical       ,parameter  ::    i_Debug_Global = .False.
 
-  real(rkp) ,dimension(0:6)                 ,parameter      ::    cs   = [  1.294987373533374_rkp, -0.12116470501146599_rkp, -0.7814954684504813_rkp, 0.4582199547136645_rkp, 2.2001736402873724_rkp, -0.36592711896172825_rkp, -1.4691984743053073_rkp ]
-  real(rkp)                                 ,parameter      ::    de   = 4.63_rkp
+  real(rkp) ,dimension(0:6)                 ,parameter      ::    cs   = [ 2.50755885_rkp, 0.07026272_rkp, -1.39166672_rkp, -0.35695668_rkp, 3.26688265_rkp, 0.53026922_rkp, -1.70954376_rkp ]
+  real(rkp)                                 ,parameter      ::    de   = 0.16687664_rkp
   real(rkp)                                 ,parameter      ::    red  = 0.96966_rkp
   real(rkp)                                 ,parameter      ::    red4 = red**(4.0_rkp)
   real(rkp)                                 ,parameter      ::    VRef = Zero
@@ -115,7 +113,7 @@ Elemental Function DiatomicPotential_OH( This, R ) result( V )
 
   call Ev2gm2(RAng, VDiat)
 
-  V = VDiat * eV_To_Hartree + VRef
+  V = VDiat + VRef
 
 End Function
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -136,8 +134,8 @@ Elemental Subroutine Compute_Vd_dVd_OH( This, R, V, dV )
 
   call Ev2gm2_Grad(RAng, VDiat, dVDiat)
 
-  V  =  VDiat * eV_To_Hartree + VRef
-  dV = dVDiat * eV_To_Hartree * B_To_Ang
+  V  =  VDiat + VRef
+  dV = dVDiat * B_To_Ang
 
 End Subroutine
 !--------------------------------------------------------------------------------------------------------------------------------!
@@ -157,7 +155,7 @@ Pure Subroutine Ev2gm2( RAng, V)
   RAng4   = RAng3*RAng;
   TempSum = (RAng4 + red4);
   y       = (RAng4 - red4) / TempSum;
-  y2      = y**2;
+  y2      = y*y;
   y3      = y2*y;
   y4      = y2*y2;
   y5      = y3*y2;
@@ -190,7 +188,7 @@ Pure Subroutine Ev2gm2_Grad( RAng, V, dV)
   RAng4   = RAng3*RAng;
   TempSum = (RAng4 + red4);
   y       = (RAng4 - red4) / TempSum;
-  y2      = y**2;
+  y2      = y*y;
   y3      = y2*y;
   y4      = y2*y2;
   y5      = y3*y2;

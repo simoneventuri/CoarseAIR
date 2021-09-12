@@ -101,7 +101,10 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
 
   if (This%NAtoms == 2) then
     do iMol = 1,Input%NMolecules
-      if ( trim(adjustl(Input%Molecules_Name(iMol))) == trim(adjustl(This%Name)) ) This%To_Molecule = iMol
+      if ( trim(adjustl(Input%Molecules_Name(iMol))) == trim(adjustl(This%Name)) ) then
+        This%To_Molecule = iMol
+        exit
+      end if
     end do
     allocate( This%BSortMethod, source = trim(adjustl(Input%BSortMethod(This%To_Molecule))) )
   end if

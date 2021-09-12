@@ -27,4 +27,5 @@ add_sources (
   NN_PES_Class.F90
   BNN_PES_Class.F90
   GP_PES_Class.F90
+  HO3_NNM_PES_Class.F90
 )

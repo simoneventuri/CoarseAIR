@@ -435,7 +435,7 @@ End Function
 
 
 !________________________________________________________________________________________________________________________________!
-Pure Function LEPS_Potential_From_R_OnlyTriat( This, R, Q ) result( V )
+Function LEPS_Potential_From_R_OnlyTriat( This, R, Q ) result( V )
    
   class(LEPS_PES_Type)                          ,intent(in)  ::    This
   real(rkp) ,dimension(:)          CONTIGUOUS   ,intent(in)  ::    R           !< Distances of atom-atom pairs [bohr]. Dim=(NPairs)
@@ -467,6 +467,10 @@ Pure Function LEPS_Potential_From_R_OnlyTriat( This, R, Q ) result( V )
   !  call computing_LEPS_Vtheta(This%De, This%Alpha, This%re, R(:) * B_To_Ang, This%A0, This%A2, This%A4, VTheta)    
   !  VTheta = VTheta * Kcm_To_Hartree
   !end if
+
+  write(*,*) EB
+  write(*,*) EA
+  write(*,*) A
 
   call ComputeTriatomic( A, dAdR, VTriat, dVTriat )
   VTriat = VTriat * Kcm_To_Hartree
