@@ -19,4 +19,5 @@ add_sources (
   CH_UIUC_DiatomicPotential_Class.F90
   CN_UIUC_DiatomicPotential_Class.F90
   HN_UIUC_DiatomicPotential_Class.F90
+  OH_IIT_DiatomicPotential_Class.F90
 )

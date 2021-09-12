@@ -116,6 +116,7 @@ Program MergeLevels
 
 
   do iMol = 1,Input%NMolecules
+    if ( size(Collision%MoleculesContainer(iMol)%Molecule%To_Atoms) == 1 ) cycle
     if (i_Debug_ML) call Logger%Write( "Checking whether to run iMol ", iMol, ", ", Collision%MoleculesContainer(iMol)%Molecule%Name )
 
     if (iMol == Input%ComputeLevels(iMol)) then 

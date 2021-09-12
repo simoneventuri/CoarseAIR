@@ -90,7 +90,9 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
 
   integer   ,parameter                                                   ::    NBisect   =   40                 ! number of bisection steps to perform
   integer   ,parameter                                                   ::    NNewton   =   80                 ! number of newton-raphson steps to perform
-  
+
+  real(rkp)                                                              ::    test       ! real test variable, to delete
+
   i_Debug_Loc      = i_Debug_Global; if ( present(i_Debug)      ) i_Debug_Loc      = i_Debug
   i_Debug_Loc_Deep = .False.;        if ( present(i_Debug_Deep) ) i_Debug_Loc_Deep = i_Debug_Deep
   if (i_Debug_Loc) call Logger%Entering( "ComputeEnergyLevels")
@@ -145,7 +147,11 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
       ! ! ==============================================================================================================
       ! !   COMPUTING DIATOMIC POTENTIAL MINIMAX POINTS
       ! ! ============================================================================================================== 
-      Vc_R2 = xmui2 * ( ijqn + Half )**2  
+      if( Input%HalfIntjqn ) then
+        Vc_R2 = xmui2 * ( (real(ijqn)+Half) + Half )**2
+      else
+        Vc_R2 = xmui2 * ( real(ijqn) + Half )**2
+      end if
       call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%FindMinimum( [Input%xExtremes(1), Input%xExtremes(2) / Two], Vc_R2, Input%EEpsilon, State%rmin, State%Vmin, ierr)
 
       call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%FindMaximum( [State%rmin, Input%xExtremes(2)], Vc_R2, Input%EEpsilon, State%rmax, State%Vmax, ierr )
@@ -208,8 +214,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
         call Numerov(NGridLocal, Input%BoundayConditions, xmui, DeltaGridLocal, EDiat, EMin, y, yLastMin, NNodesMin)    
         Err(iE)        = yLastMin
         NChngsSign(iE) = int(NNodesMin)  
-        !write(*,*) EMin + State%Vmin, NNodesMin, yLastMin
-
+!         write(*,*) EMin + State%Vmin, NNodesMin, yLastMin
 
         iE        = iE + 1
         EMax      = EMin
@@ -227,7 +232,7 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
           call Numerov(NGridLocal, Input%BoundayConditions, xmui, DeltaGridLocal, EDiat, EMax, y, yLastMax, NNodesMax)    
           Err(iE)        = yLastMax
           NChngsSign(iE) = int(NNodesMax)    
-          !write(*,*) EMax + State%Vmin, NNodesMax, yLastMax
+!           write(*,*) EMax, NNodesMax, yLastMax
         end do
         !pause
 
@@ -261,7 +266,6 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
         EintOld = (Ep + Em) / Two
         ! ! ============================================================================================================== 
 
-        
         if (((NNodes == NNodesMin) .or. (NNodes == NNodesMax)) .and. (EintOld + State%Vmin <= State%Vmax)) then
           vNotEmpty     = .true.
           State%eint    = EintOld + State%Vmin
@@ -272,18 +276,18 @@ Subroutine ComputeEnergyLevels(Input, Collision, iMol, i_Debug, i_Debug_Deep)
 
           ! ! ==============================================================================================================
           ! !   COMPUTING TURNING POINTS
-          ! ! ============================================================================================================== 
+          ! ! ==============================================================================================================
           call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%TurningPoint( [1.e-1_rkp, State%rmin], Vc_R2, State%eint, State%ri, ierr, NBisection=NBisect, NNewton=NNewton )
-          ! ! ============================================================================================================== 
-                  
-          
+          ! ! ==============================================================================================================
+
+
           ! ! ==============================================================================================================
           ! !   COMPUTING TAU
           ! ! ============================================================================================================== 
           call Collision%MoleculesContainer(iMol)%Molecule%DiatPot%Period( State%Eint, Vc_R2, .True., State%rMin, State%VMin, State%rMax, State%VMax, State%ri, State%ro, State%Tau, i_Debug_Loc_Deep )
           ! ! ============================================================================================================== 
           
-          
+
           ! ! ==============================================================================================================
           ! !   COMPUTING RESONANCE WIDTH
           ! ! ============================================================================================================== 
@@ -515,7 +519,7 @@ Subroutine ReadEnergyLevels( Input, Collision, iMol, i_Debug )
     
         levels_file  = Collision%MoleculesContainer(iMol)%Molecule%PathToMolFldr // '/Temp_' // trim(adjustl(iNode_char)) // '_' // trim(adjustl(iProc_char)) // '.inp'
         if (i_Debug_Loc) call Logger%Write( "Reading Levels from ", levels_file )
-        open( Unit=Unit_Levels, File=levels_file, status='OLD', iostat=Status)
+        open( NewUnit=Unit_Levels, File=levels_file, status='OLD', iostat=Status)
       
           ijqn = Input%ijqnMin
           do while ((Status == 0) .and. (ijqn <= ijqnMax))
@@ -582,7 +586,7 @@ Pure Subroutine Numerov(NGrid, psi, xmui, DeltaGrid, EDiat, E, y, yLast, NNodes)
   integer                                                                ::    iBC
 
   NNodes           = 0
-  g                = Two / xmui * (EDiat - E) 
+  g                = ( Two / xmui ) * (EDiat - E)
   iBC              = 1
 
   do ix = 1,NGrid
@@ -594,7 +598,7 @@ Pure Subroutine Numerov(NGrid, psi, xmui, DeltaGrid, EDiat, E, y, yLast, NNodes)
       
     else 
 
-      y(ix) = (DeltaGrid**2 / 12.e0_rkp * ( Ten*y(ix-1)*g(ix-1) + y(ix-2)*g(ix-2) ) + Two*y(ix-1) - y(ix-2) ) / ( One - DeltaGrid**2 * g(ix) / 12.e0_rkp )
+      y(ix) = ( (DeltaGrid**2 / 12.e0_rkp) * ( Ten*y(ix-1)*g(ix-1) + y(ix-2)*g(ix-2) ) + Two*y(ix-1) - y(ix-2) ) / ( One - DeltaGrid**2 * g(ix) / 12.e0_rkp )
       
       if ( (y(ix)*y(ix-1) <= Zero) .and. (y(ix-1) /= 0) ) then
         NNodes = NNodes + 1

@@ -358,7 +358,6 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   !   !==============================================================================================================
   ! end if
   
-
   ! ==============================================================================================================
   !   3. INITIALING PAIRS
   ! ==============================================================================================================  
@@ -366,7 +365,6 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
   call This%InitializeAtomsPairsSpecies( Input, i_Debug=i_Debug_Loc )
   if (i_Debug_Loc) call Logger%Write( "Done with This%InitializeAtomsPairsSpecies" )
   ! ==============================================================================================================
-
 
   ! ==============================================================================================================
   !   4. SETTING THE PES (POTENTIAL ENERGY SURFACE) OBJECT (Allocating the abstract PES to the system PES)
@@ -496,7 +494,6 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     if (i_Debug_Loc) call Logger%Write( "This%NormalKineticEnergy = ", This%NormalKineticEnergy )
   ! ==============================================================================================================
 
-
   if ( (TaskType_Loc == 1) .or. (TaskType_Loc == 2) .or. (TaskType_Loc == 3) .or. (TaskType_Loc > 5) ) then   !!! <----- If NOT RUNNING TRAJECTORIES or COMPUTING STATISTICS
     ! ==============================================================================================================
     !   7. INITIALING MOLECULES (WITH LEVELS AND BINS)
@@ -504,7 +501,6 @@ Subroutine InitializeCollision( This, Input, i_Debug, i_Debug_Deep )
     call This%InitializeMolecules( Input, i_Debug=i_Debug_Loc )
     ! ==============================================================================================================
   end if
-
 
   if (TaskType_Loc == 4) then   !!! <----- ONLY if RUNNING TRAJECTORIES
 
@@ -830,7 +826,7 @@ Subroutine InitializeMolecules( This, Input, i_Debug )
     if (i_Debug_Loc) call Logger%Write( "Molecule Nb", iMol )
 
     if (i_Debug_Loc) call Logger%Write( "Calling Molecule_Factory%Define_Molecule" )
-    call Molecule_Factory%Define_Molecule( Input, This%NPairs, This%Pairs, This%Atoms, iMol, This%MoleculesContainer(iMol)%Molecule, i_Debug=i_Debug_Loc )
+    if( Input%Molecule_NAtoms(iMol) > 1 ) call Molecule_Factory%Define_Molecule( Input, This%NPairs, This%Pairs, This%Atoms, iMol, This%MoleculesContainer(iMol)%Molecule, i_Debug=i_Debug_Loc )
     if (i_Debug_Loc) call Logger%Write( "Done with Molecule_Factory%Define_Molecule" )
 
   end do

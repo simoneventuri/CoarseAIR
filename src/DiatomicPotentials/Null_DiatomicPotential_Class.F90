@@ -22,7 +22,7 @@
 
 Module Null_DiatomicPotential_Class
 
-  use Parameters_Module         ,only:  rkp, Half, One
+  use Parameters_Module         ,only:  rkp, Zero, Half, One
   use Logger_Class              ,only:  Logger
   use DiatomicPotential_Class   ,only:  DiatomicPotential_Type
 
@@ -68,7 +68,11 @@ Subroutine Initialize_Null_DiatomicPotential( This, Input, SpeciesName, iMol, Ma
   This%iMol         =    iMol
   This%Initialized  =   .True.
 
-  This%RedMass = Mass1 * Mass2 / (Mass1 + Mass2)
+  if( Mass2 == Zero ) then
+    This%RedMass = One
+  else
+    This%RedMass = Mass1 * Mass2 / (Mass1 + Mass2)
+  end if
   This%xmui    = One  / This%RedMass            ! Computing the inverse of the target reduced mass [1/a.u.]
   This%xmui2   = Half * This%xmui
   

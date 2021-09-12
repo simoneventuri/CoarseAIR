@@ -768,6 +768,7 @@ Subroutine Compute_Coordinates_Velocities( Masses, r, dr, Omega, q, qdot, iTraj,
   if (i_Debug_Loc) then
     write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: NTrajOverall = ',i10)") NTrajOverall
     write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: iProc        = ',i10)") iProc
+    write(Logger%Unit,"(12x,'[Compute_Coordinates_Velocities]: Masses       = ',2f11.4)") Masses
   end if
 
   ma  =   Masses(1)

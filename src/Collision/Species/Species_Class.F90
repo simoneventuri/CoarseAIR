@@ -101,7 +101,10 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
 
   if (This%NAtoms == 2) then
     do iMol = 1,Input%NMolecules
-      if ( trim(adjustl(Input%Molecules_Name(iMol))) == trim(adjustl(This%Name)) ) This%To_Molecule = iMol
+      if ( trim(adjustl(Input%Molecules_Name(iMol))) == trim(adjustl(This%Name)) ) then
+        This%To_Molecule = iMol
+        exit
+      end if
     end do
     allocate( This%BSortMethod, source = trim(adjustl(Input%BSortMethod(This%To_Molecule))) )
   end if
@@ -130,7 +133,7 @@ Subroutine InitializeSpecies( This, Input, iSpecies, iAtoms, Name, Atoms, i_Debu
     call Logger%Write( "This%RedMass      = ", This%RedMass , Fr="es15.8" )
     call Logger%Write( "This%To_Molecule  = ", This%To_Molecule   )
     call Logger%Write( "This%To_Atoms     = ", This%To_Atoms      )
-    call Logger%Write( "This%BSortMethod  = ", This%BSortMethod   )
+    if( size(This%To_Atoms) > 1 ) call Logger%Write( "This%BSortMethod  = ", This%BSortMethod   )
     do iA = 1,This%NAtoms
     associate( Ato => This%Atoms(iA) )
       call Logger%Write( "-> Ato%Idx = ", Ato%Idx, "Ato%Name = ", Ato%Name, "Ato%Mass = ", Ato%Mass, F2="i1", F4="a5", Fr=",s15.8" )

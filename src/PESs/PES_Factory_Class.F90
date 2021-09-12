@@ -68,6 +68,7 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
   use NN_PES_Class              ,only:    NN_PES_Type
   use GP_PES_Class              ,only:    GP_PES_Type
   use BNN_PES_Class             ,only:    BNN_PES_Type
+  use HO3_NNM_PES_Class         ,only:    HO3_NNM_PES_Type
 
   type(Input_Type)                          ,intent(in)     ::    Input
   type(Atom_Type) ,dimension(:)             ,intent(in)     ::    Atoms
@@ -314,9 +315,17 @@ Subroutine Construct_PES( Input, Atoms, iPES, PES, i_Debug )
             call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
         end select
 
+      case('HO3')
+        select case (adjustl(trim(Input%PES_Model(iPES))))
+          case ('NNM')
+            if (i_Debug_Loc) call Logger%Write( "Constructing a HO3_NNM_Pes_Type object")
+            allocate( HO3_NNM_PES_Type :: PES )
+          case default
+            call Error( "PES Model not supported: Input%PES_Model(1) = " // Input%PES_Model(1) )
+      end select
+
       case default
         call Error( "PES not supported: Input%System = " // Input%System )
-    
     end select
   end if
   

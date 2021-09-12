@@ -104,6 +104,7 @@ Module Input_Class
     logical                                   ::    PrintLevelsFlg = .false.
     logical                                   ::    SortLevelsFlg  = .true.
     logical                                   ::    WriteWF        = .false.
+    logical                                   ::    HalfIntjqn     = .false.
 
 ! CUT INPUTS
 ! =================
@@ -1991,6 +1992,13 @@ Subroutine GenerateLevels( This, i_Debug)
               This%WriteWF = .True.
             end if
             if (i_Debug_Loc) call Logger%Write( "Write Wave Function?:      This%WriteWF  = ",  This%WriteWF )
+
+          case("Half Integer Quantum Nbs?")
+            line_input = line_input(i_eq+2:150)
+            if ((adjustl(trim(line_input)) == 'YES') .OR. (adjustl(trim(line_input)) == 'yes' )) then
+              This%HalfIntjqn = .True.
+            end if
+            if (i_Debug_Loc) call Logger%Write( "Half Integer Quantum Nbs?:      This%HalfIntjqn  = ", This%HalfIntjqn )
 
         end select
         
