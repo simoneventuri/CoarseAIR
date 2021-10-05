@@ -12,4 +12,4 @@
 
 - S Venturi, MP Sharma, B Lopez, M Panesi - Data-Inspired and Physics-Driven Model Reduction for Dissociation: Application to the O2+O System - The Journal of Physical Chemistry A 124 (41), 8359-8372 (2020)
 
-S Venturi - Machine Learning and Uncertainty Quantification Framework for Predictive Ab Initio Hypersonics - Ph.D. Thesis, University of Illinois at Urbana-Champaign (2021)
+- S Venturi - Machine Learning and Uncertainty Quantification Framework for Predictive Ab Initio Hypersonics - Ph.D. Thesis, University of Illinois at Urbana-Champaign (2021)
